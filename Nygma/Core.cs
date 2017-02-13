@@ -44,7 +44,7 @@ namespace Nygma
             else
                 config = await ConfigHandler.CreateNewAsync();
 
-
+            //Figure it out later
             //_client.UserJoined += EventsHandler.UserJoinedAsync;
             //_client.UserLeft += EventsHandler.UserLeftAsync;
             _client.UserJoined += async (user) =>
