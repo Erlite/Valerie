@@ -9,4 +9,4 @@ assembly_info:
 nuget:
   project_feed: true
 build:
-  verbosity: maximum
+  verbosity: detailed
