@@ -30,6 +30,16 @@ namespace Nygma.Modules
             await ReplyAsync(string.Empty, embed: meEmbed);
         }
 
+        [Command("Embed")]
+        public async Task EmbedAsync([Remainder] string msg)
+        {
+            await Context.Message.DeleteAsync();
+            var embed = new EmbedBuilder()
+                .WithColor(Misc.RandColor())
+                .WithDescription($"{Format.Italics(msg)}");
+            await ReplyAsync("", embed: embed);
+        }
+
         [Command("Logs")]
         public async Task LogAsync()
         {

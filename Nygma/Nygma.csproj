@@ -244,6 +244,7 @@
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\ChecksHandler.cs" />
     <Compile Include="Handlers\EventsHandler.cs" />
+    <Compile Include="Handlers\GuildHandler\GuildConfig.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\ExtraModule.cs" />
     <Compile Include="Modules\GenModule.cs" />
@@ -259,6 +260,7 @@
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\ConfigHandler.cs" />
     <Compile Include="Services\EvalService.cs" />
+    <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\GoogleService.cs" />
     <Compile Include="Services\ReminderService.cs" />
     <Compile Include="Utils\EmbedAsync.cs" />
@@ -284,9 +286,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Addons\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />

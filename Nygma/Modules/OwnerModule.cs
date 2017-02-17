@@ -92,5 +92,31 @@ namespace Nygma.Modules
             Environment.Exit(0);
         }
 
+        [Command("GuildList")]
+        public async Task GuildListAsync()
+        {
+            var cl = Context.Client as DiscordSocketClient;
+            StringBuilder sb = new StringBuilder();
+            foreach (SocketGuild guild in cl.Guilds)
+            {
+                sb.AppendLine($"**Guild Name: **{guild.Name}\n**Guild ID: ** {guild.Id}\n**Guild Owner: **{guild.Owner} || {guild.OwnerId}\n");
+            }
+            EmbedBuilder builder = new EmbedBuilder()
+                .WithTitle("Server List")
+                .WithDescription(sb.ToString())
+                .WithColor(Misc.RandColor())
+                .WithThumbnailUrl("https://s-media-cache-ak0.pinimg.com/originals/08/b4/a4/08b4a47c5dfb3f7c33557ad822bb89c3.jpg");
+
+            await ReplyAsync("", embed: builder);
+
+        }
+
+        [Command("GInvite"), Summary("Makes an invite to the specified guild"), Remarks("GI 123456")]
+        public async Task GetInviteAsync([Summary("Target guild")]ulong guild)
+        {
+            var channel = await Context.Client.GetChannelAsync((await Context.Client.GetGuildAsync(guild)).DefaultChannelId);
+            var invite = await (channel as SocketGuildChannel).CreateInviteAsync();
+            await ReplyAsync(invite.Url);
+        }
     }
 }

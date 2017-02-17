@@ -16,6 +16,7 @@ namespace Nygma.Handlers
         public string BotName { get; set; }
         public string Perms { get; set; }
         public string Game { get; set; }
+        public bool MsgLog { get; set; }
         public bool Welcome { get; set; }
         public string WelcomeMsg { get; set; }
         public string GAPI { get; set; }
@@ -72,6 +73,14 @@ namespace Nygma.Handlers
             result.Perms = Console.ReadLine();
             IConsole.Log(LogSeverity.Info, "Config", "Enter Game: ");
             result.Game = Console.ReadLine();
+            IConsole.Log(LogSeverity.Info, "Config", "Enable Message Logs? ");
+            char enabled = Console.ReadLine().ToLower()[0];
+            switch (enabled)
+            {
+                case 'y': result.MsgLog = true; break;
+                case 'n': result.MsgLog = false; break;
+                default: result.MsgLog = false; break;
+            }
             IConsole.Log(LogSeverity.Info, "Config", "Enable Welcome Message? ");
             char input = Console.ReadLine().ToLower()[0];
             IConsole.Log(LogSeverity.Info, "Config", "Enter Welcome Message: ");
