@@ -262,6 +262,7 @@
     <Compile Include="Services\EvalService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\GoogleService.cs" />
+    <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\ReminderService.cs" />
     <Compile Include="Utils\EmbedAsync.cs" />
     <Compile Include="Utils\IConsole.cs" />

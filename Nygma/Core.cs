@@ -17,7 +17,7 @@ namespace Nygma
         private CommandHandler _handler;
         private DependencyMap _map;
         private ConfigHandler config;
-        private EventService Eve;
+        //private LogService log;
 
         public Core(ConfigHandler con)
         {
@@ -40,74 +40,71 @@ namespace Nygma
 
             if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config")))
                 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Config"));
+            //if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Logs")))
+            //    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+
+            //if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Messages.json")))
+            //    log = await LogService.UseCurrentAsync();
+            //else
+            //    log = await LogService.CreateNewAsync();
 
             if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
                 config = await ConfigHandler.UseCurrentAsync();
             else
                 config = await ConfigHandler.CreateNewAsync();
 
-            //Figure it out later
-            //_client.UserJoined += EventsHandler.UserJoinedAsync;
-            //_client.UserLeft += EventsHandler.UserLeftAsync;
 
-            _client.UserJoined += Eve.UserJoinedAsync;
-            _client.UserLeft += Eve.UserLeftAsync;
-            _client.MessageReceived += Eve.GetMsgAsync;
+            _client.UserJoined += async (user) =>
+            {
+                if (config.Welcome == true)
+                {
+                    var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
+                    var embed = new EmbedBuilder();
+                    embed.Title = "User Joined Event";
+                    embed.Description = $"**Username: **{user.Mention}\n**Guild Name: **{user.Guild.Name}\n{config.WelcomeMsg}";
+                    embed.Color = Misc.RandColor();
+                    await ch.SendMessageAsync("", embed: embed);
+                }
+                else
+                {
+                    var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
+                    var embed = new EmbedBuilder();
+                    embed.Title = "User Joined Event";
+                    embed.Description = $"**Username: **{user.Username}\n**Guild Name: **{user.Guild.Name}";
+                    embed.Color = Misc.RandColor();
+                    await ch.SendMessageAsync("", embed: embed);
+                }
+            };
 
-            //_client.UserJoined += async (user) =>
-            //{
-            //    if (_client.GetGuild(config.LogGuild).Id == config.LogGuild)
-            //    {
-            //        if (config.Welcome == true)
-            //        {
-            //            var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
-            //            var embed = new EmbedBuilder();
-            //            embed.Title = "User Joined Event";
-            //            embed.Description = $"**Username: **{user.Mention}\n**Guild Name: **{user.Guild.Name}\n{config.WelcomeMsg}";
-            //            embed.Color = Misc.RandColor();
-            //            await ch.SendMessageAsync("", embed: embed);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
-            //        var embed = new EmbedBuilder();
-            //        embed.Title = "User Joined Event";
-            //        embed.Description = $"**Username: **{user.Username}\n**Guild Name: **{user.Guild.Name}";
-            //        embed.Color = Misc.RandColor();
-            //        await ch.SendMessageAsync("", embed: embed);
-            //    }
-            //};
+            _client.UserLeft += async (user) =>
+            {
+                var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
+                var embed = new EmbedBuilder();
+                embed.Title = "User Left Event";
+                embed.Description = $"**Username: **{user.Username}\n**Guild Name: **{user.Guild.Name}";
+                embed.Color = Misc.RandColor();
+                await ch.SendMessageAsync("", embed: embed);
+            };
 
-            //_client.UserLeft += async (user) =>
-            //{
-            //    var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
-            //    var embed = new EmbedBuilder();
-            //    embed.Title = "User Left Event";
-            //    embed.Description = $"**Username: **{user.Username}\n**Guild Name: **{user.Guild.Name}";
-            //    embed.Color = Misc.RandColor();
-            //    await ch.SendMessageAsync("", embed: embed);
-            //};
-
-            //_client.MessageReceived += async (message) =>
-            //{
-            //    if (config.MsgLog == true)
-            //    {
-            //        IConsole.Log(LogSeverity.Info, "MESSAGE", "[" + message.Timestamp.UtcDateTime.ToString("dd/MM/yyyy HH:mm:ss") + "]" + message.Author.Username + ": " + message.Content);
-            //        var chx = message.Channel as SocketGuildChannel as ITextChannel;
-            //        if (message.Author.Id != _client.CurrentUser.Id)
-            //        {
-            //            var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
-            //            var embed = new EmbedBuilder();
-            //            embed.Title = "Message Received Event";
-            //            embed.Description = $"**Guild Name: **{chx.Guild.Name}\n**Channel Name: **{message.Channel.Name}\n**Username: **{message.Author.Username} || **IsBot?** {message.Author.IsBot}\n**Message ID: **{message.Id}\n**Message Content: **{message.Content}\n**Attachments **{message.Attachments.Count}";
-            //            embed.Color = Misc.RandColor();
-            //            await ch.SendMessageAsync("", embed: embed);
-            //        }
-            //        else
-            //            IConsole.Log(LogSeverity.Info, "Application Message", "Ignoring this message");
-            //    }
-            //};
+            _client.MessageReceived += async (message) =>
+            {
+                if (config.MsgLog == true)
+                {
+                    IConsole.Log(LogSeverity.Info, "MESSAGE", "[" + message.Timestamp.UtcDateTime.ToString("dd/MM/yyyy HH:mm:ss") + "]" + message.Author.Username + ": " + message.Content);
+                    var chx = message.Channel as SocketGuildChannel as ITextChannel;
+                    if (message.Author.Id != _client.CurrentUser.Id)
+                    {
+                        var ch = _client.GetGuild(config.LogGuild).GetChannel(config.LogChannel) as ITextChannel;
+                        var embed = new EmbedBuilder();
+                        embed.Title = "Message Received Event";
+                        embed.Description = $"**Guild Name: **{chx.Guild.Name}\n**Channel Name: **{message.Channel.Name}\n**Username: **{message.Author.Username} || **IsBot?** {message.Author.IsBot}\n**Message ID: **{message.Id}\n**Message Content: **{message.Content}\n**Attachments **{message.Attachments.Count}";
+                        embed.Color = Misc.RandColor();
+                        await ch.SendMessageAsync("", embed: embed);
+                    }
+                    else
+                        IConsole.Log(LogSeverity.Info, "Application Message", "Ignoring this message");
+                }
+            };
 
 
             _map = new DependencyMap();
