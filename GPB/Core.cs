@@ -19,13 +19,15 @@ namespace GPB
         private DependencyMap map;
 
         public async Task StartAsync()
-        {
+        {            
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true
             });
+
+            ConsoleService.TitleCard("Oreos", DiscordConfig.Version);
             client.Log += (l) => Task.Run(() => ConsoleService.Log(l.Severity, l.Source, l.Exception?.ToString() ?? l.Message));
 
             #region Config

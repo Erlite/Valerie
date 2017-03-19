@@ -68,7 +68,7 @@ namespace GPB.Modules
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
-        [Command("Game"), RequireContext(ContextType.Guild)]
+        [Command("Status"), RequireContext(ContextType.Guild)]
         public async Task StatusAsync([Remainder] string value)
         {
             var newStatus = Enum.Parse(typeof(UserStatus), value);
