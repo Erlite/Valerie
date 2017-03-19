@@ -42,3 +42,47 @@ D:\Projects\GPB\GPB\bin\Debug\System.Interactive.Async.xml
 D:\Projects\GPB\GPB\obj\Debug\GPB.csprojResolveAssemblyReference.cache
 D:\Projects\GPB\GPB\obj\Debug\GPB.exe
 D:\Projects\GPB\GPB\obj\Debug\GPB.pdb
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\GPB.exe.config
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\GPB.exe
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\GPB.pdb
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Addons.InteractiveCommands.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Commands.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Core.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Rest.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Rpc.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.WebSocket.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Microsoft.Win32.Primitives.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Newtonsoft.Json.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.AppContext.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Collections.Immutable.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Console.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Diagnostics.DiagnosticSource.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Globalization.Calendars.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Interactive.Async.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.IO.Compression.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.IO.Compression.ZipFile.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.IO.FileSystem.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.IO.FileSystem.Primitives.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Net.Http.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Net.NameResolution.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Net.Sockets.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Net.WebSockets.Client.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Net.WebSockets.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Runtime.Serialization.Primitives.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Security.Cryptography.Algorithms.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Security.Cryptography.Encoding.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Security.Cryptography.Primitives.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Security.Cryptography.X509Certificates.dll
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Commands.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Core.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Rest.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.Rpc.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Discord.Net.WebSocket.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\Newtonsoft.Json.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Collections.Immutable.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+F:\Github projects\DiscordExampleBot\GPB\bin\Debug\System.Interactive.Async.xml
+F:\Github projects\DiscordExampleBot\GPB\obj\Debug\GPB.csprojResolveAssemblyReference.cache
+F:\Github projects\DiscordExampleBot\GPB\obj\Debug\GPB.exe
+F:\Github projects\DiscordExampleBot\GPB\obj\Debug\GPB.pdb
