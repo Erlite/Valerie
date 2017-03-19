@@ -78,17 +78,6 @@ namespace GPB.Handlers
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, CommandContext context)
         {
-            ulong ExeptionChannel = log.ServerLogChannelId;
-            if (ExeptionChannel != 0)
-            {
-                var Exembed = new EmbedBuilder();
-                Exembed.Color = new Color(150, 16, 25);
-                var exchannel = client.GetChannel(ExeptionChannel) as ITextChannel;
-                Exembed.Title = string.Format("Command {0} Errored in **{1}**  **{2}**", res.Commands.FirstOrDefault().Command.Name, context.Guild.Name, context.Channel.Name);
-                Exembed.Description = string.Format("**User:** {0}\n**Stacktrace:**\n{1}", context.User, result.Exception.StackTrace);
-                await exchannel.SendMessageAsync("", false, Exembed);
-            }
-
             var embed = new EmbedBuilder();
             embed.Color = new Color(150, 16, 25);
             embed.Title = "Error executing command";
@@ -99,13 +88,6 @@ namespace GPB.Handlers
                 x.IsInline = false;
                 x.Name = "Error Reason";
                 x.Value = result.ErrorReason;
-            });
-            embed.WithFooter(x =>
-            {
-                if (ExeptionChannel != 0)
-                    x.Text = "Posted the error in Bot logs!";
-                else
-                    x.Text = "Report this to Bot Owner!";
             });
             await context.Channel.SendMessageAsync("", false, embed);
         }
