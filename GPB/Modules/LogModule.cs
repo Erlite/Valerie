@@ -34,13 +34,17 @@ namespace GPB.Modules
         [Summary("Returns which actions are currently logged in the server log channel")]
         public async Task ListLogActions()
         {
-            var response = new StringBuilder("**CURRENTLY LOGGED ACTIONS:**\n");
-            response.AppendLine($"User joins: {_log.JoinsLogged}");
-            response.AppendLine($"User leaves: {_log.LeavesLogged}");
-            response.AppendLine($"Username changes: {_log.NameChangesLogged}");
-            response.AppendLine($"Nickname changes: {_log.NickChangesLogged}");
-            response.AppendLine($"User Ban Logs: {_log.UserBannedLogged}");
-            await ReplyAsync(response.ToString());
+            var embed = new EmbedBuilder();
+            embed.WithAuthor(x => { x.Name = "LOGGED ACTIONS"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); });
+            embed.AddField(x => { x.Name = "Server Log"; x.IsInline = true; x.Value = _log.ServerLogChannelId; });
+            embed.AddField(x => { x.Name = "Mod Log"; x.IsInline = true; x.Value = _log.ModLogChannelId; });
+            embed.AddField(x => { x.Name = "User Joins"; x.IsInline = true; x.Value = _log.JoinsLogged; });
+            embed.AddField(x => { x.Name = "User Leaves"; x.IsInline = true; x.Value = _log.LeavesLogged; });
+            embed.AddField(x => { x.Name = "Username Changes"; x.IsInline = true; x.Value = _log.NameChangesLogged; });
+            embed.AddField(x => { x.Name = "Nickname Changes"; x.IsInline = true; x.Value = _log.NickChangesLogged; });
+            embed.AddField(x => { x.Name = "User Bans"; x.IsInline = true; x.Value = _log.UserBannedLogged; });
+            embed.Color = new Color(66, 244, 232);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Joins")]
