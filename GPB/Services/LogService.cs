@@ -19,6 +19,7 @@ namespace GPB.Services
         public bool NameChangesLogged { get; private set; }
         public bool NickChangesLogged { get; private set; }
         public bool UserBannedLogged { get; private set; }
+        public bool ClientLatency { get; private set; }
 
 
         #region Server Log Command Methods
@@ -82,9 +83,20 @@ namespace GPB.Services
             UserBannedLogged = false;
         }
 
+        public void EnableSmartConnection()
+        {
+            _client.LatencyUpdated += _client_LatencyUpdated;
+            ClientLatency = true;
+        }
 
+        public void DisableSmartConnection()
+        {
+            _client.LatencyUpdated -= _client_LatencyUpdated;
+            ClientLatency = false;
+        }
         #endregion
 
+        #region Config Stuff
         public async Task LogServerMessageAsync(string message)
         {
             if (ServerLogChannelId == 0) return;
@@ -144,6 +156,8 @@ namespace GPB.Services
             }
         }
 
+#endregion
+
         #region Server Log Event Handlers
 
         private async Task _client_UserJoined(SocketGuildUser u)
@@ -191,6 +205,17 @@ namespace GPB.Services
         private async Task _client_UserBanned(SocketUser user, SocketGuild gld)
         {
             await LogServerMessageAsync($"{user.Username + user.Discriminator} was banned from from {gld.Name}");
+        }
+
+        private async Task _client_LatencyUpdated(int older, int newer)
+        {
+            if (_client == null) return;
+            var newStatus = (_client.ConnectionState == ConnectionState.Disconnected || newer > 500) ? UserStatus.DoNotDisturb
+                    : (_client.ConnectionState == ConnectionState.Connecting || newer > 250)
+                        ? UserStatus.Idle
+                        : UserStatus.Online;
+
+            await _client.SetStatusAsync(newStatus);
         }
         #endregion
 

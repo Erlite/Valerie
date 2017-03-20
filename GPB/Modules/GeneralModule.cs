@@ -5,6 +5,8 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Discord.WebSocket;
+using System.Diagnostics;
 
 namespace GPB.Modules
 {
@@ -121,6 +123,19 @@ namespace GPB.Modules
 
         [Command("Ping")]
         public async Task PingAsync()
-        { }
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var client = Context.Client as DiscordSocketClient;
+            var Gateway = client.Latency;
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+            var embed = new EmbedBuilder()
+                .WithTitle("Ping Results")
+                .WithDescription($"**Gateway Latency:** {Gateway}ms \n**Client Latency:** {ts.TotalMilliseconds}ms")
+                .WithColor(new Color(244, 66, 125));
+            await ReplyAsync("", embed: embed);
+
+        }
     }
 }

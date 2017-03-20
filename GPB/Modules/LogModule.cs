@@ -14,7 +14,7 @@ namespace GPB.Modules
 
         [Command("ModChannel")]
         [Summary("Set the mod log channel")]
-        public async Task SetModLogChannel([Summary("Channel to which to set the mod log")] ITextChannel channel)
+        public async Task SetModLogChannelAsync([Summary("Channel to which to set the mod log")] ITextChannel channel)
         {
             _log.ModLogChannelId = channel.Id;
             await _log.SaveConfigurationAsync();
@@ -23,7 +23,7 @@ namespace GPB.Modules
 
         [Command("ServerChannel")]
         [Summary("Set the server log channel")]
-        public async Task SetServerLogChannel([Summary("Channel to which to set the server log")] ITextChannel channel)
+        public async Task SetServerLogChannelAsync([Summary("Channel to which to set the server log")] ITextChannel channel)
         {
             _log.ServerLogChannelId = channel.Id;
             await _log.SaveConfigurationAsync();
@@ -32,7 +32,7 @@ namespace GPB.Modules
 
         [Command("Actions")]
         [Summary("Returns which actions are currently logged in the server log channel")]
-        public async Task ListLogActions()
+        public async Task ListLogActionsAsync()
         {
             var embed = new EmbedBuilder();
             embed.WithAuthor(x => { x.Name = "LOGGED ACTIONS"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); });
@@ -49,7 +49,7 @@ namespace GPB.Modules
 
         [Command("Joins")]
         [Summary("Toggle logging users joining")]
-        public async Task LogJoins()
+        public async Task LogJoinsAsync()
         {
             if (!_log.JoinsLogged)
             {
@@ -67,7 +67,7 @@ namespace GPB.Modules
 
         [Command("Leaves")]
         [Summary("Toggle logging users leaving")]
-        public async Task LogLeaves()
+        public async Task LogLeavesAsync()
         {
             if (!_log.LeavesLogged)
             {
@@ -85,7 +85,7 @@ namespace GPB.Modules
 
         [Command("NameChange")]
         [Summary("Toggle logging users changing usernames")]
-        public async Task LogNameChanges()
+        public async Task LogNameChangesAsync()
         {
             if (!_log.NameChangesLogged)
             {
@@ -103,7 +103,7 @@ namespace GPB.Modules
 
         [Command("NickChange")]
         [Summary("Toggle logging users changing nicknames")]
-        public async Task LogNickChanges()
+        public async Task LogNickChangesAsync()
         {
             if (!_log.NickChangesLogged)
             {
@@ -132,6 +132,22 @@ namespace GPB.Modules
             {
                 _log.DisableUserBannedLogging();
                 await ReplyAsync(":white_check_mark:  No longer logging bans.");
+            }
+            await _log.SaveConfigurationAsync();
+        }
+
+        [Command("Latency")]
+        public async Task LatencyAsync()
+        {
+            if (!_log.ClientLatency)
+            {
+                _log.EnableSmartConnection();
+                await ReplyAsync("I'm now using Smart latency monitoring");
+            }
+            else
+            {
+                _log.DisableSmartConnection();
+                await ReplyAsync("Smart Connection monitoring disabled!");
             }
             await _log.SaveConfigurationAsync();
         }

@@ -11,6 +11,7 @@ namespace GPB.Handlers
         public bool NameChangesLogged { get; set; }
         public bool NickChangesLogged { get; set; }
         public bool UserBannedLogged { get; set; }
+        public bool ClientLatench { get; set; }
 
         public LogHandler()
         {
@@ -26,6 +27,7 @@ namespace GPB.Handlers
             NameChangesLogged = s.NameChangesLogged;
             NickChangesLogged = s.NickChangesLogged;
             UserBannedLogged = s.UserBannedLogged;
+            ClientLatench = s.ClientLatency;
         }
     }
 }
