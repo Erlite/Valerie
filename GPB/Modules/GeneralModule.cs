@@ -11,7 +11,7 @@ namespace GPB.Modules
     public class GeneralModule : ModuleBase
     {
         [Command("GuildInfo"), Summary("GI"), Remarks("Displays information about a guild")]
-        public async Task GuildInfo()
+        public async Task GuildInfoAsync()
         {
             var embed = new EmbedBuilder();
             var gld = Context.Guild;
@@ -36,7 +36,7 @@ namespace GPB.Modules
         }
 
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
-        public async Task gifs([Remainder] string keywords)
+        public async Task GifsAsync([Remainder] string keywords)
         {
             if (string.IsNullOrWhiteSpace(keywords))
                 throw new ArgumentException("What do you want me to search for?");
@@ -64,7 +64,7 @@ namespace GPB.Modules
         }
 
         [Command("Urban")]
-        public async Task Urban([Remainder] string urban = null)
+        public async Task UrbanAsync([Remainder] string urban = null)
         {
             if (string.IsNullOrWhiteSpace(urban))
                 throw new NullReferenceException("Please provide a search term");
@@ -118,5 +118,9 @@ namespace GPB.Modules
 
             await ReplyAsync("", embed: embed);
         }
+
+        [Command("Ping")]
+        public async Task PingAsync()
+        { }
     }
 }
