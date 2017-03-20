@@ -64,7 +64,7 @@ namespace GPB.Handlers
 
         public static Task<IReadOnlyCollection<GiftsHandler>> GetAll()
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Configs", "users");
+            var path = Path.Combine(AppContext.BaseDirectory, "Config", "users");
             var files = Directory.GetFiles(path, "*.json").ToList();
             var configs = new List<GiftsHandler>();
             files.ForEach(x => configs.Add(Load<GiftsHandler>(File.ReadAllText(x))));

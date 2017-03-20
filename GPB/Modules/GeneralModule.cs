@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Discord.WebSocket;
 using System.Diagnostics;
-using GPB.Services;
+using GPB.Attributes;
 using GPB.Handlers;
 using System.Linq;
 
@@ -157,7 +157,7 @@ namespace GPB.Modules
         }
 
         [Command("Gift")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [Cooldown(60)]
         public async Task Gift(IGuildUser user, double points)
         {
             if (points <= 0)
