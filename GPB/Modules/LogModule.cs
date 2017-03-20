@@ -35,15 +35,13 @@ namespace GPB.Modules
         public async Task ListLogActionsAsync()
         {
             var embed = new EmbedBuilder();
-            embed.WithAuthor(x => { x.Name = "LOGGED ACTIONS"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); });
-            embed.AddField(x => { x.Name = "Server Log"; x.IsInline = true; x.Value = _log.ServerLogChannelId; });
-            embed.AddField(x => { x.Name = "Mod Log"; x.IsInline = true; x.Value = _log.ModLogChannelId; });
-            embed.AddField(x => { x.Name = "User Joins"; x.IsInline = true; x.Value = _log.JoinsLogged; });
-            embed.AddField(x => { x.Name = "User Leaves"; x.IsInline = true; x.Value = _log.LeavesLogged; });
-            embed.AddField(x => { x.Name = "Username Changes"; x.IsInline = true; x.Value = _log.NameChangesLogged; });
-            embed.AddField(x => { x.Name = "Nickname Changes"; x.IsInline = true; x.Value = _log.NickChangesLogged; });
-            embed.AddField(x => { x.Name = "User Bans"; x.IsInline = true; x.Value = _log.UserBannedLogged; });
+            embed.WithTitle("Current Log Actions");
+            embed.WithDescription($"**Server Log Channel:** {_log.ServerLogChannelId}\n**Server Mod Channel:** {_log.ModLogChannelId}\n"+
+                $"**User Join Logging:** {_log.JoinsLogged}\n**User Leave Logging:** {_log.LeavesLogged}\n"+
+                $"**Username Change Logging:** {_log.NameChangesLogged}\n **Nickname Change Logging:** {_log.NickChangesLogged}\n"+
+                $"**User Ban Logging:** {_log.UserBannedLogged}\n**Latency Monitoring:** {_log.ClientLatency}");
             embed.Color = new Color(66, 244, 232);
+            embed.WithFooter(x => { x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); x.Text = "These actions will reset upon restart."; });
             await ReplyAsync("", embed: embed);
         }
 

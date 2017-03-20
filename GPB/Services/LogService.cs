@@ -210,8 +210,8 @@ namespace GPB.Services
         private async Task _client_LatencyUpdated(int older, int newer)
         {
             if (_client == null) return;
-            var newStatus = (_client.ConnectionState == ConnectionState.Disconnected || newer > 500) ? UserStatus.DoNotDisturb
-                    : (_client.ConnectionState == ConnectionState.Connecting || newer > 250)
+            var newStatus = (_client.ConnectionState == ConnectionState.Disconnected || newer > 100) ? UserStatus.DoNotDisturb
+                    : (_client.ConnectionState == ConnectionState.Connecting || newer > 60)
                         ? UserStatus.Idle
                         : UserStatus.Online;
 
