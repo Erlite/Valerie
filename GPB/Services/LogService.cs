@@ -176,19 +176,23 @@ namespace GPB.Services
 
         private async Task _client_UserJoined(SocketGuildUser u)
         {
-            var embed = new EmbedBuilder();
-            embed.Title = "=== User Joined ===";
-            embed.Description = $"**Username: **{u.Username}#{u.Discriminator}\n{Config.WelcomeMessage}";
-            embed.Color = new Color(83, 219, 207);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            if (u.Guild.Id != 226838224952098820) return;
+            else
+            {
+                var embed = new EmbedBuilder();
+                embed.Title = "=== User Joined ===";
+                embed.Description = $"**Username: **{u.Username}#{u.Discriminator}\n{Config.WelcomeMessage}";
+                embed.Color = new Color(83, 219, 207);
+                var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
+                await LogServer.SendMessageAsync("", embed: embed);
+            }
         }
 
         private async Task _client_UserLeft(SocketGuildUser u)
         {
             var embed = new EmbedBuilder();
             embed.Title = "=== User Left ===";
-            embed.Description = $"{u.Username}#{u.Discriminator} has left the server! :wave";
+            embed.Description = $"{u.Username}#{u.Discriminator} has left the server! :wave:";
             embed.Color = new Color(223, 229, 48);
             var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
             await LogServer.SendMessageAsync("", embed: embed);
