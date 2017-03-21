@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Discord;
 using Discord.WebSocket;
 using GPB.Handlers;
+using System.Collections.Generic;
 
 namespace GPB.Services
 {
@@ -20,6 +21,7 @@ namespace GPB.Services
         public bool NickChangesLogged { get; private set; }
         public bool UserBannedLogged { get; private set; }
         public bool ClientLatency { get; private set; }
+        public bool MessageRecieve { get; private set; }
 
 
         #region Server Log Command Methods
@@ -93,6 +95,18 @@ namespace GPB.Services
         {
             _client.LatencyUpdated -= _client_LatencyUpdated;
             ClientLatency = false;
+        }
+
+        public void EnableMessageRecieve()
+        {
+            _client.MessageReceived += _client_MessageReceived;
+            MessageRecieve = true;
+        }
+
+        public void DisableMessageRecieve()
+        {
+            _client.MessageReceived -= _client_MessageReceived;
+            MessageRecieve = false;
         }
         #endregion
 
@@ -216,6 +230,19 @@ namespace GPB.Services
                         : UserStatus.Online;
 
             await _client.SetStatusAsync(newStatus);
+        }
+
+        private async Task _client_MessageReceived(SocketMessage msg)
+        {
+            Dictionary<string, string> Message = new Dictionary<string, string>()
+        {
+                {"halp", "DO YOU NED MA HALP????!11!!!!" },
+                {"but why", "http://i3.kym-cdn.com/photos/images/newsfeed/000/613/025/b64.jpg" }
+        };
+            foreach(var item in Message)
+            {
+                if (msg.Content.Contains(item.Key)) { await msg.Channel.SendMessageAsync(item.Value); }                
+            }
         }
         #endregion
 

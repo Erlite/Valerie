@@ -132,12 +132,10 @@ namespace GPB.Modules
             var Gateway = client.Latency;
             var embed = new EmbedBuilder()
                 .WithTitle("Ping Results")
-                .WithDescription($"**Gateway Latency:** { Gateway}" +
+                .WithDescription($"**Gateway Latency:** { Gateway} ms" +
                             $"\n**Response Latency:** {sw.ElapsedMilliseconds} ms" +
                             $"\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms" )
                 .WithColor(new Color(244, 66, 125));
-            var reply = await ReplyAsync("", false, embed.Build());
-
             await ReplyAsync("", embed: embed);
 
         }
