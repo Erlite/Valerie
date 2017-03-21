@@ -240,10 +240,11 @@ namespace GPB.Services
                 {"but why", "http://i3.kym-cdn.com/photos/images/newsfeed/000/613/025/b64.jpg" },
                 {"lenny", "( ͡° ͜ʖ ͡°)" },
                 {"who is your daddy", "@ExceptionDev is my daddy!" },
-                {"invite","NOOOOOOOO! !!!!You can't invite me to your server!!!!" }
+                {"invite", "NOOOOOOOO!You can't invite me to your server!!!!"},
         };
             foreach(var item in Message)
             {
+                if (msg.Author.Id == _client.CurrentUser.Id) return;
                 if (msg.Content.Contains(item.Key))
                 {
                     await msg.Channel.SendMessageAsync(item.Value);
