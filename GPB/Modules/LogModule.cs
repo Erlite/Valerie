@@ -14,7 +14,7 @@ namespace GPB.Modules
 
         [Command("ModChannel")]
         [Summary("Set the mod log channel")]
-        public async Task SetModLogChannel([Summary("Channel to which to set the mod log")] ITextChannel channel)
+        public async Task SetModLogChannelAsync([Summary("Channel to which to set the mod log")] ITextChannel channel)
         {
             _log.ModLogChannelId = channel.Id;
             await _log.SaveConfigurationAsync();
@@ -23,7 +23,7 @@ namespace GPB.Modules
 
         [Command("ServerChannel")]
         [Summary("Set the server log channel")]
-        public async Task SetServerLogChannel([Summary("Channel to which to set the server log")] ITextChannel channel)
+        public async Task SetServerLogChannelAsync([Summary("Channel to which to set the server log")] ITextChannel channel)
         {
             _log.ServerLogChannelId = channel.Id;
             await _log.SaveConfigurationAsync();
@@ -32,24 +32,22 @@ namespace GPB.Modules
 
         [Command("Actions")]
         [Summary("Returns which actions are currently logged in the server log channel")]
-        public async Task ListLogActions()
+        public async Task ListLogActionsAsync()
         {
             var embed = new EmbedBuilder();
-            embed.WithAuthor(x => { x.Name = "LOGGED ACTIONS"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); });
-            embed.AddField(x => { x.Name = "Server Log"; x.IsInline = true; x.Value = _log.ServerLogChannelId; });
-            embed.AddField(x => { x.Name = "Mod Log"; x.IsInline = true; x.Value = _log.ModLogChannelId; });
-            embed.AddField(x => { x.Name = "User Joins"; x.IsInline = true; x.Value = _log.JoinsLogged; });
-            embed.AddField(x => { x.Name = "User Leaves"; x.IsInline = true; x.Value = _log.LeavesLogged; });
-            embed.AddField(x => { x.Name = "Username Changes"; x.IsInline = true; x.Value = _log.NameChangesLogged; });
-            embed.AddField(x => { x.Name = "Nickname Changes"; x.IsInline = true; x.Value = _log.NickChangesLogged; });
-            embed.AddField(x => { x.Name = "User Bans"; x.IsInline = true; x.Value = _log.UserBannedLogged; });
+            embed.WithTitle("Current Log Actions");
+            embed.WithDescription($"**Server Log Channel:** {_log.ServerLogChannelId}\n**Server Mod Channel:** {_log.ModLogChannelId}\n"+
+                $"**User Join Logging:** {_log.JoinsLogged}\n**User Leave Logging:** {_log.LeavesLogged}\n"+
+                $"**Username Change Logging:** {_log.NameChangesLogged}\n **Nickname Change Logging:** {_log.NickChangesLogged}\n"+
+                $"**User Ban Logging:** {_log.UserBannedLogged}\n**Latency Monitoring:** {_log.ClientLatency}\n**Auto Respond:** {_log.MessageRecieve}");
             embed.Color = new Color(66, 244, 232);
+            embed.WithFooter(x => { x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); x.Text = "These actions will reset upon restart."; });
             await ReplyAsync("", embed: embed);
         }
 
         [Command("Joins")]
         [Summary("Toggle logging users joining")]
-        public async Task LogJoins()
+        public async Task LogJoinsAsync()
         {
             if (!_log.JoinsLogged)
             {
@@ -67,7 +65,7 @@ namespace GPB.Modules
 
         [Command("Leaves")]
         [Summary("Toggle logging users leaving")]
-        public async Task LogLeaves()
+        public async Task LogLeavesAsync()
         {
             if (!_log.LeavesLogged)
             {
@@ -85,7 +83,7 @@ namespace GPB.Modules
 
         [Command("NameChange")]
         [Summary("Toggle logging users changing usernames")]
-        public async Task LogNameChanges()
+        public async Task LogNameChangesAsync()
         {
             if (!_log.NameChangesLogged)
             {
@@ -103,7 +101,7 @@ namespace GPB.Modules
 
         [Command("NickChange")]
         [Summary("Toggle logging users changing nicknames")]
-        public async Task LogNickChanges()
+        public async Task LogNickChangesAsync()
         {
             if (!_log.NickChangesLogged)
             {
@@ -132,6 +130,33 @@ namespace GPB.Modules
             {
                 _log.DisableUserBannedLogging();
                 await ReplyAsync(":white_check_mark:  No longer logging bans.");
+            }
+            await _log.SaveConfigurationAsync();
+        }
+
+        [Command("Latency")]
+        public async Task LatencyAsync()
+        {
+            if (!_log.ClientLatency)
+            {
+                _log.EnableSmartConnection();
+                await ReplyAsync("I'm now using Smart latency monitoring");
+            }
+            else
+            {
+                _log.DisableSmartConnection();
+                await ReplyAsync("Smart Connection monitoring disabled!");
+            }
+            await _log.SaveConfigurationAsync();
+        }
+
+        [Command("AutoRespond")]
+        public async Task AutoRespondAsync()
+        {
+            if (!_log.MessageRecieve) { _log.EnableMessageRecieve();
+                await ReplyAsync("I will now auto respond to certain messages");
+            }
+            else { _log.DisableMessageRecieve();await ReplyAsync("Auto respond have been disabled!");
             }
             await _log.SaveConfigurationAsync();
         }

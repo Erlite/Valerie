@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Discord;
 using Discord.WebSocket;
 using GPB.Handlers;
+using System.Collections.Generic;
 
 namespace GPB.Services
 {
@@ -19,6 +20,8 @@ namespace GPB.Services
         public bool NameChangesLogged { get; private set; }
         public bool NickChangesLogged { get; private set; }
         public bool UserBannedLogged { get; private set; }
+        public bool ClientLatency { get; private set; }
+        public bool MessageRecieve { get; private set; }
 
 
         #region Server Log Command Methods
@@ -82,9 +85,32 @@ namespace GPB.Services
             UserBannedLogged = false;
         }
 
+        public void EnableSmartConnection()
+        {
+            _client.LatencyUpdated += _client_LatencyUpdated;
+            ClientLatency = true;
+        }
 
+        public void DisableSmartConnection()
+        {
+            _client.LatencyUpdated -= _client_LatencyUpdated;
+            ClientLatency = false;
+        }
+
+        public void EnableMessageRecieve()
+        {
+            _client.MessageReceived += _client_MessageReceived;
+            MessageRecieve = true;
+        }
+
+        public void DisableMessageRecieve()
+        {
+            _client.MessageReceived -= _client_MessageReceived;
+            MessageRecieve = false;
+        }
         #endregion
 
+        #region Config Stuff
         public async Task LogServerMessageAsync(string message)
         {
             if (ServerLogChannelId == 0) return;
@@ -144,6 +170,8 @@ namespace GPB.Services
             }
         }
 
+#endregion
+
         #region Server Log Event Handlers
 
         private async Task _client_UserJoined(SocketGuildUser u)
@@ -191,6 +219,37 @@ namespace GPB.Services
         private async Task _client_UserBanned(SocketUser user, SocketGuild gld)
         {
             await LogServerMessageAsync($"{user.Username + user.Discriminator} was banned from from {gld.Name}");
+        }
+
+        private async Task _client_LatencyUpdated(int older, int newer)
+        {
+            if (_client == null) return;
+            var newStatus = (_client.ConnectionState == ConnectionState.Disconnected || newer > 100) ? UserStatus.DoNotDisturb
+                    : (_client.ConnectionState == ConnectionState.Connecting || newer > 60)
+                        ? UserStatus.Idle
+                        : UserStatus.Online;
+
+            await _client.SetStatusAsync(newStatus);
+        }
+
+        private async Task _client_MessageReceived(SocketMessage msg)
+        {
+            Dictionary<string, string> Message = new Dictionary<string, string>()
+        {
+                {"halp", "DO YOU NED MA HALP????!1!!!#!1 TYPE ?help" },
+                {"but why", "http://i3.kym-cdn.com/photos/images/newsfeed/000/613/025/b64.jpg" },
+                {"lenny", "( ͡° ͜ʖ ͡°)" },
+                {"who is your daddy", "@ExceptionDev is my daddy!" },
+                {"invite", "NOOOOOOOO!You can't invite me to your server!!!!"},
+        };
+            foreach(var item in Message)
+            {
+                if (msg.Author.Id == _client.CurrentUser.Id) return;
+                if (msg.Content.Contains(item.Key))
+                {
+                    await msg.Channel.SendMessageAsync(item.Value);
+                }
+            }
         }
         #endregion
 

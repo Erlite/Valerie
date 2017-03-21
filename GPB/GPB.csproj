@@ -136,10 +136,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\CooldownAttribute.cs" />
     <Compile Include="Core.cs" />
-    <Compile Include="Enums\BotEnum.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\ConfigHandler.cs" />
+    <Compile Include="Handlers\GiftsHandler.cs" />
     <Compile Include="Handlers\LogHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
+    <Compile Include="Services\GiftService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\MethodService.cs" />
   </ItemGroup>

@@ -5,13 +5,18 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Discord.WebSocket;
+using System.Diagnostics;
+using GPB.Attributes;
+using GPB.Handlers;
+using System.Linq;
 
 namespace GPB.Modules
 {
     public class GeneralModule : ModuleBase
     {
         [Command("GuildInfo"), Summary("GI"), Remarks("Displays information about a guild")]
-        public async Task GuildInfo()
+        public async Task GuildInfoAsync()
         {
             var embed = new EmbedBuilder();
             var gld = Context.Guild;
@@ -36,7 +41,7 @@ namespace GPB.Modules
         }
 
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
-        public async Task gifs([Remainder] string keywords)
+        public async Task GifsAsync([Remainder] string keywords)
         {
             if (string.IsNullOrWhiteSpace(keywords))
                 throw new ArgumentException("What do you want me to search for?");
@@ -64,7 +69,7 @@ namespace GPB.Modules
         }
 
         [Command("Urban")]
-        public async Task Urban([Remainder] string urban = null)
+        public async Task UrbanAsync([Remainder] string urban = null)
         {
             if (string.IsNullOrWhiteSpace(urban))
                 throw new NullReferenceException("Please provide a search term");
@@ -117,6 +122,65 @@ namespace GPB.Modules
             });
 
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Ping")]
+        public async Task PingAsync()
+        {
+            var sw = Stopwatch.StartNew();
+            var client = Context.Client as DiscordSocketClient;
+            var Gateway = client.Latency;
+            var embed = new EmbedBuilder()
+                .WithTitle("Ping Results")
+                .WithDescription($"**Gateway Latency:** { Gateway} ms" +
+                            $"\n**Response Latency:** {sw.ElapsedMilliseconds} ms" +
+                            $"\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms" )
+                .WithColor(new Color(244, 66, 125));
+            await ReplyAsync("", embed: embed);
+
+        }
+
+        [Command("Gift")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task Gift(double points)
+        {
+            var guild = Context.Guild;
+            var configs = await GiftsHandler.GetAll();
+            uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
+            foreach (var config in configs)
+            {
+                config.GivePoints(Context.Guild.Id, givePoints);
+            }
+            await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
+        }
+
+        [Command("Gift")]
+        [Cooldown(60)]
+        public async Task Gift(IGuildUser user, double points)
+        {
+            if (points <= 0)
+                await ReplyAsync("You must gibe some monei");
+            if (user == Context.User)
+                await ReplyAsync("Can't gift yourself nub");
+            else
+            {
+                var config = await new GiftsHandler(user.Id).Maintain<GiftsHandler>();
+                uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
+                config.GivePoints(user.Guild.Id, givePoints);
+                await ReplyAsync($"Gifted {givePoints} XP to {user.Username}");
+            }
+        }
+
+        [Command("Wealth")]
+        public async Task Wealth()
+        {
+            var configs = await GiftsHandler.GetAll();
+            var filtered = configs
+                .Where(x => x.XP.ContainsKey(Context.Guild.Id))
+                .OrderByDescending(x => x.XP[Context.Guild.Id])
+                .Take(11);
+            await ReplyAsync($"Showing top 10 wealthiest people\n\n" +
+                            string.Join("\n", filtered.Select(x => $"{Format.Bold(Context.Guild.GetUserAsync(x.UID).ToString() ?? "Not found")} with `{x.XP[Context.Guild.Id]}` XP")));
         }
     }
 }
