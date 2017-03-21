@@ -14,8 +14,7 @@ namespace GPB.Handlers
         public ulong UID { get; protected set; }
         public DateTime LastUpdate { get; protected set; } = DateTime.UtcNow;
 
-        public override string FileName =>
-            Path.Combine("Configs", "users", $"{UID}.json");
+        public override string FileName => Path.Combine("Config", "Users", $"{UID}.json");
 
         public Dictionary<ulong, uint> XP { get; set; } = new Dictionary<ulong, uint>();
 
