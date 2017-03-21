@@ -158,8 +158,7 @@ namespace GPB.Modules
         [Cooldown(60)]
         public async Task Gift(IGuildUser user, double points)
         {
-            if (points <= 0)
-                await ReplyAsync("You must gibe some monei");
+            if (user.Id == Context.Client.CurrentUser.Id) return;
             if (user == Context.User)
                 await ReplyAsync("Can't gift yourself nub");
             else
@@ -175,10 +174,7 @@ namespace GPB.Modules
         public async Task Wealth()
         {
             var configs = await GiftsHandler.GetAll();
-            var filtered = configs
-                .Where(x => x.XP.ContainsKey(Context.Guild.Id))
-                .OrderByDescending(x => x.XP[Context.Guild.Id])
-                .Take(11);
+            var filtered = configs.Where(x => x.XP.ContainsKey(Context.Guild.Id)).OrderByDescending(x => x.XP[Context.Guild.Id]).Take(11);
             await ReplyAsync($"Showing top 10 wealthiest people\n\n" +
                             string.Join("\n", filtered.Select(x => $"{Format.Bold(Context.Guild.GetUserAsync(x.UID).ToString() ?? "Not found")} with `{x.XP[Context.Guild.Id]}` XP")));
         }
