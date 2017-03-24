@@ -5,6 +5,7 @@ using Discord.Commands;
 using System.IO;
 using GPB.Services;
 using GPB.Handlers;
+using Discord.Addons.InteractiveCommands;
 
 namespace GPB
 {
@@ -56,6 +57,7 @@ namespace GPB
             map.Add(config);
             map.Add(log);
             map.Add(git);
+            map.Add(new InteractiveService(client));
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();
