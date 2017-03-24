@@ -5,6 +5,8 @@ using Discord.Commands;
 using System.IO;
 using GPB.Services;
 using GPB.Handlers;
+using Discord.Addons.InteractiveCommands;
+using GPB.Services.TagServices;
 
 namespace GPB
 {
@@ -56,6 +58,8 @@ namespace GPB
             map.Add(config);
             map.Add(log);
             map.Add(git);
+            map.Add(new InteractiveService(client));
+            await map.UsingTagService();
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();

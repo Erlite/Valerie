@@ -32,7 +32,7 @@ namespace GPB.Services
                 StringBuilder outStr = new StringBuilder();
                 foreach (Match match in matches)
                 {
-                    outStr.AppendLine($"{match.Value} - https://github.com/RogueException/Discord.Net/issues/{match.Value.Substring(2)}");
+                    outStr.AppendLine($"{match.Value} - https://github.com/ExceptionDev/DiscordExampleBot/pull/{match.Value.Substring(2)}");
                 }
                 await message.Channel.SendMessageAsync(outStr.ToString());
             }

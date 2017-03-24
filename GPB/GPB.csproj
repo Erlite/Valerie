@@ -35,6 +35,9 @@
     <ApplicationIcon>NLogo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Discord.Addons.EmojiTools, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Addons.EmojiTools.1.1.0-ci-00017\lib\netstandard1.1\Discord.Addons.EmojiTools.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Addons.InteractiveCommands, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Addons.InteractiveCommands.1.2.1\lib\netstandard1.3\Discord.Addons.InteractiveCommands.dll</HintPath>
     </Reference>
@@ -146,12 +149,16 @@
     <Compile Include="Modules\GeneralModule.cs" />
     <Compile Include="Modules\LogModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
+    <Compile Include="Modules\TagModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
     <Compile Include="Services\GiftService.cs" />
     <Compile Include="Services\GithubService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\MethodService.cs" />
+    <Compile Include="Services\TagServices\TagDb.cs" />
+    <Compile Include="Services\TagServices\TagService.cs" />
+    <Compile Include="Services\TagServices\TagServiceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
