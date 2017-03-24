@@ -18,7 +18,6 @@ namespace GPB
         private LogService log;
         private CommandHandler handler;
         private DependencyMap map;
-        private GithubService git;
 
 
         public async Task StartAsync()
@@ -56,7 +55,6 @@ namespace GPB
             map.Add(client);
             map.Add(config);
             map.Add(log);
-            map.Add(git);
             map.Add(new InteractiveService(client));
 
             handler = new CommandHandler(map);
