@@ -38,7 +38,10 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 - Once imported you shouldn't be running into errors. Shall you encounter any error after importing then the problem is on your end.
 
 ---
- 
+
+### Problems you might run into:
+- Response.json not found (Create one manually)
+--- 
  ### Functions of this bot:
  
 - [x] Uses Json for config, logs and points
