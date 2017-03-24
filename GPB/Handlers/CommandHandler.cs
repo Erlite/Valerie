@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using GPB.Services;
+using System.IO;
 
 namespace GPB.Handlers
 {
@@ -78,18 +79,42 @@ namespace GPB.Handlers
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, CommandContext context)
         {
+            string Dir = Directory.GetCurrentDirectory();
+            using (var stream = File.Create(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Exception.txt")))
+            {
+                using (var Account = new StreamWriter(stream))
+                {
+                    await Account.WriteAsync(result.Exception.StackTrace);
+                }
+            }
             var embed = new EmbedBuilder();
             embed.Color = new Color(150, 16, 25);
-            embed.Title = "Error executing command";
-            embed.Description = string.Format("User {0} failed to execute command **{1}**.", context.User, res.Commands.FirstOrDefault().Command.Name);
-            embed.ThumbnailUrl = context.User.GetAvatarUrl();
+            embed.Title = "Error Executing Command";
+            embed.Description = string.Format($"**Guild Name:** {context.Guild.Name}\n**Command Name:** {res.Commands.FirstOrDefault().Command.Name}");
+            embed.WithAuthor(x =>
+            {
+                x.Name = context.User.ToString();
+                x.IconUrl = context.User.GetAvatarUrl();
+            });
             embed.AddField(x =>
             {
                 x.IsInline = false;
                 x.Name = "Error Reason";
                 x.Value = result.ErrorReason;
             });
-            await context.Channel.SendMessageAsync("", false, embed);
+            embed.AddField(x =>
+            {
+                x.IsInline = false;
+                x.Name = "Target Site";
+                x.Value = result.Exception.TargetSite;
+            });
+            embed.AddField(x =>
+            {
+                x.IsInline = false;
+                x.Name = "Stacktrace";
+                x.Value = result.Exception.StackTrace.LimitLength(1980);
+            });
+            await context.Channel.SendMessageAsync("", embed:embed);
         }
 
         private async void BadArgCount(IResult result, SearchResult res, CommandContext context)
@@ -126,5 +151,6 @@ namespace GPB.Handlers
             embed.Description = result.ErrorReason.ToString();
             await context.Channel.SendMessageAsync("", false, embed);
         }
+
     }
 }
