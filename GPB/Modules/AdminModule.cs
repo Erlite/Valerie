@@ -65,7 +65,7 @@ namespace GPB.Modules
             await gld.AddBanAsync(user);
         }
 
-        [Command("ServerList")]
+        [Command("ServerList"), RequireOwner]
         public async Task ServerListAsync()
         {
             var cl = Context.Client as DiscordSocketClient;
@@ -90,7 +90,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Leave")]
+        [Command("Leave"), RequireOwner]
         public async Task Leave(ulong ID, [Remainder] string msg)
         {
             if (string.IsNullOrWhiteSpace(msg))

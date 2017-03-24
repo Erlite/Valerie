@@ -171,7 +171,7 @@ namespace GPB.Modules
             }
         }
 
-        [Command("Wealth")]
+        [Command("Top")]
         public async Task Wealth()
         {
             var configs = await GiftsHandler.GetAll();
