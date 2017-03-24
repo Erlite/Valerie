@@ -14,7 +14,7 @@ namespace GPB.Handlers
         public string Token { get; set; }
         public string Prefix { get; set; }
         public ulong OwnerID { get; set; }
-        public ulong MuteRID { get; set; }
+        public ulong MatchID { get; set; }
         public ulong ModLog { get; set; }
         public string WelcomeMessage { get; set; }
         public bool MentionPrefix { get; set; }
@@ -63,8 +63,8 @@ namespace GPB.Handlers
             result.Prefix = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Owner ID: ");
             result.OwnerID = ulong.Parse(Console.ReadLine());
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Mute Role ID: ");
-            result.MuteRID = ulong.Parse(Console.ReadLine());
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Match Role ID: ");
+            result.MatchID = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Mod Log Channel ID: ");
             result.ModLog = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Welcome Message: ");
