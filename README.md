@@ -26,6 +26,17 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
   - Discord.Net.Rest
   
   Rest of them should install automatically. Such as: Discord.Net.Commands, Discord.Net.WebSocket
+- If you had to create a new project then import the following:
+  - Attributes (Folder)
+  - Handlers (Folder)
+  - Modules (Folder)
+  - Services (Folder)
+  - Core.cs
+- If "paste" option is disabled make sure you are on core.cs file then right click on project name and paste.
+![Copy](http://vvcap.com/img/9KYJEq6C9qH.png)
+![Paste](http://vvcap.com/img/mAnGKIfu39O.png)
+- Once imported you shouldn't be running into errors. Shall you encounter any error after importing then the problem is on your end.
+
 ---
  
  ### Functions of this bot:
