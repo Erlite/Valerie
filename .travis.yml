@@ -1,19 +1,13 @@
 language: csharp
+dist: trusty
+sudo: required
 solution: GPB.sln
-git:
-  depth: 1
-branches:
-  only:
-  - master
-matrix:
-  include:
-  - os: linux
-    dist: trusty
-    sudo: required
-    mono: none
-    dotnet: 1.0.0-preview2-003131
-    env: DOTNETCORE=1
+mono: none
+#dotnet: 1.0.0-preview3-004056
+before_install:
+  - sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
+  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 417A0893
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq dotnet-dev-1.0.0-rc4-004771
 script:
-  - sudo apt-get install dotnet-dev-1.0.0-rc4-004771
-  - dotnet restore --configfile nuget.config
-  - dotnet build
+  - ./build.sh --quiet verify
