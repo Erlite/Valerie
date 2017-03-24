@@ -1,4 +1,34 @@
 # DiscordExampleBot
-This is a readme
-Read it carefully.
-You *may* have to create log.json manually. I'm not sure, will test it later.
+This is a readme. Read it carefully.
+
+---
+### What you need:
+
+- Visual Studio 2017
+- Discord.Net 1.0 (Latest version please)
+- Maybe Discord.Net.Providers.WS4Net =>
+```cs
+_client = new DiscordSocketClient(new DiscordSocketConfig { 
+    WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance
+ });
+ ```
+ - Latest .Net Framework (4.6 +)
+ 
+ **That's pretty much it.**
+ 
+ ---
+ 
+ ### Functions of this bot:
+ 
+- [x] Uses Json for config, logs and points
+- [x] Uses embeds
+- [x] Admin Commands (Kick, Ban, Serverlist (Requires Owner), Leave (Requires Owner), Delete
+- [x] Bot Commands [Group Name = Set & Requires Owner] (Username, Nickname, Avatar, Game, Status)
+- [x] General Commands (Guildinfo, Gif, Urban, Ping, Gift (Admin), Gift, Top, Roleinfo)
+- [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond)
+- [ ] Google Commands
+- [ ] Github Commands
+- [ ] Autorespond json
+- [x] Command Cooldown
+- [x] Beautiful Console
+- [ ] Bot's own website
