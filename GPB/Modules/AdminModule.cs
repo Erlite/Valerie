@@ -131,7 +131,7 @@ namespace GPB.Modules
         }
 
         [Command("Response")]
-        public async Task AddResponse(string name, [Remainder]string response)
+        public async Task AddResponse(string name = null, [Remainder]string response = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new NullReferenceException("Name can't be empty");
@@ -144,7 +144,8 @@ namespace GPB.Modules
                 File.WriteAllText(LogService.DictPath, JsonConvert.SerializeObject(resp, Formatting.Indented));
                 var embed = new EmbedBuilder()
                     .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}");
+                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
+                    .WithColor(new Color(109, 242, 122));
                 await ReplyAsync("", embed:embed);
             }
             else
