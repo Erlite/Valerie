@@ -14,9 +14,19 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
  ```
  - Latest .Net Framework (4.6 +)
  
- **That's pretty much it.**
- 
- ---
+ That's pretty much it.
+
+---
+### How to get started:
+- Clone this repo
+- Either open the project and let nuget restore the packages or Create a new Console Application targetting .Net Framework 4.6.1 and install the latest versions of the following: 
+  - Discord.Net (1.0)
+  - Discord.Addons.InteractiveCommands
+  - Discord.Net.Core
+  - Discord.Net.Rest
+  
+  Rest of them should install automatically. Such as: Discord.Net.Commands, Discord.Net.WebSocket
+---
  
  ### Functions of this bot:
  
