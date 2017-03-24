@@ -4,6 +4,8 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using GPB.Services;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace GPB.Modules
 {
@@ -126,6 +128,27 @@ namespace GPB.Modules
             embed.Description = $"I've deleted {range} amount of messages.";
             embed.Color = new Color(191, 30, 60);
             await Context.Channel.SendMessageAsync("", false, embed);
+        }
+
+        [Command("Response")]
+        public async Task AddResponse(string name, [Remainder]string response)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new NullReferenceException("Name can't be empty");
+            if (string.IsNullOrWhiteSpace(response))
+                throw new NullReferenceException("Response can't be empty");
+            var resp = LogService.GetResponses();
+            if (!(resp.ContainsKey(name)))
+            {
+                resp.Add(name, response.ToString());
+                File.WriteAllText(LogService.DictPath, JsonConvert.SerializeObject(resp, Formatting.Indented));
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
+                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}");
+                await ReplyAsync("", embed:embed);
+            }
+            else
+                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
         }
     }
 }
