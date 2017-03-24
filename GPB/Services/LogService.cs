@@ -288,21 +288,7 @@ namespace GPB.Services
 
         private async Task _client_ReactionAdded(Cacheable<IUserMessage, ulong> MessageParam, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (reaction.Emoji.Name.Equals("Star")) { }
-            var star = reaction.Emoji.Id.Value.Equals("");
-            var message = MessageParam.GetOrDownloadAsync();
-            if (message == null)
-            {
-                ConsoleService.Log(LogSeverity.Warning, "Reaction", $"Dumped Message {reaction.MessageId}");
-                return;
-            }
-            if (!reaction.User.IsSpecified)
-            {
-                ConsoleService.Log(LogSeverity.Warning, "Reaction", $"Dumped Message {message.Id}");
-                return;
-            }
-            var embed = new EmbedBuilder();
-
+            // Need to figure this out
         }
 
 
