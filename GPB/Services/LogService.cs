@@ -5,6 +5,7 @@ using Discord;
 using Discord.WebSocket;
 using GPB.Handlers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GPB.Services
 {
@@ -12,6 +13,7 @@ namespace GPB.Services
     {
         private DiscordSocketClient _client;
         private ConfigHandler Config;
+        public const string DictPath = "./Config/Response.json";
 
         public ulong ServerLogChannelId { get; set; }
         public ulong ModLogChannelId { get; set; }
@@ -22,6 +24,7 @@ namespace GPB.Services
         public bool UserBannedLogged { get; private set; }
         public bool ClientLatency { get; private set; }
         public bool MessageRecieve { get; private set; }
+        public bool Starboard { get; private set; }
 
 
         #region Server Log Command Methods
@@ -108,6 +111,19 @@ namespace GPB.Services
             _client.MessageReceived -= _client_MessageReceived;
             MessageRecieve = false;
         }
+
+        public void EnableStarboard()
+        {
+            _client.ReactionAdded += _client_ReactionAdded;
+            Starboard = true;
+        }
+
+        public void DisableStarboard()
+        {
+            _client.ReactionAdded -= _client_ReactionAdded;
+            Starboard = false;
+        }
+
         #endregion
 
         #region Config Stuff
@@ -164,7 +180,12 @@ namespace GPB.Services
                     if (NickChangesLogged) EnableNickChangeLogging();
                     UserBannedLogged = config.UserBannedLogged;
                     if (UserBannedLogged) EnableUserBannedLogging();
-
+                    ClientLatency = config.ClientLatency;
+                    if (ClientLatency) EnableSmartConnection();
+                    MessageRecieve = config.MessageRecieve;
+                    if (MessageRecieve) EnableMessageRecieve();
+                    Starboard = config.Starboard;
+                    if (Starboard) EnableStarboard();
                     return true;
                 }
             }
@@ -190,12 +211,16 @@ namespace GPB.Services
 
         private async Task _client_UserLeft(SocketGuildUser u)
         {
-            var embed = new EmbedBuilder();
-            embed.Title = "=== User Left ===";
-            embed.Description = $"{u.Username}#{u.Discriminator} has left the server! :wave:";
-            embed.Color = new Color(223, 229, 48);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            if (u.Guild.Id != 226838224952098820) return;
+            else
+            {
+                var embed = new EmbedBuilder();
+                embed.Title = "=== User Left ===";
+                embed.Description = $"{u.Username}#{u.Discriminator} has left the server! :wave:";
+                embed.Color = new Color(223, 229, 48);
+                var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
+                await LogServer.SendMessageAsync("", embed: embed);
+            }
         }
 
         private async Task _client_UserUpdated_NameChange(SocketUser author, SocketUser a)
@@ -238,29 +263,46 @@ namespace GPB.Services
 
         private async Task _client_MessageReceived(SocketMessage msg)
         {
-            Dictionary<string, string> Message = new Dictionary<string, string>()
-        {
-                {"halp", "DO YOU NED MA HALP????!1!!!#!1 TYPE ?help" },
-                {"but why", "http://i3.kym-cdn.com/photos/images/newsfeed/000/613/025/b64.jpg" },
-                {"lenny", "( ͡° ͜ʖ ͡°)" },
-                {"who is your daddy", "@ExceptionDev is my daddy!" },
-                {"invite", "NOOOOOOOO!You can't invite me to your server!!!!"},
-        };
-            foreach(var item in Message)
+            var response = GetResponses();
+            foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
             {
+                var guild = _client.GetGuild(Config.DefaultGuild);
+                var Role = guild.GetRole(Config.MatchID);
+                var user = guild.GetUser(msg.Author.Id);
+
                 if (msg.Author.Id == _client.CurrentUser.Id) return;
                 if (msg.Content.Contains(item.Key))
                 {
                     await msg.Channel.SendMessageAsync(item.Value);
                 }
+                else if (msg.Content.Contains("!Match"))
+                {
+                    await user.AddRoleAsync(Role);
+                }
+                else if (msg.Content.Contains("!Done"))
+                {
+                    await user.RemoveRoleAsync(Role);
+                }
             }
         }
+
+        private async Task _client_ReactionAdded(Cacheable<IUserMessage, ulong> MessageParam, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            // Need to figure this out
+        }
+
+
         #endregion
 
         public LogService(DiscordSocketClient c, ConfigHandler config)
         {
             _client = c;
             Config = config;
+        }
+
+        public static Dictionary<string, string> GetResponses()
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
         }
     }
 }

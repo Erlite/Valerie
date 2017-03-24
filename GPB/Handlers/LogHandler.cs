@@ -13,6 +13,7 @@ namespace GPB.Handlers
         public bool UserBannedLogged { get; set; }
         public bool ClientLatency { get; set; }
         public bool MessageRecieve { get; set; }
+        public bool Starboard { get; set; }
 
         public LogHandler()
         {
@@ -30,6 +31,7 @@ namespace GPB.Handlers
             UserBannedLogged = s.UserBannedLogged;
             ClientLatency = s.ClientLatency;
             MessageRecieve = s.MessageRecieve;
+            Starboard = s.Starboard;
         }
     }
 }

@@ -14,10 +14,11 @@ namespace GPB.Handlers
         public string Token { get; set; }
         public string Prefix { get; set; }
         public ulong OwnerID { get; set; }
-        public ulong MuteRID { get; set; }
-        public ulong ModLog { get; set; }
+        public ulong MatchID { get; set; }
+        public ulong DefaultGuild { get; set; }
         public string WelcomeMessage { get; set; }
         public bool MentionPrefix { get; set; }
+
 
         public bool MentionPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
@@ -63,10 +64,10 @@ namespace GPB.Handlers
             result.Prefix = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Owner ID: ");
             result.OwnerID = ulong.Parse(Console.ReadLine());
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Mute Role ID: ");
-            result.MuteRID = ulong.Parse(Console.ReadLine());
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Mod Log Channel ID: ");
-            result.ModLog = ulong.Parse(Console.ReadLine());
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Match Role ID: ");
+            result.MatchID = ulong.Parse(Console.ReadLine());
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Default Guild ID: ");
+            result.DefaultGuild = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Welcome Message: ");
             result.WelcomeMessage = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enable Bot mention? (Y/N) Blank = N: ");

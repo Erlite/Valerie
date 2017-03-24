@@ -9,7 +9,7 @@ using GPB.Services;
 
 namespace GPB.Modules
 {
-    [Group("Set")]
+    [Group("Set"), RequireOwner]
     public class BotModule : ModuleBase
     {
         [Command("Username"), RequireContext(ContextType.Guild)]
