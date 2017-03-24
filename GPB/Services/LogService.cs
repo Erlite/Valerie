@@ -5,6 +5,7 @@ using Discord;
 using Discord.WebSocket;
 using GPB.Handlers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GPB.Services
 {
@@ -12,6 +13,7 @@ namespace GPB.Services
     {
         private DiscordSocketClient _client;
         private ConfigHandler Config;
+        public const string DictPath = "./Config/Response.json";
 
         public ulong ServerLogChannelId { get; set; }
         public ulong ModLogChannelId { get; set; }
@@ -261,18 +263,10 @@ namespace GPB.Services
 
         private async Task _client_MessageReceived(SocketMessage msg)
         {
-            Dictionary<string, string> Message = new Dictionary<string, string>()
-        {
-                {"halp", "DO YOU NED MA HALP????!1!!!#!1 TYPE ?help" },
-                {"but why", "http://i3.kym-cdn.com/photos/images/newsfeed/000/613/025/b64.jpg" },
-                {"lenny", "( ͡° ͜ʖ ͡°)" },
-                {"who is your daddy", "@ExceptionDev is my daddy!" },
-                {"!Match", "I've added you to the waitlist! You will be removed after 5 minutes! Once done use **!Done** to get out of waitlist!"},
-                {"!Done","GREAT! Hopefully you had a wonderfull match! If not feel free to join again!" },
-        };
-            foreach(var item in Message)
+            var response = GetResponses();
+            foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
             {
-                var guild = _client.GetGuild(226838224952098820);
+                var guild = _client.GetGuild(Config.DefaultGuild);
                 var Role = guild.GetRole(Config.MatchID);
                 var user = guild.GetUser(msg.Author.Id);
 
@@ -318,6 +312,11 @@ namespace GPB.Services
         {
             _client = c;
             Config = config;
+        }
+
+        public static Dictionary<string, string> GetResponses()
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
         }
     }
 }
