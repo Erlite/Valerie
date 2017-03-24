@@ -32,3 +32,6 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 - [x] Command Cooldown
 - [x] Beautiful Console
 - [ ] Bot's own website
+- [ ] Interactive Command Module
+- [ ] Option to use emoji as Command prefix
+- [x] Easy to understand code? (I kinda accomplish that. Most of it is pretty straight forward)
