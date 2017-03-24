@@ -26,5 +26,11 @@ namespace GPB.Services
                 }
             }
         }
+
+        public static string LimitLength(this string str, int maxLengh)
+        {
+            if (str.Length <= maxLengh) return str;
+            return str.Substring(0, maxLengh);
+        }
     }
 }

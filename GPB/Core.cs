@@ -5,6 +5,7 @@ using Discord.Commands;
 using System.IO;
 using GPB.Services;
 using GPB.Handlers;
+using Discord.Addons.InteractiveCommands;
 
 namespace GPB
 {
@@ -17,11 +18,10 @@ namespace GPB
         private LogService log;
         private CommandHandler handler;
         private DependencyMap map;
-        private GithubService git;
 
 
         public async Task StartAsync()
-        {            
+        {
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Verbose,
@@ -55,7 +55,7 @@ namespace GPB
             map.Add(client);
             map.Add(config);
             map.Add(log);
-            map.Add(git);
+            map.Add(new InteractiveService(client));
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();

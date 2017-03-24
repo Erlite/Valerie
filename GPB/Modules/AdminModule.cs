@@ -6,6 +6,8 @@ using Discord.WebSocket;
 using GPB.Services;
 using System.IO;
 using Newtonsoft.Json;
+using Discord.Addons.InteractiveCommands;
+using Discord.Addons.EmojiTools;
 
 namespace GPB.Modules
 {
@@ -13,39 +15,42 @@ namespace GPB.Modules
     public class AdminModule : ModuleBase
     {
         private LogService log;
+        private InteractiveService inter;
 
-        public AdminModule(LogService Logger)
+        public AdminModule(LogService Logger, InteractiveService inte)
         {
             log = Logger;
+            inter = inte;
         }
+        #region Legacy Commands
+        //[Command("Kick")]
+        //public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = null)
+        //{
+        //    if (user == null)
+        //        throw new ArgumentException("You must mention a user!");
+        //    if (string.IsNullOrWhiteSpace(reason))
+        //        throw new ArgumentException("You must provide a reason");
 
-        [Command("Kick")]
-        public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = null)
-        {
-            if (user == null)
-                throw new ArgumentException("You must mention a user!");
-            if (string.IsNullOrWhiteSpace(reason))
-                throw new ArgumentException("You must provide a reason");
-
-            var embed = new EmbedBuilder()
-                .WithTitle("===== Kicked User =====")
-                .WithDescription($"**Username: **{user.Username} || {user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
-                .WithAuthor(x =>
-                {
-                    x.Name = Context.User.Mention;
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                })
-                .WithColor(new Color(232, 226, 53))
-                .WithFooter(x =>
-                {
-                    x.Text = $"Kicked by {Context.User}";
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                });
-            var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
-            await ModLog.SendMessageAsync("", embed: embed);
-            await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
-            await user.KickAsync();
-        }
+        //    var embed = new EmbedBuilder()
+        //        .WithTitle("===== Kicked User =====")
+        //        .WithDescription($"**Username: **{user.Username} || {user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
+        //        .WithAuthor(x =>
+        //        {
+        //            x.Name = Context.User.Mention;
+        //            x.IconUrl = Context.User.GetAvatarUrl();
+        //        })
+        //        .WithColor(new Color(232, 226, 53))
+        //        .WithFooter(x =>
+        //        {
+        //            x.Text = $"Kicked by {Context.User}";
+        //            x.IconUrl = Context.User.GetAvatarUrl();
+        //        });
+        //    var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
+        //    await ModLog.SendMessageAsync("", embed: embed);
+        //    await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
+        //    await user.KickAsync();
+        //}
+#endregion
 
         [Command("Ban")]
         public async Task BanAsync(SocketGuildUser user = null, [Remainder] string reason = null)
@@ -130,26 +135,66 @@ namespace GPB.Modules
             await Context.Channel.SendMessageAsync("", false, embed);
         }
 
-        [Command("Response")]
-        public async Task AddResponse(string name = null, [Remainder]string response = null)
+        [Command("Response", RunMode = RunMode.Async)]
+        public async Task ResponseAsync()
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new NullReferenceException("Name can't be empty");
-            if (string.IsNullOrWhiteSpace(response))
-                throw new NullReferenceException("Response can't be empty");
+            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
+            var nameResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
+            if (nameResponse.Content == "cancel") return;
+            string name = nameResponse.Content;
+
+            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
+            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
+            if (contentResponse.Content == "cancel") return;
+            string response = contentResponse.Content;
+
             var resp = LogService.GetResponses();
             if (!(resp.ContainsKey(name)))
             {
-                resp.Add(name, response.ToString());
+                resp.Add(name, response);
                 File.WriteAllText(LogService.DictPath, JsonConvert.SerializeObject(resp, Formatting.Indented));
                 var embed = new EmbedBuilder()
                     .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
                     .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
                     .WithColor(new Color(109, 242, 122));
-                await ReplyAsync("", embed:embed);
+                await ReplyAsync("", embed: embed);
             }
             else
                 await ReplyAsync("I wasn't able to add the response to the response list! :x:");
+        }
+
+        [Command("Kick", RunMode = RunMode.Async)]
+        public async Task KickAsync(SocketGuildUser user)
+        {
+            await ReplyAsync("**Please provide a reason** _'cancel' to cancel_");
+            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
+            if (contentResponse.Content == "cancel") return;
+            string reason = contentResponse.Content;
+            await ReplyAsync("Are you sure you want to kick this user?");
+            var okResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            if (okResponse.Content.Trim().ToLower() == "yes")
+            {
+                var embed = new EmbedBuilder()
+                    .WithTitle("===== Kicked User =====")
+                    .WithDescription($"**Username: **{user.Username} || {user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
+                    .WithAuthor(x =>
+                    {
+                        x.Name = Context.Client.CurrentUser.Username;
+                        x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                    })
+                    .WithColor(new Color(232, 226, 53))
+                    .WithFooter(x =>
+                    {
+                        x.Text = $"Kicked by {Context.User}";
+                        x.IconUrl = Context.User.GetAvatarUrl();
+                    });
+                var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
+                await ModLog.SendMessageAsync("", embed: embed);
+                await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
+                await user.KickAsync();
+            }                
+            else
+                await ReplyAsync($"{UnicodeEmoji.FromText(":put_litter_in_its_place:")} **Request disposed**");
         }
     }
 }
