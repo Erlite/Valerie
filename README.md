@@ -44,7 +44,7 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 --- 
  ### Functions of this bot:
  
-- [x] Uses Json for config, logs and points
+- [x] Uses Json for config, logs, points and responses
 - [x] Uses embeds
 - [x] Admin Commands (Kick, Ban, Serverlist (Requires Owner), Leave (Requires Owner), Delete
 - [x] Bot Commands [Group Name = Set & Requires Owner] (Username, Nickname, Avatar, Game, Status)
