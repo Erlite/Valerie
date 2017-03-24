@@ -36,7 +36,6 @@ namespace GPB.Handlers
         {
             var message = m as SocketUserMessage;
             if (message == null) return;
-            if (message.Content.StartsWith("##")) return;
             if (!(message.Channel is IGuildChannel)) return;
             int argPos = 0;
             if (!(message.HasStringPrefix(config.Prefix, ref argPos) || config.MentionPrefixEnabled(message, client, ref argPos))) return;
