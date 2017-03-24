@@ -10,4 +10,4 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq dotnet-dev-1.0.0-rc4-004771
 script:
-  - ./build.sh --quiet verify
+  - ./build.sh
