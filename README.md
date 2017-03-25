@@ -52,10 +52,10 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 - [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond)
 - [ ] Google Commands
 - [ ] Github Commands
-- [ ] Autorespond json
+- [x] Autorespond json
 - [x] Command Cooldown
 - [x] Beautiful Console
 - [ ] Bot's own website
-- [ ] Interactive Command Module
+- [x] Interactive Command Module (Some commands have been turned into interactive commands such as: Kick, Response)
 - [ ] Option to use emoji as Command prefix
 - [x] Easy to understand code? (I kinda accomplish that. Most of it is pretty straight forward)
