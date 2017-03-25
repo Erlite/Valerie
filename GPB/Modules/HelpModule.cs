@@ -13,7 +13,6 @@ using System.Collections.Generic;
 
 namespace GPB.Modules
 {
-    [Name("Help")]
     public class HelpModule : ModuleBase
     {
         private CommandService _service;
@@ -25,71 +24,54 @@ namespace GPB.Modules
             Config = config;
         }
 
-        [Command("help")]
+        [Command("Help")]
         public async Task HelpAsync()
         {
-            string prefix = Config.Prefix;
             var builder = new EmbedBuilder()
             {
-                Color = new Color(114, 137, 218),
-                Description = "These are the commands you can use"
+                Color = new Color(179, 56, 216),
+                Description = $"**Admin Module:** Kick, Ban, Serverlist, Response, Leave, Delete, Gift" +
+                "\n**Bot Module:** [Group = Set] Username, Nickname, Avatar, Game, Status" +
+                "\n**General Module:** Guildinfo, Gif, Urban, Ping, Gift, Top, Roleinfo" + 
+                "\n**Help Module:** Help, Help" + 
+                "\n**Log Module:** [Group = Log] ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, AutoRespond",
+                Author = new EmbedAuthorBuilder()
+                {
+                    Name = "Command List",
+                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl()
+                },
+                Footer = new EmbedFooterBuilder()
+                {
+                    IconUrl = "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-help-circled-128.png",
+                    Text = "What is this, 90's Conan?"
+                }
             };
-
-            foreach (var module in _service.Modules)
-            {
-                string description = null;
-                foreach (var cmd in module.Commands)
-                {
-                    var result = await cmd.CheckPreconditionsAsync(Context);
-                    if (result.IsSuccess)
-                        description += $"{prefix}{cmd.Aliases.First()}\n";
-                }
-
-                if (!string.IsNullOrWhiteSpace(description))
-                {
-                    builder.AddField(x =>
-                    {
-                        x.Name = module.Name;
-                        x.Value = description;
-                        x.IsInline = false;
-                    });
-                }
-            }
 
             await ReplyAsync("", false, builder.Build());
         }
 
-        [Command("help")]
+        [Command("Help")]
         public async Task HelpAsync(string command)
         {
             var result = _service.Search(Context, command);
 
             if (!result.IsSuccess)
             {
-                await ReplyAsync($"Sorry, I couldn't find a command like **{command}**.");
+                await ReplyAsync($"**Command Name:** {command}\n**Error:** Not Found!\n**Reason:** Wubbalubbadubdub!");
                 return;
             }
-
-            string prefix = Config.Prefix;
             var builder = new EmbedBuilder()
             {
-                Color = new Color(114, 137, 218),
-                Description = $"Here are some commands like **{command}**"
+                Color = new Color(179, 56, 216)
             };
 
             foreach (var match in result.Commands)
             {
                 var cmd = match.Command;
-
-                builder.AddField(x =>
-                {
-                    x.Name = string.Join(", ", cmd.Aliases);
-                    x.Value = $"Parameters: {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n" +
-                              $"Remarks: {cmd.Remarks}";
-                    x.IsInline = false;
-                });
+                builder.Title = cmd.Name.ToUpper();
+                builder.Description = $"**Aliases:** {string.Join(", ", cmd.Aliases)}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n"+
+                    $"**Remarks:** {cmd.Remarks}\n**Summary:**{cmd.Summary}";
             }
-
             await ReplyAsync("", false, builder.Build());
         }
     }
