@@ -98,7 +98,7 @@ namespace GPB.Modules
         }
 
         [Command("Leave"), RequireOwner]
-        public async Task Leave(ulong ID, [Remainder] string msg)
+        public async Task LeaveAsync(ulong ID, [Remainder] string msg)
         {
             if (string.IsNullOrWhiteSpace(msg))
                 throw new Exception("You must provide a reason!");
