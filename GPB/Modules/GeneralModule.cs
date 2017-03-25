@@ -142,20 +142,6 @@ namespace GPB.Modules
         }
 
         [Command("Gift")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task Gift(double points)
-        {
-            var guild = Context.Guild;
-            var configs = await GiftsHandler.GetAll();
-            uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
-            foreach (var config in configs)
-            {
-                config.GivePoints(Context.Guild.Id, givePoints);
-            }
-            await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
-        }
-
-        [Command("Gift")]
         [Cooldown(60)]
         public async Task Gift(IGuildUser user, double points)
         {
