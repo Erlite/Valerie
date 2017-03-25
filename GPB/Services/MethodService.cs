@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GPB.Services
@@ -31,6 +30,19 @@ namespace GPB.Services
         {
             if (str.Length <= maxLengh) return str;
             return str.Substring(0, maxLengh);
+        }
+
+        public static async Task<IEnumerable<CommandInfo>> CheckConditionsAsync(this IEnumerable<CommandInfo> commandInfos, ICommandContext context, IDependencyMap map = null)
+        {
+            var ret = new List<CommandInfo>();
+            foreach (var commandInfo in commandInfos)
+            {
+                if ((await commandInfo.CheckPreconditionsAsync(context, map)).IsSuccess)
+                {
+                    ret.Add(commandInfo);
+                }
+            }
+            return ret;
         }
     }
 }

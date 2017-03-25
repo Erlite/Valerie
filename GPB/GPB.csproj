@@ -150,6 +150,7 @@
     <Compile Include="Handlers\LogHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
+    <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="Modules\LogModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\TagModule.cs" />
