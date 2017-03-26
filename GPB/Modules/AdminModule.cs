@@ -8,6 +8,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Discord.Addons.InteractiveCommands;
 using Discord.Addons.EmojiTools;
+using GPB.Handlers;
 
 namespace GPB.Modules
 {
@@ -195,6 +196,19 @@ namespace GPB.Modules
             }                
             else
                 await ReplyAsync($"{UnicodeEmoji.FromText(":put_litter_in_its_place:")} **Request disposed**");
+        }
+
+        [Command("Gift")]
+        public async Task Gift(double points)
+        {
+            var guild = Context.Guild;
+            var configs = await GiftsHandler.GetAll();
+            uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
+            foreach (var config in configs)
+            {
+                config.GivePoints(Context.Guild.Id, givePoints);
+            }
+            await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
         }
     }
 }
