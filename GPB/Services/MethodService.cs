@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 ﻿using System;
+=======
+﻿using Discord.Commands;
+using System;
+using System.Collections.Generic;
+>>>>>>> origin/master
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -32,6 +38,7 @@ namespace GPB.Services
             return str.Substring(0, maxLengh);
         }
 
+<<<<<<< HEAD
         //public static string[,] GetGame()
         //{
         //    if (game == null)
@@ -39,5 +46,19 @@ namespace GPB.Services
 
         //    return ((JArray)game["Games"]).ToObject<string[,]>();
         //}
+=======
+        public static async Task<IEnumerable<CommandInfo>> CheckConditionsAsync(this IEnumerable<CommandInfo> commandInfos, ICommandContext context, IDependencyMap map = null)
+        {
+            var ret = new List<CommandInfo>();
+            foreach (var commandInfo in commandInfos)
+            {
+                if ((await commandInfo.CheckPreconditionsAsync(context, map)).IsSuccess)
+                {
+                    ret.Add(commandInfo);
+                }
+            }
+            return ret;
+        }
+>>>>>>> origin/master
     }
 }
