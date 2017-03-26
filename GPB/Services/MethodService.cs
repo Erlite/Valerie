@@ -1,14 +1,20 @@
+<<<<<<< HEAD
+﻿using System;
+=======
 ﻿using Discord.Commands;
 using System;
 using System.Collections.Generic;
+>>>>>>> origin/master
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace GPB.Services
 {
     public static class MethodService
     {
+        private static JObject game;
         public static async Task DownloadAsync(this HttpClient client, Uri requestUri, string filename)
         {
             using (client = new HttpClient())
@@ -32,6 +38,15 @@ namespace GPB.Services
             return str.Substring(0, maxLengh);
         }
 
+<<<<<<< HEAD
+        //public static string[,] GetGame()
+        //{
+        //    if (game == null)
+        //        return null;
+
+        //    return ((JArray)game["Games"]).ToObject<string[,]>();
+        //}
+=======
         public static async Task<IEnumerable<CommandInfo>> CheckConditionsAsync(this IEnumerable<CommandInfo> commandInfos, ICommandContext context, IDependencyMap map = null)
         {
             var ret = new List<CommandInfo>();
@@ -44,5 +59,6 @@ namespace GPB.Services
             }
             return ret;
         }
+>>>>>>> origin/master
     }
 }
