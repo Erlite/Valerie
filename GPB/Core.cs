@@ -62,6 +62,7 @@ namespace GPB
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
+            //await client.SetGameAsync(MethodService.GetGame().ToString());
 
             await Task.Delay(-1);
         }

@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace GPB.Services
 {
     public static class MethodService
     {
+        private static JObject game;
         public static async Task DownloadAsync(this HttpClient client, Uri requestUri, string filename)
         {
             using (client = new HttpClient())
@@ -32,5 +31,13 @@ namespace GPB.Services
             if (str.Length <= maxLengh) return str;
             return str.Substring(0, maxLengh);
         }
+
+        //public static string[,] GetGame()
+        //{
+        //    if (game == null)
+        //        return null;
+
+        //    return ((JArray)game["Games"]).ToObject<string[,]>();
+        //}
     }
 }

@@ -130,7 +130,7 @@ namespace GPB.Modules
             await Context.Channel.DeleteMessagesAsync(messageList);
             var embed = new EmbedBuilder();
             embed.Title = "Messages Deleted";
-            embed.Description = $"I've deleted {range} amount of messages.";
+            embed.Description = $"I've deleted {range} messages.";
             embed.Color = new Color(191, 30, 60);
             await Context.Channel.SendMessageAsync("", false, embed);
         }
