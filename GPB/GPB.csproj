@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>NLogo.ico</ApplicationIcon>
+    <ApplicationIcon>rick_Q4X_1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Discord.Addons.EmojiTools, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -165,7 +165,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NLogo.ico" />
+    <Content Include="rick_Q4X_1.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
