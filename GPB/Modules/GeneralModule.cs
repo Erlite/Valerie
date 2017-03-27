@@ -11,6 +11,7 @@ using GPB.Attributes;
 using GPB.Handlers;
 using System.Linq;
 using System.Collections.Generic;
+using GPB.Services;
 
 namespace GPB.Modules
 {
@@ -276,7 +277,7 @@ namespace GPB.Modules
         [Command("ResponseList")]
         public async Task ResponseListAsync()
         {
-
+            var resp = LogService.GetResponses();
         }
     }
 }
