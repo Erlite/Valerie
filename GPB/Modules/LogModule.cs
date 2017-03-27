@@ -39,7 +39,8 @@ namespace GPB.Modules
             embed.WithDescription($"**Server Log Channel:** {_log.ServerLogChannelId}\n**Server Mod Channel:** {_log.ModLogChannelId}\n"+
                 $"**User Join Logging:** {_log.JoinsLogged}\n**User Leave Logging:** {_log.LeavesLogged}\n"+
                 $"**Username Change Logging:** {_log.NameChangesLogged}\n **Nickname Change Logging:** {_log.NickChangesLogged}\n"+
-                $"**User Ban Logging:** {_log.UserBannedLogged}\n**Latency Monitoring:** {_log.ClientLatency}\n**Auto Respond:** {_log.MessageRecieve}");
+                $"**User Ban Logging:** {_log.UserBannedLogged}\n**Latency Monitoring:** {_log.ClientLatency}\n**Auto Respond:** {_log.MessageRecieve}\n" +
+                $"**Starboard:** {_log.Starboard}");
             embed.Color = new Color(66, 244, 232);
             embed.WithFooter(x => { x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); x.Text = "These actions will reset upon restart."; });
             await ReplyAsync("", embed: embed);
@@ -157,6 +158,21 @@ namespace GPB.Modules
                 await ReplyAsync("I will now auto respond to certain messages");
             }
             else { _log.DisableMessageRecieve();await ReplyAsync("Auto respond have been disabled!");
+            }
+            await _log.SaveConfigurationAsync();
+        }
+
+        [Command("Starboard")]
+        public async Task StarBoardAsync()
+        {
+            if (!_log.Starboard)
+            {
+                _log.EnableStarboard();
+                await ReplyAsync("Starboarding has been enabled!");
+            }
+            else
+            {
+                _log.DisableStarboard(); await ReplyAsync("Auto respond have been disabled!");
             }
             await _log.SaveConfigurationAsync();
         }

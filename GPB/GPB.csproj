@@ -159,6 +159,7 @@
     <Compile Include="Services\GiftService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\MethodService.cs" />
+    <Compile Include="Services\SBService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
