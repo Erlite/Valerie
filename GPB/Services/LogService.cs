@@ -261,22 +261,10 @@ namespace GPB.Services
             var response = GetResponses();
             foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
             {
-                var guild = _client.GetGuild(Config.DefaultGuild);
-                var Role = guild.GetRole(Config.MatchID);
-                var user = guild.GetUser(msg.Author.Id);
-
                 if (msg.Author.Id == _client.CurrentUser.Id) return;
                 if (msg.Content.Contains(item.Key))
                 {
                     await msg.Channel.SendMessageAsync(item.Value);
-                }
-                else if (msg.Content.Contains("!Match"))
-                {
-                    await user.AddRoleAsync(Role);
-                }
-                else if (msg.Content.Contains("!Done"))
-                {
-                    await user.RemoveRoleAsync(Role);
                 }
             }
         }

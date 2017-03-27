@@ -143,7 +143,7 @@ namespace GPB.Modules
 
         [Command("Gift")]
         [Cooldown(60)]
-        public async Task Gift(IGuildUser user, double points)
+        public async Task GiftAsync(IGuildUser user, double points)
         {
             if (user.Id == Context.Client.CurrentUser.Id) return;
             if (user == Context.User)
@@ -158,7 +158,7 @@ namespace GPB.Modules
         }
 
         [Command("Top")]
-        public async Task Wealth()
+        public async Task WealthAsync()
         {
             var configs = await GiftsHandler.GetAll();
             var filtered = configs.Where(x => x.XP.ContainsKey(Context.Guild.Id)).OrderByDescending(x => x.XP[Context.Guild.Id]).Take(11);
@@ -167,7 +167,7 @@ namespace GPB.Modules
         }
 
         [Command("Roleinfo"), Summary("Roleinfo RoleNameGoesHere"), Remarks("Displays information about given Role"), Alias("RI")]
-        public async Task RoleInfo(IRole role)
+        public async Task RoleInfoAsync(IRole role)
         {
             var gld = Context.Guild;
             var chn = Context.Channel;
@@ -271,6 +271,12 @@ namespace GPB.Modules
             });
 
             await chn.SendMessageAsync("", false, embed);
+        }
+
+        [Command("ResponseList")]
+        public async Task ResponseListAsync()
+        {
+
         }
     }
 }

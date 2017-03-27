@@ -14,7 +14,6 @@ namespace GPB.Handlers
         public string Token { get; set; }
         public string Prefix { get; set; }
         public ulong OwnerID { get; set; }
-        public ulong MatchID { get; set; }
         public ulong DefaultGuild { get; set; }
         public string WelcomeMessage { get; set; }
         public bool MentionPrefix { get; set; }
@@ -64,8 +63,6 @@ namespace GPB.Handlers
             result.Prefix = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Owner ID: ");
             result.OwnerID = ulong.Parse(Console.ReadLine());
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Match Role ID: ");
-            result.MatchID = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Default Guild ID: ");
             result.DefaultGuild = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Welcome Message: ");
