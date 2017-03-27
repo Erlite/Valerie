@@ -137,34 +137,6 @@ namespace GPB.Modules
             await Context.Channel.SendMessageAsync("", false, embed);
         }
 
-        [Command("Response", RunMode = RunMode.Async)]
-        public async Task ResponseAsync()
-        {
-            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-            var nameResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
-            if (nameResponse.Content == "cancel") return;
-            string name = nameResponse.Content;
-
-            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
-            if (contentResponse.Content == "cancel") return;
-            string response = contentResponse.Content;
-
-            var resp = LogService.GetResponses();
-            if (!(resp.ContainsKey(name)))
-            {
-                resp.Add(name, response);
-                File.WriteAllText(LogService.DictPath, JsonConvert.SerializeObject(resp, Formatting.Indented));
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
-                    .WithColor(new Color(109, 242, 122));
-                await ReplyAsync("", embed: embed);
-            }
-            else
-                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
-        }
-
         [Command("Kick", RunMode = RunMode.Async)]
         public async Task KickAsync(SocketGuildUser user)
         {

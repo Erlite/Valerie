@@ -12,11 +12,22 @@ using GPB.Handlers;
 using System.Linq;
 using System.Collections.Generic;
 using GPB.Services;
+using System.Text;
+using Newtonsoft.Json;
+using System.IO;
+using Discord.Addons.InteractiveCommands;
 
 namespace GPB.Modules
 {
     public class GeneralModule : ModuleBase
     {
+        private InteractiveService inter;
+        public GeneralModule(InteractiveService inte)
+        {
+            inter = inte;
+        }
+
+
         [Command("GuildInfo"), Summary("GI"), Remarks("Displays information about a guild")]
         public async Task GuildInfoAsync()
         {
@@ -70,7 +81,7 @@ namespace GPB.Modules
             }
         }
 
-        [Command("Urban")]
+        [Command("Urban"), Summary("Urban IE"), Remarks("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string urban = null)
         {
             if (string.IsNullOrWhiteSpace(urban))
@@ -126,7 +137,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Ping")]
+        [Command("Ping"), Summary("Just run the command"), Remarks("Measures gateway ping and response time")]
         public async Task PingAsync()
         {
             var sw = Stopwatch.StartNew();
@@ -142,7 +153,7 @@ namespace GPB.Modules
 
         }
 
-        [Command("Gift")]
+        [Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei")]
         [Cooldown(60)]
         public async Task GiftAsync(IGuildUser user, double points)
         {
@@ -158,7 +169,7 @@ namespace GPB.Modules
             }
         }
 
-        [Command("Top")]
+        [Command("Top"), Summary("Just run the command"), Remarks("Shows the top 10 rich people")]
         public async Task WealthAsync()
         {
             var configs = await GiftsHandler.GetAll();
@@ -274,10 +285,57 @@ namespace GPB.Modules
             await chn.SendMessageAsync("", false, embed);
         }
 
-        [Command("ResponseList")]
+        [Command("ResponseList"), Summary("Just run the command"), Remarks("Lists all the responses saved in the JSON file."), Alias("RL")]
         public async Task ResponseListAsync()
         {
             var resp = LogService.GetResponses();
+            StringBuilder list = new StringBuilder();
+            var embed = new EmbedBuilder()
+                .WithAuthor(x =>
+                {
+                    x.Name = Context.Client.CurrentUser.Username;
+                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                })
+                .WithColor(new Color(109, 242, 122))
+                .WithTitle($"**Total Responses:** {resp.Count}");
+            foreach(var values in resp)
+            {
+                embed.AddField(x =>
+                {
+                    x.Name = values.Key;
+                    x.Value = values.Value;
+                    x.IsInline = true;
+                });
+            }
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Response", RunMode = RunMode.Async), Summary("Just run the command"), Remarks("Uses interactive command to create a new response for you")]
+        public async Task ResponseAsync()
+        {
+            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
+            var nameResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (nameResponse.Content == "cancel") return;
+            string name = nameResponse.Content;
+
+            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
+            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (contentResponse.Content == "cancel") return;
+            string response = contentResponse.Content;
+
+            var resp = LogService.GetResponses();
+            if (!(resp.ContainsKey(name)))
+            {
+                resp.Add(name, response);
+                File.WriteAllText(LogService.DictPath, JsonConvert.SerializeObject(resp, Formatting.Indented));
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
+                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
+                    .WithColor(new Color(109, 242, 122));
+                await ReplyAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
         }
     }
 }
