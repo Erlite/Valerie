@@ -6,6 +6,8 @@ using Discord.WebSocket;
 using GPB.Handlers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Concurrent;
+using System;
 
 namespace GPB.Services
 {
@@ -170,6 +172,7 @@ namespace GPB.Services
                     if (config == null) return false;
 
                     ServerLogChannelId = config.ServerLog;
+                    ModLogChannelId = config.ModLog;
                     JoinsLogged = config.JoinsLogged;
                     if (JoinsLogged) EnableJoinLogging();
                     LeavesLogged = config.LeavesLogged;
@@ -278,9 +281,9 @@ namespace GPB.Services
             }
         }
 
-        private async Task _client_ReactionAdded(Cacheable<IUserMessage, ulong> MessageParam, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task _client_ReactionAdded(Cacheable<IUserMessage, ulong> msgCacheable, ISocketMessageChannel msgChannel, SocketReaction reaction)
         {
-            // Need to figure this out
+          // work on this later
         }
 
 
@@ -296,5 +299,12 @@ namespace GPB.Services
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
         }
+
+        public struct starMsg
+        {
+            public ulong starMSGID;
+            public int counter;
+        }
+
     }
 }

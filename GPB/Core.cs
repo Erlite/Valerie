@@ -6,6 +6,8 @@ using System.IO;
 using GPB.Services;
 using GPB.Handlers;
 using Discord.Addons.InteractiveCommands;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace GPB
 {
@@ -18,6 +20,8 @@ namespace GPB
         private LogService log;
         private CommandHandler handler;
         private DependencyMap map;
+        string dict = Path.Combine(Directory.GetCurrentDirectory(), "Guilds");
+        private const string EmptyJson = "{\r\n}";
 
 
         public async Task StartAsync()
@@ -51,6 +55,7 @@ namespace GPB
             log = new LogService(client, config);
             await log.LoadConfigurationAsync();
 
+            client.GuildAvailable += GuildAvailable;
             map = new DependencyMap();
             map.Add(client);
             map.Add(config);
@@ -62,9 +67,39 @@ namespace GPB
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
-            //await client.SetGameAsync(MethodService.GetGame().ToString());
 
             await Task.Delay(-1);
+        }
+
+        private async Task GuildAvailable(SocketGuild gld)
+        {
+            LogHandler result;
+            result = new LogHandler();
+            if (!Directory.Exists(dict))
+                Directory.CreateDirectory(dict);
+            foreach (var guild in client.Guilds)
+            {
+                string guildDirectory = Path.Combine(dict, guild.Id.ToString());
+                if (!Directory.Exists(guildDirectory))
+                {
+                    Directory.CreateDirectory(guildDirectory);
+                }
+
+                using (var configStream = File.Create(Path.Combine(guildDirectory, "logs.json")))
+                {
+                    using (var configWriter = new StreamWriter(configStream))
+                    {
+                        var save = JsonConvert.SerializeObject(result, Formatting.Indented);
+                        await configWriter.WriteAsync(save);
+                    }
+                }
+                using (var file = File.Create(Path.Combine(guildDirectory, "response.json")))
+                {
+                    var content = Encoding.UTF8.GetBytes(EmptyJson);
+                    file.Write(content, 0, content.Length);
+                    file.Flush();
+                }
+            }
         }
     }
 }

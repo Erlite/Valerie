@@ -67,6 +67,7 @@ namespace GPB.Modules
             embed.Color = new Color(206, 47, 47);
             embed.Title = "=== Banned User ===";
             embed.Description = $"**Username: ** {user.Username} || {user.Discriminator}\n**Responsilbe Mod: ** {Context.User}\n**Reason: **{reason}";
+            embed.ImageUrl = "https://i.redd.it/psv0ndgiqrny.gif";
             var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
             await ModLog.SendMessageAsync("", embed: embed);
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
