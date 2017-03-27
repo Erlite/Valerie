@@ -141,11 +141,11 @@ namespace GPB.Modules
         public async Task KickAsync(SocketGuildUser user)
         {
             await ReplyAsync("**Please provide a reason** _'cancel' to cancel_");
-            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(5));
+            var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
             if (contentResponse.Content == "cancel") return;
             string reason = contentResponse.Content;
             await ReplyAsync("Are you sure you want to kick this user?");
-            var okResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            var okResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
             if (okResponse.Content.Trim().ToLower() == "yes")
             {
                 var embed = new EmbedBuilder()
