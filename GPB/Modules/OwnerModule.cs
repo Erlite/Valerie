@@ -45,7 +45,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Leave"), Summary("Leave 123897481723"), Remarks("Tells the bot to leave a certain guild")]
+        [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
         public async Task LeaveAsync(ulong ID, [Remainder] string msg)
         {
             if (string.IsNullOrWhiteSpace(msg))
@@ -84,9 +84,8 @@ namespace GPB.Modules
             await ReplyAsync(invite.Url);
         }
 
-        [Command("archive")]
-        [Summary("archives a channel and uploads a JSON")]
-        public async Task ArchiveCommand(string guildName, string channelName, int amount = 10000)
+        [Command("Archive"), Summary("Archive GuildName ChannelName 10"),Remarks("archives a channel and uploads a JSON")]
+        public async Task ArchiveCommand(string guildName, string channelName, int amount = 9000)
         {
             var channelToArchive = (await
                 (await Context.Client.GetGuildsAsync()).FirstOrDefault(x => x.Name == guildName).GetTextChannelsAsync()).FirstOrDefault(x => x.Name == channelName);
