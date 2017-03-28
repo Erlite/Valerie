@@ -347,7 +347,6 @@ namespace GPB.Modules
             if (string.IsNullOrWhiteSpace(search))
                 throw new ArgumentException("Not sure what I should search for??");
 
-            await Context.Message.DeleteAsync();
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
@@ -366,12 +365,16 @@ namespace GPB.Modules
                     return;
                 }
                 JObject image = (JObject)arr[0];
-                EmbedBuilder eb = new EmbedBuilder();
-                eb.Title = $"Image: {search}";
-                eb.Color = new Color(66, 244, 191);
-                eb.Description = $"[Image link]({(string)image["contentUrl"]})";
-                eb.ImageUrl = (string)image["contentUrl"];
-                await ReplyAsync("", false, eb);
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x =>
+                    {
+                        x.Name = $"Search Term:   {search.ToUpper()}";
+                        x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                        x.Url = (string)image["contentUrl"];
+                    })
+                    .WithColor(new Color(66, 244, 191))
+                    .WithImageUrl((string)image["contentUrl"]);
+                await ReplyAsync("", embed:embed);
             }
         }
     }
