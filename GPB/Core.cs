@@ -8,6 +8,9 @@ using GPB.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Newtonsoft.Json;
 using System.Text;
+using GPB.Services.TagServices;
+using Discord.Net.WebSockets;
+using Discord.Net.Providers.WS4Net;
 
 namespace GPB
 {
@@ -20,6 +23,7 @@ namespace GPB
         private LogService log;
         private CommandHandler handler;
         private DependencyMap map;
+        private TagService tag;
         string dict = Path.Combine(Directory.GetCurrentDirectory(), "Guilds");
         private const string EmptyJson = "{\r\n}";
 
@@ -28,7 +32,7 @@ namespace GPB
         {
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
-                WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance,
+                WebSocketProvider = WS4NetProvider.Instance,
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true
@@ -62,6 +66,7 @@ namespace GPB
             map.Add(config);
             map.Add(log);
             map.Add(new InteractiveService(client));
+            map.Add(tag);
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();
