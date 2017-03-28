@@ -45,7 +45,7 @@ This is a readme. Read it carefully.
 - [x] General Commands (Guildinfo, Gif, Urban, Ping, Gift (Admin), Gift, Top, Roleinfo)
 - [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond)
 - [ ] Google Commands
-- [ ] Github Command/s
+- [x] Github Command/s => (Uses Fox's example) ##{Issue Number} pulls issue from my github
 - [x] Autorespond json
 - [x] Command Cooldown
 - [x] Beautiful Console
