@@ -9,16 +9,13 @@ using Discord.Addons.InteractiveCommands;
 using Newtonsoft.Json;
 using System.Text;
 using GPB.Services.TagServices;
-using Discord.Net.WebSockets;
-using System;
 using Discord.Net.Providers.WS4Net;
 
 namespace GPB
 {
-    class Core
+    public class Core
     {
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
-
         private DiscordSocketClient client;
         private ConfigHandler config;
         private LogService log;
@@ -31,32 +28,16 @@ namespace GPB
 
         public async Task StartAsync()
         {
-            ConsoleService.Log(LogSeverity.Info, "Connection", "Type 7 for Windows 7 & below else Type 8: ");
-            var get = Convert.ToInt32(Console.ReadLine());
-            if (get == 7)
-            {
-                client = new DiscordSocketClient(new DiscordSocketConfig()
-                {
-                    WebSocketProvider = WS4NetProvider.Instance,
-                    LogLevel = LogSeverity.Verbose,
-                    MessageCacheSize = 10000,
-                    AlwaysDownloadUsers = true
-                });
-            }
-            else if (get == 8)
-            {
-                client = new DiscordSocketClient(new DiscordSocketConfig()
-                {
-                    LogLevel = LogSeverity.Verbose,
-                    MessageCacheSize = 10000,
-                    AlwaysDownloadUsers = true
-                });
-            }
-            else
-                throw new FormatException("Not a valid value!");
 
+            ConsoleService.TitleCard("Rick", DiscordConfig.Version);
+            client = new DiscordSocketClient(new DiscordSocketConfig()
+            {
+                WebSocketProvider = WS4NetProvider.Instance,
+                LogLevel = LogSeverity.Info,
+                MessageCacheSize = 10000,
+                AlwaysDownloadUsers = true
+            });
 
-            ConsoleService.TitleCard("Oreos", DiscordConfig.Version);
             client.Log += (l) => Task.Run(() => ConsoleService.Log(l.Severity, l.Source, l.Exception?.ToString() ?? l.Message));
 
             #region Config
@@ -91,10 +72,8 @@ namespace GPB
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
-
             await Task.Delay(-1);
         }
-
         private async Task GuildAvailable(SocketGuild gld)
         {
             LogHandler result;

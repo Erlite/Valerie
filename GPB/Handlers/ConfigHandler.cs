@@ -13,6 +13,7 @@ namespace GPB.Handlers
     {
         public string Token { get; set; }
         public string Prefix { get; set; }
+        public string Game { get; set; }
         public ulong OwnerID { get; set; }
         public ulong DefaultGuild { get; set; }
         public string WelcomeMessage { get; set; }
@@ -61,6 +62,8 @@ namespace GPB.Handlers
             result.Token = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Prefix: ");
             result.Prefix = Console.ReadLine();
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot's Game: ");
+            result.Game = Console.ReadLine();
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Owner ID: ");
             result.OwnerID = ulong.Parse(Console.ReadLine());
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Default Guild ID: ");
