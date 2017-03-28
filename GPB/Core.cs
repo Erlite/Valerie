@@ -10,8 +10,8 @@ using Newtonsoft.Json;
 using System.Text;
 using GPB.Services.TagServices;
 using Discord.Net.WebSockets;
-using Discord.Net.Providers.WS4Net;
 using System;
+using Discord.Net.Providers.WS4Net;
 
 namespace GPB
 {
