@@ -16,7 +16,7 @@ namespace GPB.Services
         private DiscordSocketClient _client;
         private ConfigHandler Config;
         public const string DictPath = "./Config/Response.json";
-        private Regex _issueRegex = new Regex(@"##([0-9]+)");
+        private Regex _issueRegex = new Regex(@">>([0-9]+)");
 
         public ulong ServerLogChannelId { get; set; }
         public ulong ModLogChannelId { get; set; }
