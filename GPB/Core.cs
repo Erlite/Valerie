@@ -28,6 +28,7 @@ namespace GPB
         {
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
+                WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance,
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true

@@ -6,8 +6,8 @@ using Discord.WebSocket;
 using GPB.Handlers;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Concurrent;
-using System;
+using System.Text.RegularExpressions;
+using System.Text;
 
 namespace GPB.Services
 {
@@ -16,6 +16,7 @@ namespace GPB.Services
         private DiscordSocketClient _client;
         private ConfigHandler Config;
         public const string DictPath = "./Config/Response.json";
+        private Regex _issueRegex = new Regex(@"##([0-9]+)");
 
         public ulong ServerLogChannelId { get; set; }
         public ulong ModLogChannelId { get; set; }
@@ -258,14 +259,25 @@ namespace GPB.Services
 
         private async Task _client_MessageReceived(SocketMessage msg)
         {
+            if (msg.Author.Id == _client.CurrentUser.Id) return;
             var response = GetResponses();
             foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
             {
-                if (msg.Author.Id == _client.CurrentUser.Id) return;
                 if (msg.Content.Contains(item.Key))
                 {
                     await msg.Channel.SendMessageAsync(item.Value);
                 }
+            }
+
+            var matches = _issueRegex.Matches(msg.Content);
+            if (matches.Count > 0)
+            {
+                var outStr = new StringBuilder();
+                foreach (Match match in matches)
+                {
+                    outStr.AppendLine($"**{match.Value}** - https://github.com/ExceptionDev/DiscordExampleBot/issues/{match.Value.Substring(2)}");
+                }
+                await msg.Channel.SendMessageAsync(outStr.ToString());
             }
         }
 
@@ -287,12 +299,5 @@ namespace GPB.Services
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
         }
-
-        public struct starMsg
-        {
-            public ulong starMSGID;
-            public int counter;
-        }
-
     }
 }
