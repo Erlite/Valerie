@@ -16,12 +16,14 @@ This is a readme. Read it carefully.
 - Either open the project and let nuget restore the packages or Create a new Console Application targetting .Net Framework 4.6.1 and install the latest versions of the following: 
   - Discord.Net (1.0)
   - Discord.Addons.InteractiveCommands
+  - Discord.Addons.EmojiTools
   - Discord.Net.Core
   - Discord.Net.Rest
   
   Rest of them should install automatically. Such as: Discord.Net.Commands, Discord.Net.WebSocket
 - If you had to create a new project then import the following:
   - Attributes (Folder)
+  - Classes (Folder)
   - Handlers (Folder)
   - Modules (Folder)
   - Services (Folder)
@@ -43,14 +45,18 @@ This is a readme. Read it carefully.
 - [x] Admin Commands (Kick, Ban, Serverlist (Requires Owner), Leave (Requires Owner), Delete
 - [x] Bot Commands [Group Name = Set & Requires Owner] (Username, Nickname, Avatar, Game, Status)
 - [x] General Commands (Guildinfo, Gif, Urban, Ping, Gift (Admin), Gift, Top, Roleinfo)
-- [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond)
-- [ ] Google Commands
+- [x] Owner Commands (More coming)
+- [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond, Starboard [Under Constructions])
 - [x] Github Command/s => (Uses Fox's example) ##{Issue Number} pulls issue from my github
 - [x] Autorespond json
-- [x] Command Cooldown
+- [x] Cooldown Attribute
 - [x] Beautiful Console
-- [ ] Bot's own website
 - [x] Interactive Command Module (Some commands have been turned into interactive commands such as: Kick, Response)
-- [ ] Option to use emoji as Command prefix
 - [x] Easy to understand code? (I kinda accomplish that. Most of it is pretty straight forward)
 - [x] No longer requires WS4NET. Already installed it and added it in `Core.cs`
+- [ ] Configureable Prefix for Github MessageReceived event?
+- [ ] Google Commands
+- [ ] Custom Permission Attribute
+- [ ] Custom Channels Attribute
+- [ ] Bot's own website / Doc Website
+- [ ] Option to use emoji as Command prefix
