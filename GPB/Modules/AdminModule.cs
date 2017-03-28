@@ -24,7 +24,7 @@ namespace GPB.Modules
             inter = inte;
         }
 
-        [Command("Kick")]
+        [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
         public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = null)
         {
             if (user == null)
@@ -52,7 +52,7 @@ namespace GPB.Modules
             await user.KickAsync();
         }
 
-        [Command("Ban")]
+        [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
         public async Task BanAsync(SocketGuildUser user = null, [Remainder] string reason = null)
         {
             if (user == null)
@@ -71,53 +71,6 @@ namespace GPB.Modules
             await ModLog.SendMessageAsync("", embed: embed);
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
             await gld.AddBanAsync(user);
-        }
-
-        [Command("ServerList"), RequireOwner]
-        public async Task ServerListAsync()
-        {
-            var cl = Context.Client as DiscordSocketClient;
-            var embed = new EmbedBuilder();
-            foreach (SocketGuild guild in cl.Guilds)
-            {
-                embed.AddField(x =>
-                {
-                    x.Name = $"{guild.Name} || {guild.Id}";
-                    x.Value = $"Guild Owner: { guild.Owner} || { guild.OwnerId}\nGuild Members: {guild.MemberCount}";
-                    x.IsInline = true;
-                });
-            }
-            embed.Title = "=== Server List ===";
-            embed.Color = new Color(244, 66, 113);
-            embed.Footer = new EmbedFooterBuilder()
-            {
-                Text = $"Total Guilds: {cl.Guilds.Count.ToString()}",
-                IconUrl = "http://tabard.gnomeregan.info/result/faction_Alliance_icon_emblem_00_border_border_00_iconcolor_ffffff_bgcolor_000000_bordercolor_ffffff.png"
-            };
-
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Leave"), RequireOwner]
-        public async Task LeaveAsync(ulong ID, [Remainder] string msg)
-        {
-            if (string.IsNullOrWhiteSpace(msg))
-                throw new Exception("You must provide a reason!");
-            var client = Context.Client;
-            var gld = await client.GetGuildAsync(ID);
-            var ch = await gld.GetDefaultChannelAsync();
-            var embed = new EmbedBuilder();
-            embed.Description = $"Hello, I've been instructed by my owner to leave this guild!\n**Reason: **{msg}";
-            embed.Color = new Color(186, 24, 66);
-            embed.Author = new EmbedAuthorBuilder()
-            {
-                Name = Context.User.Username,
-                IconUrl = Context.User.GetAvatarUrl()
-            };
-            await ch.SendMessageAsync("", embed: embed);
-            await Task.Delay(5000);
-            await gld.LeaveAsync();
-            await ReplyAsync("Message has been sent and I've left the guild!");
         }
 
         [Command("Delete"), Summary("Delete 10"), Remarks("Deletes X amount of messages"), Alias("Del")]

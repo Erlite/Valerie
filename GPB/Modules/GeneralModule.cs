@@ -28,7 +28,7 @@ namespace GPB.Modules
         }
 
 
-        [Command("GuildInfo"), Summary("GI"), Remarks("Displays information about a guild")]
+        [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
         public async Task GuildInfoAsync()
         {
             var embed = new EmbedBuilder();
@@ -137,7 +137,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Ping"), Summary("Just run the command"), Remarks("Measures gateway ping and response time")]
+        [Command("Ping"), Summary("Normal Command"), Remarks("Measures gateway ping and response time")]
         public async Task PingAsync()
         {
             var sw = Stopwatch.StartNew();
@@ -169,7 +169,7 @@ namespace GPB.Modules
             }
         }
 
-        [Command("Top"), Summary("Just run the command"), Remarks("Shows the top 10 rich people")]
+        [Command("Top"), Summary("Normal Command"), Remarks("Shows the top 10 rich people")]
         public async Task WealthAsync()
         {
             var configs = await GiftsHandler.GetAll();
@@ -310,7 +310,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Response", RunMode = RunMode.Async), Summary("Just run the command"), Remarks("Uses interactive command to create a new response for you")]
+        [Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses interactive command to create a new response for you")]
         public async Task ResponseAsync()
         {
             await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
