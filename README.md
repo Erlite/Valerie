@@ -6,12 +6,6 @@ This is a readme. Read it carefully.
 
 - Visual Studio 2017
 - Discord.Net 1.0 (Latest version please)
-- Maybe Discord.Net.Providers.WS4Net =>
-```cs
-_client = new DiscordSocketClient(new DiscordSocketConfig { 
-    WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance
- });
- ```
  - Latest .Net Framework (4.6 +)
  
  That's pretty much it.
@@ -51,7 +45,7 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 - [x] General Commands (Guildinfo, Gif, Urban, Ping, Gift (Admin), Gift, Top, Roleinfo)
 - [x] Enable/Disable certain loggings [Group Name = Log] (ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, Autorespond)
 - [ ] Google Commands
-- [ ] Github Commands
+- [ ] Github Command/s
 - [x] Autorespond json
 - [x] Command Cooldown
 - [x] Beautiful Console
@@ -59,3 +53,4 @@ _client = new DiscordSocketClient(new DiscordSocketConfig {
 - [x] Interactive Command Module (Some commands have been turned into interactive commands such as: Kick, Response)
 - [ ] Option to use emoji as Command prefix
 - [x] Easy to understand code? (I kinda accomplish that. Most of it is pretty straight forward)
+- [x] No longer requires WS4NET. Already installed it and added it in `Core.cs`
