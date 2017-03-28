@@ -1,15 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using Discord.WebSocket;
-using GPB.Services;
-using System.IO;
-using Newtonsoft.Json;
-using System.Text;
 using GPB.Handlers;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace GPB.Modules
 {
