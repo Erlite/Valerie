@@ -22,9 +22,11 @@ namespace GPB.Modules
     public class GeneralModule : ModuleBase
     {
         private InteractiveService inter;
-        public GeneralModule(InteractiveService inte)
+        private ConfigHandler config;
+        public GeneralModule(InteractiveService inte, ConfigHandler Config)
         {
             inter = inte;
+            config = Config;
         }
 
 
@@ -336,6 +338,40 @@ namespace GPB.Modules
             }
             else
                 await ReplyAsync("I wasn't able to add the response to the response list! :x:");
+        }
+
+        [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
+        public async Task Image([Remainder] string search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                throw new ArgumentException("Not sure what I should search for??");
+
+            await Context.Message.DeleteAsync();
+            using (var httpClient = new HttpClient())
+            {
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", config.BingAPI);
+                var res = await httpClient.GetAsync(link);
+                if (!res.IsSuccessStatusCode)
+                {
+                    await ReplyAsync($"An error occurred: {res.ReasonPhrase}");
+                    return;
+                }
+                JObject result = JObject.Parse(await res.Content.ReadAsStringAsync());
+                JArray arr = (JArray)result["value"];
+                if (arr.Count == 0)
+                {
+                    await ReplyAsync("No results found.");
+                    return;
+                }
+                JObject image = (JObject)arr[0];
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.Title = $"Image: {search}";
+                eb.Color = new Color();
+                eb.Description = $"[Image link]({(string)image["contentUrl"]})";
+                eb.ImageUrl = (string)image["contentUrl"];
+                await ReplyAsync("", false, eb);
+            }
         }
     }
 }
