@@ -63,7 +63,7 @@ namespace GPB.Modules
                 var cmd = match.Command;
                 builder.Title = cmd.Name.ToUpper();
                 builder.Description = $"**Aliases:** {string.Join(", ", cmd.Aliases)}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n"+
-                    $"**Remarks:** {cmd.Remarks}\n**Summary:**{cmd.Summary}";
+                    $"**Remarks:** {cmd.Remarks}\n**Summary:** {cmd.Summary}";
             }
             await ReplyAsync("", false, builder.Build());
         }
