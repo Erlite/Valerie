@@ -28,7 +28,6 @@ namespace GPB
 
         public async Task StartAsync()
         {
-
             ConsoleService.TitleCard("Rick", DiscordConfig.Version);
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
