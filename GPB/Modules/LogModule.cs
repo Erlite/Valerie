@@ -1,9 +1,7 @@
 ﻿using System.Threading.Tasks;
-using System.Text;
 using Discord;
 using Discord.Commands;
 using GPB.Services;
-using GPB.Handlers;
 
 namespace GPB.Modules
 {

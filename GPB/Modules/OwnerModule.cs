@@ -7,6 +7,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using System.IO;
+using GPB.Classes;
 
 namespace GPB.Modules
 {
@@ -14,6 +16,10 @@ namespace GPB.Modules
     public class OwnerModule : ModuleBase
     {
         private DiscordSocketClient client;
+        private static MemoryStream GenerateStreamFromString(string value)
+        {
+            return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
+        }
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()

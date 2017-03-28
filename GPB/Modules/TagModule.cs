@@ -20,7 +20,7 @@ namespace GPB.Modules
             _interactive = interactive;
         }
 
-        [Command("create", RunMode = RunMode.Async)]
+        [Command("Create", RunMode = RunMode.Async)]
         public async Task AddTagAsync()
         {
             await ReplyAsync("**What is the name of your tag?** _'cancel' to cancel_");
@@ -62,7 +62,7 @@ namespace GPB.Modules
                 await ReplyAsync($"{UnicodeEmoji.FromText(":put_litter_in_its_place:")} **Tag disposed**");
         }
 
-        [Command("remove", RunMode = RunMode.Async)]
+        [Command("Remove", RunMode = RunMode.Async)]
         public async Task RemoveTagAsync([Remainder] string name)
         {
             var tag = _service.Database.Tags.FirstOrDefault(t => t.Name == name || t.Aliases.Contains(name));
@@ -82,7 +82,7 @@ namespace GPB.Modules
                 await ReplyAsync($"{UnicodeEmoji.FromText(":wheelchair:")}");
         }
 
-        [Command("modify", RunMode = RunMode.Async)]
+        [Command("Modify", RunMode = RunMode.Async)]
         public async Task ModifyTagAsync(ModifyType modify, [Remainder] string name)
         {
             var tag = _service.Database.Tags.FirstOrDefault(t => t.Name == name || t.Aliases.Contains(name));
@@ -129,7 +129,7 @@ namespace GPB.Modules
             await ReplyAsync(UnicodeEmoji.FromText(":ok:"));
         }
 
-        [Command("set", RunMode = RunMode.Async)]
+        [Command("Set", RunMode = RunMode.Async)]
         public async Task SetTagAsync(ModifyType modify, string name, [Remainder] string value)
         {
             var tag = _service.Database.Tags.FirstOrDefault(t => t.Name == name || t.Aliases.Contains(name));
@@ -162,7 +162,7 @@ namespace GPB.Modules
             await ReplyAsync(UnicodeEmoji.FromText(":ok:"));
         }
 
-        [Command("info")]
+        [Command("Info")]
         public async Task GetTagAsync([Remainder] string name)
         {
             var tag = _service.Database.Tags.FirstOrDefault(t => t.Name == name || t.Aliases.Contains(name));
@@ -194,7 +194,7 @@ namespace GPB.Modules
             await ReplyAsync("", embed: builder);
         }
 
-        [Command("list")]
+        [Command("List")]
         [Alias("tags")]
         public async Task ListTagsAsync()
         {

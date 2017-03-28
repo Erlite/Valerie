@@ -16,6 +16,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.IO;
 using Discord.Addons.InteractiveCommands;
+using System.Net;
 
 namespace GPB.Modules
 {
@@ -367,7 +368,7 @@ namespace GPB.Modules
                 JObject image = (JObject)arr[0];
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.Title = $"Image: {search}";
-                eb.Color = new Color();
+                eb.Color = new Color(66, 244, 191);
                 eb.Description = $"[Image link]({(string)image["contentUrl"]})";
                 eb.ImageUrl = (string)image["contentUrl"];
                 await ReplyAsync("", false, eb);
