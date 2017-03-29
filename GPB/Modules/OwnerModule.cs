@@ -15,7 +15,6 @@ namespace GPB.Modules
     [RequireOwner]
     public class OwnerModule : ModuleBase
     {
-        private DiscordSocketClient client;
         private static MemoryStream GenerateStreamFromString(string value)
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
@@ -24,6 +23,7 @@ namespace GPB.Modules
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
         {
+            var client = Context.Client as DiscordSocketClient;
             var embed = new EmbedBuilder();
             foreach (SocketGuild guild in client.Guilds)
             {
@@ -71,7 +71,7 @@ namespace GPB.Modules
         [Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
         public async Task Broadcast([Remainder] string broadcast)
         {
-            var guilds = client.Guilds;
+            var guilds = (Context.Client as DiscordSocketClient).Guilds;
             var defaultChannels = guilds.Select(g => g.GetChannel(g.Id)).Cast<ITextChannel>();
             await Task.WhenAll(defaultChannels.Select(c => c.SendMessageAsync(broadcast)));
         }
