@@ -1,5 +1,3 @@
-# Information
-
 Discord Example Bot is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.1
 This bot provides wide range of functionality such as:
   - Owner Commands
