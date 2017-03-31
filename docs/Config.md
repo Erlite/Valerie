@@ -1,13 +1,22 @@
-# Config Example
+# Config Examples
+
+?> **Bot Config**  More options will be added soon :tm:
 
 ```Json
 {
-  "Token": "YOUR TOKEN GOES HERE",
-  "Prefix": "???",
-  "BingAPI": "1234567890abcdefgh",
-  "OwnerID": 1234567890,
-  "DefaultGuild": 1234567890,
-  "WelcomeMessage": "WELCOME TO OUR GUILD!",
-  "MentionPrefix": true
+  "BotToken": "BOT TOKEN HERE",
+  "DefaultCommandPrefix": "?>",
+  "BingAPI": "API KEY HERE",
+  "WelcomeMessage": "Welcome to our Guild"
+}
+```
+?> **Guild Config**  Bot will use your guild prefix instead of DefaultCommandPrefix! :tongue:
+
+```Json
+{
+  "CommandPrefix": "||",
+  "AutoRespond": {
+    "Enabled": false
+  }
 }
 ```
