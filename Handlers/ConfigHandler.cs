@@ -49,26 +49,5 @@ namespace DiscordBot.Handlers
                 return "";
             return (string)config["DefaultCommandPrefix"];
         }
-
-        public string[,] GetAnswers()
-        {
-            if (config == null)
-                return new string[,] { };
-            return ((JArray)config["Answers"]).ToObject<string[,]>();
-        }
-
-        public int GetSwearTimer()
-        {
-            if (config == null)
-                return 1;
-            return (int)config["SwearTimer"];
-        }
-
-        public string GetSwearString()
-        {
-            if (config == null)
-                return "";
-            return (string)config["SwearString"];
-        }
     }
 }

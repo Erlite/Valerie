@@ -73,25 +73,11 @@ namespace DiscordBot.Handlers
             guilds[guild.Id] = gh;
         }
 
-        public DatabaseHandler GuildDatabaseHandler(IGuild guild)
-        {
-            if (guild == null)
-                return null;
-            return guilds[guild.Id].DatabaseHandler;
-        }
-
         public TagHandler GuildTagHandler(IGuild guild)
         {
             if (guild == null)
                 return null;
             return guilds[guild.Id].TagHandler;
-        }
-
-        public IgnoreHandler GuildIgnoreHandler(IGuild guild)
-        {
-            if (guild == null)
-                return null;
-            return guilds[guild.Id].IgnoreHandler;
         }
 
         public GuildHandlers.ConfigHandler GuildConfigHandler(IGuild guild)

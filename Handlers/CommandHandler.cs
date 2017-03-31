@@ -25,7 +25,7 @@ namespace DiscordBot.Handlers
             client = _map.Get<DiscordSocketClient>();
             //log = _map.Get<LogService>();
             cmds = new CommandService();
-            _map.Add(cmds);
+            //_map.Add(cmds);
             map = _map;
 
             cmds.AddTypeReader<int?>(new NullableTypeReader<int>(int.TryParse));
@@ -44,8 +44,7 @@ namespace DiscordBot.Handlers
         {
             var msg = parameterMessage as SocketUserMessage;
             if (msg == null) return Task.CompletedTask;
-            if (msg.Channel is ITextChannel && !MainHandler.GuildConfigHandler((msg.Channel as ITextChannel).Guild).IsChannelAllowed(msg.Channel)) return Task.CompletedTask;
-            if (msg.Channel is ITextChannel && MainHandler.GuildIgnoreHandler((msg.Channel as ITextChannel).Guild).Contains(msg.Author.Id)) return Task.CompletedTask;
+            if (!(msg.Channel is ITextChannel)) return Task.CompletedTask;
             int argPos = 0;
             if (!(/*msg.HasMentionPrefix(client.CurrentUser, ref argPos) || */msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return Task.CompletedTask;
             var _ = HandleCommandAsync(msg, argPos);

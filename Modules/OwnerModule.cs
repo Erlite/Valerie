@@ -9,11 +9,12 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
 using DiscordBot.Classes;
+using DiscordBot.ModulesAddon;
 
 namespace DiscordBot.Modules
 {
     [RequireOwner]
-    public class OwnerModule : ModuleBase
+    public class OwnerModule : ModuleBase<CustomCommandContext>
     {
         private static MemoryStream GenerateStreamFromString(string value)
         {

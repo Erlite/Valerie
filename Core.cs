@@ -16,7 +16,7 @@ namespace DiscordBot
         private DiscordSocketClient client;
         private MainHandler MainHandler;
         //private LogService log;
-        //private CommandHandler handler;
+        private CommandHandler handler;
         //private DependencyMap map;
 
 
@@ -26,7 +26,7 @@ namespace DiscordBot
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
-                LogLevel = LogSeverity.Info,
+                LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true
             });
@@ -37,6 +37,7 @@ namespace DiscordBot
             //await log.LoadConfigurationAsync();
             var map = new DependencyMap();
             map.Add(client);
+            map.Add(handler);
 
             MainHandler = new MainHandler(client);
             client.GuildAvailable += MainHandler.GuildAvailableEvent;

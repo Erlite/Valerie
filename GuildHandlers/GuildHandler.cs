@@ -14,16 +14,12 @@ namespace DiscordBot.GuildHandlers
         public MainHandler MainHandler { get; private set; }
         public IGuild Guild { get; private set; }
         public ConfigHandler ConfigHandler { get; private set; }
-        public DatabaseHandler DatabaseHandler { get; private set; }
-        public IgnoreHandler IgnoreHandler { get; private set; }
         public TagHandler TagHandler { get; private set; }
         public GuildHandler(MainHandler MainHandler, SocketGuild Guild)
         {
             this.MainHandler = MainHandler;
             this.Guild = Guild;
             ConfigHandler = new ConfigHandler(this);
-            DatabaseHandler = new DatabaseHandler(this);
-            IgnoreHandler = new IgnoreHandler(this);
             TagHandler = new TagHandler(this);
         }
 
@@ -36,16 +32,12 @@ namespace DiscordBot.GuildHandlers
         private async Task PrivateInitializeAsync()
         {
             await ConfigHandler.InitializeAsync();
-            await DatabaseHandler.InitializeAsync();
-            await IgnoreHandler.InitializeAsync();
             await TagHandler.InitializeAsync();
         }
 
         public async Task Close()
         {
             await ConfigHandler.Close();
-            await DatabaseHandler.Close();
-            await IgnoreHandler.Close();
             await TagHandler.Close();
         }
 

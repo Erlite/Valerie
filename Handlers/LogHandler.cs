@@ -1,37 +1,37 @@
-﻿using DiscordBot.Services;
+﻿//using DiscordBot.Services;
 
-namespace DiscordBot.Handlers
-{
-    public class LogHandler
-    {
-        public ulong ServerLog { get; set; }
-        public ulong ModLog { get; set; }
-        public bool JoinsLogged { get; set; }
-        public bool LeavesLogged { get; set; }
-        public bool NameChangesLogged { get; set; }
-        public bool NickChangesLogged { get; set; }
-        public bool UserBannedLogged { get; set; }
-        public bool ClientLatency { get; set; }
-        public bool MessageRecieve { get; set; }
-        public bool Starboard { get; set; }
+//namespace DiscordBot.Handlers
+//{
+//    public class LogHandler
+//    {
+//        public ulong ServerLog { get; set; }
+//        public ulong ModLog { get; set; }
+//        public bool JoinsLogged { get; set; }
+//        public bool LeavesLogged { get; set; }
+//        public bool NameChangesLogged { get; set; }
+//        public bool NickChangesLogged { get; set; }
+//        public bool UserBannedLogged { get; set; }
+//        public bool ClientLatency { get; set; }
+//        public bool MessageRecieve { get; set; }
+//        public bool Starboard { get; set; }
 
-        public LogHandler()
-        {
+//        public LogHandler()
+//        {
 
-        }
+//        }
 
-        public LogHandler(LogService s)
-        {
-            ServerLog = s.ServerLogChannelId;
-            ModLog = s.ModLogChannelId;
-            JoinsLogged = s.JoinsLogged;
-            LeavesLogged = s.LeavesLogged;
-            NameChangesLogged = s.NameChangesLogged;
-            NickChangesLogged = s.NickChangesLogged;
-            UserBannedLogged = s.UserBannedLogged;
-            ClientLatency = s.ClientLatency;
-            MessageRecieve = s.MessageRecieve;
-            Starboard = s.Starboard;
-        }
-    }
-}
+//        public LogHandler(LogService s)
+//        {
+//            ServerLog = s.ServerLogChannelId;
+//            ModLog = s.ModLogChannelId;
+//            JoinsLogged = s.JoinsLogged;
+//            LeavesLogged = s.LeavesLogged;
+//            NameChangesLogged = s.NameChangesLogged;
+//            NickChangesLogged = s.NickChangesLogged;
+//            UserBannedLogged = s.UserBannedLogged;
+//            ClientLatency = s.ClientLatency;
+//            MessageRecieve = s.MessageRecieve;
+//            Starboard = s.Starboard;
+//        }
+//    }
+//}
