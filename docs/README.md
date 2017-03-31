@@ -18,4 +18,7 @@ This bot is as flexible as you want it to be. It is being actively developed on 
 
 ## Errors
 ---
-Response.json not found error.
+
+- Have to manually create config folder.
+- Commands not working. Command Context problem.
+- Loggers turned off.
