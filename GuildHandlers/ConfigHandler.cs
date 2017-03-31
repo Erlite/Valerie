@@ -48,9 +48,8 @@ namespace DiscordBot.GuildHandlers
 
         public class WrapperCSA
         {
-            public WrapperCSA(JObject obj) { IsEnabled = (bool)obj["Enabled"]; TextChannels = obj["TextChannels"].ToObject<List<string>>(); }
+            public WrapperCSA(JObject obj) { IsEnabled = (bool)obj["Enabled"]; }
             public bool IsEnabled { get; private set; }
-            public List<string> TextChannels { get; private set; }
         }
     }
 }

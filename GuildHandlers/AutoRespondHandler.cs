@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Discord.Commands;
+using System.Linq;
 
 namespace DiscordBot.GuildHandlers
 {
@@ -40,16 +41,18 @@ namespace DiscordBot.GuildHandlers
             });
         }
 
-        public async Task LoadResponsesAsync()
+        public Dictionary<string, string> LoadResponsesAsync()
         {
-            await Task.Run(() =>
-            {
-                Dictionary<string, string> temp;
-                temp = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
-            });
+            //await Task.Run(() =>
+            //{
+            //Dictionary<string, string> temp;
+                //temp = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
+                return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
+            //});
         }
 
-        public async Task HandleAutoRespondAsync(SocketMessage message)
+
+    public async Task HandleAutoRespondAsync(SocketMessage message)
         {
             var msg = message as SocketUserMessage;
             if (msg == null) return;
@@ -61,8 +64,16 @@ namespace DiscordBot.GuildHandlers
             var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
             if (autorespond.IsEnabled)
             {
-                await channel.SendMessageAsync("Auto Respond Thing");
-                // figure it out
+                var load = LoadResponsesAsync();
+                {
+                    foreach (KeyValuePair<string, string> item in load.Where(x => x.Key.Contains(msg.ToString())))
+                    {
+                        if (msg.Content.Contains(item.Key))
+                        {
+                            await msg.Channel.SendMessageAsync(item.Value);
+                        }
+                    }
+                }
             }
         }
     }
