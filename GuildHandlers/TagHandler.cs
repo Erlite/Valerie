@@ -15,6 +15,7 @@ namespace DiscordBot.GuildHandlers
         private GuildHandler GuildHandler;
         private Dictionary<string, Tag> tags = null;
         private Timer timer;
+
         public TagHandler(GuildHandler GuildHandler)
         {
             this.GuildHandler = GuildHandler;

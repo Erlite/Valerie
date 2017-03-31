@@ -149,7 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\CooldownAttribute.cs" />
-    <Compile Include="Attributes\RequiredAttribute.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Enums\AdminEnum.cs" />
@@ -163,6 +162,7 @@
     <Compile Include="Handlers\LogHandler.cs" />
     <Compile Include="Handlers\MainHandler.cs" />
     <Compile Include="Handlers\PermissionHandler.cs" />
+    <Compile Include="GuildHandlers\AutoRespondHandler.cs" />
     <Compile Include="Interface\IGuildHandler.cs" />
     <Compile Include="Interface\IHandler.cs" />
     <Compile Include="ModulesAddon\CustomCommandContext.cs" />

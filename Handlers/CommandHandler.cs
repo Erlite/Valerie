@@ -1,11 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Reflection;
-using System.Linq;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using DiscordBot.Services;
-using System.IO;
 using System;
 using DiscordBot.ModulesAddon;
 
@@ -16,16 +13,13 @@ namespace DiscordBot.Handlers
         private IDependencyMap map;
         private DiscordSocketClient client;
         private CommandService cmds;
-        //private LogService log;
         private MainHandler MainHandler;
 
         public async Task InitializeAsync(MainHandler MainHandler, IDependencyMap _map)
         {
             this.MainHandler = MainHandler;
             client = _map.Get<DiscordSocketClient>();
-            //log = _map.Get<LogService>();
             cmds = new CommandService();
-            //_map.Add(cmds);
             map = _map;
 
             cmds.AddTypeReader<int?>(new NullableTypeReader<int>(int.TryParse));

@@ -1,10 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using DiscordBot.Handlers;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiscordBot.GuildHandlers
@@ -15,12 +12,15 @@ namespace DiscordBot.GuildHandlers
         public IGuild Guild { get; private set; }
         public ConfigHandler ConfigHandler { get; private set; }
         public TagHandler TagHandler { get; private set; }
+        public AutoRespondHandler Autorespond { get; private set; }
+
         public GuildHandler(MainHandler MainHandler, SocketGuild Guild)
         {
             this.MainHandler = MainHandler;
             this.Guild = Guild;
             ConfigHandler = new ConfigHandler(this);
             TagHandler = new TagHandler(this);
+            Autorespond = new AutoRespondHandler(this);
         }
 
         public async Task InitializeAsync()
@@ -33,12 +33,14 @@ namespace DiscordBot.GuildHandlers
         {
             await ConfigHandler.InitializeAsync();
             await TagHandler.InitializeAsync();
+            await Autorespond.InitializeAsync();
         }
 
         public async Task Close()
         {
             await ConfigHandler.Close();
             await TagHandler.Close();
+            await Autorespond.Close();
         }
 
         public async Task RenewGuildObject(SocketGuild Guild)
