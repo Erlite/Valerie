@@ -6,11 +6,12 @@ using Discord.WebSocket;
 using System.Net.Http;
 using System.IO;
 using DiscordBot.Services;
+using DiscordBot.ModulesAddon;
 
 namespace DiscordBot.Modules
 {
     [Group("Set"), RequireOwner]
-    public class BotModule : ModuleBase
+    public class BotModule : ModuleBase<CustomCommandContext>
     {
         [Command("Username"), RequireContext(ContextType.Guild)]
         public async Task UsernameAsync([Remainder] string value)
