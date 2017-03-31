@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using DiscordBot.Handlers;
+using Discord.Addons.InteractiveCommands;
 
 namespace DiscordBot.ModulesAddon
 {

@@ -16,6 +16,7 @@ namespace DiscordBot
         private DiscordSocketClient client;
         private MainHandler MainHandler;
         private CommandHandler handler;
+        private InteractiveService Interactive;
 
 
         public async Task StartAsync()
@@ -34,6 +35,7 @@ namespace DiscordBot
             var map = new DependencyMap();
             map.Add(client);
             map.Add(handler);
+            map.Add(Interactive);
 
             MainHandler = new MainHandler(client);
             client.GuildAvailable += MainHandler.GuildAvailableEvent;

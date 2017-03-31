@@ -16,14 +16,14 @@ using DiscordBot.GuildHandlers;
 
 namespace DiscordBot.Modules
 {
-    public class GeneralModule : ModuleBase
+    public class GeneralModule : ModuleBase<CustomCommandContext>
     {
-        //private InteractiveService inter;
+        private InteractiveService Interactive;
         private AutoRespondHandler ar;
         private MainHandler main;
-        public GeneralModule(MainHandler Main)
+        public GeneralModule(InteractiveService Inter)
         {
-            main = Main;
+            Interactive = Inter;
         }
 
 
@@ -309,16 +309,16 @@ namespace DiscordBot.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        //[Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses interactive command to create a new response for you")]
+        //[Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
         //public async Task ResponseAsync()
         //{
         //    await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-        //    var nameResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+        //    var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
         //    if (nameResponse.Content == "cancel") return;
         //    string name = nameResponse.Content;
 
         //    await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-        //    var contentResponse = await inter.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+        //    var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
         //    if (contentResponse.Content == "cancel") return;
         //    string response = contentResponse.Content;
 
