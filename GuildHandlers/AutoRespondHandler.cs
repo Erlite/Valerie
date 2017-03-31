@@ -5,13 +5,14 @@ using DiscordBot.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Discord.Commands;
 
 namespace DiscordBot.GuildHandlers
 {
     public class AutoRespondHandler : IHandler
     {
         private GuildHandler GuildHandler;
-        private DiscordSocketClient client;
+        private CommandContext context;
 
         public AutoRespondHandler(GuildHandler GuildHandler)
         {
@@ -51,7 +52,11 @@ namespace DiscordBot.GuildHandlers
         public async Task HandleAutoRespondAsync(SocketMessage message)
         {
             var msg = message as SocketUserMessage;
-            if (msg == null || msg.Author.IsBot || msg.Author.Id == client.CurrentUser.Id || !(msg.Channel is ITextChannel)) return;
+            if (msg == null) return;
+            if (msg.Author.IsBot) return;
+            
+            //if (msg.Channel != message.Channel) return;
+            //if (msg == null || msg.Author.IsBot || msg.Author.Id == client.CurrentUser.Id || !(msg.Channel is ITextChannel)) return;
             var channel = msg.Channel as ITextChannel;            
             var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
             if (autorespond.IsEnabled)
