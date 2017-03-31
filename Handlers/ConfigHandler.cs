@@ -49,5 +49,19 @@ namespace DiscordBot.Handlers
                 return "";
             return (string)config["DefaultCommandPrefix"];
         }
+
+        public string GetBingAPI()
+        {
+            if (config == null)
+                return "";
+            return (string)config["BingAPI"];
+        }
+
+        public string GetWelcomeMessage()
+        {
+            if (config == null)
+                return "";
+            return (string)config["WelcomeMessage"];
+        }
     }
 }

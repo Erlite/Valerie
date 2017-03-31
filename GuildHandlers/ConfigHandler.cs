@@ -40,5 +40,17 @@ namespace DiscordBot.GuildHandlers
         {
             return (string)config["CommandPrefix"];
         }
+
+        public WrapperCSA GetAutoRespond()
+        {
+            return new WrapperCSA((JObject)config["AutoRespond"]);
+        }
+
+        public class WrapperCSA
+        {
+            public WrapperCSA(JObject obj) { IsEnabled = (bool)obj["Enabled"]; TextChannels = obj["TextChannels"].ToObject<List<string>>(); }
+            public bool IsEnabled { get; private set; }
+            public List<string> TextChannels { get; private set; }
+        }
     }
 }

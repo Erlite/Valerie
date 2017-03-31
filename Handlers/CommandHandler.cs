@@ -46,7 +46,7 @@ namespace DiscordBot.Handlers
             if (msg == null) return Task.CompletedTask;
             if (!(msg.Channel is ITextChannel)) return Task.CompletedTask;
             int argPos = 0;
-            if (!(/*msg.HasMentionPrefix(client.CurrentUser, ref argPos) || */msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return Task.CompletedTask;
+            if (!(msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return Task.CompletedTask;
             var _ = HandleCommandAsync(msg, argPos);
             return Task.CompletedTask;
         }

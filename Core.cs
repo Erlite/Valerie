@@ -15,9 +15,7 @@ namespace DiscordBot
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
         private DiscordSocketClient client;
         private MainHandler MainHandler;
-        //private LogService log;
         private CommandHandler handler;
-        //private DependencyMap map;
 
 
         public async Task StartAsync()
@@ -33,8 +31,6 @@ namespace DiscordBot
 
             client.Log += (l) => Task.Run(() => ConsoleService.Log(l.Severity, l.Source, l.Exception?.ToString() ?? l.Message));
 
-            //log = new LogService(client, config);
-            //await log.LoadConfigurationAsync();
             var map = new DependencyMap();
             map.Add(client);
             map.Add(handler);
