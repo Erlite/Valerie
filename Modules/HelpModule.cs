@@ -1,20 +1,18 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using DiscordBot.Handlers;
+using DiscordBot.ModulesAddon;
 using System.Linq;
 
 namespace DiscordBot.Modules
 {
-    public class HelpModule : ModuleBase
+    public class HelpModule : ModuleBase<CustomCommandContext>
     {
         private CommandService _service;
-        //private ConfigHandlerOLD Config;
 
         public HelpModule(CommandService service)
         {
             _service = service;
-          //  Config = config;
         }
 
         [Command("Help")]

@@ -41,7 +41,7 @@ namespace DiscordBot.Handlers
             if (msg == null) return;
             if (!(msg.Channel is ITextChannel)) return;
             int argPos = 0;
-            if (!(msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return;
+            if (!(msg.HasStringPrefix(MainHandler.ConfigHandler.GetDefaultCommandPrefix(), ref argPos) || msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return;
             var context = new CustomCommandContext(client, MainHandler, msg);
             var Result = cmds.Search(context, argPos);
             CommandInfo Command = null;

@@ -52,13 +52,6 @@ namespace DiscordBot.Handlers
             return (string)config["BingAPI"];
         }
 
-        public string GetWelcomeMessage()
-        {
-            if (config == null)
-                return "";
-            return (string)config["WelcomeMessage"];
-        }
-
         public bool DebugMode()
         {
             if (config == null)

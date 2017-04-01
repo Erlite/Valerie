@@ -20,13 +20,12 @@ namespace DiscordBot.Modules
     {
         private InteractiveService Interactive;
         private AutoRespondHandler ar;
-        private MainHandler main;
+        public MainHandler Main { get; }
 
         public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
         }
-
 
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
         public async Task GuildInfoAsync()
@@ -56,9 +55,6 @@ namespace DiscordBot.Modules
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
         public async Task GifsAsync([Remainder] string keywords)
         {
-            if (string.IsNullOrWhiteSpace(keywords))
-                throw new ArgumentException("What do you want me to search for?");
-
             var getUrl = new Uri("http://api.giphy.com/");
             using (var client = new HttpClient())
             {
@@ -341,13 +337,10 @@ namespace DiscordBot.Modules
         [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
         public async Task Image([Remainder] string search)
         {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new ArgumentException("Not sure what I should search for??");
-
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", main.ConfigHandler.GetBingAPI());
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Main.ConfigHandler.GetBingAPI());
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {
