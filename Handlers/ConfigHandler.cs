@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DiscordBot.Interfaces;
 
@@ -62,6 +57,13 @@ namespace DiscordBot.Handlers
             if (config == null)
                 return "";
             return (string)config["WelcomeMessage"];
+        }
+
+        public bool DebugMode()
+        {
+            if (config == null)
+                return true;
+            return (bool)config["EnableDebugMode"];
         }
     }
 }

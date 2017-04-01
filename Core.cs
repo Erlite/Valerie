@@ -2,7 +2,6 @@
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using System.IO;
 using DiscordBot.Services;
 using DiscordBot.Handlers;
 using Discord.Addons.InteractiveCommands;

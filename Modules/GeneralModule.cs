@@ -21,6 +21,7 @@ namespace DiscordBot.Modules
         private InteractiveService Interactive;
         private AutoRespondHandler ar;
         private MainHandler main;
+
         public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
