@@ -21,11 +21,6 @@ namespace DiscordBot.Modules
         [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
         public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = null)
         {
-            if (user == null)
-                throw new ArgumentException("You must mention a user!");
-            if (string.IsNullOrWhiteSpace(reason))
-                throw new ArgumentException("You must provide a reason");
-
             var embed = new EmbedBuilder()
                 .WithTitle("===== Kicked User =====")
                 .WithDescription($"**Username: **{user.Username} || {user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")

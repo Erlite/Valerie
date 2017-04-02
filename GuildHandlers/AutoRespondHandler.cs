@@ -41,7 +41,7 @@ namespace DiscordBot.GuildHandlers
             });
         }
 
-        public Dictionary<string, string> LoadResponsesAsync()
+        public Dictionary<string, string> LoadResponsesAsync(ulong ID)
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
         }
@@ -50,13 +50,14 @@ namespace DiscordBot.GuildHandlers
         public async Task HandleAutoRespondAsync(SocketMessage message)
         {
             var msg = message as SocketUserMessage;
+            var guild = context.Guild as SocketGuild;
             if (msg == null) return;
             if (msg.Author.IsBot) return;
             var channel = msg.Channel as ITextChannel;
             var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
             if (autorespond.IsEnabled)
             {
-                var load = LoadResponsesAsync();
+                var load = LoadResponsesAsync(guild.Id);
                 {
                     foreach (KeyValuePair<string, string> item in load.Where(x => x.Key.Contains(msg.ToString())))
                     {

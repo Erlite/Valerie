@@ -281,30 +281,31 @@ namespace DiscordBot.Modules
             await chn.SendMessageAsync("", false, embed);
         }
 
-        [Command("ResponseList"), Summary("Just run the command"), Remarks("Lists all the responses saved in the JSON file."), Alias("RL")]
-        public async Task ResponseListAsync()
-        {
-            var resp = ar.LoadResponsesAsync();
-            StringBuilder list = new StringBuilder();
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = Context.Client.CurrentUser.Username;
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                })
-                .WithColor(new Color(109, 242, 122))
-                .WithTitle($"**Total Responses:** {resp.Count}");
-            foreach (var values in resp)
-            {
-                embed.AddField(x =>
-                {
-                    x.Name = values.Key;
-                    x.Value = values.Value;
-                    x.IsInline = true;
-                });
-            }
-            await ReplyAsync("", embed: embed);
-        }
+        //[Command("ResponseList"), Summary("Just run the command"), Remarks("Lists all the responses saved in the JSON file."), Alias("RL")]
+        //public async Task ResponseListAsync()
+        //{
+        //    var guild = Context.Guild as SocketGuild;
+        //    var resp = ar.LoadResponsesAsync(guild.Id);
+        //    StringBuilder list = new StringBuilder();
+        //    var embed = new EmbedBuilder()
+        //        .WithAuthor(x =>
+        //        {
+        //            x.Name = Context.Client.CurrentUser.Username;
+        //            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+        //        })
+        //        .WithColor(new Color(109, 242, 122))
+        //        .WithTitle($"**Total Responses:** {resp.Count}");
+        //    foreach (var values in resp)
+        //    {
+        //        embed.AddField(x =>
+        //        {
+        //            x.Name = values.Key;
+        //            x.Value = values.Value;
+        //            x.IsInline = true;
+        //        });
+        //    }
+        //    await ReplyAsync("", embed: embed);
+        //}
 
         //[Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
         //public async Task ResponseAsync()
@@ -366,6 +367,16 @@ namespace DiscordBot.Modules
                     .WithImageUrl((string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
+        }
+
+        [Command("Embed")]
+        public async Task EmbedAsync([Remainder] string msg)
+        {
+            await Context.Message.DeleteAsync();
+            var embed = new EmbedBuilder()
+                .WithColor(new Color(255, 255, 255))
+                .WithDescription($"{Format.Italics(msg)}");
+            await ReplyAsync("", embed: embed);
         }
     }
 }
