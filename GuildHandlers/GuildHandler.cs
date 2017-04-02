@@ -12,7 +12,7 @@ namespace DiscordBot.GuildHandlers
         public IGuild Guild { get; private set; }
         public ConfigHandler ConfigHandler { get; private set; }
         public TagHandler TagHandler { get; private set; }
-        public AutoRespondHandler Autorespond { get; private set; }
+        public LogHandler Autorespond { get; private set; }
 
         public GuildHandler(MainHandler MainHandler, SocketGuild Guild)
         {
@@ -20,7 +20,7 @@ namespace DiscordBot.GuildHandlers
             this.Guild = Guild;
             ConfigHandler = new ConfigHandler(this);
             TagHandler = new TagHandler(this);
-            Autorespond = new AutoRespondHandler(this);
+            Autorespond = new LogHandler(this);
         }
 
         public async Task InitializeAsync()

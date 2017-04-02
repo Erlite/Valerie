@@ -41,15 +41,62 @@ namespace DiscordBot.GuildHandlers
             return (string)config["CommandPrefix"];
         }
 
-        public WrapperCSA GetAutoRespond()
+        public string GetWelcomeMessage()
         {
-            return new WrapperCSA((JObject)config["AutoRespond"]);
+            return (string)config["WelcomeMessage"];
+        }
+        
+        public SingleWrapper GetModChannel()
+        {
+            return new SingleWrapper((JObject)config["ModChannel"]);
         }
 
-        public class WrapperCSA
+
+        public class SingleWrapper
         {
-            public WrapperCSA(JObject obj) { IsEnabled = (bool)obj["Enabled"]; }
+            public SingleWrapper(JObject obj) { IsEnabled = (bool)obj["Enabled"]; TextChannel = (string)obj["TextChannel"]; }
             public bool IsEnabled { get; private set; }
+            public string TextChannel { get; private set; }
+        }
+
+        public MultiWrapper GetAutoRespond()
+        {
+            return new MultiWrapper((JObject)config["AutoRespond"]);
+        }
+
+        public EventWrapper EventsLogging()
+        {
+            return new EventWrapper((JObject)config["EventsLog"]);
+        }
+
+
+        // Classes
+        public class MultiWrapper
+        {
+            public MultiWrapper(JObject obj)
+            {
+                IsEnabled = (bool)obj["Enabled"];
+                TextChannels = obj["TextChannels"].ToObject<List<string>>();
+            }
+
+            public bool IsEnabled { get; private set; }
+            public List<string> TextChannels { get; private set; }
+        }
+
+        public class EventWrapper
+        {
+            public EventWrapper(JObject obj)
+            {
+                JoinLog = (bool)obj["JoinLog"];
+                LeaveLog = (bool)obj["LeaveLog"];
+                BanLog = (bool)obj["BanLog"];
+                TextChannel = (string)obj["EventTextChannel"];
+            }
+
+            public bool JoinLog { get; private set; }
+            public bool LeaveLog { get; private set; }
+            public bool BanLog { get; private set; }
+            public string TextChannel { get; private set; }
         }
     }
 }

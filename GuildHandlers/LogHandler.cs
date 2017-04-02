@@ -10,12 +10,12 @@ using System.Linq;
 
 namespace DiscordBot.GuildHandlers
 {
-    public class AutoRespondHandler : IHandler
+    public class LogHandler : IHandler
     {
         private GuildHandler GuildHandler;
         private CommandContext context;
 
-        public AutoRespondHandler(GuildHandler GuildHandler)
+        public LogHandler(GuildHandler GuildHandler)
         {
             this.GuildHandler = GuildHandler;
         }
@@ -23,12 +23,18 @@ namespace DiscordBot.GuildHandlers
         public async Task InitializeAsync()
         {
             GuildHandler.MainHandler.Client.MessageReceived += HandleAutoRespondAsync;
+            GuildHandler.MainHandler.Client.UserJoined += UserJoinAsync;
+            GuildHandler.MainHandler.Client.UserLeft += UserLeftAsync;
+            GuildHandler.MainHandler.Client.UserBanned += UserBannedAsync;
             await Task.CompletedTask;
         }
 
         public Task Close()
         {
             GuildHandler.MainHandler.Client.MessageReceived -= HandleAutoRespondAsync;
+            GuildHandler.MainHandler.Client.UserJoined -= UserJoinAsync;
+            GuildHandler.MainHandler.Client.UserLeft -= UserLeftAsync;
+            GuildHandler.MainHandler.Client.UserBanned -= UserBannedAsync;
             return Task.CompletedTask;
         }
 
@@ -45,7 +51,6 @@ namespace DiscordBot.GuildHandlers
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
         }
-
 
         public async Task HandleAutoRespondAsync(SocketMessage message)
         {
@@ -68,6 +73,21 @@ namespace DiscordBot.GuildHandlers
                     }
                 }
             }
+        }
+
+        private async Task UserBannedAsync(SocketUser arg1, SocketGuild arg2)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private async Task UserLeftAsync(SocketGuildUser arg)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private async Task UserJoinAsync(SocketGuildUser arg)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

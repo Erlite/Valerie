@@ -19,7 +19,7 @@ namespace DiscordBot.Modules
     public class GeneralModule : ModuleBase<CustomCommandContext>
     {
         private InteractiveService Interactive;
-        private AutoRespondHandler ar;
+        private GuildHandlers.LogHandler ar;
         public MainHandler Main { get; }
 
         public GeneralModule(InteractiveService Inter)
