@@ -7,6 +7,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Discord.Commands;
 using System.Linq;
+using DiscordBot.Services;
+using DiscordBot.Handlers;
 
 namespace DiscordBot.GuildHandlers
 {
@@ -14,10 +16,12 @@ namespace DiscordBot.GuildHandlers
     {
         private GuildHandler GuildHandler;
         private CommandContext context;
+        private MainHandler MainHandler;
 
-        public LogHandler(GuildHandler GuildHandler)
+        public LogHandler(GuildHandler GuildHandler, MainHandler MainHandler)
         {
             this.GuildHandler = GuildHandler;
+            this.MainHandler = MainHandler;
         }
 
         public async Task InitializeAsync()
@@ -47,7 +51,7 @@ namespace DiscordBot.GuildHandlers
             });
         }
 
-        public Dictionary<string, string> LoadResponsesAsync(ulong ID)
+        public Dictionary<string, string> LoadResponsesAsync()
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
         }
@@ -56,13 +60,13 @@ namespace DiscordBot.GuildHandlers
         {
             var msg = message as SocketUserMessage;
             var guild = context.Guild as SocketGuild;
+            var channel = msg.Channel as ITextChannel;
             if (msg == null) return;
             if (msg.Author.IsBot) return;
-            var channel = msg.Channel as ITextChannel;
-            var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
+            var autorespond = MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
             if (autorespond.IsEnabled)
             {
-                var load = LoadResponsesAsync(guild.Id);
+                var load = LoadResponsesAsync();
                 {
                     foreach (KeyValuePair<string, string> item in load.Where(x => x.Key.Contains(msg.ToString())))
                     {
@@ -75,19 +79,36 @@ namespace DiscordBot.GuildHandlers
             }
         }
 
-        private async Task UserBannedAsync(SocketUser arg1, SocketGuild arg2)
+        private async Task UserBannedAsync(SocketUser user1, SocketGuild user2)
         {
-            throw new System.NotImplementedException();
         }
 
-        private async Task UserLeftAsync(SocketGuildUser arg)
+        private async Task UserLeftAsync(SocketGuildUser user)
         {
-            throw new System.NotImplementedException();
+            var embed = new EmbedBuilder();
+            embed.Title = "=== User Joined ===";
+            embed.Description = $"**Username: **{user.Username}#{user.Discriminator}}";
+            embed.Color = new Color(83, 219, 207);
+            var Log = MainHandler.GuildConfigHandler(user.Guild).EventsLogging();
+            if (Log.JoinLog)
+            {
+                var channel = user.Guild.GetChannel(Log.TextChannel) as ITextChannel;
+                await channel.SendMessageAsync("", embed: embed);
+            }
         }
 
-        private async Task UserJoinAsync(SocketGuildUser arg)
+        private async Task UserJoinAsync(SocketGuildUser user)
         {
-            throw new System.NotImplementedException();
+            var embed = new EmbedBuilder();
+            embed.Title = "=== User Joined ===";
+            embed.Description = $"**Username: **{user.Username}#{user.Discriminator}\n{GuildHandler.ConfigHandler.GetWelcomeMessage()}";
+            embed.Color = new Color(83, 219, 207);
+            var Log = MainHandler.GuildConfigHandler(user.Guild).EventsLogging();
+            if (Log.JoinLog)
+            {
+                var channel = user.Guild.GetChannel(Log.TextChannel) as ITextChannel;
+                await channel.SendMessageAsync("", embed: embed);
+            }
         }
     }
 }

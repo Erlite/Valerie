@@ -172,10 +172,9 @@
     <Compile Include="Handlers\ConfigHandler.cs" />
     <Compile Include="Handlers\ExceptionHandler.cs" />
     <Compile Include="Handlers\GiftsHandler.cs" />
-    <Compile Include="Handlers\LogHandler.cs" />
     <Compile Include="Handlers\MainHandler.cs" />
     <Compile Include="Handlers\PermissionHandler.cs" />
-    <Compile Include="GuildHandlers\AutoRespondHandler.cs" />
+    <Compile Include="GuildHandlers\LogHandler.cs" />
     <Compile Include="Interface\IGuildHandler.cs" />
     <Compile Include="Interface\IHandler.cs" />
     <Compile Include="ModulesAddon\CustomCommandContext.cs" />

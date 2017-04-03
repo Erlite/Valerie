@@ -46,17 +46,9 @@ namespace DiscordBot.GuildHandlers
             return (string)config["WelcomeMessage"];
         }
         
-        public SingleWrapper GetModChannel()
+        public ulong GetModChannel()
         {
-            return new SingleWrapper((JObject)config["ModChannel"]);
-        }
-
-
-        public class SingleWrapper
-        {
-            public SingleWrapper(JObject obj) { IsEnabled = (bool)obj["Enabled"]; TextChannel = (string)obj["TextChannel"]; }
-            public bool IsEnabled { get; private set; }
-            public string TextChannel { get; private set; }
+            return (ulong)config["ModChannelID"];
         }
 
         public MultiWrapper GetAutoRespond()
@@ -68,7 +60,6 @@ namespace DiscordBot.GuildHandlers
         {
             return new EventWrapper((JObject)config["EventsLog"]);
         }
-
 
         // Classes
         public class MultiWrapper
@@ -90,13 +81,13 @@ namespace DiscordBot.GuildHandlers
                 JoinLog = (bool)obj["JoinLog"];
                 LeaveLog = (bool)obj["LeaveLog"];
                 BanLog = (bool)obj["BanLog"];
-                TextChannel = (string)obj["EventTextChannel"];
+                TextChannel = (ulong)obj["EventTextChannel"];
             }
 
             public bool JoinLog { get; private set; }
             public bool LeaveLog { get; private set; }
             public bool BanLog { get; private set; }
-            public string TextChannel { get; private set; }
+            public ulong TextChannel { get; private set; }
         }
     }
 }
