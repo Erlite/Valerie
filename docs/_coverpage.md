@@ -11,7 +11,7 @@
 - Lots of customization options
 
 [GitHub](https://github.com/ExceptionDev/DiscordExampleBot)
-[Halp Me](https://discord.me/ArcaneOps)
+[HELP](https://discord.me/ArcaneOps)
 
 
 <!--- background Image --->

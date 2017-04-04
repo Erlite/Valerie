@@ -14,18 +14,14 @@ Create new Console application targeting .Net Framework 4.6.1. Add this to your 
 ?> *https://www.myget.org/F/discord-net/api/v3/index.json*
 
 Install the latest version of the following from Nuget ( Make sure to check off prereleases):
-  - Discord.Net 1.0 (This should also install Discord.Net.Commands, Discord.Net.WebSocket automatically. If it doesn't do it manually)
-  - Discord.Net.Core
-  - Discord.Net.Rest
+  - Discord.Net 1.0 (This should also install Discord.Net.Commands, Discord.Net.WebSocket, etc automatically. If it doesn't do it manually)
   - Discord.Addons.InteractiveCommands
   - Discord.Addons.EmojiTools
   - Discord.Addons.WS4NetCompatibility
 
-Once packages are installed, start importing the folders/files.
+Once packages are installed, start importing the folders/files within the project.
 
-!>*FOLDERS:* Attributes, Classes, Handlers, Modules, Services
-
-!>*FILES:* Core.cs
+?> **Folders/Files not needed:** Properties, Docs, App.config, .gitignore
 
 A simple copy paste should do the trick:
 

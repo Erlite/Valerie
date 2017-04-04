@@ -32,6 +32,11 @@ This contains the current Todo list for myself and the bot. Will keep this updat
 
 ?> *No longer requires WS4NET. Already installed it and added it in `Core.cs`*
 
+?> *Bot's own website / Doc Website*
+
+?> Config for each Guild
+
+
 ## Planned Feature
 ---
 !> *Configureable Prefix for Github MessageReceived event?*
@@ -41,7 +46,3 @@ This contains the current Todo list for myself and the bot. Will keep this updat
 !> *Custom Permission Attribute*
 
 !> *Custom Channels Attribute*
-
-!> *Bot's own website / Doc Website*
-
-!> *Option to use emoji as Command prefix*

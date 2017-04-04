@@ -64,14 +64,8 @@ namespace DiscordBot.GuildHandlers
         // Classes
         public class MultiWrapper
         {
-            public MultiWrapper(JObject obj)
-            {
-                IsEnabled = (bool)obj["Enabled"];
-                TextChannels = obj["TextChannels"].ToObject<List<string>>();
-            }
-
+            public MultiWrapper(JObject obj){IsEnabled = (bool)obj["Enabled"];}
             public bool IsEnabled { get; private set; }
-            public List<string> TextChannels { get; private set; }
         }
 
         public class EventWrapper
