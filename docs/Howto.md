@@ -34,6 +34,9 @@ If everything is done correctly, you shouldn't run into errors. If you run into 
 
 
 ## Quick Setup
+---
 
 If for some reason you don't want an un-compiled version of the bot. You can always download the installer to quickly get started with your bot.
 The installer will be updated with the current version!
+
+?> [***ALPHA VERSION***](https://exceptiondev.github.io/DiscordExampleBot/Downloads/installer.bat)
