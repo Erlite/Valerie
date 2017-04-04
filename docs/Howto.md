@@ -31,3 +31,9 @@ A simple copy paste should do the trick:
 If everything is done correctly, you shouldn't run into errors. If you run into an error after importing and the error is regarding some assembly not found then install that package VIA Nuget.
 
 !> DO NOT UPDATE WS4NetCompatibility PACKAGE EVER! IT WILL CAUSE SOME KIND OF PROBLEM THAT I'M NOT AWARE OF!
+
+
+## Quick Setup
+
+If for some reason you don't want an un-compiled version of the bot. You can always download the installer to quickly get started with your bot.
+The installer will be updated with the current version!

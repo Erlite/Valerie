@@ -10,6 +10,7 @@
    ░     ░        ░  ░ ░          ░ ░     ░        ░        ░          ░ ░           
  ░                   ░                           ░               ░                   
  ```
+
 Discord Example Bot is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.1
 This bot provides wide range of functionality such as:
   - Owner Commands
@@ -29,7 +30,6 @@ This bot is as flexible as you want it to be. It is being actively developed on 
 ?> *To get more Information on commands or current bot commands, look at Command List*
 
 Look at the issues on this Bot's repo to see what issues have been fixed and what issues are there. If you come across an issues within the bot please feel free to open a new issue and/or join my discord server if you require more help.
-
 
 ## FAQ
 ---
