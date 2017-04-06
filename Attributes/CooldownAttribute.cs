@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DiscordBot.Attributes
+namespace Meeseeks.Attributes
 {
     public class CooldownAttribute : PreconditionAttribute
     {

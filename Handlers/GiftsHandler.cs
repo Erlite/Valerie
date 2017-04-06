@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using DiscordBot.Services;
+using Meeseeks.Services;
 
-namespace DiscordBot.Handlers
+namespace Meeseeks.Handlers
 {
     public class GiftsHandler : GiftService
     {

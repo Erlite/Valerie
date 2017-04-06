@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DiscordBot.Classes
+namespace Meeseeks.Classes
 {
     public class Message
     {

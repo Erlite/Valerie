@@ -1,5 +1,5 @@
 ﻿using Discord;
-using DiscordBot.Interfaces;
+using Meeseeks.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace DiscordBot.Handlers
+namespace Meeseeks.Handlers
 {
     public class ExceptionHandler : IHandler
     {

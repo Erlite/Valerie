@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using DiscordBot.Interfaces;
+using Meeseeks.Interfaces;
 
-namespace DiscordBot.Handlers
+namespace Meeseeks.Handlers
 {
     public class ConfigHandler : IHandler
     {

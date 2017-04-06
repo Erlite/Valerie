@@ -4,9 +4,9 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
-using DiscordBot.ModulesAddon;
+using Meeseeks.ModulesAddon;
 
-namespace DiscordBot.Modules
+namespace Meeseeks.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator)]
     public class AdminModule : ModuleBase<CustomCommandContext>
@@ -76,6 +76,14 @@ namespace DiscordBot.Modules
             embed.Description = $"I've deleted {range} messages.";
             embed.Color = new Color(191, 30, 60);
             await Context.Channel.SendMessageAsync("", false, embed);
+        }
+
+        [Command("SaveTags")]
+        [RequireContext(ContextType.Guild)]
+        public async Task Forcesave()
+        {
+            await Context.MainHandler.GuildTagHandler(Context.Guild).SaveTagsAsync();
+            await ReplyAsync("Saved tags, titles, and DB.");
         }
 
         //[Command("Gift")]

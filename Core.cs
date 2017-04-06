@@ -2,12 +2,12 @@
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using DiscordBot.Services;
-using DiscordBot.Handlers;
+using Meeseeks.Services;
+using Meeseeks.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
 
-namespace DiscordBot
+namespace Meeseeks
 {
     public class Core
     {
@@ -19,8 +19,7 @@ namespace DiscordBot
 
 
         public async Task StartAsync()
-        {
-            ConsoleService.TitleCard("Rick", DiscordConfig.Version);
+        {            
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,

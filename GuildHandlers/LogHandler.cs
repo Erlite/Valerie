@@ -1,17 +1,17 @@
 ﻿using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord;
-using DiscordBot.Interfaces;
+using Meeseeks.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Discord.Commands;
 using System.Linq;
-using DiscordBot.Services;
-using DiscordBot.Handlers;
+using Meeseeks.Services;
+using Meeseeks.Handlers;
 using System;
 
-namespace DiscordBot.GuildHandlers
+namespace Meeseeks.GuildHandlers
 {
     public class LogHandler : IHandler
     {

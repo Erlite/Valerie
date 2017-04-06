@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace DiscordBot.Services
+namespace Meeseeks.Services
 {
     public class ExtraService
     {

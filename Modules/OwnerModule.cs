@@ -8,10 +8,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
-using DiscordBot.Classes;
-using DiscordBot.ModulesAddon;
+using Meeseeks.Classes;
+using Meeseeks.ModulesAddon;
 
-namespace DiscordBot.Modules
+namespace Meeseeks.Modules
 {
     [RequireOwner]
     public class OwnerModule : ModuleBase<CustomCommandContext>
@@ -100,6 +100,45 @@ namespace DiscordBot.Modules
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
                 await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
             }
+        }
+
+        [Command("reload"), Summary("Reload MainConfig")]
+        public async Task Reload([Remainder] string what = null)
+        {
+            switch (what)
+            {
+                case "MainConfig":
+                    {
+                        await Context.MainHandler.ConfigHandler.LoadAsync();
+                        break;
+                    }
+                case "Guild":
+                    {
+                        if (!(Context.Channel is ITextChannel))
+                        {
+                            await ReplyAsync("You aren't in a guild channel!");
+                            return;
+                        }
+                        await Context.MainHandler.ReloadGuildAsync((Context.Channel as ITextChannel).Guild as SocketGuild);
+                        break;
+                    }
+                case "GuildConfig":
+                    {
+                        if (!(Context.Channel is ITextChannel))
+                        {
+                            await ReplyAsync("You aren't in a guild channel!");
+                            return;
+                        }
+                        await Context.MainHandler.GuildConfigHandler(Context.Guild).LoadAsync();
+                        break;
+                    }
+                default:
+                    {
+                        await ReplyAsync("Option not found.");
+                        return;
+                    }
+            }
+            await ReplyAsync("Reloaded! :ok_hand:");
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord;
 
-namespace DiscordBot.Services
+namespace Meeseeks.Services
 {
     public class ConsoleService
     {

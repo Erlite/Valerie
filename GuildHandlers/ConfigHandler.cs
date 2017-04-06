@@ -3,10 +3,10 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using DiscordBot.Interfaces;
-using DiscordBot.Services;
+using Meeseeks.Interfaces;
+using Meeseeks.Services;
 
-namespace DiscordBot.GuildHandlers
+namespace Meeseeks.GuildHandlers
 {
     public class ConfigHandler : IGuildHandler
     {

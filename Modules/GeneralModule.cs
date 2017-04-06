@@ -7,14 +7,14 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Discord.WebSocket;
 using System.Diagnostics;
-using DiscordBot.Handlers;
+using Meeseeks.Handlers;
 using System.Collections.Generic;
 using System.Text;
 using Discord.Addons.InteractiveCommands;
-using DiscordBot.ModulesAddon;
-using DiscordBot.GuildHandlers;
+using Meeseeks.ModulesAddon;
+using Meeseeks.GuildHandlers;
 
-namespace DiscordBot.Modules
+namespace Meeseeks.Modules
 {
     public class GeneralModule : ModuleBase<CustomCommandContext>
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace DiscordBot.Services
+namespace Meeseeks.Services
 {
     public abstract class GiftService : IConfig
     {

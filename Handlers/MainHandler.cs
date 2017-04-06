@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using DiscordBot.GuildHandlers;
+using Meeseeks.GuildHandlers;
 
-namespace DiscordBot.Handlers
+namespace Meeseeks.Handlers
 {
     public class MainHandler
     {

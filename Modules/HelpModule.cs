@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using DiscordBot.ModulesAddon;
+using Meeseeks.ModulesAddon;
 using System.Linq;
 
-namespace DiscordBot.Modules
+namespace Meeseeks.Modules
 {
     public class HelpModule : ModuleBase<CustomCommandContext>
     {

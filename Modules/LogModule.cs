@@ -1,9 +1,9 @@
 ﻿//using System.Threading.Tasks;
 //using Discord;
 //using Discord.Commands;
-//using DiscordBot.Services;
+//using Meeseeks.Services;
 
-//namespace DiscordBot.Modules
+//namespace Meeseeks.Modules
 //{
 //    [Group("Log")]
 //    public class LogModule : ModuleBase

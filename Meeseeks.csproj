@@ -186,6 +186,7 @@
     <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="Modules\LogModule.cs" />
     <Compile Include="Modules\OwnerModule.cs" />
+    <Compile Include="Modules\TagModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
     <Compile Include="Services\ExtraService.cs" />

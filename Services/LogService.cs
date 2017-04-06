@@ -3,13 +3,13 @@
 //using Newtonsoft.Json;
 //using Discord;
 //using Discord.WebSocket;
-//using DiscordBot.Handlers;
+//using Meeseeks.Handlers;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text.RegularExpressions;
 //using System.Text;
 
-//namespace DiscordBot.Services
+//namespace Meeseeks.Services
 //{
 //    public class LogService
 //    {

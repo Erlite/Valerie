@@ -4,10 +4,10 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using System;
-using DiscordBot.ModulesAddon;
+using Meeseeks.ModulesAddon;
 using System.Linq;
 
-namespace DiscordBot.Handlers
+namespace Meeseeks.Handlers
 {
     public class CommandHandler
     {

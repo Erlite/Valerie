@@ -5,10 +5,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Net.Http;
 using System.IO;
-using DiscordBot.Services;
-using DiscordBot.ModulesAddon;
+using Meeseeks.Services;
+using Meeseeks.ModulesAddon;
 
-namespace DiscordBot.Modules
+namespace Meeseeks.Modules
 {
     [Group("Set"), RequireOwner]
     public class BotModule : ModuleBase<CustomCommandContext>
