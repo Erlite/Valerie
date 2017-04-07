@@ -5,6 +5,7 @@ using Discord.Commands;
 using System.Text.RegularExpressions;
 using Meeseeks.ModulesAddon;
 using Meeseeks.GuildHandlers;
+using Rick.Classes;
 
 namespace Meeseeks.Modules
 {
