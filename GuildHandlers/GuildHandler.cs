@@ -12,7 +12,7 @@ namespace Meeseeks.GuildHandlers
         public IGuild Guild { get; private set; }
         public ConfigHandler ConfigHandler { get; private set; }
         public TagHandler TagHandler { get; private set; }
-        public LogHandler Autorespond { get; private set; }
+        public LogHandler LogHandler { get; private set; }
 
         public GuildHandler(MainHandler MainHandler, SocketGuild Guild)
         {
@@ -20,7 +20,7 @@ namespace Meeseeks.GuildHandlers
             this.Guild = Guild;
             ConfigHandler = new ConfigHandler(this);
             TagHandler = new TagHandler(this);
-            Autorespond = new LogHandler(this);
+            LogHandler = new LogHandler(this);
         }
 
         public async Task InitializeAsync()
@@ -33,14 +33,14 @@ namespace Meeseeks.GuildHandlers
         {
             await ConfigHandler.InitializeAsync();
             await TagHandler.InitializeAsync();
-            await Autorespond.InitializeAsync();
+            await LogHandler.InitializeAsync();
         }
 
         public async Task Close()
         {
             await ConfigHandler.Close();
             await TagHandler.Close();
-            await Autorespond.Close();
+            await LogHandler.Close();
         }
 
         public async Task RenewGuildObject(SocketGuild Guild)
