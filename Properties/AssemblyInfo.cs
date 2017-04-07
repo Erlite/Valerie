@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Meeseeks")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Rick")]
+[assembly: AssemblyDescription("Rick is a discord bot!")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Meeseeks")]
+[assembly: AssemblyCompany("Noegenesis Studios")]
+[assembly: AssemblyProduct("Rick")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Noegenesis Studios TM")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f3528ae9-e888-4e89-878b-cde30e48dc27")]
+[assembly: Guid("9202209c-b568-4d63-9fb3-89f5060c9398")]
 
 // Version information for an assembly consists of the following four values:
 //
