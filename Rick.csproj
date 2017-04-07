@@ -159,6 +159,8 @@
   <ItemGroup>
     <Compile Include="Attributes\CooldownAttribute.cs" />
     <Compile Include="Classes\Message.cs" />
+    <Compile Include="Classes\Response.cs" />
+    <Compile Include="Classes\Tag.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Enums\AdminEnum.cs" />
     <Compile Include="GuildHandlers\ConfigHandler.cs" />

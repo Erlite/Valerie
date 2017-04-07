@@ -68,14 +68,8 @@ namespace Meeseeks.Modules
         {
             if (range <= 0)
                 throw new ArgumentException("Enter a valid amount");
-
             var messageList = await Context.Channel.GetMessagesAsync(range).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
-            var embed = new EmbedBuilder();
-            embed.Title = "Messages Deleted";
-            embed.Description = $"I've deleted {range} messages.";
-            embed.Color = new Color(191, 30, 60);
-            await Context.Channel.SendMessageAsync("", false, embed);
         }
 
         [Command("SaveTags")]
@@ -83,7 +77,8 @@ namespace Meeseeks.Modules
         public async Task Forcesave()
         {
             await Context.MainHandler.GuildTagHandler(Context.Guild).SaveTagsAsync();
-            await ReplyAsync("Saved tags, titles, and DB.");
+            await Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).SaveResponsesAsync();
+            await ReplyAsync("Saved tags and responses! :ok_hand: :tongue:");
         }
 
         //[Command("Gift")]
