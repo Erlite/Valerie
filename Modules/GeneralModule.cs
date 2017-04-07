@@ -307,33 +307,32 @@ namespace Meeseeks.Modules
         //    await ReplyAsync("", embed: embed);
         //}
 
-        //[Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
-        //public async Task ResponseAsync()
-        //{
-        //    await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-        //    var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-        //    if (nameResponse.Content == "cancel") return;
-        //    string name = nameResponse.Content;
+        [Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
+        public async Task ResponseAsync()
+        {
+            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
+            var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (nameResponse.Content == "cancel") return;
+            string name = nameResponse.Content;
 
-        //    await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-        //    var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-        //    if (contentResponse.Content == "cancel") return;
-        //    string response = contentResponse.Content;
+            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
+            var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (contentResponse.Content == "cancel") return;
+            string response = contentResponse.Content;
 
-        //    var resp = ar.LoadResponsesAsync();
-        //    if (!(resp.ContainsKey(name)))
-        //    {
-        //        resp.Add(name, response);
-        //        await ar.SaveResponsesAsync();
-        //        var embed = new EmbedBuilder()
-        //            .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-        //            .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
-        //            .WithColor(new Color(109, 242, 122));
-        //        await ReplyAsync("", embed: embed);
-        //    }
-        //    else
-        //        await ReplyAsync("I wasn't able to add the response to the response list! :x:");
-        //}
+            Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
+            var resp = ar.LoadResponsesAsync();
+            if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
+            {
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
+                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
+                    .WithColor(new Color(109, 242, 122));
+                await ReplyAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
+        }
 
         [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
         public async Task Image([Remainder] string search)
