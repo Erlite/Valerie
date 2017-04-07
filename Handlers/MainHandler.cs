@@ -80,6 +80,13 @@ namespace Meeseeks.Handlers
             return guilds[guild.Id].TagHandler;
         }
 
+        public LogHandler GuildResponseHandlerAsync(IGuild guild)
+        {
+            if (guild == null)
+                return null;
+            return guilds[guild.Id].LogHandler;
+        }
+
         public GuildHandlers.ConfigHandler GuildConfigHandler(IGuild guild)
         {
             if (guild == null)
