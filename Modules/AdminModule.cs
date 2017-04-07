@@ -70,6 +70,10 @@ namespace Meeseeks.Modules
                 throw new ArgumentException("Enter a valid amount");
             var messageList = await Context.Channel.GetMessagesAsync(range).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
+            var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
+            await Task.Delay(5000);
+            await msg.DeleteAsync();
+
         }
 
         [Command("SaveTags")]
