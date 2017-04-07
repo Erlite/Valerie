@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Meeseeks.Interfaces;
 using Newtonsoft.Json;
+using Rick.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,20 +92,6 @@ namespace Meeseeks.GuildHandlers
             if (!tags.ContainsKey(tag))
                 return null;
             return tags[tag];
-        }
-    }
-    public class Tag
-    {
-        public string tag;
-        public string text;
-        public ulong creator;
-        public DateTime when;
-        public Tag(string tag, string text, ulong creator_id, DateTime when)
-        {
-            this.tag = tag;
-            this.text = text;
-            this.creator = creator_id;
-            this.when = when;
         }
     }
 }

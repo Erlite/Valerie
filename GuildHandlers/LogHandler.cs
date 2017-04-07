@@ -7,9 +7,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Discord.Commands;
 using System.Linq;
-using Meeseeks.Services;
-using Meeseeks.Handlers;
 using System;
+using Rick.Classes;
 
 namespace Meeseeks.GuildHandlers
 {
@@ -17,6 +16,7 @@ namespace Meeseeks.GuildHandlers
     {
         private GuildHandler GuildHandler;
         private CommandContext context;
+        private Dictionary<string, Response> Resp = null;
 
         public LogHandler(GuildHandler GuildHandler)
         {
@@ -43,13 +43,26 @@ namespace Meeseeks.GuildHandlers
 
         public async Task SaveResponsesAsync()
         {
-            Dictionary<string, string> temp = new Dictionary<string, string>();
-            File.WriteAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json", JsonConvert.SerializeObject(temp, Formatting.Indented));
+            await Task.Run(() =>
+            {
+                Dictionary<string, Response> temp = new Dictionary<string, Response>();
+                File.WriteAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json", JsonConvert.SerializeObject(temp, Formatting.Indented));
+            });
         }
 
-        public Dictionary<string, string> LoadResponsesAsync()
+        public async Task LoadResponsesAsync()
         {
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
+            await Task.Run(() =>
+            {
+                Dictionary<string, Response> Responses;
+                Responses = JsonConvert.DeserializeObject<Dictionary<string, Response>>(File.ReadAllText($"Configs{Path.DirectorySeparatorChar}Guilds{Path.DirectorySeparatorChar}{GuildHandler.Guild.Id}{Path.DirectorySeparatorChar}Responses.json"));
+                Resp = Responses;
+            });
+        }
+
+        public void CreateResponse(string trigger, string response, IUser user)
+        {
+            Resp[trigger.ToLower()] = new Response(trigger, response, user.Id);
         }
 
         public async Task AutoRespondAsync(SocketMessage message)
@@ -57,20 +70,17 @@ namespace Meeseeks.GuildHandlers
             var msg = message as SocketUserMessage;
             var guild = context.Guild as SocketGuild;
             var channel = msg.Channel as ITextChannel;
-            if (msg == null) return;
-            if (msg.Author.IsBot) return;
+            if (msg == null || msg.Author.IsBot || msg.Channel.Id == 0) return;
             var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
             if (autorespond.IsEnabled)
             {
-                var load = LoadResponsesAsync();
-                    foreach (KeyValuePair<string, string> item in load.Where(x => x.Key.Contains(msg.ToString())))
+                foreach (KeyValuePair<string, Response> item in Resp.Where(x=>x.Key.Contains(msg.ToString())))
+                {
+                    if (msg.Content.Contains(item.Key))
                     {
-                        if (msg.Content.Contains(item.Key))
-                        {
-                            await msg.Channel.SendMessageAsync(item.Value);
-                        }
+                        await msg.Channel.SendMessageAsync(item.Value.ToString());
                     }
-                
+                }
             }
         }
 
