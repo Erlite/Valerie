@@ -12,7 +12,7 @@ using Rick.Classes;
 
 namespace Meeseeks.GuildHandlers
 {
-    public class LogHandler : IHandler
+    public class LogHandler : IGuildHandler
     {
         private GuildHandler GuildHandler;
         private CommandContext context;
@@ -63,6 +63,11 @@ namespace Meeseeks.GuildHandlers
         public void CreateResponse(string trigger, string response, IUser user)
         {
             Resp[trigger.ToLower()] = new Response(trigger, response, user.Id);
+        }
+
+        public bool ContainsResponse(string resp)
+        {
+            return Resp.ContainsKey(resp.ToLower());
         }
 
         public async Task AutoRespondAsync(SocketMessage message)
@@ -135,5 +140,6 @@ namespace Meeseeks.GuildHandlers
                 await channel.SendMessageAsync("", embed: embed);
             }
         }
+
     }
 }
