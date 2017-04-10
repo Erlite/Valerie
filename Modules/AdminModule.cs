@@ -76,7 +76,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("SaveTags")]
+        [Command("ConfigSave")]
         [RequireContext(ContextType.Guild)]
         public async Task Forcesave()
         {
