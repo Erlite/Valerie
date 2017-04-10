@@ -1,9 +1,9 @@
 ﻿using Discord;
-using Meeseeks.Interfaces;
-using Meeseeks.Enums;
+using Rick.Interfaces;
+using Rick.Enums;
 using System.Threading.Tasks;
 
-namespace Meeseeks.Handlers
+namespace Rick.Handlers
 {
     public class PermissionHandler : IHandler
     {

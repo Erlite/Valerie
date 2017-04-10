@@ -4,10 +4,10 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using System;
-using Meeseeks.ModulesAddon;
+using Rick.ModulesAddon;
 using System.Linq;
 
-namespace Meeseeks.Handlers
+namespace Rick.Handlers
 {
     public class CommandHandler
     {
@@ -98,17 +98,8 @@ namespace Meeseeks.Handlers
                     x.Name = "Error Reason";
                     x.Value = result.ErrorReason;
                 });
-                embed.AddField(x =>
-                {
-                    x.IsInline = false;
-                    x.Name = "Target Site";
-                    x.Value = result.Exception.TargetSite;
-                });
-                embed.AddField(x =>
-                {
-                    x.IsInline = false;
-                    x.Name = "Stacktrace";
-                    x.Value = result.Exception.StackTrace;
+                embed.WithFooter(x => {
+                    x.Text = result.Exception.StackTrace;
                 });
                 await context.Channel.SendMessageAsync("", embed: embed);
             }

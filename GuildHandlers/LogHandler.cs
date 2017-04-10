@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord;
-using Meeseeks.Interfaces;
+using Rick.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Linq;
 using System;
 using Rick.Classes;
 
-namespace Meeseeks.GuildHandlers
+namespace Rick.GuildHandlers
 {
     public class LogHandler : IGuildHandler
     {
@@ -76,8 +76,9 @@ namespace Meeseeks.GuildHandlers
             var guild = context.Guild as SocketGuild;
             var channel = msg.Channel as ITextChannel;
             if (msg == null || msg.Author.IsBot || msg.Channel.Id == 0) return;
+            var auto = GuildHandler.MainHandler.GuildResponseHandlerAsync(channel.Guild);
             var autorespond = GuildHandler.MainHandler.GuildConfigHandler(channel.Guild).GetAutoRespond();
-            if (autorespond.IsEnabled)
+            if (autorespond.IsEnabled == true)
             {
                 foreach (KeyValuePair<string, Response> item in Resp.Where(x=>x.Key.Contains(msg.ToString())))
                 {
@@ -105,12 +106,11 @@ namespace Meeseeks.GuildHandlers
                     x.Text = $"Banned on {DateTime.Now.ToString()}";
                 });
             var Log = GuildHandler.MainHandler.GuildConfigHandler(usr.Guild).EventsLogging();
-            if (Log.BanLog)
+            if (Log.BanLog ==  true)
             {
                 var channel = usr.Guild.GetChannel(Log.TextChannel) as ITextChannel;
                 await channel.SendMessageAsync("", embed: embed);
             }
-
         }
 
         private async Task UserLeftAsync(SocketGuildUser user)
@@ -120,7 +120,7 @@ namespace Meeseeks.GuildHandlers
             embed.Description = $"**Username: **{user.Username}#{user.Discriminator} has left the server :wave:";
             embed.Color = new Color(83, 219, 207);
             var Log = GuildHandler.MainHandler.GuildConfigHandler(user.Guild).EventsLogging();
-            if (Log.LeaveLog)
+            if (Log.LeaveLog == true)
             {
                 var channel = user.Guild.GetChannel(Log.TextChannel) as ITextChannel;
                 await channel.SendMessageAsync("", embed: embed);
@@ -134,12 +134,11 @@ namespace Meeseeks.GuildHandlers
             embed.Description = $"**Username: **{user.Username}#{user.Discriminator}\n{GuildHandler.ConfigHandler.GetWelcomeMessage()}";
             embed.Color = new Color(83, 219, 207);
             var Log = GuildHandler.MainHandler.GuildConfigHandler(user.Guild).EventsLogging();
-            if (Log.JoinLog)
+            if (Log.JoinLog == true)
             {
                 var channel = user.Guild.GetChannel(Log.TextChannel) as ITextChannel;
                 await channel.SendMessageAsync("", embed: embed);
             }
         }
-
     }
 }

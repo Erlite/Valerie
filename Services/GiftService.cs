@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Meeseeks.Services
+namespace Rick.Services
 {
     public abstract class GiftService : IConfig
     {

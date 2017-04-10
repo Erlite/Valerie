@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Meeseeks.Interfaces
+namespace Rick.Interfaces
 {
     public interface IHandler
     {

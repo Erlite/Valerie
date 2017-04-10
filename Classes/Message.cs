@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Meeseeks.Classes
+namespace Rick.Classes
 {
     public class Message
     {

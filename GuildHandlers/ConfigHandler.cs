@@ -3,10 +3,10 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Meeseeks.Interfaces;
-using Meeseeks.Services;
+using Rick.Interfaces;
+using Rick.Services;
 
-namespace Meeseeks.GuildHandlers
+namespace Rick.GuildHandlers
 {
     public class ConfigHandler : IGuildHandler
     {

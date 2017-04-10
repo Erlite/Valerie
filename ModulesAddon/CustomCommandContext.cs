@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Meeseeks.Handlers;
+using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 
-namespace Meeseeks.ModulesAddon
+namespace Rick.ModulesAddon
 {
     public class CustomCommandContext : ICommandContext
     {

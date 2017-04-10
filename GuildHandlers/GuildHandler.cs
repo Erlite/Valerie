@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Meeseeks.Handlers;
+using Rick.Handlers;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Meeseeks.GuildHandlers
+namespace Rick.GuildHandlers
 {
     public class GuildHandler
     {

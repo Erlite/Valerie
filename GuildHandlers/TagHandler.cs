@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Meeseeks.Interfaces;
+using Rick.Interfaces;
 using Newtonsoft.Json;
 using Rick.Classes;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Meeseeks.GuildHandlers
+namespace Rick.GuildHandlers
 {
     public class TagHandler : IGuildHandler
     {

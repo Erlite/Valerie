@@ -8,14 +8,16 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
-using Meeseeks.Classes;
-using Meeseeks.ModulesAddon;
+using Rick.Classes;
+using Rick.ModulesAddon;
+using Rick.Handlers;
 
-namespace Meeseeks.Modules
+namespace Rick.Modules
 {
     [RequireOwner]
     public class OwnerModule : ModuleBase<CustomCommandContext>
     {
+        private MainHandler MainHandler;
         private static MemoryStream GenerateStreamFromString(string value)
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
@@ -85,7 +87,7 @@ namespace Meeseeks.Modules
             await ReplyAsync(invite.Url);
         }
 
-        [Command("Archive"), Summary("Archive GuildName ChannelName 10"),Remarks("archives a channel and uploads a JSON")]
+        [Command("Archive"), Summary("Archive GuildName ChannelName 10"), Remarks("archives a channel and uploads a JSON")]
         public async Task ArchiveCommand(string guildName, string channelName, int amount = 9000)
         {
             var channelToArchive = (await
@@ -102,7 +104,7 @@ namespace Meeseeks.Modules
             }
         }
 
-        [Command("reload"), Summary("Reload MainConfig")]
+        [Command("Reload"), Summary("Reload MainConfig")]
         public async Task Reload([Remainder] string what = null)
         {
             switch (what)
@@ -140,5 +142,6 @@ namespace Meeseeks.Modules
             }
             await ReplyAsync("Reloaded! :ok_hand:");
         }
+
     }
 }

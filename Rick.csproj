@@ -169,7 +169,6 @@
     <Compile Include="GuildHandlers\TagHandler.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\ConfigHandler.cs" />
-    <Compile Include="Handlers\ExceptionHandler.cs" />
     <Compile Include="Handlers\GiftsHandler.cs" />
     <Compile Include="Handlers\MainHandler.cs" />
     <Compile Include="Handlers\PermissionHandler.cs" />

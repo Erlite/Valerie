@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using System.Text.RegularExpressions;
-using Meeseeks.ModulesAddon;
-using Meeseeks.GuildHandlers;
+using Rick.ModulesAddon;
+using Rick.GuildHandlers;
 using Rick.Classes;
 
-namespace Meeseeks.Modules
+namespace Rick.Modules
 {
     [RequireContext(ContextType.Guild)]
     public class TagModule : ModuleBase<CustomCommandContext>

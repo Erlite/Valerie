@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace Meeseeks.Services
+namespace Rick.Services
 {
     public static class MethodService
     {

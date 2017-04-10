@@ -5,9 +5,9 @@
 //using System.Threading.Tasks;
 //using Discord.WebSocket;
 //using Newtonsoft.Json;
-//using Meeseeks.Services;
+//using Rick.Services;
 
-//namespace Meeseeks.Handlers
+//namespace Rick.Handlers
 //{
 //    public class GiftsHandler : GiftService
 //    {

@@ -7,14 +7,14 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Discord.WebSocket;
 using System.Diagnostics;
-using Meeseeks.Handlers;
+using Rick.Handlers;
 using System.Collections.Generic;
 using System.Text;
 using Discord.Addons.InteractiveCommands;
-using Meeseeks.ModulesAddon;
-using Meeseeks.GuildHandlers;
+using Rick.ModulesAddon;
+using Rick.GuildHandlers;
 
-namespace Meeseeks.Modules
+namespace Rick.Modules
 {
     public class GeneralModule : ModuleBase<CustomCommandContext>
     {
@@ -329,6 +329,19 @@ namespace Meeseeks.Modules
                     .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
                     .WithColor(new Color(109, 242, 122));
                 await ReplyAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
+        }
+
+        [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
+        public async Task ResponseAsync(string name, [Remainder] string response)
+        {
+            Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
+            var resp = ar.LoadResponsesAsync();
+            if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
+            {
+                await ReplyAsync("Response added");
             }
             else
                 await ReplyAsync("I wasn't able to add the response to the response list! :x:");

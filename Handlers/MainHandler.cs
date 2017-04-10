@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using Meeseeks.GuildHandlers;
+using Rick.GuildHandlers;
 
-namespace Meeseeks.Handlers
+namespace Rick.Handlers
 {
     public class MainHandler
     {
@@ -16,7 +16,6 @@ namespace Meeseeks.Handlers
         public Handlers.ConfigHandler ConfigHandler { get; private set; }
         public CommandHandler CommandHandler { get; private set; }
         public PermissionHandler PermissionHandler { get; private set; }
-        public ExceptionHandler ExceptionHandler { get; private set; }
 
         //Guild Handlers
         private Dictionary<ulong, GuildHandler> guilds;
@@ -28,7 +27,6 @@ namespace Meeseeks.Handlers
             ConfigHandler = new Handlers.ConfigHandler();
             CommandHandler = new CommandHandler();
             PermissionHandler = new PermissionHandler(this);
-            ExceptionHandler = new ExceptionHandler(this);
         }
 
         internal async Task GuildAvailableEvent(SocketGuild guild)

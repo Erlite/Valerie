@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Meeseeks.Enums
+namespace Rick.Enums
 {
     public class AdminEnum
     {

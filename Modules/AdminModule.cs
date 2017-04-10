@@ -4,9 +4,9 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
-using Meeseeks.ModulesAddon;
+using Rick.ModulesAddon;
 
-namespace Meeseeks.Modules
+namespace Rick.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator)]
     public class AdminModule : ModuleBase<CustomCommandContext>

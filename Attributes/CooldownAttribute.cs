@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Meeseeks.Attributes
+namespace Rick.Attributes
 {
     public class CooldownAttribute : PreconditionAttribute
     {

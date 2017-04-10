@@ -1,9 +1,9 @@
 ﻿//using System.Threading.Tasks;
 //using Discord;
 //using Discord.Commands;
-//using Meeseeks.Services;
+//using Rick.Services;
 
-//namespace Meeseeks.Modules
+//namespace Rick.Modules
 //{
 //    [Group("Log")]
 //    public class LogModule : ModuleBase

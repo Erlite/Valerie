@@ -2,12 +2,12 @@
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Meeseeks.Services;
-using Meeseeks.Handlers;
+using Rick.Services;
+using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
 
-namespace Meeseeks
+namespace Rick
 {
     public class Core
     {

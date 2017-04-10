@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-namespace Meeseeks.Services
+namespace Rick.Services
 {
     public class ExtraService
     {

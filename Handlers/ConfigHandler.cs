@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using Meeseeks.Interfaces;
+using Rick.Interfaces;
 
-namespace Meeseeks.Handlers
+namespace Rick.Handlers
 {
     public class ConfigHandler : IHandler
     {
