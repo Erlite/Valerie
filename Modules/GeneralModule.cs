@@ -337,14 +337,11 @@ namespace Rick.Modules
         [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
         public async Task ResponseAsync(string name, [Remainder] string response)
         {
-            Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
-            var resp = ar.LoadResponsesAsync();
-            if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
-            {
+            var ResponseHandler = Context.MainHandler.GuildResponseHandlerAsync(Context.Guild);
+            var user = Context.User as IUser;
+            //var resp = ar.LoadResponsesAsync();
+                ResponseHandler.CreateResponse(name, response, user);
                 await ReplyAsync("Response added");
-            }
-            else
-                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
         }
 
         [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
