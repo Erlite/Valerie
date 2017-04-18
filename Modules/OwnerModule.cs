@@ -9,15 +9,12 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
 using Rick.Classes;
-using Rick.ModulesAddon;
-using Rick.Handlers;
 
 namespace Rick.Modules
 {
     [RequireOwner]
-    public class OwnerModule : ModuleBase<CustomCommandContext>
+    public class OwnerModule : ModuleBase
     {
-        private MainHandler MainHandler;
         private static MemoryStream GenerateStreamFromString(string value)
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
@@ -103,45 +100,5 @@ namespace Rick.Modules
                 await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
             }
         }
-
-        [Command("Reload"), Summary("Reload MainConfig")]
-        public async Task Reload([Remainder] string what = null)
-        {
-            switch (what)
-            {
-                case "MainConfig":
-                    {
-                        await Context.MainHandler.ConfigHandler.LoadAsync();
-                        break;
-                    }
-                case "Guild":
-                    {
-                        if (!(Context.Channel is ITextChannel))
-                        {
-                            await ReplyAsync("You aren't in a guild channel!");
-                            return;
-                        }
-                        await Context.MainHandler.ReloadGuildAsync((Context.Channel as ITextChannel).Guild as SocketGuild);
-                        break;
-                    }
-                case "GuildConfig":
-                    {
-                        if (!(Context.Channel is ITextChannel))
-                        {
-                            await ReplyAsync("You aren't in a guild channel!");
-                            return;
-                        }
-                        await Context.MainHandler.GuildConfigHandler(Context.Guild).LoadAsync();
-                        break;
-                    }
-                default:
-                    {
-                        await ReplyAsync("Option not found.");
-                        return;
-                    }
-            }
-            await ReplyAsync("Reloaded! :ok_hand:");
-        }
-
     }
 }

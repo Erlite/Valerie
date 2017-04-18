@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using Rick.ModulesAddon;
 using System.Linq;
 
 namespace Rick.Modules
 {
-    public class HelpModule : ModuleBase<CustomCommandContext>
+    public class HelpModule : ModuleBase
     {
         private CommandService _service;
 

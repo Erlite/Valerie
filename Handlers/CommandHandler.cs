@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 using System.Reflection;
+using System.Linq;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using System;
-using Rick.ModulesAddon;
-using System.Linq;
+using System.IO;
 
 namespace Rick.Handlers
 {
@@ -14,35 +13,30 @@ namespace Rick.Handlers
         private IDependencyMap map;
         private DiscordSocketClient client;
         private CommandService cmds;
-        private MainHandler MainHandler;
+        private ConfigHandler config;
 
-        public async Task InitializeAsync(MainHandler MainHandler, IDependencyMap _map)
+        public CommandHandler(IDependencyMap _map)
         {
-            this.MainHandler = MainHandler;
             client = _map.Get<DiscordSocketClient>();
+            config = _map.Get<ConfigHandler>();
             cmds = new CommandService();
             map = _map;
+        }
 
-            cmds.AddTypeReader<int?>(new NullableTypeReader<int>(int.TryParse));
+        public async Task InstallAsync()
+        {
+            client.MessageReceived += HandleCommandAsync;
             await cmds.AddModulesAsync(Assembly.GetEntryAssembly());
-
-            client.MessageReceived += HandleCommand;
         }
 
-        public Task Close()
+        public async Task HandleCommandAsync(SocketMessage m)
         {
-            client.MessageReceived -= HandleCommand;
-            return Task.CompletedTask;
-        }
-
-        public async Task HandleCommand(SocketMessage parameterMessage)
-        {
-            var msg = parameterMessage as SocketUserMessage;
-            if (msg == null) return;
-            if (!(msg.Channel is ITextChannel)) return;
+            var message = m as SocketUserMessage;
+            if (message == null) return;
+            if (!(message.Channel is IGuildChannel)) return;
             int argPos = 0;
-            if (!(msg.HasStringPrefix(MainHandler.ConfigHandler.GetDefaultCommandPrefix(), ref argPos) || msg.HasStringPrefix(MainHandler.GetCommandPrefix(msg.Channel), ref argPos))) return;
-            var context = new CustomCommandContext(client, MainHandler, msg);
+            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos))) return;
+            var context = new CommandContext(client, message);
             var Result = cmds.Search(context, argPos);
             CommandInfo Command = null;
             if (Result.IsSuccess)
@@ -79,9 +73,9 @@ namespace Rick.Handlers
             });
         }
 
-        private async void DefaultCommandError(ExecuteResult result, SearchResult res, CustomCommandContext context)
+        private async void DefaultCommandError(ExecuteResult result, SearchResult res, CommandContext context)
         {
-            if (MainHandler.ConfigHandler.DebugMode())
+            if (config.DebugMode)
             {
                 var embed = new EmbedBuilder();
                 embed.Color = new Color(150, 16, 25);
@@ -98,68 +92,62 @@ namespace Rick.Handlers
                     x.Name = "Error Reason";
                     x.Value = result.ErrorReason;
                 });
-                embed.WithFooter(x => {
-                    x.Text = result.Exception.StackTrace;
+                embed.AddField(x =>
+                {
+                    x.IsInline = false;
+                    x.Name = "Target Site";
+                    x.Value = result.Exception.TargetSite;
+                });
+                embed.AddField(x =>
+                {
+                    x.IsInline = false;
+                    x.Name = "Stacktrace";
+                    x.Value = result.Exception.StackTrace;
                 });
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
-                await context.Channel.SendMessageAsync(result.ErrorReason);
+                await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
         }
 
-        private async void BadArgCount(IResult result, SearchResult res, CustomCommandContext context)
+        private async void BadArgCount(IResult result, SearchResult res, CommandContext context)
         {
-            var embed = new EmbedBuilder();
-            embed.Title = "Um.. Shit bro..It ain't working";
-            embed.Description = "Enclose parameters in question marks";
-           
-
-            embed.AddField(f =>
-            {
-                f.Name = "Bad Arg Count";
-                f.Value = result.ErrorReason;
-            });
-
+            var embed = new EmbedBuilder()
+                .WithColor(new Color(150, 16, 25))
+                .WithAuthor(x =>
+                {
+                    x.IconUrl = client.CurrentUser.GetAvatarUrl();
+                    x.Name = "Bad argument count!";
+                })
+                .WithDescription($"Enclose parameters in question marks\n{result.ErrorReason}");
             await context.Channel.SendMessageAsync("", false, embed);
         }
 
-        private async void UnmetPrecondition(IResult result, CustomCommandContext context)
+        private async void UnmetPrecondition(IResult result, CommandContext context)
         {
-            var embed = new EmbedBuilder();
-
-            embed.Title = "UnMet PreCondition!";
-            embed.Description = result.ErrorReason.ToString();
-
+            var embed = new EmbedBuilder()
+                .WithColor(new Color(150, 16, 25))
+                .WithAuthor(x =>
+                {
+                    x.IconUrl = client.CurrentUser.GetAvatarUrl();
+                    x.Name = "Precondition Error";
+                })
+                .WithDescription($"Unmet Precondition Error\n{result.ErrorReason.ToString()}");
             await context.Channel.SendMessageAsync("", false, embed);
         }
 
-        private async void ParseFailed(IResult result, CustomCommandContext context)
+        private async void ParseFailed(IResult result, CommandContext context)
         {
-            var embed = new EmbedBuilder();
-
-            embed.Title = "Parsing Failed!";
-            embed.Description = result.ErrorReason.ToString();
+            var embed = new EmbedBuilder()
+                .WithColor(new Color(150, 16, 25))
+                .WithAuthor(x =>
+                {
+                    x.IconUrl = client.CurrentUser.GetAvatarUrl();
+                    x.Name = "Parsing Failed";
+                })
+                .WithDescription(result.ErrorReason);
             await context.Channel.SendMessageAsync("", false, embed);
         }
-    } 
 
-
-    public class NullableTypeReader<T> : TypeReader
-    where T : struct
-    {
-        public delegate bool TryParse<W>(string str, out T value);
-        public TryParse<T> tryParseFunc;
-        public NullableTypeReader(TryParse<T> parseFunc)
-        {
-            tryParseFunc = parseFunc;
-        }
-
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
-        {
-            T value;
-            if (tryParseFunc(input, out value))
-                return Task.FromResult(TypeReaderResult.FromSuccess(new Nullable<T>(value)));
-            return Task.FromResult(TypeReaderResult.FromSuccess(new Nullable<T>()));
-        }
     }
 }

@@ -11,20 +11,18 @@ using Rick.Handlers;
 using System.Collections.Generic;
 using System.Text;
 using Discord.Addons.InteractiveCommands;
-using Rick.ModulesAddon;
-using Rick.GuildHandlers;
 
 namespace Rick.Modules
 {
-    public class GeneralModule : ModuleBase<CustomCommandContext>
+    public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-        private GuildHandlers.LogHandler ar;
-        public MainHandler Main { get; }
+        private ConfigHandler Config;
 
-        public GeneralModule(InteractiveService Inter)
+        public GeneralModule(InteractiveService Inter, ConfigHandler ConfigHandler)
         {
             Interactive = Inter;
+            Config = ConfigHandler;
         }
 
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
@@ -310,38 +308,28 @@ namespace Rick.Modules
         [Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
         public async Task ResponseAsync()
         {
-            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-            var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-            if (nameResponse.Content == "cancel") return;
-            string name = nameResponse.Content;
+            //await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
+            //var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            //if (nameResponse.Content == "cancel") return;
+            //string name = nameResponse.Content;
 
-            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-            var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-            if (contentResponse.Content == "cancel") return;
-            string response = contentResponse.Content;
+            //await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
+            //var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            //if (contentResponse.Content == "cancel") return;
+            //string response = contentResponse.Content;
 
-            Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
-            var resp = ar.LoadResponsesAsync();
-            if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
-            {
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-                    .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
-                    .WithColor(new Color(109, 242, 122));
-                await ReplyAsync("", embed: embed);
-            }
-            else
-                await ReplyAsync("I wasn't able to add the response to the response list! :x:");
-        }
-
-        [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
-        public async Task ResponseAsync(string name, [Remainder] string response)
-        {
-            var ResponseHandler = Context.MainHandler.GuildResponseHandlerAsync(Context.Guild);
-            var user = Context.User as IUser;
+            //Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
             //var resp = ar.LoadResponsesAsync();
-                ResponseHandler.CreateResponse(name, response, user);
-                await ReplyAsync("Response added");
+            //if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
+            //{
+            //    var embed = new EmbedBuilder()
+            //        .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
+            //        .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
+            //        .WithColor(new Color(109, 242, 122));
+            //    await ReplyAsync("", embed: embed);
+            //}
+            //else
+            //    await ReplyAsync("I wasn't able to add the response to the response list! :x:");
         }
 
         [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
@@ -350,7 +338,7 @@ namespace Rick.Modules
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Main.ConfigHandler.GetBingAPI());
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Config.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {

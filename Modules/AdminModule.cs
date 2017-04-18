@@ -4,12 +4,11 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
-using Rick.ModulesAddon;
 
 namespace Rick.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator)]
-    public class AdminModule : ModuleBase<CustomCommandContext>
+    public class AdminModule : ModuleBase
     {
         private InteractiveService inter;
 
@@ -35,8 +34,6 @@ namespace Rick.Modules
                     x.Text = $"Kicked by {Context.User}";
                     x.IconUrl = Context.User.GetAvatarUrl();
                 });
-            //var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
-            //await ModLog.SendMessageAsync("", embed: embed);
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
             await user.KickAsync();
         }
@@ -56,8 +53,6 @@ namespace Rick.Modules
             embed.Title = "=== Banned User ===";
             embed.Description = $"**Username: ** {user.Username} || {user.Discriminator}\n**Responsilbe Mod: ** {Context.User}\n**Reason: **{reason}";
             embed.ImageUrl = "https://i.redd.it/psv0ndgiqrny.gif";
-            //var ModLog = await Context.Client.GetChannelAsync(log.ModLogChannelId) as ITextChannel;
-            //await ModLog.SendMessageAsync("", embed: embed);
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
             await gld.AddBanAsync(user);
         }
@@ -74,15 +69,6 @@ namespace Rick.Modules
             await Task.Delay(5000);
             await msg.DeleteAsync();
 
-        }
-
-        [Command("ConfigSave")]
-        [RequireContext(ContextType.Guild)]
-        public async Task Forcesave()
-        {
-            await Context.MainHandler.GuildTagHandler(Context.Guild).SaveTagsAsync();
-            await Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).SaveResponsesAsync();
-            await ReplyAsync("Saved tags and responses! :ok_hand: :tongue:");
         }
 
         //[Command("Gift")]
