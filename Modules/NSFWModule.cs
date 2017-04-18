@@ -8,6 +8,7 @@ using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using Rick.Attributes;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {

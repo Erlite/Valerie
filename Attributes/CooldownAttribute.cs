@@ -19,7 +19,7 @@ namespace Rick.Attributes
         public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
             if (Cooldown)
-                return Task.FromResult(PreconditionResult.FromError(SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.")));
+                return Task.FromResult(PreconditionResult.FromError("This command is under Cooldown. Please wait few seconds before using this command again!"));
             Cooldown = true;
             timer.Change(_cooldown * 1000, Timeout.Infinite);
             return Task.FromResult(PreconditionResult.FromSuccess());

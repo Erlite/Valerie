@@ -159,11 +159,13 @@
   <ItemGroup>
     <Compile Include="Attributes\CooldownAttribute.cs" />
     <Compile Include="Attributes\RequiredChannelAttribute.cs" />
+    <Compile Include="Attributes\RequiredRoleAttribute.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\ConfigHandler.cs" />
     <Compile Include="Handlers\GiftsHandler.cs" />
+    <Compile Include="Handlers\GlobalHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
