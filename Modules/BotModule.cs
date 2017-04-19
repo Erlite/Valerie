@@ -9,10 +9,10 @@ using Rick.Services;
 
 namespace Rick.Modules
 {
-    [Group("Set"), RequireOwner]
+    [Group("Set"), RequireOwner, RequireContext(ContextType.Guild)]
     public class BotModule : ModuleBase
     {
-        [Command("Username"), RequireContext(ContextType.Guild)]
+        [Command("Username"), Summary("Username OwO"), Remarks("Changes Bot's username")]
         public async Task UsernameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -22,7 +22,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
-        [Command("Nickname"), RequireContext(ContextType.Guild)]
+        [Command("Nickname"), Summary("Nickname XD"), Remarks("Changes Bot's nickname")]
         public async Task NicknameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -32,7 +32,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
-        [Command("Avatar"), RequireContext(ContextType.Guild)]
+        [Command("Avatar"), Summary("Avatar {Some-Link.Com}"), Remarks("Changes Bot's avatar")]
         public async Task AvatarAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -57,7 +57,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
-        [Command("Game"), RequireContext(ContextType.Guild)]
+        [Command("Game"), Summary("Game DarkSouls 3"), Remarks("Changes Bot's game")]
         public async Task GameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -67,7 +67,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
-        [Command("Status"), RequireContext(ContextType.Guild)]
+        [Command("Status"), Summary("Status 3"), Remarks("Changes Bot's status such as setting status to DND")]
         public async Task StatusAsync([Remainder] string value)
         {
             var newStatus = Enum.Parse(typeof(UserStatus), value);
