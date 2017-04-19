@@ -51,8 +51,11 @@ namespace Rick.Modules
         }
 
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
-        public async Task GifsAsync([Remainder] string keywords)
+        public async Task GifsAsync([Remainder] string keywords = null)
         {
+            if (string.IsNullOrWhiteSpace(keywords))
+                throw new NullReferenceException("Please enter what you are trying to search for!");
+
             var getUrl = new Uri("http://api.giphy.com/");
             using (var client = new HttpClient())
             {
@@ -79,7 +82,7 @@ namespace Rick.Modules
         public async Task UrbanAsync([Remainder] string urban = null)
         {
             if (string.IsNullOrWhiteSpace(urban))
-                throw new NullReferenceException("Please provide a search term");
+                throw new NullReferenceException("A search term should be provided for me to search!");
             var embed = new EmbedBuilder();
             var vc = new HttpClient();
             embed.WithAuthor(x =>
@@ -333,8 +336,10 @@ namespace Rick.Modules
         //}
 
         [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
-        public async Task Image([Remainder] string search)
+        public async Task Image([Remainder] string search = null)
         {
+            if (string.IsNullOrWhiteSpace(search))
+                throw new NullReferenceException("A search term should be provided for me to search!");
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
@@ -367,7 +372,7 @@ namespace Rick.Modules
         }
 
         [Command("Embed")]
-        public async Task EmbedAsync([Remainder] string msg)
+        public async Task EmbedAsync([Remainder] string msg = "Sorry, I'm too dumb to use an embed command!")
         {
             await Context.Message.DeleteAsync();
             var embed = new EmbedBuilder()

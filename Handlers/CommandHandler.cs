@@ -130,9 +130,9 @@ namespace Rick.Handlers
                 .WithAuthor(x =>
                 {
                     x.IconUrl = client.CurrentUser.GetAvatarUrl();
-                    x.Name = "Precondition Error";
+                    x.Name = "Unmet Precondition Error";
                 })
-                .WithDescription($"Unmet Precondition Error\n{result.ErrorReason.ToString()}");
+                .WithDescription(result.ErrorReason);
             await context.Channel.SendMessageAsync("", false, embed);
         }
 
@@ -148,6 +148,5 @@ namespace Rick.Handlers
                 .WithDescription(result.ErrorReason);
             await context.Channel.SendMessageAsync("", false, embed);
         }
-
     }
 }

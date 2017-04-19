@@ -158,7 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\CooldownAttribute.cs" />
-    <Compile Include="Attributes\NSFWChannelAttribute.cs" />
+    <Compile Include="Attributes\RequireNSFWChannelAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Core.cs" />
