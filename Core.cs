@@ -46,7 +46,7 @@ namespace Rick
                 DefaultRetryMode = RetryMode.AlwaysRetry
             });
 
-            client.Log += (l) => Task.Run(() => ConsoleService.Log(l.Severity, l.Source, l.Exception?.ToString() ?? l.Message));
+            client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
 
             var map = new DependencyMap();
             map.Add(client);
@@ -56,7 +56,6 @@ namespace Rick
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();
-
 
             await client.LoginAsync(TokenType.Bot, config.BotToken);
             await client.StartAsync();

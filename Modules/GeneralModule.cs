@@ -32,21 +32,21 @@ namespace Rick.Modules
             var gld = Context.Guild;
             if (!string.IsNullOrWhiteSpace(gld.IconUrl))
                 embed.ThumbnailUrl = gld.IconUrl;
-            var I = gld.Id;
-            var O = gld.GetOwnerAsync().GetAwaiter().GetResult().Mention;
-            var D = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention;
-            var V = gld.VoiceRegionId;
-            var C = gld.CreatedAt;
-            var A = gld.Available;
-            var N = gld.DefaultMessageNotifications;
-            var E = gld.IsEmbeddable;
-            var L = gld.MfaLevel;
-            var R = gld.Roles;
-            var VL = gld.VerificationLevel;
+            var GuildID = gld.Id;
+            var GuildOwner = gld.GetOwnerAsync().GetAwaiter().GetResult().Mention;
+            var GuildDefault = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention;
+            var GuildVoice = gld.VoiceRegionId;
+            var GuildCreated = gld.CreatedAt;
+            var GuildAvailable = gld.Available;
+            var GuildNotification = gld.DefaultMessageNotifications;
+            var GuildEmbed = gld.IsEmbeddable;
+            var GuildMfa = gld.MfaLevel;
+            var GuildRoles = gld.Roles;
+            var GuildVeri = gld.VerificationLevel;
             embed.Color = new Color(153, 30, 87);
             embed.Title = $"{gld.Name} Information";
-            embed.Description = $"**Guild ID: **{I}\n**Guild Owner: **{O}\n**Default Channel: **{D}\n**Voice Region: **{V}\n**Created At: **{C}\n**Available? **{A}\n" +
-                $"**Default Msg Notif: **{N}\n**Embeddable? **{E}\n**MFA Level: **{L}\n**Verification Level: **{VL}\n";
+            embed.Description = $"**Guild ID: **{GuildID}\n**Guild Owner: **{GuildOwner}\n**Default Channel: **{GuildDefault}\n**Voice Region: **{GuildVoice}\n**Created At: **{GuildCreated}\n**Available? **{GuildAvailable}\n" +
+                $"**Default Msg Notif: **{GuildNotification}\n**Embeddable? **{GuildEmbed}\n**MFA Level: **{GuildMfa}\n**Verification Level: **{GuildVeri}\n";
             await ReplyAsync("", false, embed);
         }
 
