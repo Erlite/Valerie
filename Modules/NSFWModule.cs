@@ -12,7 +12,7 @@ using Rick.Handlers;
 
 namespace Rick.Modules
 {
-    [RequiredChannel]
+    [NSFWChannelAttribute]
     public class NSFWModule : ModuleBase
     {
         [Command("Tests")]
