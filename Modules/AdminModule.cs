@@ -22,6 +22,7 @@ namespace Rick.Modules
         {
             if (user == null)
                 throw new NullReferenceException("Please mention the user you would like to kick!");
+
             var embed = new EmbedBuilder()
                 .WithTitle("===== Kicked User =====")
                 .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
@@ -47,11 +48,21 @@ namespace Rick.Modules
                 throw new NullReferenceException("Please mention the user you would like to kick!");
 
             var gld = Context.Guild as SocketGuild;
-            var embed = new EmbedBuilder();
-            embed.Color = new Color(206, 47, 47);
-            embed.Title = "=== Banned User ===";
-            embed.Description = $"**Username: ** {user.Username} || {user.Discriminator}\n**Responsilbe Mod: ** {Context.User}\n**Reason: **{reason}";
-            embed.ImageUrl = "https://i.redd.it/psv0ndgiqrny.gif";
+            var embed = new EmbedBuilder()
+                .WithTitle("===== Banned User =====")
+                .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
+                .WithAuthor(x =>
+                {
+                    x.Name = Context.User.Username;
+                    x.IconUrl = Context.User.GetAvatarUrl();
+                })
+                .WithColor(new Color(206, 47, 47))
+                .WithFooter(x =>
+                {
+                    x.Text = $"Banned by {Context.User}";
+                    x.IconUrl = Context.User.GetAvatarUrl();
+                })
+                .WithImageUrl("https://i.redd.it/psv0ndgiqrny.gif");
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
             await gld.AddBanAsync(user);
         }
