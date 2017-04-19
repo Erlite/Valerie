@@ -1,10 +1,8 @@
 using System;
-﻿using Discord.Commands;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using System.Xml;
 
 namespace Rick.Services
 {
@@ -32,17 +30,26 @@ namespace Rick.Services
             if (str.Length <= maxLengh) return str;
             return str.Substring(0, maxLengh);
         }
-        public static async Task<IEnumerable<CommandInfo>> CheckConditionsAsync(this IEnumerable<CommandInfo> commandInfos, ICommandContext context, IDependencyMap map = null)
+
+        public static async Task<string> GetE621ImageLink(string tag)
         {
-            var ret = new List<CommandInfo>();
-            foreach (var commandInfo in commandInfos)
+            try
             {
-                if ((await commandInfo.CheckPreconditionsAsync(context, map)).IsSuccess)
+                using (var http = new HttpClient())
                 {
-                    ret.Add(commandInfo);
+                    var data = await http.GetStreamAsync("http://e621.net/post/index.xml?tags=" + tag);
+                    var doc = new XmlDocument();
+                    doc.Load(data);
+                    var nodes = doc.GetElementsByTagName("file_url");
+
+                    var node = nodes[new Random().Next(0, nodes.Count)];
+                    return node.InnerText;
                 }
             }
-            return ret;
+            catch
+            {
+                return null;
+            }
         }
     }
 }

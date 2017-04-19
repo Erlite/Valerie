@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using Rick.Attributes;
-using Rick.Handlers;
+using Rick.Services;
+
 
 namespace Rick.Modules
 {
@@ -50,5 +48,25 @@ namespace Rick.Modules
                 await ReplyAsync(ex.Message);
             }
         }
+
+        [Command("E621"), Summary("E621 Kawaii"), Remarks("Never used this command. Don't ask me")]
+        public async Task E621Async(string search = null)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                throw new NullReferenceException("Please provide me a search term!");
+            search = search?.Trim() ?? "";
+            var url = await MethodService.GetE621ImageLink(search);
+            if (url == null)
+                await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
+            var embed = new EmbedBuilder()
+                .WithAuthor(x =>
+                {
+                    x.Name = $"{Context.User.Username} searched for {search}";
+                    x.IconUrl = url;
+                })
+                .WithImageUrl(url);
+            await ReplyAsync("",  embed: embed);
+        }
+
     }
 }
