@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Rick.Handlers
 {
-    public class GlobalHandler
+    public class AttributeHandler
     {
         public ulong[] RequiredRole { get; set; }
         public ulong[] RequiredChannel { get; set; }
@@ -26,24 +26,24 @@ namespace Rick.Handlers
             }
         }
 
-        public static async Task<GlobalHandler> UseCurrentAsync()
+        public static async Task<AttributeHandler> UseCurrentAsync()
         {
-            GlobalHandler result;
+            AttributeHandler result;
             using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
             {
                 using (var configReader = new StreamReader(configStream))
                 {
                     var deserializedConfig = await configReader.ReadToEndAsync();
-                    result = JsonConvert.DeserializeObject<GlobalHandler>(deserializedConfig);
+                    result = JsonConvert.DeserializeObject<AttributeHandler>(deserializedConfig);
                     return result;
                 }
             }
         }
 
-        public static  async Task<GlobalHandler> CreateNewAsync()
+        public static  async Task<AttributeHandler> CreateNewAsync()
         {
-            GlobalHandler result;
-            result = new GlobalHandler();
+            AttributeHandler result;
+            result = new AttributeHandler();
 
             string directory = Directory.GetCurrentDirectory();
 
