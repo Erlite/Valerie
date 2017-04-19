@@ -18,14 +18,16 @@ namespace Rick.Modules
         }
 
         [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
-        public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = null)
+        public async Task KickAsync(SocketGuildUser user = null, [Remainder] string reason = "No reason provided by the moderator!")
         {
+            if (user == null)
+                throw new NullReferenceException("Please mention the user you would like to kick!");
             var embed = new EmbedBuilder()
                 .WithTitle("===== Kicked User =====")
-                .WithDescription($"**Username: **{user.Username} || {user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
+                .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
                 .WithAuthor(x =>
                 {
-                    x.Name = Context.User.Mention;
+                    x.Name = Context.User.Username;
                     x.IconUrl = Context.User.GetAvatarUrl();
                 })
                 .WithColor(new Color(232, 226, 53))
@@ -34,20 +36,17 @@ namespace Rick.Modules
                     x.Text = $"Kicked by {Context.User}";
                     x.IconUrl = Context.User.GetAvatarUrl();
                 });
-            await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
+            await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ", embed: embed);
             await user.KickAsync();
         }
 
         [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
-        public async Task BanAsync(SocketGuildUser user = null, [Remainder] string reason = null)
+        public async Task BanAsync(SocketGuildUser user = null, [Remainder] string reason = "No reason provided by the moderator!")
         {
             if (user == null)
-                throw new ArgumentException("You must mention a user!");
-            if (string.IsNullOrWhiteSpace(reason))
-                throw new ArgumentException("You must provide a reason");
+                throw new NullReferenceException("Please mention the user you would like to kick!");
 
             var gld = Context.Guild as SocketGuild;
-
             var embed = new EmbedBuilder();
             embed.Color = new Color(206, 47, 47);
             embed.Title = "=== Banned User ===";
@@ -62,13 +61,12 @@ namespace Rick.Modules
         public async Task DeleteAsync(int range = 0)
         {
             if (range <= 0)
-                throw new ArgumentException("Enter a valid amount");
+                throw new ArgumentException("The amount cannot be lower than or equal to 0!");
             var messageList = await Context.Channel.GetMessagesAsync(range).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
             var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
             await Task.Delay(5000);
             await msg.DeleteAsync();
-
         }
 
         //[Command("Gift")]
