@@ -12,15 +12,9 @@ using Rick.Handlers;
 
 namespace Rick.Modules
 {
-    [NSFWChannelAttribute]
+    [RequireNSFWChannel]
     public class NSFWModule : ModuleBase
     {
-        [Command("Tests")]
-        public async Task TestAsync()
-        {
-            await ReplyAsync("Worked");
-        }
-
         [Command("Breasts"), Remarks("Fetches Female breasts from the api.")]
         public async Task BoobsAsync()
         {

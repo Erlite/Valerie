@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Rick.Attributes
 {
-    public class NSFWChannelAttribute : PreconditionAttribute
+    public class RequireNSFWChannelAttribute : PreconditionAttribute
     {
         ulong[] ChannelsList;
-        public NSFWChannelAttribute(params ulong[] RequiredChannel)
+        public RequireNSFWChannelAttribute(params ulong[] RequiredChannel)
         {
             ChannelsList = RequiredChannel;
         }
