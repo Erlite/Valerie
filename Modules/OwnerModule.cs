@@ -46,10 +46,12 @@ namespace Rick.Modules
         }
 
         [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
-        public async Task LeaveAsync(ulong ID, [Remainder] string msg)
+        public async Task LeaveAsync(ulong ID, [Remainder] string msg = "No reason provided by the owner.")
         {
             if (string.IsNullOrWhiteSpace(msg))
-                throw new Exception("You must provide a reason!");
+                throw new NullReferenceException("You must provide a reason!");
+            if (ID <= 0)
+                throw new ArgumentException("Please enter a valid Guild ID");
             var client = Context.Client;
             var gld = await client.GetGuildAsync(ID);
             var ch = await gld.GetDefaultChannelAsync();
@@ -69,8 +71,10 @@ namespace Rick.Modules
 
         [Command("Broadcast")]
         [Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
-        public async Task Broadcast([Remainder] string broadcast)
+        public async Task Broadcast([Remainder] string broadcast = null)
         {
+            if (string.IsNullOrWhiteSpace(broadcast))
+                throw new NullReferenceException("Broadcast message cannot be empty!");
             var guilds = (Context.Client as DiscordSocketClient).Guilds;
             var defaultChannels = guilds.Select(g => g.GetChannel(g.Id)).Cast<ITextChannel>();
             await Task.WhenAll(defaultChannels.Select(c => c.SendMessageAsync(broadcast)));
