@@ -13,30 +13,30 @@ namespace Rick.Modules
     public class BotModule : ModuleBase
     {
         [Command("Username"), Summary("Username OwO"), Remarks("Changes Bot's username")]
-        public async Task UsernameAsync([Remainder] string value)
+        public async Task UsernameAsync([Remainder] string value = null)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be empty");
+                throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
             await Context.Client.CurrentUser.ModifyAsync(x => x.Username = value).ConfigureAwait(false);
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
         [Command("Nickname"), Summary("Nickname XD"), Remarks("Changes Bot's nickname")]
-        public async Task NicknameAsync([Remainder] string value)
+        public async Task NicknameAsync([Remainder] string value = null)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be empty");
+                throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
             await (await Context.Guild.GetCurrentUserAsync().ConfigureAwait(false)).ModifyAsync(x => x.Nickname = value).ConfigureAwait(false);
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
         [Command("Avatar"), Summary("Avatar {Some-Link.Com}"), Remarks("Changes Bot's avatar")]
-        public async Task AvatarAsync([Remainder] string value)
+        public async Task AvatarAsync([Remainder] string value = null)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be empty");
+                throw new NullReferenceException("Value cannot be empty");
             var url = value;
             if (value == "reset")
             {
@@ -58,18 +58,20 @@ namespace Rick.Modules
         }
 
         [Command("Game"), Summary("Game DarkSouls 3"), Remarks("Changes Bot's game")]
-        public async Task GameAsync([Remainder] string value)
+        public async Task GameAsync([Remainder] string value = null)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value cannot be empty");
+                throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
             await client.SetGameAsync(value).ConfigureAwait(false);
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
 
         [Command("Status"), Summary("Status 3"), Remarks("Changes Bot's status such as setting status to DND")]
-        public async Task StatusAsync([Remainder] string value)
+        public async Task StatusAsync([Remainder] string value = null)
         {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new NullReferenceException("Value cannot be empty");
             var newStatus = Enum.Parse(typeof(UserStatus), value);
             await (Context.Client as DiscordSocketClient).SetStatusAsync((UserStatus)newStatus).ConfigureAwait(false);
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
