@@ -15,7 +15,7 @@ namespace Rick.Modules
     [RequireNSFWChannel]
     public class NSFWModule : ModuleBase
     {
-        [Command("Breasts"), Remarks("Fetches Female breasts from the api.")]
+        [Command("Boobs"), Remarks("Fetches Female breasts from the api.")]
         public async Task BoobsAsync()
         {
             try
@@ -33,8 +33,8 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Rear"), Summary("MotherOfGod"), Remarks("I can't believe you need help with this command..")]
-        public async Task Butts()
+        [Command("Bum"), Summary("MotherOfGod"), Remarks("I can't believe you need help with this command..")]
+        public async Task BumsAsync()
         {
             try
             {
