@@ -17,7 +17,7 @@ namespace Rick.Attributes
         {
             var ChannelName = context.Channel.Name.Contains("nsfw");
             var ChannelUlong = ChannelsList.Contains(context.Channel.Id);
-            return await Task.FromResult(ChannelName || ChannelUlong) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"{Format.Bold("ERROR: ")}This command cannot be used here! Please make sure you are in correct channel!");
+            return await Task.FromResult(ChannelName || ChannelUlong) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"{Format.Bold("ERROR: ")}This command can only be used in a channel named \"nsfw\"!");
         }
     }
 }

@@ -70,6 +70,5 @@ namespace Rick.Modules
                 await ReplyAsync("", embed: embed);
             }
         }
-
     }
 }
