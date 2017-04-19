@@ -58,14 +58,17 @@ namespace Rick.Modules
             var url = await MethodService.GetE621ImageLink(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = $"{Context.User.Username} searched for {search}";
-                    x.IconUrl = url;
-                })
-                .WithImageUrl(url);
-            await ReplyAsync("",  embed: embed);
+            else
+            {
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x =>
+                    {
+                        x.Name = $"{Context.User.Username} searched for {search}";
+                        x.IconUrl = url;
+                    })
+                    .WithImageUrl(url);
+                await ReplyAsync("", embed: embed);
+            }
         }
 
     }
