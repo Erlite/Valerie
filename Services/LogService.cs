@@ -132,7 +132,7 @@ namespace Rick.Services
 
         public async Task<bool> SaveConfigurationAsync()
         {
-            var config = new LogHandler(this);
+            var config = new GuildHandler(this);
 
             var serializedConfig = JsonConvert.SerializeObject(config, Formatting.Indented);
 
@@ -155,10 +155,9 @@ namespace Rick.Services
                 using (var configReader = new StreamReader(configStream))
                 {
                     var serializedConfig = await configReader.ReadToEndAsync();
-                    var config = JsonConvert.DeserializeObject<LogHandler>(serializedConfig);
+                    var config = JsonConvert.DeserializeObject<GuildHandler>(serializedConfig);
                     if (config == null) return false;
 
-                    ServerLogChannelId = config.ServerLog;
                     ModLogChannelId = config.ModLog;
                     JoinsLogged = config.JoinsLogged;
                     if (JoinsLogged) EnableJoinLogging();
