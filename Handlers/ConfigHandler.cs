@@ -1,7 +1,6 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Rick.Services;
 using System;
 using System.IO;

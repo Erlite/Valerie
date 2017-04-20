@@ -16,8 +16,7 @@ namespace Rick
         private DiscordSocketClient client;
         private ConfigHandler config;
         private CommandHandler handler;
-        //private AttributeHandler GlobalHandler;
-
+        private GuildHandler GuildHandler;
         public async Task StartAsync()
         {
             #region Config Check
@@ -27,13 +26,13 @@ namespace Rick
             {
                 ConsoleService.Log(LogSeverity.Info, "Config", "Config has been Loaded!");
                 config = await ConfigHandler.UseCurrentAsync();
-                await AttributeHandler.UseCurrentAsync();
+                GuildHandler = await GuildHandler.UseCurrentAsync();
             }
             else
             {
                 ConsoleService.Log(LogSeverity.Warning, "Config", "Config Directory created! Time to setup config!");
                 config = await ConfigHandler.CreateNewAsync();
-                await AttributeHandler.CreateNewAsync();
+                GuildHandler = await GuildHandler.CreateNewAsync();
             }
 #endregion
 
@@ -52,7 +51,7 @@ namespace Rick
             map.Add(client);
             map.Add(config);
             map.Add(new InteractiveService(client));
-            map.Add(new AttributeHandler());
+            map.Add(GuildHandler);
 
             handler = new CommandHandler(map);
             await handler.InstallAsync();

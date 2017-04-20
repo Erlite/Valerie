@@ -1,18 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Commands;
+using Discord.WebSocket;
+using Newtonsoft.Json;
+using Rick.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Discord;
 
 namespace Rick.Handlers
 {
-    public class AttributeHandler
+    public class GuildHandler
     {
-        public ulong[] RequiredRole { get; set; }
-        public ulong[] RequiredChannel { get; set; }
-        public string[] ReqChannel { get; set; }
+        public ulong ModChannelID { get; set; }
+        public bool JoinLogs { get; set; }
+        public bool LeaveLogs { get; set; }
+        public bool NameChangesLogged { get; set; }
+        public bool NickChangesLogged { get; set; }
+        public bool UserBannedLogged { get; set; }
+        public bool ClientLatency { get; set; }
+        public bool MessageRecieve { get; set; }
+        public ulong[] RequiredRoleID { get; set; } = new ulong[] { 1234567890, 0987654321 };
+        public ulong[] RequiredChannelIDs { get; set; } = new ulong[] { 1234567890, 0987654321 };
+        public string[] RequiredChannelNames { get; set; } = new string[] { "Spam", "NSFW"};
 
         public async Task SaveAsync()
         {
@@ -26,24 +35,24 @@ namespace Rick.Handlers
             }
         }
 
-        public static async Task<AttributeHandler> UseCurrentAsync()
+        public static async Task<GuildHandler> UseCurrentAsync()
         {
-            AttributeHandler result;
+            GuildHandler result;
             using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
             {
                 using (var configReader = new StreamReader(configStream))
                 {
                     var deserializedConfig = await configReader.ReadToEndAsync();
-                    result = JsonConvert.DeserializeObject<AttributeHandler>(deserializedConfig);
+                    result = JsonConvert.DeserializeObject<GuildHandler>(deserializedConfig);
                     return result;
                 }
             }
         }
 
-        public static  async Task<AttributeHandler> CreateNewAsync()
+        public static async Task<GuildHandler> CreateNewAsync()
         {
-            AttributeHandler result;
-            result = new AttributeHandler();
+            GuildHandler result;
+            result = new GuildHandler();
 
             string directory = Directory.GetCurrentDirectory();
 
