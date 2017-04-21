@@ -129,7 +129,12 @@ namespace Rick.Modules
                         x.IconUrl = client.CurrentUser.GetAvatarUrl();
                     })
                     .WithDescription($"**Input:**```{value}```\n**Output:**```{eval.ToString()}```")
-                    .WithColor(new Color(20,255,5));
+                    .WithColor(new Color(20, 255, 5))
+                    .WithFooter(x =>
+                    {
+                        x.IconUrl = "https://blog.mariusschulz.com/content/images/dotnet_foundation_logo.png";
+                        x.Text = "Using Microsoft Code Analysis Csharp Scripting";
+                    });
 
                 await ReplyAsync("", embed: embed);
             }
@@ -142,7 +147,12 @@ namespace Rick.Modules
                         x.IconUrl = client.CurrentUser.GetAvatarUrl();
                     })
                     .WithDescription($"**Input:**```{value}```\n**Output:**```{e.Message.ToString()}```")
-                    .WithColor(new Color(255, 6, 14));
+                    .WithColor(new Color(255, 6, 14))
+                    .WithFooter(x =>
+                    {
+                        x.IconUrl = "https://blog.mariusschulz.com/content/images/dotnet_foundation_logo.png";
+                        x.Text = "Using Microsoft Code Analysis Csharp Scripting";
+                    });
 
                 await ReplyAsync("", embed: embed);
             }
@@ -150,6 +160,26 @@ namespace Rick.Modules
             {
                 await working.DeleteAsync();
             }
+        }
+
+        [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
+        public async Task ListImportsAsync()
+        {
+            await ReplyAsync(string.Join(", ", MethodService.EvalImports.Select(x => x))).ConfigureAwait(false);
+        }
+
+        [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
+        public async Task RemoveImportAsync([Summary("Namespace name")]string import)
+        {
+            MethodService.EvalImports.Remove(import);
+            await ReplyAsync($"Removed {import}").ConfigureAwait(false);
+        }
+
+        [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
+        public async Task AddImportAsync([Summary("Namespace name")]string import)
+        {
+            MethodService.EvalImports.Add(import);
+            await ReplyAsync($"Added {import}").ConfigureAwait(false);
         }
     }
 }
