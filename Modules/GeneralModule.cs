@@ -10,6 +10,10 @@ using System.Diagnostics;
 using Rick.Handlers;
 using System.Collections.Generic;
 using Discord.Addons.InteractiveCommands;
+using Rick.Services;
+using AngleSharp;
+using AngleSharp.Dom.Html;
+using System.Linq;
 
 namespace Rick.Modules
 {
@@ -274,7 +278,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("A search term should be provided for me to search!");
             using (var httpClient = new HttpClient())
             {
-                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Moderate";
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
                 httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Config.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
@@ -301,6 +305,7 @@ namespace Rick.Modules
                     .WithImageUrl((string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
+
         }
 
         [Command("Lmgtfy"), Summary("Lmgtfy How To Google"), Remarks("Googles something for that special person who is crippled")]
@@ -378,6 +383,33 @@ namespace Rick.Modules
                 var fact = JObject.Parse(response)["facts"][0].ToString();
                 await ReplyAsync($":feet: {fact}");
             }
+        }
+
+        [Command("Imgur"), Summary("Imgur XD"), Remarks("Searches imgure for your image")]
+        public async Task FallBackAsync(string search)
+        {
+            var BaseUrl = $"http://imgur.com/search?q={search}";
+            var config = Configuration.Default.WithDefaultLoader();
+            var document = await BrowsingContext.New(config).OpenAsync(BaseUrl);
+            var elems = document.QuerySelectorAll("a.image-list-link").ToList();
+            if (!elems.Any())
+                return;
+            var img = (elems.ElementAtOrDefault(new Random().Next(0, elems.Count))?.Children?.FirstOrDefault() as IHtmlImageElement);
+            if (img?.Source == null)
+                return;
+            var source = img.Source.Replace("b.", ".");
+
+            var embed = new EmbedBuilder()
+                .WithColor(new Color(66, 244, 191))
+                .WithAuthor(x =>
+                {
+                    x.IconUrl = "https://s25.postimg.org/mi3j4sppb/imgur_1.png";
+                    x.Name = $"Searched for: {search}";
+                    x.Url = BaseUrl;
+                })
+                .WithDescription(source)
+                .WithImageUrl(source);
+            await ReplyAsync("", embed: embed);
         }
 
         //[Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei")]

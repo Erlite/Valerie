@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
+using Discord;
+using Discord.WebSocket;
+using AngleSharp;
+using AngleSharp.Dom.Html;
 
 namespace Rick.Services
 {
@@ -92,5 +96,6 @@ namespace Rick.Services
             yield return Assembly.GetEntryAssembly();
             yield return typeof(ILookup<string, string>).GetTypeInfo().Assembly;
         }
+
     }
 }
