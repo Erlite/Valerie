@@ -27,7 +27,7 @@ namespace Rick
             {
                 ConsoleService.Log(LogSeverity.Info, "Config", "Config has been Loaded!");
                 config = await ConfigHandler.UseCurrentAsync();
-                GuildHandler = await GuildHandler.UseCurrentAsync();
+                //GuildHandler = await GuildHandler.UseCurrentAsync();
             }
             else
             {

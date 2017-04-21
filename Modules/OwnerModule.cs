@@ -9,6 +9,10 @@ using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
 using Rick.Classes;
+using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -19,6 +23,8 @@ namespace Rick.Modules
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
+        public static IEnumerable<Assembly> Assemblies => MethodService.GetAssemblies();
+        public static IEnumerable<string> Imports => MethodService.EvalImports;
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
@@ -102,6 +108,47 @@ namespace Rick.Modules
                 var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
                 await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
+            }
+        }
+
+        [Command("Eval"), Summary("Eval 2+2"), Remarks("Evaluates some sort of expression for you.")]
+        public async Task EvalAsync([Remainder] string value)
+        {
+            var client = Context.Client as DiscordSocketClient;
+            var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
+            var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait...");
+            var _globals = new ScriptGlobals { client = Context.Client as DiscordSocketClient };
+            value = value.Trim('`');
+            try
+            {
+                var eval = await CSharpScript.EvaluateAsync(value, options, _globals, typeof(ScriptGlobals));
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x =>
+                    {
+                        x.Name = "Evaluated Successfully!";
+                        x.IconUrl = client.CurrentUser.GetAvatarUrl();
+                    })
+                    .WithDescription($"**Input:**```{value}```\n**Output:**```{eval.ToString()}```")
+                    .WithColor(new Color(20,255,5));
+
+                await ReplyAsync("", embed: embed);
+            }
+            catch (Exception e)
+            {
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x =>
+                    {
+                        x.Name = "An Error Occurred";
+                        x.IconUrl = client.CurrentUser.GetAvatarUrl();
+                    })
+                    .WithDescription($"**Input:**```{value}```\n**Output:**```{e.Message.ToString()}```")
+                    .WithColor(new Color(255, 6, 14));
+
+                await ReplyAsync("", embed: embed);
+            }
+            finally
+            {
+                await working.DeleteAsync();
             }
         }
     }

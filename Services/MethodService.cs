@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Linq;
+using System.Reflection;
 
 namespace Rick.Services
 {
@@ -58,6 +61,36 @@ namespace Rick.Services
             http.DefaultRequestHeaders.Clear();
             http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1");
             http.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        }
+
+        public static List<string> EvalImports { get; } = new List<string> {
+            "Discord",
+            "Discord.Net",
+            "Discord.Rest",
+            "Discord.Commands",
+            "Discord.WebSocket",
+            "System",
+            "System.Collections",
+            "System.Collections.Generic",
+            "System.Diagnostics",
+            "System.IO",
+            "System.Linq",
+            "System.Math",
+            "System.Reflection",
+            "System.Runtime",
+            "System.Threading.Tasks"
+        };
+
+        public static IEnumerable<Assembly> GetAssemblies()
+        {
+            var Assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+            foreach (var a in Assemblies)
+            {
+                var asm = Assembly.Load(a);
+                yield return asm;
+            }
+            yield return Assembly.GetEntryAssembly();
+            yield return typeof(ILookup<string, string>).GetTypeInfo().Assembly;
         }
     }
 }

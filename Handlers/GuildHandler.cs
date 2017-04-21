@@ -14,7 +14,6 @@ namespace Rick.Handlers
         private DiscordSocketClient client;
         private LogService LogService;
 
-
         public ulong ModChannelID { get; set; }
         public bool JoinLogs { get; set; }
         public bool LeaveLogs { get; set; }
