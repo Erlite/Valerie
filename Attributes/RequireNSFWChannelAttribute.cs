@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Rick.Handlers;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,8 @@ namespace Rick.Attributes
 {
     public class RequireNSFWChannelAttribute : PreconditionAttribute
     {
+        private GuildHandler GuildHandler;
+
         ulong[] ChannelsList;
         public RequireNSFWChannelAttribute(params ulong[] RequiredChannel)
         {

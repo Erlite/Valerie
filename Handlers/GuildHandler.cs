@@ -1,11 +1,8 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using Rick.Services;
-using System;
 using System.IO;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Rick.Handlers
 {
