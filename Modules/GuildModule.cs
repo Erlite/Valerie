@@ -6,6 +6,7 @@ using Rick.Handlers;
 
 namespace Rick.Modules
 {
+    [Group("Guild")]
     public class GuildModule : ModuleBase
     {
         private GuildHandler GuildHandler;
@@ -17,29 +18,28 @@ namespace Rick.Modules
             Log = log;
         }
 
-        [Command("ModChannel"), Summary("Set the mod log channel")]
-        public async Task SetModLogChannelAsync([Summary("Channel to which to set the mod log")] ITextChannel channel)
+        [Command("ModChannel"), Summary("ModChannel #ChannelName"), Remarks("Sets the Modchannel to log bans, etc.")]
+        public async Task SetModLogChannelAsync(ITextChannel channel)
         {
             GuildHandler.ModChannelID = channel.Id;
             await GuildHandler.SaveConfigurationAsync();
-            await ReplyAsync(":white_check_mark: ");
+            await ReplyAsync($"Mod Channel has been set to **{channel.Name}**");
         }
 
-        [Command("Actions")]
-        [Summary("Returns which actions are currently logged in the server log channel")]
+        [Command("Logs"), Summary("Normal Command"), Remarks("Shows what Actiosn are being logged")]
         public async Task ListLogActionsAsync()
         {
-            var embed = new EmbedBuilder();
-            embed.WithTitle("Current Log Actions");
-            embed.WithDescription($"**Server Mod Channel:** {GuildHandler.ModChannelID}\n" +
+            var embed = new EmbedBuilder()
+                .WithTitle("Current Log Actions")
+                .WithDescription($"**Server Mod Channel:** {GuildHandler.ModChannelID}\n" +
                 $"**User Join Logging:** {GuildHandler.JoinLogs}\n**User Leave Logging:** {GuildHandler.LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildHandler.NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildHandler.UserBannedLogged}\n**Latency Monitoring:** {GuildHandler.ClientLatency}\n**Auto Respond:** {GuildHandler.MessageRecieve}");
-            embed.Color = new Color(66, 244, 232);
+                $"**User Ban Logging:** {GuildHandler.UserBannedLogged}\n**Latency Monitoring:** {GuildHandler.ClientLatency}\n**Auto Respond:** {GuildHandler.MessageRecieve}")
+                .WithColor(new Color(66, 244, 232));
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Joins"), Summary("Toggle logging users joining")]
+        [Command("Joins"), Summary("Normal Command"), Remarks("Toggles Join logging")]
         public async Task LogJoinsAsync()
         {
             if (!GuildHandler.JoinLogs)
@@ -50,12 +50,12 @@ namespace Rick.Modules
             else
             {
                 Log.DisableJoinLogging();
-                await ReplyAsync(":white_check_mark:  No longer logging joins.");
+                await ReplyAsync(":anger:   No longer logging joins.");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("Leaves"), Summary("Toggle logging users leaving")]
+        [Command("Leaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
         public async Task LogLeavesAsync()
         {
             if (!GuildHandler.LeaveLogs)
@@ -66,12 +66,12 @@ namespace Rick.Modules
             else
             {
                 Log.DisableLeaveLogging();
-                await ReplyAsync(":white_check_mark:  No longer logging leaves.");
+                await ReplyAsync(":anger:  No longer logging leaves.");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("NameChange"), Summary("Toggle logging users changing usernames")]
+        [Command("Name"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
         public async Task LogNameChangesAsync()
         {
             if (!GuildHandler.NameChangesLogged)
@@ -82,12 +82,12 @@ namespace Rick.Modules
             else
             {
                 Log.DisableNameChangeLogging();
-                await ReplyAsync(":white_check_mark:  No longer logging username changes.");
+                await ReplyAsync(":anger:  No longer logging username changes.");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("NickChange"), Summary("Toggle logging users changing nicknames")]
+        [Command("Nick"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
         public async Task LogNickChangesAsync()
         {
             if (!GuildHandler.NickChangesLogged)
@@ -98,12 +98,12 @@ namespace Rick.Modules
             else
             {
                 Log.DisableNickChangeLogging();
-                await ReplyAsync(":white_check_mark:  No longer logging nickname changes.");
+                await ReplyAsync(":anger:   No longer logging nickname changes.");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("BanLog"), Summary("Toggles ban logging")]
+        [Command("BanLog"), Summary("Normal Command"), Remarks("Toggles ban logging")]
         public async Task BanLogAsync()
         {
             if (!GuildHandler.UserBannedLogged)
@@ -114,28 +114,28 @@ namespace Rick.Modules
             else
             {
                 Log.DisableUserBannedLogging();
-                await ReplyAsync(":white_check_mark:  No longer logging bans.");
+                await ReplyAsync(":anger:  No longer logging bans.");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("Latency")]
+        [Command("Latency"), Summary("Normal Command"), Remarks("Toggles client latency. Changes client latency based on connection")]
         public async Task LatencyAsync()
         {
             if (!GuildHandler.ClientLatency)
             {
                 Log.EnableLatencyMonitor();
-                await ReplyAsync("I'm now using Smart latency monitoring");
+                await ReplyAsync("I'm now monitoring client latency");
             }
             else
             {
                 Log.DisableLatencyMonitor();
-                await ReplyAsync("Smart Connection monitoring disabled!");
+                await ReplyAsync("client latency monitoring disabled!");
             }
             await GuildHandler.SaveConfigurationAsync();
         }
 
-        [Command("AutoRespond")]
+        [Command("AutoRespond"), Summary("Normal Command"), Remarks("Autoresponds to certain words")]
         public async Task AutoRespondAsync()
         {
             if (!GuildHandler.MessageRecieve)
