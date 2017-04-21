@@ -41,7 +41,7 @@ namespace Rick.Handlers
             }
         }
 
-        public  async Task<GuildHandler> UseCurrentAsync()
+        public  static async Task<GuildHandler> UseCurrentAsync()
         {
             GuildHandler result;
             using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
@@ -50,13 +50,6 @@ namespace Rick.Handlers
                 {
                     var deserializedConfig = await configReader.ReadToEndAsync();
                     result = JsonConvert.DeserializeObject<GuildHandler>(deserializedConfig);
-
-                    if (JoinLogs) LogService.EnableJoinLogging();
-                    if (LeaveLogs) LogService.EnableLeaveLogging();
-                    if (NameChangesLogged) LogService.EnableNameChangeLogging();
-                    if (NickChangesLogged) LogService.EnableNickChangeLogging();
-                    if (UserBannedLogged) LogService.EnableUserBannedLogging();
-                    if (ClientLatency) LogService.EnableLatencyMonitor();
 
                     return result;
                 }
@@ -80,5 +73,30 @@ namespace Rick.Handlers
             }
             return result;
         }
+
+        public async Task<bool> LoadGuildConfigAsync()
+        {
+            if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json"))) return false;
+
+            using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
+            {
+                using (var configReader = new StreamReader(configStream))
+                {
+                    var serializedConfig = await configReader.ReadToEndAsync();
+                    var config = JsonConvert.DeserializeObject<GuildHandler>(serializedConfig);
+                    if (config == null) return false;
+
+                    if (JoinLogs) LogService.EnableJoinLogging();
+                    if (LeaveLogs) LogService.EnableLeaveLogging();
+                    if (NameChangesLogged) LogService.EnableNameChangeLogging();
+                    if (NickChangesLogged) LogService.EnableNickChangeLogging();
+                    if (UserBannedLogged) LogService.EnableUserBannedLogging();
+                    if (ClientLatency) LogService.EnableLatencyMonitor();
+
+                    return true;
+                }
+            }
+        }
+
     }
 }

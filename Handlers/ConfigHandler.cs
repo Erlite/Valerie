@@ -52,6 +52,7 @@ namespace Rick.Handlers
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bing API Key: ");
             result.BingAPIKey = Console.ReadLine();
 
+            ConsoleService.NewLine("Yes = y and No = n ");
             ConsoleService.Log(LogSeverity.Info, "Config", "Enable Debug mode for commands? ");
             char debug = Console.ReadLine().ToLower()[0];
             switch (debug)
@@ -61,7 +62,7 @@ namespace Rick.Handlers
                 default: result.DebugMode = false; break;
             }
 
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enable Bot mention? (Y/N) Blank = N: ");
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enable Bot mention? ");
             char input = Console.ReadLine().ToLower()[0];
             switch (input)
             {

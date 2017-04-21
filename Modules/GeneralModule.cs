@@ -10,7 +10,6 @@ using System.Diagnostics;
 using Rick.Handlers;
 using System.Collections.Generic;
 using Discord.Addons.InteractiveCommands;
-using Rick.Services;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
