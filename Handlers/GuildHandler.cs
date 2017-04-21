@@ -33,10 +33,10 @@ namespace Rick.Handlers
 
         public async Task CreateGuildConfigAsync(SocketGuild Guild)
         {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
             //await Guild.DefaultChannel.SendMessageAsync($"Thank you for inviting me to **{Guild.Name}**. I've set up your config!");
             var newConfig = new GuildHandler();
             GuildConfig.Add(Guild.Id, newConfig);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
             await SaveAsync(path, GuildConfig);
         }
 

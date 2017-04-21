@@ -52,10 +52,10 @@ namespace Rick
             map.Add(new InteractiveService(client));
             map.Add(new GuildHandler());
 
-            //client.GuildAvailable += CreateGuildConfigAsync;
-            //client.LeftGuild += RemoveGuildConfigAsync;
-            client.GuildAvailable += GuildHandler.CreateGuildConfigAsync;
-            client.GuildAvailable += GuildHandler.RemoveGuildConfigAsync;
+            client.GuildAvailable += CreateGuildConfigAsync;
+            client.LeftGuild += RemoveGuildConfigAsync;
+            //client.GuildAvailable += GuildHandler.CreateGuildConfigAsync;
+            //client.GuildAvailable += GuildHandler.RemoveGuildConfigAsync;
            
             handler = new CommandHandler(map);
             await handler.InstallAsync();
