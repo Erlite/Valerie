@@ -14,15 +14,13 @@ namespace Rick.Services
     public class LogService
     {
         private DiscordSocketClient client;
-        private ConfigHandler Config;
         private GuildHandler GuildHandler;
 
         public const string DictPath = "./Config/Response.json";
 
-        public LogService(DiscordSocketClient c, ConfigHandler config, GuildHandler gldhndler)
+        public LogService(DiscordSocketClient c, GuildHandler gldhndler)
         {
             client = c;
-            Config = config;
             GuildHandler = gldhndler;
         }
 
