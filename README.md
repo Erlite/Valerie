@@ -17,9 +17,9 @@ This bot is as flexible as you want it to be. It is being actively developed on 
 ## FAQ
 ---
 
-> Current version = 8.4
+> Current version = 8.8
 <br>Release = Beta</br>
-All Commands = Yes
+Commands Working = Yes
 <br>Errors = Minimum to None</br>
 Github = https://github.com/ExceptionDev/Rick
 <br>DiscordName = ExceptionDev#6045</br>
