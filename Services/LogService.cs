@@ -13,107 +13,109 @@ namespace Rick.Services
 {
     public class LogService
     {
-        private DiscordSocketClient _client;
+        private DiscordSocketClient client;
         private ConfigHandler Config;
+        private GuildHandler GuildHandler;
+
         public const string DictPath = "./Config/Response.json";
         private Regex _issueRegex = new Regex(@">>([0-9]+)");
 
-        public ulong ServerLogChannelId { get; set; }
-        public ulong ModLogChannelId { get; set; }
-        public bool JoinsLogged { get; private set; }
-        public bool LeavesLogged { get; private set; }
-        public bool NameChangesLogged { get; private set; }
-        public bool NickChangesLogged { get; private set; }
-        public bool UserBannedLogged { get; private set; }
-        public bool ClientLatency { get; private set; }
-        public bool MessageRecieve { get; private set; }
+        public LogService(DiscordSocketClient c, ConfigHandler config, GuildHandler gldhndler)
+        {
+            client = c;
+            Config = config;
+            GuildHandler = gldhndler;
+        }
 
+        public static Dictionary<string, string> GetResponses()
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
+        }
 
         public void EnableJoinLogging()
         {
-            _client.UserJoined +=  UserJoinedAsync ;
-            JoinsLogged = true;
+            client.UserJoined +=  UserJoinedAsync ;
+            GuildHandler.JoinLogs = true;
         }
 
         public void DisableJoinLogging()
         {
-            _client.UserJoined -= UserJoinedAsync;
-            JoinsLogged = false;
+            client.UserJoined -= UserJoinedAsync;
+            GuildHandler.JoinLogs = false;
         }
 
         public void EnableLeaveLogging()
         {
-            _client.UserLeft += _client_UserLeft;
-            LeavesLogged = true;
+            client.UserLeft += UserLeftAsync;
+            GuildHandler.LeaveLogs = true;
         }
 
         public void DisableLeaveLogging()
         {
-            _client.UserLeft -= _client_UserLeft;
-            LeavesLogged = false;
+            client.UserLeft += UserLeftAsync;
+            GuildHandler.LeaveLogs = false;
         }
 
         public void EnableNameChangeLogging()
         {
-            _client.UserUpdated += _client_UserUpdated_NameChange;
-            NameChangesLogged = true;
+            client.UserUpdated += NameChangeAsync;
+            GuildHandler.NameChangesLogged = true;
         }
 
         public void DisableNameChangeLogging()
         {
-            _client.UserUpdated -= _client_UserUpdated_NameChange;
-            NameChangesLogged = false;
+            client.UserUpdated += NameChangeAsync;
+            GuildHandler.NameChangesLogged = false;
         }
 
         public void EnableNickChangeLogging()
         {
-            _client.GuildMemberUpdated += _client_GuildMemberUpdated_NickChange;
-            NickChangesLogged = true;
+            client.GuildMemberUpdated += NickChangeAsync;
+            GuildHandler.NickChangesLogged = true;
         }
 
         public void DisableNickChangeLogging()
         {
-            _client.GuildMemberUpdated -= _client_GuildMemberUpdated_NickChange;
-            NickChangesLogged = false;
+            client.GuildMemberUpdated -= NickChangeAsync;
+            GuildHandler.NickChangesLogged = false;
         }
 
         public void EnableUserBannedLogging()
         {
-            _client.UserBanned += _client_UserBanned;
-            UserBannedLogged = true;
+            client.UserBanned += UserBannedAsync;
+            GuildHandler.UserBannedLogged = true;
         }
 
         public void DisableUserBannedLogging()
         {
-            _client.UserBanned -= _client_UserBanned;
-            UserBannedLogged = false;
+            client.UserBanned -= UserBannedAsync;
+            GuildHandler.UserBannedLogged = false;
         }
 
         public void EnableLatencyMonitor()
         {
-            _client.LatencyUpdated += _client_LatencyUpdated;
-            ClientLatency = true;
+            client.LatencyUpdated += LatencyUpdateAsync;
+            GuildHandler.ClientLatency = true;
         }
 
         public void DisableLatencyMonitor()
         {
-            _client.LatencyUpdated -= _client_LatencyUpdated;
-            ClientLatency = false;
+            client.LatencyUpdated -= LatencyUpdateAsync;
+            GuildHandler.ClientLatency = false;
         }
 
         public void EnableMessageRecieve()
         {
-            _client.MessageReceived += _client_MessageReceived;
-            MessageRecieve = true;
+            client.MessageReceived += MessageReceivedAsync;
+            GuildHandler.MessageRecieve = true;
         }
 
         public void DisableMessageRecieve()
         {
-            _client.MessageReceived -= _client_MessageReceived;
-            MessageRecieve = false;
+            client.MessageReceived -= MessageReceivedAsync;
+            GuildHandler.MessageRecieve = false;
         }
    
-
 
         private async Task UserJoinedAsync(SocketGuildUser u)
         {
@@ -121,61 +123,61 @@ namespace Rick.Services
             embed.Title = "=== User Joined ===";
             embed.Description = $"**Username: **{u.Username}#{u.Discriminator}";
             embed.Color = new Color(83, 219, 207);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            var LogChannel = client.GetChannel(GuildHandler.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task _client_UserLeft(SocketGuildUser u)
+        private async Task UserLeftAsync(SocketGuildUser u)
         {
             var embed = new EmbedBuilder();
             embed.Title = "=== User Left ===";
             embed.Description = $"{u.Username}#{u.Discriminator} has left the server! :wave:";
             embed.Color = new Color(223, 229, 48);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            var LogChannel = client.GetChannel(GuildHandler.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task _client_UserUpdated_NameChange(SocketUser author, SocketUser a)
+        private async Task NameChangeAsync(SocketUser author, SocketUser a)
         {
             if (author.Username == a.Username) return;
             var embed = new EmbedBuilder();
             embed.Title = "=== Username Change ====";
             embed.Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}";
             embed.Color = new Color(193, 60, 144);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            var LogChannel = client.GetChannel(GuildHandler.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task _client_GuildMemberUpdated_NickChange(SocketGuildUser author, SocketGuildUser a)
+        private async Task NickChangeAsync(SocketGuildUser author, SocketGuildUser a)
         {
             if (author.Nickname == a.Nickname) return;
             var embed = new EmbedBuilder();
             embed.Title = "=== Nickname Change ====";
             embed.Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}";
             embed.Color = new Color(193, 60, 144);
-            var LogServer = _client.GetChannel(ServerLogChannelId) as ITextChannel;
-            await LogServer.SendMessageAsync("", embed: embed);
+            var LogChannel = client.GetChannel(GuildHandler.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task _client_UserBanned(SocketUser user, SocketGuild gld)
+        private async Task UserBannedAsync(SocketUser user, SocketGuild gld)
         {
             await gld.DefaultChannel.SendMessageAsync($"{user.Username} was banned from {gld.Name}");
         }
 
-        private async Task _client_LatencyUpdated(int older, int newer)
+        private async Task LatencyUpdateAsync(int older, int newer)
         {
-            if (_client == null) return;
-            var newStatus = (_client.ConnectionState == ConnectionState.Disconnected || newer > 100) ? UserStatus.DoNotDisturb
-                    : (_client.ConnectionState == ConnectionState.Connecting || newer > 60)
+            if (client == null) return;
+            var newStatus = (client.ConnectionState == ConnectionState.Disconnected || newer > 100) ? UserStatus.DoNotDisturb
+                    : (client.ConnectionState == ConnectionState.Connecting || newer > 60)
                         ? UserStatus.Idle
                         : UserStatus.Online;
 
-            await _client.SetStatusAsync(newStatus);
+            await client.SetStatusAsync(newStatus);
         }
 
-        private async Task _client_MessageReceived(SocketMessage msg)
+        private async Task MessageReceivedAsync(SocketMessage msg)
         {
-            if (msg.Author.Id == _client.CurrentUser.Id) return;
+            if (msg.Author.Id == client.CurrentUser.Id) return;
             var response = GetResponses();
             foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
             {
@@ -197,17 +199,5 @@ namespace Rick.Services
             }
         }
 
-
-
-        public LogService(DiscordSocketClient c, ConfigHandler config)
-        {
-            _client = c;
-            Config = config;
-        }
-
-        public static Dictionary<string, string> GetResponses()
-        {
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(DictPath));
-        }
     }
 }
