@@ -11,6 +11,8 @@ using Rick.Handlers;
 using System.Collections.Generic;
 using System.Text;
 using Discord.Addons.InteractiveCommands;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Rick.Modules
 {
@@ -349,6 +351,23 @@ namespace Rick.Modules
                 })
                 .WithDescription($"Your unique UUID is: {id}");
             await ReplyAsync("", false, embed);
+        }
+
+        [Command("Coinflip"), Summary("Coinflip"), Remarks("Flips a coin")]
+        public async Task CoinFlipAsync()
+        {
+            var rand = new Random().Next(2);
+            switch (rand)
+            {
+                case 0:
+                    await ReplyAsync("HEAAADS");
+                    break;
+                case 1:
+                    await ReplyAsync("TAAAILS");
+                    break;
+
+            }
+
         }
 
         //[Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei")]
