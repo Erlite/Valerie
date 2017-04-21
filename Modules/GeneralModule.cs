@@ -158,7 +158,7 @@ namespace Rick.Modules
         }
 
         [Command("Userinfo"), Summary("Userinfo @Username"), Remarks("Displays information about a User"), Alias("UI")]
-        public async Task UserInfo(IUser user = null)
+        public async Task UserInfoAsync(IUser user = null)
         {
             if (user == null)
                 throw new NullReferenceException("You must mention a user for me to display information!");
@@ -302,6 +302,12 @@ namespace Rick.Modules
                     .WithImageUrl((string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
+        }
+
+        [Command("Lmgtfy"), Summary("Lmg How To Google"), Remarks("Googles something for that special person who is crippled")]
+        public async Task LmgtfyAsync([Remainder] string ffs = "How to use Lmgtfy")
+        {
+            await ReplyAsync($"<http://lmgtfy.com/?q={ Uri.EscapeUriString(ffs) }>");
         }
 
         [Command("Ping"), Summary("Normal Command"), Remarks("Measures gateway ping and response time")]
