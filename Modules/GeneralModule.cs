@@ -306,10 +306,10 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Lmgtfy"), Summary("Lmg How To Google"), Remarks("Googles something for that special person who is crippled")]
-        public async Task LmgtfyAsync([Remainder] string ffs = "How to use Lmgtfy")
+        [Command("Lmgtfy"), Summary("Lmgtfy How To Google"), Remarks("Googles something for that special person who is crippled")]
+        public async Task LmgtfyAsync([Remainder] string search = "How to use Lmgtfy")
         {
-            await ReplyAsync($"<http://lmgtfy.com/?q={ Uri.EscapeUriString(ffs) }>");
+            await ReplyAsync($"**Your special URL: **<http://lmgtfy.com/?q={ Uri.EscapeUriString(search) }>");
         }
 
         [Command("Ping"), Summary("Normal Command"), Remarks("Measures gateway ping and response time")]
@@ -328,12 +328,12 @@ namespace Rick.Modules
 
         }
 
-        [Command("Embed")]
-        public async Task EmbedAsync([Remainder] string msg = "Sorry, I'm too dumb to use an embed command!")
+        [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
+        public async Task EmbedAsync(int Color1 = 0, int Color2 = 0, int Color3 = 0, [Remainder] string msg = "Sorry, I'm too dumb to use an embed command!")
         {
             await Context.Message.DeleteAsync();
             var embed = new EmbedBuilder()
-                .WithColor(new Color(255, 255, 255))
+                .WithColor(new Color(Color1, Color2, Color3))
                 .WithDescription($"{Format.Italics(msg)}");
             await ReplyAsync("", embed: embed);
         }
