@@ -9,10 +9,7 @@ using Discord.WebSocket;
 using System.Diagnostics;
 using Rick.Handlers;
 using System.Collections.Generic;
-using System.Text;
 using Discord.Addons.InteractiveCommands;
-using System.Linq;
-using Newtonsoft.Json;
 
 namespace Rick.Modules
 {
@@ -331,7 +328,6 @@ namespace Rick.Modules
         [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
         public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Sorry, I'm too dumb to use an embed command!")
         {
-            if (Color1 > 256 || Color2 > 256 || Color3 > 256) return;
             await Context.Message.DeleteAsync();
             var embed = new EmbedBuilder()
                 .WithColor(new Color(Color1, Color2, Color3))
