@@ -18,7 +18,6 @@ namespace Rick.Services
         private GuildHandler GuildHandler;
 
         public const string DictPath = "./Config/Response.json";
-        private Regex _issueRegex = new Regex(@">>([0-9]+)");
 
         public LogService(DiscordSocketClient c, ConfigHandler config, GuildHandler gldhndler)
         {
@@ -185,17 +184,6 @@ namespace Rick.Services
                 {
                     await msg.Channel.SendMessageAsync(item.Value);
                 }
-            }
-
-            var matches = _issueRegex.Matches(msg.Content);
-            if (matches.Count > 0)
-            {
-                var outStr = new StringBuilder();
-                foreach (Match match in matches)
-                {
-                    outStr.AppendLine($"**{match.Value}** - https://github.com/ExceptionDev/DiscordExampleBot/issues/{match.Value.Substring(2)}");
-                }
-                await msg.Channel.SendMessageAsync(outStr.ToString());
             }
         }
 
