@@ -89,17 +89,17 @@ namespace Rick.Services
             GuildHandler.UserBannedLogged = false;
         }
 
-        public void EnableLatencyMonitor()
-        {
-            client.LatencyUpdated += LatencyUpdateAsync;
-            GuildHandler.ClientLatency = true;
-        }
+        //public void EnableLatencyMonitor()
+        //{
+        //    client.LatencyUpdated += LatencyUpdateAsync;
+        //    GuildHandler.ClientLatency = true;
+        //}
 
-        public void DisableLatencyMonitor()
-        {
-            client.LatencyUpdated -= LatencyUpdateAsync;
-            GuildHandler.ClientLatency = false;
-        }
+        //public void DisableLatencyMonitor()
+        //{
+        //    client.LatencyUpdated -= LatencyUpdateAsync;
+        //    GuildHandler.ClientLatency = false;
+        //}
 
         public void EnableMessageRecieve()
         {

@@ -27,13 +27,11 @@ namespace Rick
             {
                 ConsoleService.Log(LogSeverity.Info, "Config", "Config has been Loaded!");
                 config = await ConfigHandler.UseCurrentAsync();
-                GuildHandler = await GuildHandler.UseCurrentAsync();
             }
             else
             {
                 ConsoleService.Log(LogSeverity.Warning, "Config", "Config Directory created! Time to setup config!");
                 config = await ConfigHandler.CreateNewAsync();
-                GuildHandler = await GuildHandler.CreateNewAsync();
             }
 #endregion
 
@@ -52,16 +50,40 @@ namespace Rick
             map.Add(client);
             map.Add(config);
             map.Add(new InteractiveService(client));
-            map.Add(GuildHandler);
+            map.Add(new GuildHandler());
+
+            //client.GuildAvailable += CreateGuildConfigAsync;
+            //client.LeftGuild += RemoveGuildConfigAsync;
+            client.GuildAvailable += GuildHandler.CreateGuildConfigAsync;
+            client.GuildAvailable += GuildHandler.RemoveGuildConfigAsync;
            
             handler = new CommandHandler(map);
             await handler.InstallAsync();
-
-            await GuildHandler.LoadGuildConfigAsync();
 
             await client.LoginAsync(TokenType.Bot, config.BotToken);
             await client.StartAsync();
             await Task.Delay(-1);
         }
+
+        public async Task CreateGuildConfigAsync(SocketGuild Guild)
+        {
+            //await Guild.DefaultChannel.SendMessageAsync($"Thank you for inviting me to **{Guild.Name}**. I've set up your config!");
+            var newConfig = new GuildHandler();
+            GuildHandler.GuildConfig.Add(Guild.Id, newConfig);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
+            await GuildHandler.SaveAsync(path, GuildHandler.GuildConfig);
+        }
+
+        public async Task RemoveGuildConfigAsync(SocketGuild Guild)
+        {
+            ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
+            if (GuildHandler.GuildConfig.ContainsKey(Guild.Id))
+            {
+                GuildHandler.GuildConfig.Remove(Guild.Id);
+            }
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
+            await GuildHandler.SaveAsync(path, GuildHandler.GuildConfig);
+        }
+
     }
 }
