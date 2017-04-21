@@ -217,7 +217,6 @@
     <Compile Include="Modules\GeneralModule.cs" />
     <Compile Include="Modules\GuildModule.cs" />
     <Compile Include="Modules\HelpModule.cs" />
-    <Compile Include="Modules\LogModule.cs" />
     <Compile Include="Modules\NSFWModule.cs" />
     <Compile Include="Modules\OwnerModule.cs" />
     <Compile Include="Modules\TagModule.cs" />
