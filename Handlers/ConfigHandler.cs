@@ -24,18 +24,6 @@ namespace Rick.Handlers
             return m.HasMentionPrefix(c.CurrentUser, ref ap);
         }
 
-        public async Task SaveAsync()
-        {
-            using (var configStream = File.OpenWrite(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
-            {
-                using (var configWriter = new StreamWriter(configStream))
-                {
-                    var save = JsonConvert.SerializeObject(this);
-                    await configWriter.WriteAsync(save);
-                }
-            }
-        }
-
         public static async Task<ConfigHandler> UseCurrentAsync()
         {
             ConfigHandler result;

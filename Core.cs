@@ -17,6 +17,7 @@ namespace Rick
         private ConfigHandler config;
         private CommandHandler handler;
         private GuildHandler GuildHandler;
+
         public async Task StartAsync()
         {
             #region Config Check

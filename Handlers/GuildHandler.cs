@@ -11,6 +11,10 @@ namespace Rick.Handlers
 {
     public class GuildHandler
     {
+        private DiscordSocketClient client;
+        private LogService LogService;
+
+
         public ulong ModChannelID { get; set; }
         public bool JoinLogs { get; set; }
         public bool LeaveLogs { get; set; }
@@ -23,19 +27,22 @@ namespace Rick.Handlers
         public ulong[] RequiredChannelIDs { get; set; } = new ulong[] { 1234567890, 0987654321 };
         public string[] RequiredChannelNames { get; set; } = new string[] { "Spam", "NSFW"};
 
-        public async Task SaveAsync()
+        public async Task<bool> SaveConfigurationAsync()
         {
+            var config = new GuildHandler();
+            var serializedConfig = JsonConvert.SerializeObject(config, Formatting.Indented);
+
             using (var configStream = File.OpenWrite(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
             {
                 using (var configWriter = new StreamWriter(configStream))
                 {
-                    var save = JsonConvert.SerializeObject(this);
-                    await configWriter.WriteAsync(save);
+                    await configWriter.WriteAsync(serializedConfig);
+                    return true;
                 }
             }
         }
 
-        public static async Task<GuildHandler> UseCurrentAsync()
+        public  async Task<GuildHandler> UseCurrentAsync()
         {
             GuildHandler result;
             using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json")))
@@ -44,6 +51,14 @@ namespace Rick.Handlers
                 {
                     var deserializedConfig = await configReader.ReadToEndAsync();
                     result = JsonConvert.DeserializeObject<GuildHandler>(deserializedConfig);
+
+                    if (JoinLogs) LogService.EnableJoinLogging();
+                    if (LeaveLogs) LogService.EnableLeaveLogging();
+                    if (NameChangesLogged) LogService.EnableNameChangeLogging();
+                    if (NickChangesLogged) LogService.EnableNickChangeLogging();
+                    if (UserBannedLogged) LogService.EnableUserBannedLogging();
+                    if (ClientLatency) LogService.EnableLatencyMonitor();
+
                     return result;
                 }
             }
