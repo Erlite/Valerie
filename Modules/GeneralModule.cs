@@ -370,6 +370,19 @@ namespace Rick.Modules
 
         }
 
+        [Command("Catfacts"), Summary("Catfacts"), Remarks("Catfacts for cat lovers")]
+        public async Task CatfactsAsync()
+        {
+            using (var http = new HttpClient())
+            {
+                var response = await http.GetStringAsync("http://catfacts-api.appspot.com/api/facts");
+                if (response == null)
+                    return;
+                var fact = JObject.Parse(response)["facts"][0].ToString();
+                await ReplyAsync($":feet: {fact}");
+            }
+        }
+
         //[Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei")]
         //[Cooldown(60)]
         //public async Task GiftAsync(IGuildUser user, double points)
