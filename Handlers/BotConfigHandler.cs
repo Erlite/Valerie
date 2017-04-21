@@ -6,16 +6,19 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
+using System.Collections.Generic;
+using Rick.Interfaces;
 
 namespace Rick.Handlers
 {
-    public class ConfigHandler 
+    public class BotConfigHandler 
     {
         public string BotToken { get; set; }
         public string DefaultPrefix { get; set; }
         public string BingAPIKey { get; set; }
         public bool MentionDefaultPrefix { get; set; }
         public bool DebugMode { get; set; }
+        public bool ClientLatency { get; set; }
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
@@ -24,24 +27,24 @@ namespace Rick.Handlers
             return m.HasMentionPrefix(c.CurrentUser, ref ap);
         }
 
-        public static async Task<ConfigHandler> UseCurrentAsync()
+        public static async Task<BotConfigHandler> UseCurrentAsync()
         {
-            ConfigHandler result;
+            BotConfigHandler result;
             using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
             {
                 using (var configReader = new StreamReader(configStream))
                 {
                     var deserializedConfig = await configReader.ReadToEndAsync();
-                    result = JsonConvert.DeserializeObject<ConfigHandler>(deserializedConfig);
+                    result = JsonConvert.DeserializeObject<BotConfigHandler>(deserializedConfig);
                     return result;
                 }
             }
         }
 
-        public static async Task<ConfigHandler> CreateNewAsync()
+        public static async Task<BotConfigHandler> CreateNewAsync()
         {
-            ConfigHandler result;
-            result = new ConfigHandler();
+            BotConfigHandler result;
+            result = new BotConfigHandler();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();

@@ -7,6 +7,7 @@ using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
 using System.IO;
+using Rick.Models;
 
 namespace Rick
 {
@@ -14,9 +15,8 @@ namespace Rick
     {
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
         private DiscordSocketClient client;
-        private ConfigHandler config;
+        private BotConfigHandler config;
         private CommandHandler handler;
-        private GuildHandler GuildHandler;
 
         public async Task StartAsync()
         {
@@ -26,14 +26,14 @@ namespace Rick
             if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
             {
                 ConsoleService.Log(LogSeverity.Info, "Config", "Config has been Loaded!");
-                config = await ConfigHandler.UseCurrentAsync();
+                config = await BotConfigHandler.UseCurrentAsync();
             }
             else
             {
                 ConsoleService.Log(LogSeverity.Warning, "Config", "Config Directory created! Time to setup config!");
-                config = await ConfigHandler.CreateNewAsync();
+                config = await BotConfigHandler.CreateNewAsync();
             }
-#endregion
+            #endregion
 
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
@@ -54,8 +54,6 @@ namespace Rick
 
             client.GuildAvailable += CreateGuildConfigAsync;
             client.LeftGuild += RemoveGuildConfigAsync;
-            //client.GuildAvailable += GuildHandler.CreateGuildConfigAsync;
-            //client.GuildAvailable += GuildHandler.RemoveGuildConfigAsync;
            
             handler = new CommandHandler(map);
             await handler.InstallAsync();
@@ -67,22 +65,21 @@ namespace Rick
 
         public async Task CreateGuildConfigAsync(SocketGuild Guild)
         {
-            //await Guild.DefaultChannel.SendMessageAsync($"Thank you for inviting me to **{Guild.Name}**. I've set up your config!");
-            var newConfig = new GuildHandler();
-            GuildHandler.GuildConfig.Add(Guild.Id, newConfig);
+            var gldConfig = new GuildModel();
+            GuildModel.GuildConfig.Add(Guild.Id, gldConfig);
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
-            await GuildHandler.SaveAsync(path, GuildHandler.GuildConfig);
+            await GuildModel.SaveAsync(path, GuildModel.GuildConfig);
         }
 
         public async Task RemoveGuildConfigAsync(SocketGuild Guild)
         {
             ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
-            if (GuildHandler.GuildConfig.ContainsKey(Guild.Id))
+            if (GuildModel.GuildConfig.ContainsKey(Guild.Id))
             {
-                GuildHandler.GuildConfig.Remove(Guild.Id);
+                GuildModel.GuildConfig.Remove(Guild.Id);
             }
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Config", "GuildConfig.json");
-            await GuildHandler.SaveAsync(path, GuildHandler.GuildConfig);
+            await GuildModel.SaveAsync(path, GuildModel.GuildConfig);
         }
 
     }

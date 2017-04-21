@@ -13,15 +13,16 @@ using Discord.Addons.InteractiveCommands;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
+using Rick.Services;
 
 namespace Rick.Modules
 {
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-        private ConfigHandler Config;
+        private BotConfigHandler Config;
 
-        public GeneralModule(InteractiveService Inter, ConfigHandler ConfigHandler)
+        public GeneralModule(InteractiveService Inter, BotConfigHandler ConfigHandler)
         {
             Interactive = Inter;
             Config = ConfigHandler;

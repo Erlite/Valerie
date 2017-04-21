@@ -5,6 +5,8 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using System.IO;
+using Rick.Services;
+using Rick.Models;
 
 namespace Rick.Handlers
 {
@@ -13,12 +15,12 @@ namespace Rick.Handlers
         private IDependencyMap map;
         private DiscordSocketClient client;
         private CommandService cmds;
-        private ConfigHandler config;
+        private BotConfigHandler config;
 
         public CommandHandler(IDependencyMap _map)
         {
             client = _map.Get<DiscordSocketClient>();
-            config = _map.Get<ConfigHandler>();
+            config = _map.Get<BotConfigHandler>();
             cmds = new CommandService();
             map = _map;
         }
@@ -31,12 +33,12 @@ namespace Rick.Handlers
 
         public async Task HandleCommandAsync(SocketMessage m)
         {
-            var message = m as SocketUserMessage;
-            if (message == null) return;
-            if (!(message.Channel is IGuildChannel)) return;
+            var message = m as SocketUserMessage;            
+            if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
-            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos))) return;
             var context = new CommandContext(client, message);
+            var gld = context.Guild as SocketGuild;
+            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfig[gld.Id].GuildPrefix, ref argPos))) return;
             var Result = cmds.Search(context, argPos);
             CommandInfo Command = null;
             if (Result.IsSuccess)
