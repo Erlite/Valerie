@@ -48,10 +48,10 @@ namespace Rick.Models
         public string[] RequiredChannelNames { get; set; } = new string[] { "Spam", "NSFW" };
 
         [JsonProperty("Tags")]
-        public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string> { };
+        public Dictionary<string, string> Tags { get; set; }
 
         [JsonProperty("Responses")]
-        public Dictionary<string, string> Responses { get; set; } = new Dictionary<string, string> { };
+        public Dictionary<string, string> Responses { get; set; }
 
         public static Dictionary<ulong, GuildModel> GuildConfigs { get; set; } = new Dictionary<ulong, GuildModel>();
 
