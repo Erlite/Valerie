@@ -84,11 +84,11 @@ namespace Rick.Services
 
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
+            var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
             var embed = new EmbedBuilder();
             embed.Title = "=== User Joined ===";
-            embed.Description = $"**Username: **{user.Username}#{user.Discriminator}";
+            embed.Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}";
             embed.Color = new Color(83, 219, 207);
-            var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
         }
