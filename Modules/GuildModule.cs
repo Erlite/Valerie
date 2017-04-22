@@ -155,7 +155,7 @@ namespace Rick.Modules
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
 
-        [Command("BanLog"), Summary("Normal Command"), Remarks("Toggles ban logging")]
+        [Command("Bans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
         public async Task BanLogAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -163,13 +163,11 @@ namespace Rick.Modules
             if (!GuildModel.GuildConfigs[Guild.Id].UserBannedLogged)
             {
                 gldConfig.UserBannedLogged = true;
-                Log.EnableUserBannedLogging();
                 await ReplyAsync(":white_check_mark:  Now logging bans.");
             }
             else
             {
                 gldConfig.UserBannedLogged = false;
-                Log.DisableUserBannedLogging();
                 await ReplyAsync(":anger:  No longer logging bans.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;

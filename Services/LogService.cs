@@ -56,16 +56,6 @@ namespace Rick.Services
             client.GuildMemberUpdated -= NickChangeAsync;
         }
 
-        public void EnableUserBannedLogging()
-        {
-            client.UserBanned += UserBannedAsync;
-        }
-
-        public void DisableUserBannedLogging()
-        {
-            client.UserBanned -= UserBannedAsync;
-        }
-
         //public void EnableLatencyMonitor()
         //{
         //    client.LatencyUpdated += LatencyUpdateAsync;
@@ -133,11 +123,6 @@ namespace Rick.Services
             var getGuild = GuildModel.GuildConfigs[author.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
-        }
-
-        private async Task UserBannedAsync(SocketUser user, SocketGuild gld)
-        {
-            await gld.DefaultChannel.SendMessageAsync($"{user.Username} was banned from {gld.Name}");
         }
 
         private async Task LatencyUpdateAsync(int older, int newer)

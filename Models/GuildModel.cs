@@ -35,6 +35,9 @@ namespace Rick.Models
         [JsonProperty("UserBanned")]
         public bool UserBannedLogged { get; set; }
 
+        [JsonProperty("CaseNumber")]
+        public int CaseNumber { get; set; }
+
         [JsonProperty("AutoRespond")]
         public bool AutoRespond { get; set; }
 
@@ -45,13 +48,13 @@ namespace Rick.Models
         public ulong[] RequiredChannelIDs { get; set; } = new ulong[] { 1234567890, 0987654321 };
 
         [JsonProperty("RequiredChannelNames")]
-        public string[] RequiredChannelNames { get; set; } = new string[] { "Spam", "NSFW" };
+        public string[] RequiredChannelNames { get; set; } = new string[] { "spam", "nsfw" };
 
         [JsonProperty("Tags")]
-        public Dictionary<string, string> Tags { get; set; }
+        public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string>();
 
         [JsonProperty("Responses")]
-        public Dictionary<string, string> Responses { get; set; }
+        public Dictionary<string, string> Responses { get; set; } = new Dictionary<string, string>();
 
         public static Dictionary<ulong, GuildModel> GuildConfigs { get; set; } = new Dictionary<ulong, GuildModel>();
 

@@ -8,8 +8,6 @@ namespace Rick.Attributes
 {
     public class RequiredRoleAttribute : PreconditionAttribute
     {
-        private GuildModel Model;
-
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
             var user = context.User as IGuildUser;

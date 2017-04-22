@@ -4,6 +4,7 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
+using Rick.Models;
 
 namespace Rick.Modules
 {
@@ -47,24 +48,33 @@ namespace Rick.Modules
             if (user == null)
                 throw new NullReferenceException("Please mention the user you would like to kick!");
 
-            var gld = Context.Guild as SocketGuild;
-            var embed = new EmbedBuilder()
-                .WithTitle("===== Banned User =====")
-                .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}")
-                .WithAuthor(x =>
-                {
-                    x.Name = Context.User.Username;
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                })
-                .WithColor(new Color(206, 47, 47))
-                .WithFooter(x =>
-                {
-                    x.Text = $"Banned by {Context.User}";
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                })
-                .WithImageUrl("https://i.redd.it/psv0ndgiqrny.gif");
-            await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
-            await gld.AddBanAsync(user);
+            var gldConfig = GuildModel.GuildConfigs[user.Guild.Id];
+            var Case = gldConfig.CaseNumber;
+            if (gldConfig.UserBannedLogged)
+            {
+                var embed = new EmbedBuilder()
+                    .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}\n**Case Number:** {Case + 1}")
+                    .WithAuthor(x =>
+                    {
+                        x.Name = $"{user.Username} Banned from {user.Guild.Name}";
+                        x.IconUrl = user.GetAvatarUrl();
+                    })
+                    .WithColor(new Color(206, 47, 47))
+                    .WithFooter(x =>
+                    {
+                        x.Text = $"Banned by {Context.User}";
+                        x.IconUrl = Context.User.GetAvatarUrl();
+                    })
+                    .WithImageUrl("https://i.redd.it/psv0ndgiqrny.gif");
+                var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
+                await ModChannel.SendMessageAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
+
+            GuildModel.GuildConfigs[user.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            await user.Guild.AddBanAsync(user);
         }
 
         [Command("Delete"), Summary("Delete 10"), Remarks("Deletes X amount of messages"), Alias("Del")]

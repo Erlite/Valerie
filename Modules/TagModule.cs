@@ -40,9 +40,9 @@ namespace Rick.Modules
                 GuildModel.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
                 await ReplyAsync("Tag Added", embed: embed);
             }
-            catch
+            catch(Exception e)
             {
-                await ReplyAsync("Failed to add tag");
+                await ReplyAsync($"Failed to add tag.\nException: {e.ToString()}");
             }
 
         }

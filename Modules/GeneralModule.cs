@@ -14,6 +14,7 @@ using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Services;
+using Rick.Models;
 
 namespace Rick.Modules
 {
@@ -345,7 +346,7 @@ namespace Rick.Modules
         {
             var id = Guid.NewGuid().ToString();
             var embed = new EmbedBuilder()
-                .WithColor(new Color(255,255,255))
+                .WithColor(new Color(255, 255, 255))
                 .WithAuthor(x =>
                 {
                     x.Name = Context.User.Username;
@@ -438,57 +439,31 @@ namespace Rick.Modules
         //}
 
 
-        //[Command("ResponseList"), Summary("Just run the command"), Remarks("Lists all the responses saved in the JSON file."), Alias("RL")]
-        //public async Task ResponseListAsync()
-        //{
-        //    var guild = Context.Guild as SocketGuild;
-        //    var resp = ar.LoadResponsesAsync(guild.Id);
-        //    StringBuilder list = new StringBuilder();
-        //    var embed = new EmbedBuilder()
-        //        .WithAuthor(x =>
-        //        {
-        //            x.Name = Context.Client.CurrentUser.Username;
-        //            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-        //        })
-        //        .WithColor(new Color(109, 242, 122))
-        //        .WithTitle($"**Total Responses:** {resp.Count}");
-        //    foreach (var values in resp)
-        //    {
-        //        embed.AddField(x =>
-        //        {
-        //            x.Name = values.Key;
-        //            x.Value = values.Value;
-        //            x.IsInline = true;
-        //        });
-        //    }
-        //    await ReplyAsync("", embed: embed);
-        //}
+        [Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
+        public async Task ResponseAsync()
+        {
+            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
+            var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (nameResponse.Content == "cancel") return;
+            string name = nameResponse.Content;
 
-        //[Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
-        //public async Task ResponseAsync()
-        //{
-        //    await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-        //    var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-        //    if (nameResponse.Content == "cancel") return;
-        //    string name = nameResponse.Content;
+            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
+            var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
+            if (contentResponse.Content == "cancel") return;
+            string response = contentResponse.Content;
 
-        //    await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-        //    var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-        //    if (contentResponse.Content == "cancel") return;
-        //    string response = contentResponse.Content;
-
-        //    Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).CreateResponse(name, response, Context.User);
-        //    var resp = ar.LoadResponsesAsync();
-        //    if (!(Context.MainHandler.GuildResponseHandlerAsync(Context.Guild).ContainsResponse(name)))
-        //    {
-        //        var embed = new EmbedBuilder()
-        //            .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-        //            .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
-        //            .WithColor(new Color(109, 242, 122));
-        //        await ReplyAsync("", embed: embed);
-        //    }
-        //    else
-        //        await ReplyAsync("I wasn't able to add the response to the response list! :x:");
-        //}
+            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var resp = gldConfig.Responses;
+            if (resp.ContainsKey(name))
+                await ReplyAsync("A response with the exact name already exist! :anger:");
+            resp.Add(name, response);
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            var embed = new EmbedBuilder()
+                .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
+                .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
+                .WithColor(new Color(109, 242, 122));
+            await ReplyAsync("", embed: embed);
+        }
     }
 }
