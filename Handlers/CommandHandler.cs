@@ -42,7 +42,7 @@ namespace Rick.Handlers
             int argPos = 0;
             var context = new CommandContext(client, message);
             var gld = context.Guild as SocketGuild;
-            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
+            if (!(message.HasStringPrefix(BotModel.BotConfig.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
             var Result = cmds.Search(context, argPos);
             CommandInfo Command = null;
             if (Result.IsSuccess)

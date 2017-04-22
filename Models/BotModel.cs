@@ -1,23 +1,38 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using Rick.Interfaces;
 using Rick.Services;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
-using System.Collections.Generic;
-using Rick.Interfaces;
 
-namespace Rick.Handlers
+namespace Rick.Models
 {
-    public class BotConfigHandler 
+    public class BotModel : IBotInterface
     {
+        public static IBotInterface BotConfig { get; set; }
+        [JsonIgnore]
+        public const string configPath = "BotConfig.json";
+
+        [JsonProperty]
         public string BotToken { get; set; }
+
+        [JsonProperty]
         public string DefaultPrefix { get; set; }
+
+        [JsonProperty]
         public string BingAPIKey { get; set; }
+
+        [JsonProperty]
         public bool MentionDefaultPrefix { get; set; }
+
+        [JsonProperty]
         public bool DebugMode { get; set; }
+
+        [JsonProperty]
         public bool ClientLatency { get; set; }
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
@@ -27,24 +42,21 @@ namespace Rick.Handlers
             return m.HasMentionPrefix(c.CurrentUser, ref ap);
         }
 
-        public static async Task<BotConfigHandler> UseCurrentAsync()
+        public static async Task<BotModel> LoadConfigAsync()
         {
-            BotConfigHandler result;
-            using (var configStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
+            if (File.Exists(configPath))
             {
-                using (var configReader = new StreamReader(configStream))
-                {
-                    var deserializedConfig = await configReader.ReadToEndAsync();
-                    result = JsonConvert.DeserializeObject<BotConfigHandler>(deserializedConfig);
-                    return result;
-                }
+                var json = File.ReadAllText(configPath);
+                return JsonConvert.DeserializeObject<BotModel>(json);
             }
+            var newConfig = await CreateNewAsync();
+            return newConfig;
         }
 
-        public static async Task<BotConfigHandler> CreateNewAsync()
+        public static async Task<BotModel> CreateNewAsync()
         {
-            BotConfigHandler result;
-            result = new BotConfigHandler();
+            BotModel result;
+            result = new BotModel();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();
@@ -76,7 +88,7 @@ namespace Rick.Handlers
 
             string directory = Directory.GetCurrentDirectory();
 
-            using (var configStream = File.Create(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
+            using (var configStream = File.Create(Path.Combine(Directory.GetCurrentDirectory(), configPath)))
             {
                 using (var configWriter = new StreamWriter(configStream))
                 {
@@ -85,6 +97,12 @@ namespace Rick.Handlers
                 }
             }
             return result;
+        }
+
+        public void Save()
+        {
+            var json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(configPath, json);
         }
     }
 }
