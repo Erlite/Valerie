@@ -39,37 +39,31 @@ namespace Rick.Services
         public void EnableNameChangeLogging()
         {
             client.UserUpdated += NameChangeAsync;
-            GuildModel.NameChangesLogged = true;
         }
 
         public void DisableNameChangeLogging()
         {
             client.UserUpdated += NameChangeAsync;
-            GuildModel.NameChangesLogged = false;
         }
 
         public void EnableNickChangeLogging()
         {
             client.GuildMemberUpdated += NickChangeAsync;
-            GuildModel.NickChangesLogged = true;
         }
 
         public void DisableNickChangeLogging()
         {
             client.GuildMemberUpdated -= NickChangeAsync;
-            GuildModel.NickChangesLogged = false;
         }
 
         public void EnableUserBannedLogging()
         {
             client.UserBanned += UserBannedAsync;
-            GuildModel.UserBannedLogged = true;
         }
 
         public void DisableUserBannedLogging()
         {
             client.UserBanned -= UserBannedAsync;
-            GuildModel.UserBannedLogged = false;
         }
 
         //public void EnableLatencyMonitor()
@@ -84,16 +78,14 @@ namespace Rick.Services
         //    GuildModel.ClientLatency = false;
         //}
 
-        public void EnableMessageRecieve()
+        public void EnableAutoRespond()
         {
             client.MessageReceived += MessageReceivedAsync;
-            GuildModel.MessageRecieve = true;
         }
 
-        public void DisableMessageRecieve()
+        public void DisableAutoRespond()
         {
             client.MessageReceived -= MessageReceivedAsync;
-            GuildModel.MessageRecieve = false;
         }
 
 

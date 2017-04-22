@@ -66,7 +66,7 @@ namespace Rick.Modules
                 .WithDescription($"**Server Mod Channel:** {GuildModel.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildModel.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
                 $"**Welcome Message:** {GuildModel.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildModel.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildModel.GuildConfigs[Guild.Id].LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildModel.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildModel.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildModel.GuildConfigs[Guild.Id].UserBannedLogged}\n**Auto Respond:** {GuildModel.GuildConfigs[Guild.Id].MessageRecieve}")
+                $"**User Ban Logging:** {GuildModel.GuildConfigs[Guild.Id].UserBannedLogged}\n**Auto Respond:** {GuildModel.GuildConfigs[Guild.Id].AutoRespond}")
                 .WithColor(new Color(66, 244, 232));
             await ReplyAsync("", embed: embed);
         }
@@ -99,14 +99,14 @@ namespace Rick.Modules
             var gldConfig = GuildModel.GuildConfigs[Guild.Id];
             if (!GuildModel.GuildConfigs[Guild.Id].LeaveLogs)
             {
-                Log.EnableLeaveLogging();
                 gldConfig.LeaveLogs = true;
+                Log.EnableLeaveLogging();
                 await ReplyAsync(":white_check_mark:  Now logging leaves.");
             }
             else
             {
-                Log.DisableLeaveLogging();
                 gldConfig.LeaveLogs = false;
+                Log.DisableLeaveLogging();
                 await ReplyAsync(":anger:  No longer logging leaves.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
@@ -117,67 +117,84 @@ namespace Rick.Modules
         public async Task LogNameChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
             if (!GuildModel.GuildConfigs[Guild.Id].NameChangesLogged)
             {
+                gldConfig.NameChangesLogged = true;
                 Log.EnableNameChangeLogging();
                 await ReplyAsync(":white_check_mark:  Now logging username changes.");
             }
             else
             {
+                gldConfig.NameChangesLogged = false;
                 Log.DisableNameChangeLogging();
                 await ReplyAsync(":anger:  No longer logging username changes.");
             }
-            //await GuildModel.SaveConfigurationAsync();
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
 
         [Command("Nick"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
         public async Task LogNickChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
             if (!GuildModel.GuildConfigs[Guild.Id].NickChangesLogged)
             {
+                gldConfig.NickChangesLogged = true;
                 Log.EnableNickChangeLogging();
                 await ReplyAsync(":white_check_mark:  Now logging nickname changes.");
             }
             else
             {
+                gldConfig.NickChangesLogged = false;
                 Log.DisableNickChangeLogging();
                 await ReplyAsync(":anger:   No longer logging nickname changes.");
             }
-            //await GuildModel.SaveConfigurationAsync();
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
 
         [Command("BanLog"), Summary("Normal Command"), Remarks("Toggles ban logging")]
         public async Task BanLogAsync()
         {
             var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
             if (!GuildModel.GuildConfigs[Guild.Id].UserBannedLogged)
             {
+                gldConfig.UserBannedLogged = true;
                 Log.EnableUserBannedLogging();
                 await ReplyAsync(":white_check_mark:  Now logging bans.");
             }
             else
             {
+                gldConfig.UserBannedLogged = false;
                 Log.DisableUserBannedLogging();
                 await ReplyAsync(":anger:  No longer logging bans.");
             }
-            //await GuildModel.SaveConfigurationAsync();
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
 
         [Command("AutoRespond"), Summary("Normal Command"), Remarks("Autoresponds to certain words")]
         public async Task AutoRespondAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            if (!GuildModel.GuildConfigs[Guild.Id].MessageRecieve)
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            if (!GuildModel.GuildConfigs[Guild.Id].AutoRespond)
             {
-                Log.EnableMessageRecieve();
+                gldConfig.AutoRespond = true;
+                Log.EnableAutoRespond();
                 await ReplyAsync("I will now auto respond to certain messages");
             }
             else
             {
-                Log.DisableMessageRecieve();
-                await ReplyAsync("Auto respond have been disabled!");
+                gldConfig.AutoRespond = false;
+                Log.DisableAutoRespond();
+                await ReplyAsync(":anger: Auto respond have been disabled!");
             }
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
     }
 }

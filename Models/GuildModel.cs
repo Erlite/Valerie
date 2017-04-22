@@ -35,8 +35,8 @@ namespace Rick.Models
         [JsonProperty("UserBanned")]
         public bool UserBannedLogged { get; set; }
 
-        [JsonProperty("MessageRecieve")]
-        public bool MessageRecieve { get; set; }
+        [JsonProperty("AutoRespond")]
+        public bool AutoRespond { get; set; }
 
         [JsonProperty("RequiredRoleID")]
         public ulong[] RequiredRoleID { get; set; } = new ulong[] { 1234567890, 0987654321 };

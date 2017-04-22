@@ -16,7 +16,7 @@ namespace Rick.Interfaces
         bool NameChangesLogged { get; set; }
         bool NickChangesLogged { get; set; }
         bool UserBannedLogged { get; set; }
-        bool MessageRecieve { get; set; }
+        bool AutoRespond { get; set; }
         ulong[] RequiredRoleID { get; set;}
         ulong[] RequiredChannelIDs { get; set; }
         string[] RequiredChannelNames { get; set; }
