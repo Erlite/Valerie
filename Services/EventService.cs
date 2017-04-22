@@ -3,6 +3,7 @@ using Discord;
 using Discord.WebSocket;
 using Rick.Models;
 using System.Linq;
+using Rick.Handlers;
 
 namespace Rick.Services
 {
@@ -10,11 +11,13 @@ namespace Rick.Services
     {
         private DiscordSocketClient client;
         private GuildModel GuildModel;
+        private BotConfigHandler Config;
 
-        public EventService(DiscordSocketClient c, GuildModel gldhndler)
+        public EventService(DiscordSocketClient c, GuildModel gldhndler, BotConfigHandler config)
         {
             client = c;
             GuildModel = gldhndler;
+            Config = config;
         }
 
         public void EnableJoinLogging()
@@ -57,18 +60,6 @@ namespace Rick.Services
             client.GuildMemberUpdated -= NickChangeAsync;
         }
 
-        //public void EnableLatencyMonitor()
-        //{
-        //    client.LatencyUpdated += LatencyUpdateAsync;
-        //    GuildModel.ClientLatency = true;
-        //}
-
-        //public void DisableLatencyMonitor()
-        //{
-        //    client.LatencyUpdated -= LatencyUpdateAsync;
-        //    GuildModel.ClientLatency = false;
-        //}
-
         public void EnableAutoRespond()
         {
             client.MessageReceived += MessageReceivedAsync;
@@ -79,6 +70,17 @@ namespace Rick.Services
             client.MessageReceived -= MessageReceivedAsync;
         }
 
+        public void EnableLatencyMonitor()
+        {
+            client.LatencyUpdated += LatencyUpdateAsync;
+            Config.ClientLatency = true;
+        }
+
+        public void DisableLatencyMonitor()
+        {
+            client.LatencyUpdated -= LatencyUpdateAsync;
+            Config.ClientLatency = false;
+        }
 
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
