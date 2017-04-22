@@ -387,7 +387,7 @@ namespace Rick.Modules
         }
 
         [Command("Imgur"), Summary("Imgur XD"), Remarks("Searches imgure for your image")]
-        public async Task FallBackAsync(string search)
+        public async Task ImgurAsync([Remainder]string search)
         {
             var BaseUrl = $"http://imgur.com/search?q={search}";
             var config = Configuration.Default.WithDefaultLoader();

@@ -42,9 +42,9 @@ namespace Rick.Modules
                 .WithTitle(name)
                 .WithDescription(content)
                 .WithColor(new Color(255, 255, 255))
-                .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = Context.User.Username; });
+                .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = $"New Tag added by {Context.User.Username}"; });
                 GuildModel.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
-                await ReplyAsync("Tag Added", embed: embed);
+                await ReplyAsync("", embed: embed);
         }
 
         [Command("Execute"), Summary("Executes a tag"), Remarks("Tag Execute TagName")]
