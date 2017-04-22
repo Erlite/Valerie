@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
-using Discord;
-using Discord.WebSocket;
-using AngleSharp;
-using AngleSharp.Dom.Html;
 
 namespace Rick.Services
 {

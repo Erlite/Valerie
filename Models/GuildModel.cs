@@ -8,8 +8,14 @@ namespace Rick.Models
 {
     public class GuildModel : IGuildConfig
     {
+        [JsonIgnore]
+        public const string configPath = "GuildConfig.json";
+
         [JsonProperty("GuildPrefix")]
         public string GuildPrefix { get; set; } = ">";
+
+        [JsonProperty("WelcomeMessage")]
+        public string WelcomeMessage { get; set; }
 
         [JsonProperty("ModChannelID")]
         public ulong ModChannelID { get; set; } = 0;
@@ -44,25 +50,26 @@ namespace Rick.Models
         [JsonProperty("Tags")]
         public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string> { };
 
-        public static Dictionary<ulong, GuildModel> GuildConfig { get; set; } = new Dictionary<ulong, GuildModel>();
+        [JsonProperty("Responses")]
+        public Dictionary<string, string> Responses { get; set; } = new Dictionary<string, string> { };
 
-        public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs)
+        public static Dictionary<ulong, GuildModel> GuildConfigs { get; set; } = new Dictionary<ulong, GuildModel>();
+
+        public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildConfig
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 
-        //public GuildModel(string commandPrefix, ulong mod, bool joins, bool leaves, bool names, bool nicks, bool ban, bool msg, ulong[] roles, ulong[] ChnIds, string[] ChnNames, Dictionary<string, string> tags)
-        //{
-        //    GuildPrefix = commandPrefix;
-        //    ModChannelID = mod;
-        //    JoinLogs = joins;
-        //    LeaveLogs = leaves;
-        //    NameChangesLogged = names;
-        //    NickChangesLogged = nicks;
-        //    UserBannedLogged = ban;
-        //    MessageRecieve = msg;
-        //    RequiredRoleID = roles;
-        //    RequiredChannelIDs = ChnIds;
-        //    RequiredChannelNames = ChnNames;
-        //    Tags = tags;
-        //}
+        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T> (string path = configPath) where T : IGuildConfig, new()
+        {
+            if (File.Exists(path))
+            {
+                return
+                    await
+                        Task.Run(() => JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(path))).
+                             ConfigureAwait(false);
+            }
+            var newConfig = new Dictionary<ulong, T>();
+            await SaveAsync(path, newConfig).ConfigureAwait(false);
+            return newConfig;
+        }
     }
 }

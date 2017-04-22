@@ -16,11 +16,15 @@ namespace Rick.Handlers
         private DiscordSocketClient client;
         private CommandService cmds;
         private BotConfigHandler config;
+        private GuildModel model;
+        private LogService Logger;
 
         public CommandHandler(IDependencyMap _map)
         {
             client = _map.Get<DiscordSocketClient>();
             config = _map.Get<BotConfigHandler>();
+            model = _map.Get<GuildModel>();
+            Logger = _map.Get<LogService>();
             cmds = new CommandService();
             map = _map;
         }
@@ -38,7 +42,7 @@ namespace Rick.Handlers
             int argPos = 0;
             var context = new CommandContext(client, message);
             var gld = context.Guild as SocketGuild;
-            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfig[gld.Id].GuildPrefix, ref argPos))) return;
+            if (!(message.HasStringPrefix(config.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
             var Result = cmds.Search(context, argPos);
             CommandInfo Command = null;
             if (Result.IsSuccess)
@@ -81,30 +85,15 @@ namespace Rick.Handlers
             {
                 var embed = new EmbedBuilder();
                 embed.Color = new Color(150, 16, 25);
-                embed.Title = "Error Executing Command";
-                embed.Description = string.Format($"**Guild Name:** {context.Guild.Name}\n**Command Name:** {res.Commands.FirstOrDefault().Command.Name}");
                 embed.WithAuthor(x =>
                 {
-                    x.Name = context.User.ToString();
-                    x.IconUrl = context.User.GetAvatarUrl();
+                    x.Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
+                    x.IconUrl = client.CurrentUser.GetAvatarUrl();
                 });
-                embed.AddField(x =>
+                embed.Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
+                embed.WithFooter(x =>
                 {
-                    x.IsInline = false;
-                    x.Name = "Error Reason";
-                    x.Value = result.ErrorReason;
-                });
-                embed.AddField(x =>
-                {
-                    x.IsInline = false;
-                    x.Name = "Target Site";
-                    x.Value = result.Exception.TargetSite;
-                });
-                embed.AddField(x =>
-                {
-                    x.IsInline = false;
-                    x.Name = "Stacktrace";
-                    x.Value = result.Exception.StackTrace;
+                    x.Text = result.Exception.StackTrace;
                 });
                 await context.Channel.SendMessageAsync("", embed: embed);
             }

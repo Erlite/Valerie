@@ -9,6 +9,7 @@ namespace Rick.Interfaces
     public interface IGuildConfig
     {
         string GuildPrefix { get; set; }
+        string WelcomeMessage { get; set; }
         ulong ModChannelID { get; set; }
         bool JoinLogs { get; set; }
         bool LeaveLogs { get; set; }
@@ -20,5 +21,6 @@ namespace Rick.Interfaces
         ulong[] RequiredChannelIDs { get; set; }
         string[] RequiredChannelNames { get; set; }
         Dictionary<string, string> Tags { get; set; }
+        Dictionary<string, string> Responses { get; set; }
     }
 }
