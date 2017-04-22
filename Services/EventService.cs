@@ -2,15 +2,16 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Models;
+using System.Linq;
 
 namespace Rick.Services
 {
-    public class LogService
+    public class EventService
     {
         private DiscordSocketClient client;
         private GuildModel GuildModel;
 
-        public LogService(DiscordSocketClient c, GuildModel gldhndler)
+        public EventService(DiscordSocketClient c, GuildModel gldhndler)
         {
             client = c;
             GuildModel = gldhndler;
@@ -103,14 +104,16 @@ namespace Rick.Services
 
         private async Task NameChangeAsync(SocketUser author, SocketUser a)
         {
+            var SockGuildUser = author as SocketGuildUser;
+            var Guild = SockGuildUser.Guild;
             if (author.Username == a.Username) return;
             var embed = new EmbedBuilder();
             embed.Title = "=== Username Change ====";
             embed.Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}";
             embed.Color = new Color(193, 60, 144);
-            //var getGuild = GuildModel.GuildConfigs[author.];
-            //var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-            //await LogChannel.SendMessageAsync("", embed: embed);
+            var getGuild = GuildModel.GuildConfigs[Guild.Id];
+            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task NickChangeAsync(SocketGuildUser author, SocketGuildUser a)
@@ -138,15 +141,15 @@ namespace Rick.Services
 
         private async Task MessageReceivedAsync(SocketMessage msg)
         {
-            //if (msg.Author.Id == client.CurrentUser.Id) return;
-            //var response = GuildModel.GuildConfigs[Guild.Id].Responses;
-            //foreach (KeyValuePair<string, string> item in response.Where(x => x.Key.Contains(msg.ToString())))
-            //{
-            //    if (msg.Content.Contains(item.Key))
-            //    {
-            //        await msg.Channel.SendMessageAsync(item.Value);
-            //    }
-            //}
+            if (msg.Author.IsBot) return;
+            var SocChan = msg.Channel as SocketGuildChannel;
+            var Guild = SocChan.Guild;            
+            var GetResponses = GuildModel.GuildConfigs[Guild.Id].Responses;
+            var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
+            if (msg.Content.Contains(hasValue.Key))
+            {
+                await msg.Channel.SendMessageAsync(hasValue.Value);
+            }
         }
     }
 }

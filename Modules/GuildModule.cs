@@ -12,9 +12,9 @@ namespace Rick.Modules
     public class GuildModule : ModuleBase
     {
         private GuildModel model;
-        private LogService Log;
+        private EventService Log;
 
-        public GuildModule(GuildModel gld, LogService Logger)
+        public GuildModule(GuildModel gld, EventService Logger)
         {
             model = gld;
             Log = Logger;

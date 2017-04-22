@@ -17,14 +17,14 @@ namespace Rick.Handlers
         private CommandService cmds;
         private BotConfigHandler config;
         private GuildModel model;
-        private LogService Logger;
+        private EventService Logger;
 
         public CommandHandler(IDependencyMap _map)
         {
             client = _map.Get<DiscordSocketClient>();
             config = _map.Get<BotConfigHandler>();
             model = _map.Get<GuildModel>();
-            Logger = _map.Get<LogService>();
+            Logger = _map.Get<EventService>();
             cmds = new CommandService();
             map = _map;
         }
