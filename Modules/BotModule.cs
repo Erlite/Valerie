@@ -6,12 +6,19 @@ using Discord.WebSocket;
 using System.Net.Http;
 using System.IO;
 using Rick.Services;
+using Rick.Models;
 
 namespace Rick.Modules
 {
     [Group("Set"), RequireOwner, RequireContext(ContextType.Guild)]
     public class BotModule : ModuleBase
     {
+        private EventService Events;
+        public BotModule(EventService events)
+        {
+            Events = events;
+        }
+
         [Command("Username"), Summary("Username OwO"), Remarks("Changes Bot's username")]
         public async Task UsernameAsync([Remainder] string value = null)
         {
@@ -76,5 +83,64 @@ namespace Rick.Modules
             await (Context.Client as DiscordSocketClient).SetStatusAsync((UserStatus)newStatus).ConfigureAwait(false);
             await ReplyAsync(":eyes: Done :eyes:").ConfigureAwait(false);
         }
+
+        [Command("Latency"), Summary("Normal Command"), Remarks("Enables/Disables monitoring your ping")]
+        public async Task LatencyAsync()
+        {
+            var Config = BotModel.BotConfig;
+            if (!Config.ClientLatency)
+            {
+                Config.ClientLatency = true;
+                Events.EnableLatencyMonitor();
+                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
+            }
+            else
+            {
+                Config.ClientLatency = false;
+                Events.DisableLatencyMonitor();
+                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
+            }
+            await BotModel.SaveAsync(BotModel.configPath, Config);
+        }
+
+        [Command("Prefix"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
+        public async Task DefaultPrefixAsync([Remainder]string prefix)
+        {
+            var botConfig = BotModel.BotConfig;
+            botConfig.DefaultPrefix = prefix;
+            await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
+            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+        }
+
+        [Command("Debug"), Summary("Normal Command"), Remarks("Enables/Disables debug mode")]
+        public async Task DebugAsync()
+        {
+            var Config = BotModel.BotConfig;
+            if (!Config.DebugMode)
+            {
+                await ReplyAsync(":gear: Debug mode has been enabled!");
+            }
+            else
+            {
+                await ReplyAsync(":skull_crossbones: Debug mode has been disbaled!");
+            }
+            await BotModel.SaveAsync(BotModel.configPath, Config);
+        }
+
+        [Command("Mention"), Summary("Normal Command"), Remarks("Enables/Disables mention prefix")]
+        public async Task MentionAsync()
+        {
+            var Config = BotModel.BotConfig;
+            if (!Config.MentionDefaultPrefix)
+            {
+                await ReplyAsync(":gear: Mention Prefix has been enabled!");
+            }
+            else
+            {
+                await ReplyAsync(":skull_crossbones: Mention Prefix has been disbaled!");
+            }
+            await BotModel.SaveAsync(BotModel.configPath, Config);
+        }
+
     }
 }
