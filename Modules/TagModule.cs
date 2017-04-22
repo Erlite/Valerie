@@ -30,21 +30,21 @@ namespace Rick.Modules
             if (TagResponse.Content == "cancel") return;
             string content = TagResponse.Content;
 
+            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var resp = gldConfig.Responses;
+            if (resp.ContainsKey(name))
+                await ReplyAsync("A response with the exact name already exist! :anger:");
+            resp.Add(name, content);
+            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+
             var embed = new EmbedBuilder()
                 .WithTitle(name)
                 .WithDescription(content)
                 .WithColor(new Color(255, 255, 255))
                 .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = Context.User.Username; });
-            try
-            {
                 GuildModel.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
                 await ReplyAsync("Tag Added", embed: embed);
-            }
-            catch(Exception e)
-            {
-                await ReplyAsync($"Failed to add tag.\nException: {e.ToString()}");
-            }
-
         }
 
         [Command("Execute"), Summary("Executes a tag"), Remarks("Tag Execute TagName")]
