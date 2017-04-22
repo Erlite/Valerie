@@ -13,18 +13,15 @@ using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Rick.Services;
-using Rick.Handlers;
 
 namespace Rick.Modules
 {
     [RequireOwner]
     public class OwnerModule : ModuleBase
     {
-        private BotConfigHandler Config;
         private EventService Events;
-        public OwnerModule(BotConfigHandler config, EventService events)
+        public OwnerModule(EventService events)
         {
-            Config = config;
             Events = events;
         }
         private static MemoryStream GenerateStreamFromString(string value)
@@ -192,16 +189,17 @@ namespace Rick.Modules
         [Command("Latency"), Summary("Normal Command"), Remarks("Enables/Disables monitoring your ping")]
         public async Task LatencyAsync()
         {
-            if (!Config.ClientLatency)
-            {
-                Events.EnableLatencyMonitor();
-                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
-            }
-            else
-            {
-                Events.DisableLatencyMonitor();
-                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
-            }
+            //if (!Config.ClientLatency)
+            //{
+            //    //BotModel.BotConfig = BotModel.BotConfig.ClientLatency;
+            //    Events.EnableLatencyMonitor();
+            //    await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
+            //}
+            //else
+            //{
+            //    Events.DisableLatencyMonitor();
+            //    await ReplyAsync(":skull_crossbones: Latency monitor disabled");
+            //}
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Rick.Attributes
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
             var user = context.User as IGuildUser;
-            var role = user.RoleIds.Intersect(GuildModel.GuildConfigs[context.Guild.Id].RequiredRoleID).Any();
+            var role = user.RoleIds.Intersect(GuildModel.GuildConfigs[context.Guild.Id].RequiredRoleIDs).Any();
             return await Task.FromResult(role) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"{Format.Bold("ERROR: ")}Role is missing! Please get the appropriate role for this command!");
         }
     }

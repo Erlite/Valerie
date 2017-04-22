@@ -209,9 +209,10 @@
     <Compile Include="Classes\ScriptGlobals.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
-    <Compile Include="Handlers\BotConfigHandler.cs" />
     <Compile Include="Handlers\GiftsHandler.cs" />
-    <Compile Include="Interfaces\IGuildConfig.cs" />
+    <Compile Include="Interfaces\IBotInterface.cs" />
+    <Compile Include="Interfaces\IGuildInterface.cs" />
+    <Compile Include="Models\BotModel.cs" />
     <Compile Include="Models\GuildModel.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\BotModule.cs" />

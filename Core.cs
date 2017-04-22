@@ -6,7 +6,6 @@ using Rick.Services;
 using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
-using System.IO;
 using Rick.Models;
 
 namespace Rick
@@ -15,21 +14,11 @@ namespace Rick
     {
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
         private DiscordSocketClient client;
-        private BotConfigHandler config;
         private CommandHandler handler;
-        private GuildModel Model;
+        private GuildModel GuildModel;
 
         public async Task StartAsync()
         {
-            #region Config Check
-            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config")))
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Config"));
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Config", "Config.json")))
-                config = await BotConfigHandler.UseCurrentAsync();
-            else
-                config = await BotConfigHandler.CreateNewAsync();
-            #endregion
-
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
@@ -43,19 +32,20 @@ namespace Rick
 
             var map = new DependencyMap();
             map.Add(client);
-            map.Add(config);
-            map.Add(Model);
+            map.Add(new GuildModel());
             map.Add(new InteractiveService(client));
-            map.Add(new EventService(client, Model, config));
+            map.Add(new EventService(client, GuildModel));
+            map.Add(new BotModel());
+            handler = new CommandHandler(map);
+            await handler.InstallAsync();
 
             client.GuildAvailable += CreateGuildConfigAsync;
             client.LeftGuild += RemoveGuildConfigAsync;
 
             GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
-            handler = new CommandHandler(map);
-            await handler.InstallAsync();
+            BotModel.BotConfig = await BotModel.LoadConfigAsync();
 
-            await client.LoginAsync(TokenType.Bot, config.BotToken);
+            await client.LoginAsync(TokenType.Bot, BotModel.BotConfig.BotToken);
             await client.StartAsync();
             await Task.Delay(-1);
         }

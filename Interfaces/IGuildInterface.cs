@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Rick.Interfaces
 {
-    public interface IGuildConfig
+    public interface IGuildInterface
     {
         string GuildPrefix { get; set; }
         string WelcomeMessage { get; set; }
@@ -17,9 +13,9 @@ namespace Rick.Interfaces
         bool NickChangesLogged { get; set; }
         bool UserBannedLogged { get; set; }
         bool AutoRespond { get; set; }
-        ulong[] RequiredRoleID { get; set;}
-        ulong[] RequiredChannelIDs { get; set; }
-        string[] RequiredChannelNames { get; set; }
+        IEnumerable<ulong> RequiredRoleIDs { get; set;}
+        IEnumerable<ulong> RequiredChannelIDs { get; set; }
+        IEnumerable<string> RequiredChannelNames { get; set; }
         Dictionary<string, string> Tags { get; set; }
         Dictionary<string, string> Responses { get; set; }
     }

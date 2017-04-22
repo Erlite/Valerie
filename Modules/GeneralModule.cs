@@ -21,12 +21,11 @@ namespace Rick.Modules
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-        private BotConfigHandler Config;
+        
 
-        public GeneralModule(InteractiveService Inter, BotConfigHandler ConfigHandler)
+        public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
-            Config = ConfigHandler;
         }
 
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
@@ -280,7 +279,7 @@ namespace Rick.Modules
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Config.BingAPIKey);
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotModel.BotConfig.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {

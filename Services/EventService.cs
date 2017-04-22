@@ -11,13 +11,11 @@ namespace Rick.Services
     {
         private DiscordSocketClient client;
         private GuildModel GuildModel;
-        private BotConfigHandler Config;
 
-        public EventService(DiscordSocketClient c, GuildModel gldhndler, BotConfigHandler config)
+        public EventService(DiscordSocketClient c, GuildModel gldhndler)
         {
             client = c;
             GuildModel = gldhndler;
-            Config = config;
         }
 
         public void EnableJoinLogging()
@@ -73,13 +71,11 @@ namespace Rick.Services
         public void EnableLatencyMonitor()
         {
             client.LatencyUpdated += LatencyUpdateAsync;
-            Config.ClientLatency = true;
         }
 
         public void DisableLatencyMonitor()
         {
             client.LatencyUpdated -= LatencyUpdateAsync;
-            Config.ClientLatency = false;
         }
 
         private async Task UserJoinedAsync(SocketGuildUser user)
