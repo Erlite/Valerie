@@ -203,6 +203,7 @@ namespace Rick.Modules
                 Events.DisableLatencyMonitor();
                 await ReplyAsync(":skull_crossbones: Latency monitor disabled");
             }
+            await BotModel.SaveAsync(BotModel.configPath, Config);
         }
     }
 }
