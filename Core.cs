@@ -46,8 +46,7 @@ namespace Rick
             map.Add(config);
             map.Add(Model);
             map.Add(new InteractiveService(client));
-            map.Add(new EventService(client, Model));
-            //map.Add(Logger);
+            map.Add(new EventService(client, Model, config));
 
             client.GuildAvailable += CreateGuildConfigAsync;
             client.LeftGuild += RemoveGuildConfigAsync;

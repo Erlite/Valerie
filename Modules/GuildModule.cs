@@ -80,13 +80,13 @@ namespace Rick.Modules
             {
                 Log.EnableJoinLogging();
                 gldConfig.JoinLogs = true;
-                await ReplyAsync(":white_check_mark:  Now logging joins.");
+                await ReplyAsync(":gear:   Now logging joins.");
             }
             else
             {
                 Log.DisableJoinLogging();
                 gldConfig.JoinLogs = false;
-                await ReplyAsync(":anger:   No longer logging joins.");
+                await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -101,13 +101,13 @@ namespace Rick.Modules
             {
                 gldConfig.LeaveLogs = true;
                 Log.EnableLeaveLogging();
-                await ReplyAsync(":white_check_mark:  Now logging leaves.");
+                await ReplyAsync(":gear:   Now logging leaves.");
             }
             else
             {
                 gldConfig.LeaveLogs = false;
                 Log.DisableLeaveLogging();
-                await ReplyAsync(":anger:  No longer logging leaves.");
+                await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -122,13 +122,13 @@ namespace Rick.Modules
             {
                 gldConfig.NameChangesLogged = true;
                 Log.EnableNameChangeLogging();
-                await ReplyAsync(":white_check_mark:  Now logging username changes.");
+                await ReplyAsync(":gear:   Now logging username changes.");
             }
             else
             {
                 gldConfig.NameChangesLogged = false;
                 Log.DisableNameChangeLogging();
-                await ReplyAsync(":anger:  No longer logging username changes.");
+                await ReplyAsync(":skull_crossbones:  No longer logging username changes.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -143,13 +143,13 @@ namespace Rick.Modules
             {
                 gldConfig.NickChangesLogged = true;
                 Log.EnableNickChangeLogging();
-                await ReplyAsync(":white_check_mark:  Now logging nickname changes.");
+                await ReplyAsync(":gear:   Now logging nickname changes.");
             }
             else
             {
                 gldConfig.NickChangesLogged = false;
                 Log.DisableNickChangeLogging();
-                await ReplyAsync(":anger:   No longer logging nickname changes.");
+                await ReplyAsync(":skull_crossbones:   No longer logging nickname changes.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -163,12 +163,12 @@ namespace Rick.Modules
             if (!GuildModel.GuildConfigs[Guild.Id].UserBannedLogged)
             {
                 gldConfig.UserBannedLogged = true;
-                await ReplyAsync(":white_check_mark:  Now logging bans.");
+                await ReplyAsync(":gear:   Now logging bans.");
             }
             else
             {
                 gldConfig.UserBannedLogged = false;
-                await ReplyAsync(":anger:  No longer logging bans.");
+                await ReplyAsync(":skull_crossbones:  No longer logging bans.");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -189,7 +189,7 @@ namespace Rick.Modules
             {
                 gldConfig.AutoRespond = false;
                 Log.DisableAutoRespond();
-                await ReplyAsync(":anger: Auto respond have been disabled!");
+                await ReplyAsync(":skull_crossbones: Auto respond have been disabled!");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);

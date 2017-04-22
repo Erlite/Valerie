@@ -13,12 +13,20 @@ using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Rick.Services;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
     [RequireOwner]
     public class OwnerModule : ModuleBase
     {
+        private BotConfigHandler Config;
+        private EventService Events;
+        public OwnerModule(BotConfigHandler config, EventService events)
+        {
+            Config = config;
+            Events = events;
+        }
         private static MemoryStream GenerateStreamFromString(string value)
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
@@ -75,8 +83,7 @@ namespace Rick.Modules
             await ReplyAsync("Message has been sent and I've left the guild!");
         }
 
-        [Command("Broadcast")]
-        [Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
+        [Command("Broadcast"),Summary("Broadcast This is a msg"), Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
         public async Task Broadcast([Remainder] string broadcast = null)
         {
             if (string.IsNullOrWhiteSpace(broadcast))
@@ -180,6 +187,21 @@ namespace Rick.Modules
         {
             MethodService.EvalImports.Add(import);
             await ReplyAsync($"Added {import}").ConfigureAwait(false);
+        }
+
+        [Command("Latency"), Summary("Normal Command"), Remarks("Enables/Disables monitoring your ping")]
+        public async Task LatencyAsync()
+        {
+            if (!Config.ClientLatency)
+            {
+                Events.EnableLatencyMonitor();
+                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
+            }
+            else
+            {
+                Events.DisableLatencyMonitor();
+                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
+            }
         }
     }
 }

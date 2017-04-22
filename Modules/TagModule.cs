@@ -33,7 +33,7 @@ namespace Rick.Modules
             var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
             var resp = gldConfig.Responses;
             if (resp.ContainsKey(name))
-                await ReplyAsync("A response with the exact name already exist! :anger:");
+                await ReplyAsync("A response with the exact name already exist! :skull_crossbones:");
             resp.Add(name, content);
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
@@ -58,7 +58,7 @@ namespace Rick.Modules
             }
             else
             {
-                await ReplyAsync("Tag couldn't be found :anger: ");
+                await ReplyAsync("Tag couldn't be found :skull_crossbones: ");
             }
         }
 
