@@ -5,6 +5,7 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
 using Rick.Models;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
@@ -90,17 +91,17 @@ namespace Rick.Modules
             await msg.DeleteAsync();
         }
 
-        //[Command("Gift")]
-        //public async Task Gift(double points)
-        //{
-        //    var guild = Context.Guild;
-        //    var configs = await GiftsHandler.GetAll();
-        //    uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
-        //    foreach (var config in configs)
-        //    {
-        //        config.GivePoints(Context.Guild.Id, givePoints);
-        //    }
-        //    await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
-        //}
+        [Command("Gift"), Summary("Gift 50"), Remarks("Gifts everyone x amount of XP")]
+        public async Task Gift(double points)
+        {
+            var guild = Context.Guild;
+            var configs = await GiftsHandler.GetAll();
+            uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
+            foreach (var config in configs)
+            {
+                config.GivePoints(Context.Guild.Id, givePoints);
+            }
+            await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
+        }
     }
 }

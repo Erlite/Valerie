@@ -3,7 +3,6 @@ using Discord;
 using Discord.WebSocket;
 using Rick.Models;
 using System.Linq;
-using Rick.Handlers;
 
 namespace Rick.Services
 {

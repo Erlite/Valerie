@@ -13,8 +13,8 @@ using Discord.Addons.InteractiveCommands;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
-using Rick.Services;
 using Rick.Models;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
@@ -22,7 +22,6 @@ namespace Rick.Modules
     {
         private InteractiveService Interactive;
         
-
         public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
@@ -412,43 +411,37 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        //[Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei")]
-        //[Cooldown(60)]
-        //public async Task GiftAsync(IGuildUser user, double points)
-        //{
-        //    if (user.Id == Context.Client.CurrentUser.Id) return;
-        //    if (user == Context.User)
-        //        await ReplyAsync("Can't gift yourself nub");
-        //    else
-        //    {
-        //        var config = await new GiftsHandler(user.Id).Maintain<GiftsHandler>();
-        //        uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
-        //        config.GivePoints(user.Guild.Id, givePoints);
-        //        await ReplyAsync($"Gifted {givePoints} XP to {user.Username}");
-        //    }
-        //}
-
-        //[Command("Top"), Summary("Normal Command"), Remarks("Shows the top 10 rich people")]
-        //public async Task WealthAsync()
-        //{
-        //    var configs = await GiftsHandler.GetAll();
-        //    var filtered = configs.Where(x => x.XP.ContainsKey(Context.Guild.Id)).OrderByDescending(x => x.XP[Context.Guild.Id]).Take(11);
-        //    await ReplyAsync($"Showing top 10 wealthiest people\n\n" +
-        //                    string.Join("\n", filtered.Select(x => $"{Format.Bold(Context.Guild.GetUserAsync(x.UID).ToString() ?? "Not found")} with `{x.XP[Context.Guild.Id]}` XP")));
-        //}
-
-        [Command("Response", RunMode = RunMode.Async), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
-        public async Task ResponseAsync()
+        [Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei"), Cooldown(60)]
+        public async Task GiftAsync(IGuildUser user, double points)
         {
-            await ReplyAsync("**What is the name of your response?** _'cancel' to cancel_");
-            var nameResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-            if (nameResponse.Content == "cancel") return;
-            string name = nameResponse.Content;
+            if (user.Id == Context.Client.CurrentUser.Id) return;
+            if (user == Context.User)
+                await ReplyAsync("Can't gift yourself nub");
+            else
+            {
+                var config = await new GiftsHandler(user.Id).Maintain<GiftsHandler>();
+                uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
+                config.GivePoints(user.Guild.Id, givePoints);
+                await ReplyAsync($"Gifted {givePoints} XP to {user.Username}");
+            }
+        }
 
-            await ReplyAsync("**Enter the response body:** _'cancel' to cancel_");
-            var contentResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(10));
-            if (contentResponse.Content == "cancel") return;
-            string response = contentResponse.Content;
+        [Command("Top"), Summary("Normal Command"), Remarks("Shows the top 10 rich people")]
+        public async Task WealthAsync()
+        {
+            var configs = await GiftsHandler.GetAll();
+            var filtered = configs.Where(x => x.XP.ContainsKey(Context.Guild.Id)).OrderByDescending(x => x.XP[Context.Guild.Id]).Take(11);
+            await ReplyAsync($"Showing top 10 wealthiest people\n\n" +
+                            string.Join("\n", filtered.Select(x => $"{Format.Bold(Context.Guild.GetUserAsync(x.UID).ToString() ?? "Not found")} with `{x.XP[Context.Guild.Id]}` XP")));
+        }
+
+        [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
+        public async Task ResponseAsync(string name, [Remainder]string response)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new NullReferenceException(":skull: Response name can't be empty!");
+            if (string.IsNullOrWhiteSpace(response))
+                throw new NullReferenceException(":skull: Response content can't be empty!");
 
             var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
             var resp = gldConfig.Responses;
