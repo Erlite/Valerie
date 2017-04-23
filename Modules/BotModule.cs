@@ -106,9 +106,22 @@ namespace Rick.Modules
         [Command("Prefix"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
         public async Task DefaultPrefixAsync([Remainder]string prefix)
         {
+            if (string.IsNullOrWhiteSpace(prefix))
+                throw new NullReferenceException("Prefix can't be left empty!");
             var botConfig = BotModel.BotConfig;
             botConfig.DefaultPrefix = prefix;
             await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
+            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+        }
+
+        [Command("Name"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
+        public async Task BotNameAsync([Remainder]string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new NullReferenceException("Name can't be left empty!");
+            var botConfig = BotModel.BotConfig;
+            botConfig.BotName = name;
+            await ReplyAsync($":gear: Console window name has been set to: **{name}**");
             await BotModel.SaveAsync(BotModel.configPath, botConfig);
         }
 

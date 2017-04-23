@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Rick.Interfaces;
 using Rick.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,6 +18,9 @@ namespace Rick.Models
 
         [JsonProperty]
         public string BotToken { get; set; }
+
+        [JsonProperty]
+        public string BotName { get; set; }
 
         [JsonProperty]
         public string DefaultPrefix { get; set; }
@@ -60,6 +62,9 @@ namespace Rick.Models
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();
+
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Name");
+            result.BotName = Console.ReadLine();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();

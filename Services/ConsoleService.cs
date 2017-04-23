@@ -7,6 +7,27 @@ namespace Rick.Services
 {
     public class ConsoleService
     {
+        public static void TitleCard(string title, string version = null, ConsoleColor? color = null)
+        {
+            if (color == null)
+                color = ConsoleColor.Cyan;
+
+            var card = new List<string>();
+            card.Add($"┌{new string('─', 12)}{new string('─', title.Count())}{new string('─', 12)}┐");
+            card.Add($"│{new string(' ', 12)}{title}{new string(' ', 12)}│");
+            if (version != null)
+            {
+                int diff = title.Count() - version.Count() / 2;
+
+                if (diff > 0)
+                    card.Add($"│{new string(' ', 12 + diff)}{version}{new string(' ', 12 + diff)}│");
+            }
+            card.Add($"└{new string('─', 12)}{new string('─', title.Count())}{new string('─', 12)}┘");
+
+            Console.Title = title;
+            NewLine(string.Join(Environment.NewLine, card));
+        }
+
         public static void Append(string text, ConsoleColor? foreground = null, ConsoleColor? background = null)
         {
             if (foreground == null)
