@@ -4,9 +4,9 @@ using System.Linq;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using System.IO;
 using Rick.Services;
 using Rick.Models;
+using Discord.Addons.InteractiveCommands;
 
 namespace Rick.Handlers
 {
@@ -18,6 +18,7 @@ namespace Rick.Handlers
         private BotModel config;
         private GuildModel model;
         private EventService Logger;
+        private InteractiveService Interactive;
 
         public CommandHandler(IDependencyMap _map)
         {
@@ -25,6 +26,7 @@ namespace Rick.Handlers
             config = _map.Get<BotModel>();
             model = _map.Get<GuildModel>();
             Logger = _map.Get<EventService>();
+            Interactive = _map.Get<InteractiveService>();
             cmds = new CommandService();
             map = _map;
         }

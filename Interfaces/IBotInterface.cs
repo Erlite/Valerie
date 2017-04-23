@@ -1,4 +1,6 @@
-﻿namespace Rick.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Rick.Interfaces
 {
     public interface IBotInterface
     {
@@ -9,5 +11,6 @@
         bool MentionDefaultPrefix { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
+        Dictionary<ulong, string> Blacklist { get; set; }
     }
 }

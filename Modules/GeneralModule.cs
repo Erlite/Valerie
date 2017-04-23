@@ -18,6 +18,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
+    [RequiredBlacklist]
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;

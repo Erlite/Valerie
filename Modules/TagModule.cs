@@ -5,10 +5,11 @@ using Discord.Commands;
 using System.Text.RegularExpressions;
 using Rick.Models;
 using Discord.Addons.InteractiveCommands;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Tag")]
+    [Group("Tag"), RequiredBlacklist]
     public class TagModule : ModuleBase
     {
         private readonly InteractiveService Interactive;

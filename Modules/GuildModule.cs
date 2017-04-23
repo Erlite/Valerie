@@ -5,10 +5,11 @@ using Rick.Services;
 using Rick.Models;
 using Discord.WebSocket;
 using Rick.Classes;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator)]
+    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator), RequiredBlacklist]
     public class GuildModule : ModuleBase
     {
         private GuildModel model;

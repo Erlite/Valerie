@@ -14,13 +14,19 @@ namespace Rick.Models
         public const string configPath = "GuildConfig.json";
 
         [JsonProperty("GuildPrefix")]
-        public string GuildPrefix { get; set; } = ">";
+        public string GuildPrefix { get; set; }
 
         [JsonProperty("WelcomeMessage")]
         public string WelcomeMessage { get; set; }
 
         [JsonProperty("ModChannelID")]
-        public ulong ModChannelID { get; set; } = 0;
+        public ulong ModChannelID { get; set; }
+
+        [JsonProperty("MuteRoleID")]
+        public ulong MuteRoleId { get; set; }
+
+        [JsonProperty("CaseNumber")]
+        public int CaseNumber { get; set; }
 
         [JsonProperty("JoinLogs")]
         public bool JoinLogs { get; set; }
@@ -36,9 +42,6 @@ namespace Rick.Models
 
         [JsonProperty("UserBanned")]
         public bool UserBannedLogged { get; set; }
-
-        [JsonProperty("CaseNumber")]
-        public int CaseNumber { get; set; }
 
         [JsonProperty("AutoRespond")]
         public bool AutoRespond { get; set; }

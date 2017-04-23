@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Rick.Handlers;
-using System.Linq;
 using System.Threading.Tasks;
 using Rick.Models;
 

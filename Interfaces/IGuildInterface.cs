@@ -7,6 +7,8 @@ namespace Rick.Interfaces
         string GuildPrefix { get; set; }
         string WelcomeMessage { get; set; }
         ulong ModChannelID { get; set; }
+        ulong MuteRoleId { get; set; }
+        int CaseNumber { get; set; }
         bool JoinLogs { get; set; }
         bool LeaveLogs { get; set; }
         bool NameChangesLogged { get; set; }

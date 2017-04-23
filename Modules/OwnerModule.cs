@@ -13,6 +13,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Rick.Services;
+using Rick.Models;
 
 namespace Rick.Modules
 {
@@ -110,6 +111,40 @@ namespace Rick.Modules
             }
         }
 
+        [Command("Blacklist"), Summary("Blacklist @Username Reason"), Remarks("Forbids a user from using bot commands")]
+        public async Task BlacklistAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the owner!")
+        {
+            if (user.Id == Context.Client.CurrentUser.Id)
+                await ReplyAsync("Wow, You think this is funny?");
+            var botConfig = BotModel.BotConfig;
+            var Bl = botConfig.Blacklist;
+            if (Bl.ContainsKey(user.Id))
+                await ReplyAsync("This user already exist in the blacklist! :skull_crossbones:");
+            else
+            {
+                Bl.Add(user.Id, reason);
+                BotModel.BotConfig.Blacklist = Bl;
+                await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+                await ReplyAsync($"{user.Username} has been added to blacklist!");
+            }
+        }
+
+        [Command("Whitelist"), Summary("Whitelist @username"), Remarks("Removes users from blacklist")]
+        public async Task WhitelistAsync(SocketGuildUser user)
+        {
+            var botConfig = BotModel.BotConfig;
+            var Bl = botConfig.Blacklist;
+            if (!Bl.ContainsKey(user.Id))
+                await ReplyAsync("This user is not listed in the Blacklist!");
+            else
+            {
+                Bl.Remove(user.Id);
+                BotModel.BotConfig.Blacklist = Bl;
+                await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+                await ReplyAsync($"{user.Username} has been removed from the blacklist!");
+            }
+        }
+
         [Command("Eval"), Summary("Eval 2+2"), Remarks("Evaluates some sort of expression for you.")]
         public async Task EvalAsync([Remainder] string value)
         {
@@ -142,10 +177,10 @@ namespace Rick.Modules
                 var embed = new EmbedBuilder()
                     .WithAuthor(x =>
                     {
-                        x.Name = "An Error Occurred";
+                        x.Name = "Failed to evaluate code!";
                         x.IconUrl = client.CurrentUser.GetAvatarUrl();
                     })
-                    .WithDescription($"**Input:**```{value}```\n**Output:**```{e.Message.ToString()}```")
+                    .WithDescription($"**Input:**```{value}```\n**Output:**```{e.Message.ToString()}```\n**Stacktrace:**```{e.StackTrace}```")
                     .WithColor(new Color(255, 6, 14))
                     .WithFooter(x =>
                     {

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Rick.Interfaces;
 using Rick.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -37,6 +38,9 @@ namespace Rick.Models
         [JsonProperty]
         public bool ClientLatency { get; set; }
 
+        [JsonProperty]
+        public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
+
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
             if (!MentionDefaultPrefix)
@@ -63,7 +67,7 @@ namespace Rick.Models
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();
 
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Name");
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Name: ");
             result.BotName = Console.ReadLine();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot DefaultPrefix: ");

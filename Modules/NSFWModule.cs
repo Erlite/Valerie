@@ -10,7 +10,7 @@ using Rick.Services;
 
 namespace Rick.Modules
 {
-    [RequireChannel]
+    [RequireChannel, RequiredBlacklist]
     public class NSFWModule : ModuleBase
     {
         [Command("Boobs"), Remarks("Fetches Female breasts from the api.")]

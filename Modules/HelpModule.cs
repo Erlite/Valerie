@@ -2,9 +2,11 @@
 using Discord.Commands;
 using Discord;
 using System.Linq;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
+    [RequiredBlacklist]
     public class HelpModule : ModuleBase
     {
         private CommandService _service;
