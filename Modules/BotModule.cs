@@ -131,10 +131,12 @@ namespace Rick.Modules
             var Config = BotModel.BotConfig;
             if (!Config.DebugMode)
             {
+                Config.DebugMode = true;
                 await ReplyAsync(":gear: Debug mode has been enabled!");
             }
             else
             {
+                Config.DebugMode = false;
                 await ReplyAsync(":skull_crossbones: Debug mode has been disbaled!");
             }
             await BotModel.SaveAsync(BotModel.configPath, Config);

@@ -81,7 +81,7 @@ namespace Rick.Handlers
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, CommandContext context)
         {
-            if (config.DebugMode)
+            if (BotModel.BotConfig.DebugMode)
             {
                 var embed = new EmbedBuilder();
                 embed.Color = new Color(150, 16, 25);

@@ -44,25 +44,13 @@ namespace Rick.Models
         public bool AutoRespond { get; set; }
 
         [JsonProperty("RequiredRoleID")]
-        public IEnumerable<ulong> RequiredRoleIDs { get; set; } = new ulong[] 
-        {
-            1234567890,
-            0987654321
-        };
+        public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
 
         [JsonProperty("RequiredChannelIDs")]
-        public IEnumerable<ulong> RequiredChannelIDs { get; set; } = new ulong[]
-        {
-            1234567890,
-            0987654321
-        };
+        public List<ulong> RequiredChannelIDs { get; set; } = new List<ulong>();
 
         [JsonProperty("RequiredChannelNames")]
-        public IEnumerable<string> RequiredChannelNames { get; set; } = new string[] 
-        {
-            "spam",
-            "nsfw"
-        };
+        public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
         public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string>();

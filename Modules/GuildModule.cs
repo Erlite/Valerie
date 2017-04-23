@@ -2,13 +2,13 @@
 using Discord;
 using Discord.Commands;
 using Rick.Services;
-using Rick.Handlers;
 using Rick.Models;
 using Discord.WebSocket;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
-    [Group("Guild")]
+    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator)]
     public class GuildModule : ModuleBase
     {
         private GuildModel model;
@@ -192,6 +192,66 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones: Auto respond have been disabled!");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+        }
+
+        [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
+        public async Task ChannelAsync(ListProperty Prop, ITextChannel channel = null)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var embed = new EmbedBuilder();
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            switch (Prop)
+            {
+                case ListProperty.Add:
+                    gldConfig.RequiredChannelNames.Add(channel.Name);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Channel **{channel.Name}** has been added to RequiredChannel Attribute.");
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    break;
+
+                case ListProperty.Remove:
+                    gldConfig.RequiredChannelNames.Remove(channel.Name);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Channel **{channel.Name}** has been removed from RequiredChannel Attribute.");
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    break;
+
+                case ListProperty.AddId:
+                    gldConfig.RequiredRoleIDs.Add(channel.Id);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Channel **{channel.Id}** has been added to RequiredChannel Attribute.");
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    break;
+
+                case ListProperty.RemoveId:
+                    gldConfig.RequiredRoleIDs.Remove(channel.Id);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Channel **{channel.Id}** has been removed from RequiredChannel Attribute.");
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    break;
+            }
+        }
+
+        [Command("Role"), Summary("Role AddId RoleName"), Remarks("Adds/Removes role ids from the list")]
+        public async Task RoleAsync(ListProperty Prop, IRole Role)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            switch (Prop)
+            {
+                case ListProperty.AddId:
+                    gldConfig.RequiredRoleIDs.Add(Role.Id);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Role **{Role.Id}** has been added to RequiredRoleIDs Attribute");
+                    break;
+
+                case ListProperty.RemoveId:
+                    gldConfig.RequiredRoleIDs.Remove(Role.Id);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await ReplyAsync($"Role **{Role.Id}** has been removed to RequiredRoleIDs Attribute");
+                    break;
+            }
             await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
         }
     }

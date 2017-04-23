@@ -13,9 +13,9 @@ namespace Rick.Interfaces
         bool NickChangesLogged { get; set; }
         bool UserBannedLogged { get; set; }
         bool AutoRespond { get; set; }
-        IEnumerable<ulong> RequiredRoleIDs { get; set;}
-        IEnumerable<ulong> RequiredChannelIDs { get; set; }
-        IEnumerable<string> RequiredChannelNames { get; set; }
+        List<ulong> RequiredRoleIDs { get; set;}
+        List<ulong> RequiredChannelIDs { get; set; }
+        List<string> RequiredChannelNames { get; set; }
         Dictionary<string, string> Tags { get; set; }
         Dictionary<string, string> Responses { get; set; }
     }
