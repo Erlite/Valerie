@@ -10,7 +10,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [RequireUserPermission(GuildPermission.Administrator), RequiredBlacklist]
+    [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class AdminModule : ModuleBase
     {
         private InteractiveService inter;
@@ -124,7 +124,7 @@ namespace Rick.Modules
             var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
 
             if (GetMuteRole == null)
-                await ReplyAsync("Mute Role ID is null! Add Mute Role ID in guild Config!");
+                throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
 
             await user.AddRoleAsync(GetMuteRole);
             await ReplyAsync("User has been added to Mute Role!");

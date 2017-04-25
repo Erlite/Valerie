@@ -6,7 +6,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [RequiredBlacklist]
+    [CheckBlacklist]
     public class HelpModule : ModuleBase
     {
         private CommandService _service;

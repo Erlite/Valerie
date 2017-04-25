@@ -5,7 +5,7 @@ using Rick.Models;
 
 namespace Rick.Attributes
 {
-    public class RequiredBlacklistAttribute : PreconditionAttribute
+    public class CheckBlacklistAttribute : PreconditionAttribute
     {
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {

@@ -9,7 +9,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Tag"), RequiredBlacklist]
+    [Group("Tag"), CheckBlacklist]
     public class TagModule : ModuleBase
     {
         private readonly InteractiveService Interactive;
