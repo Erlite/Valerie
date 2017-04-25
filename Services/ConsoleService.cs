@@ -79,5 +79,12 @@ namespace Rick.Services
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
         }
+
+        public static void Log(string source,string message)
+        {
+            NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
+            Append($"[{source}] ", ConsoleColor.DarkYellow);
+            Append(message, ConsoleColor.Magenta);
+        }
     }
 }

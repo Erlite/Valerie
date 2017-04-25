@@ -11,6 +11,8 @@ namespace Rick.Interfaces
         bool MentionDefaultPrefix { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
+        bool AutoUpdate { get; set; }
+        string Version { get; set; }
         Dictionary<ulong, string> Blacklist { get; set; }
     }
 }

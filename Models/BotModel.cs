@@ -39,6 +39,12 @@ namespace Rick.Models
         public bool ClientLatency { get; set; }
 
         [JsonProperty]
+        public bool AutoUpdate { get; set; }
+
+        [JsonProperty]
+        public string Version { get; set; }
+
+        [JsonProperty]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
@@ -76,7 +82,17 @@ namespace Rick.Models
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bing API Key: ");
             result.BingAPIKey = Console.ReadLine();
 
-            ConsoleService.NewLine("Yes = y and No = n ");
+            ConsoleService.Log(LogSeverity.Info, "Config", "Yes = y and No = n");
+
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enable autoupdate? ");
+            char update = Console.ReadLine().ToLower()[0];
+            switch (update)
+            {
+                case 'y': result.AutoUpdate = true; break;
+                case 'n': result.AutoUpdate = false; break;
+                default: result.AutoUpdate = false; break;
+            }
+
             ConsoleService.Log(LogSeverity.Info, "Config", "Enable Debug mode for commands? ");
             char debug = Console.ReadLine().ToLower()[0];
             switch (debug)

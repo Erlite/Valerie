@@ -19,7 +19,6 @@ namespace Rick
 
         public async Task StartAsync()
         {
-
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
@@ -39,16 +38,15 @@ namespace Rick
             map.Add(new BotModel());
             handler = new CommandHandler(map);
             await handler.InstallAsync();
-
-            
-
+           
             client.GuildAvailable += CreateGuildConfigAsync;
             client.LeftGuild += RemoveGuildConfigAsync;
 
             GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
             BotModel.BotConfig = await BotModel.LoadConfigAsync();
 
-            ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} {DiscordConfig.Version}");
+            ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} v{BotModel.BotConfig.Version}");
+            await MethodService.ProgramUpdater();
 
             await client.LoginAsync(TokenType.Bot, BotModel.BotConfig.BotToken);
             await client.StartAsync();

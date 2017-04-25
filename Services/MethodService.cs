@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
+using System.Net;
+using Rick.Models;
+using System.Diagnostics;
 
 namespace Rick.Services
 {
@@ -93,5 +96,38 @@ namespace Rick.Services
             yield return typeof(ILookup<string, string>).GetTypeInfo().Assembly;
         }
 
+        public static async Task ProgramUpdater()
+        {
+            var botConfig = BotModel.BotConfig;
+            if (botConfig.AutoUpdate)
+            {
+                ConsoleService.Log("Autoupdate", "Checking for updates ...");
+                WebClient web = new WebClient();
+                Stream stream = web.OpenRead("https://exceptiondev.github.io/Docs/Downloads/version.txt");
+                using (StreamReader reader = new System.IO.StreamReader(stream))
+                {
+                    String version = reader.ReadToEnd();
+                    if (botConfig.Version != version)
+                    {
+                        ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
+                        var response = Console.ReadLine().ToLower();
+                        if (response == "yes")
+                        {
+                            ConsoleService.Log("Autoupdate", "Downloading update ...");
+                            web.DownloadFile("https://exceptiondev.github.io/Docs/Downloads/Installer.bat", "Installer.bat");
+                            Process.Start("Installer.bat");
+                            botConfig.Version = version;
+                            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+                            await Task.Delay(5000);
+                            Process.GetCurrentProcess().Kill();
+                        }
+                        else
+                            ConsoleService.Log("Autoupdate", "Continuing ...");
+                    }
+                }
+            }
+            else
+                ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...");
+        }
     }
 }
