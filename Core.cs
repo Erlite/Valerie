@@ -25,7 +25,8 @@ namespace Rick
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true,
-                DefaultRetryMode = RetryMode.AlwaysRetry
+                DefaultRetryMode = RetryMode.AlwaysRetry,
+                HandlerTimeout = 5000
             });
             
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
@@ -45,9 +46,10 @@ namespace Rick
             GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
             BotModel.BotConfig = await BotModel.LoadConfigAsync();
 
-            ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} v{BotModel.BotConfig.Version}");
+            ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} v{BotModel.BotVersion}");
             await MethodService.ProgramUpdater();
 
+            //await client.SetGameAsync(BotModel.BotConfig.BotGame);
             await client.LoginAsync(TokenType.Bot, BotModel.BotConfig.BotToken);
             await client.StartAsync();
 

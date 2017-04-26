@@ -14,38 +14,45 @@ namespace Rick.Models
     public class BotModel : IBotInterface
     {
         public static IBotInterface BotConfig { get; set; }
+
         [JsonIgnore]
         public const string configPath = "BotConfig.json";
 
-        [JsonProperty]
+        [JsonIgnore]
+        public const string BotVersion = "";
+
+        [JsonProperty("BotToken")]
         public string BotToken { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("BotName")]
         public string BotName { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("BotGame")]
+        public string BotGame { get; set; }
+
+        [JsonProperty("DefaultPrefix")]
         public string DefaultPrefix { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("BingAPIKey")]
         public string BingAPIKey { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("MentionDefaultPrefix")]
         public bool MentionDefaultPrefix { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("ClientLatency")]
         public bool ClientLatency { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("AutoUpdate")]
         public bool AutoUpdate { get; set; }
 
-        [JsonProperty]
-        public string Version { get; set; }
-
-        [JsonProperty]
+        [JsonProperty("Blacklist")]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
+
+        [JsonProperty("EvalImports")]
+        public List<string> EvalImports { get; set; } = new List<string>();
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {

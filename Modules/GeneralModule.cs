@@ -15,6 +15,7 @@ using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Models;
 using Rick.Attributes;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -31,13 +32,10 @@ namespace Rick.Modules
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
         public async Task GuildInfoAsync()
         {
-            var embed = new EmbedBuilder();
             var gld = Context.Guild;
-            if (!string.IsNullOrWhiteSpace(gld.IconUrl))
-                embed.ThumbnailUrl = gld.IconUrl;
             var GuildID = gld.Id;
             var GuildOwner = gld.GetOwnerAsync().GetAwaiter().GetResult().Mention;
-            var GuildDefault = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention;
+            var GuildDefault = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention.ToUpper();
             var GuildVoice = gld.VoiceRegionId;
             var GuildCreated = gld.CreatedAt;
             var GuildAvailable = gld.Available;
@@ -45,11 +43,40 @@ namespace Rick.Modules
             var GuildEmbed = gld.IsEmbeddable;
             var GuildMfa = gld.MfaLevel;
             var GuildRoles = gld.Roles;
+            var GuildAfak = gld.AFKTimeout;
             var GuildVeri = gld.VerificationLevel;
-            embed.Color = new Color(153, 30, 87);
-            embed.Title = $"{gld.Name} Information";
-            embed.Description = $"**Guild ID: **{GuildID}\n**Guild Owner: **{GuildOwner}\n**Default Channel: **{GuildDefault}\n**Voice Region: **{GuildVoice}\n**Created At: **{GuildCreated}\n**Available? **{GuildAvailable}\n" +
-                $"**Default Msg Notif: **{GuildNotification}\n**Embeddable? **{GuildEmbed}\n**MFA Level: **{GuildMfa}\n**Verification Level: **{GuildVeri}\n";
+            var users = await gld.GetUsersAsync();
+            var OnlineUsers = users.Count(x => x.Status == UserStatus.Online);
+            var OfflineUsers = users.Count(x => x.Status == UserStatus.Offline);
+            var InvisibleUsers = users.Count(x => x.Status == UserStatus.Invisible);
+            var DndUsers = users.Count(x => x.Status == UserStatus.DoNotDisturb);
+            var IdleUsers = users.Count(x => x.Status == UserStatus.Idle);
+            var embed = new EmbedBuilder()
+                .WithAuthor(x =>
+                {
+                    x.Name = gld.Name;
+                    x.IconUrl = gld.IconUrl;
+                })
+                .WithColor(new Color(153, 30, 87))
+                .AddInlineField("Guild ID", GuildID)
+                .AddInlineField("Guild Owner", GuildOwner)
+                .AddInlineField("Default Channel", GuildDefault)
+                .AddInlineField("Voice Region", GuildVoice)
+                .AddInlineField("Created At", GuildCreated)
+                .AddInlineField("Guild Available?", GuildAvailable)
+                .AddInlineField("Default Notifcations", GuildNotification)
+                .AddInlineField("Is Embedable?", GuildEmbed)
+                .AddInlineField("MFA Level", GuildMfa)
+                .AddInlineField("AFK Timeout", GuildAfak)
+                .AddInlineField("Roles Count", GuildRoles.Count)
+                .AddInlineField("Verification Level", GuildVeri)
+                .AddInlineField("Total Guild Users", users.Count)
+                .AddInlineField(":green_heart: Onlines Users", OnlineUsers)
+                .AddInlineField(":black_circle: Offline Users", OfflineUsers)
+                .AddInlineField(":black_circle: Invisble Users", InvisibleUsers)
+                .AddInlineField(":red_circle: DND Users", DndUsers)
+                .AddInlineField(":yellow_heart: Idle Users", IdleUsers)
+                .AddInlineField(":robot: Bot Users", users.Where(u => u.IsBot).Count());
             await ReplyAsync("", false, embed);
         }
 

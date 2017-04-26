@@ -66,24 +66,6 @@ namespace Rick.Services
             http.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         }
 
-        public static List<string> EvalImports { get; } = new List<string> {
-            "Discord",
-            "Discord.Net",
-            "Discord.Rest",
-            "Discord.Commands",
-            "Discord.WebSocket",
-            "System",
-            "System.Collections",
-            "System.Collections.Generic",
-            "System.Diagnostics",
-            "System.IO",
-            "System.Linq",
-            "System.Math",
-            "System.Reflection",
-            "System.Runtime",
-            "System.Threading.Tasks"
-        };
-
         public static IEnumerable<Assembly> GetAssemblies()
         {
             var Assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
@@ -107,7 +89,7 @@ namespace Rick.Services
                 using (StreamReader reader = new System.IO.StreamReader(stream))
                 {
                     String version = reader.ReadToEnd();
-                    if (botConfig.Version != version)
+                    if (BotModel.BotVersion != version)
                     {
                         ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
                         var response = Console.ReadLine().ToLower();
@@ -116,8 +98,6 @@ namespace Rick.Services
                             ConsoleService.Log("Autoupdate", "Downloading update ...");
                             web.DownloadFile("https://exceptiondev.github.io/Docs/Downloads/Installer.bat", "Installer.bat");
                             Process.Start("Installer.bat");
-                            botConfig.Version = version;
-                            await BotModel.SaveAsync(BotModel.configPath, botConfig);
                             await Task.Delay(5000);
                             Process.GetCurrentProcess().Kill();
                         }

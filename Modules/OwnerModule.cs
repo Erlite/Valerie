@@ -25,7 +25,7 @@ namespace Rick.Modules
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
         public static IEnumerable<Assembly> Assemblies => MethodService.GetAssemblies();
-        public static IEnumerable<string> Imports => MethodService.EvalImports;
+        public static IEnumerable<string> Imports => BotModel.BotConfig.EvalImports;
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
@@ -199,21 +199,23 @@ namespace Rick.Modules
         [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
         public async Task ListImportsAsync()
         {
-            await ReplyAsync(string.Join(", ", MethodService.EvalImports.Select(x => x))).ConfigureAwait(false);
+            await ReplyAsync(string.Join(", ", BotModel.BotConfig.EvalImports.Select(x => x)));
         }
 
         [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
-        public async Task RemoveImportAsync([Summary("Namespace name")]string import)
+        public async Task RemoveImportAsync(string import)
         {
-            MethodService.EvalImports.Remove(import);
-            await ReplyAsync($"Removed {import}").ConfigureAwait(false);
+            BotModel.BotConfig.EvalImports.Remove(import);
+            await ReplyAsync($"Removed {import}");
+            await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
         }
 
         [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
-        public async Task AddImportAsync([Summary("Namespace name")]string import)
+        public async Task AddImportAsync(string import)
         {
-            MethodService.EvalImports.Add(import);
-            await ReplyAsync($"Added {import}").ConfigureAwait(false);
+            BotModel.BotConfig.EvalImports.Add(import);
+            await ReplyAsync($"Added {import}");
+            await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
         }
     }
 }
