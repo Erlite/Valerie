@@ -29,8 +29,8 @@ namespace Rick.Handlers
             Logger = _map.Get<EventService>();
             Interactive = _map.Get<InteractiveService>();
             client.MessageReceived += HandleCommandsAsync;
-            cmds = _map.Get<CommandService>();
-            //cmds = new CommandService();
+            //cmds = _map.Get<CommandService>();
+            cmds = new CommandService();
             map = _map;
         }
 

@@ -36,12 +36,7 @@ namespace Rick
             map.Add(new InteractiveService(client));
             map.Add(new EventService(client, GuildModel));
             map.Add(new BotModel());
-            map.Add(new CommandService(new CommandServiceConfig
-            {
-                CaseSensitiveCommands = false,
-                ThrowOnError = false,
-                LogLevel = LogSeverity.Verbose
-            }));
+
             //handler = new CommandHandler(map);
             //await handler.InstallAsync();
 
