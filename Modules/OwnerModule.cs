@@ -162,7 +162,16 @@ namespace Rick.Modules
                         x.Name = "Evaluated Successfully!";
                         x.IconUrl = client.CurrentUser.GetAvatarUrl();
                     })
-                    .WithDescription($"**Input:**```{value}```\n**Output:**```{eval.ToString()}```")
+                    .AddField(x =>
+                    {
+                        x.Name = "Input";
+                        x.Value = $"```{value}```";
+                    })
+                    .AddField(x =>
+                    {
+                        x.Name = "Output";
+                        x.Value = $"```{eval.ToString()}```";
+                    })
                     .WithColor(new Color(20, 255, 5))
                     .WithFooter(x =>
                     {
@@ -180,12 +189,21 @@ namespace Rick.Modules
                         x.Name = "Failed to evaluate code!";
                         x.IconUrl = client.CurrentUser.GetAvatarUrl();
                     })
-                    .WithDescription($"**Input:**```{value}```\n**Output:**```{e.Message.ToString()}```\n**Stacktrace:**```{e.StackTrace}```")
+                    .AddField(x =>
+                    {
+                        x.Name = "Input";
+                        x.Value = $"```{value}```";
+                    })
+                    .AddField(x =>
+                    {
+                        x.Name = "Output";
+                        x.Value = $"```{ e.Message.ToString()}```";
+                    })
                     .WithColor(new Color(255, 6, 14))
                     .WithFooter(x =>
                     {
                         x.IconUrl = "https://blog.mariusschulz.com/content/images/dotnet_foundation_logo.png";
-                        x.Text = "Using Microsoft Code Analysis Csharp Scripting";
+                        x.Text = e.StackTrace;
                     });
 
                 await ReplyAsync("", embed: embed);
