@@ -19,7 +19,7 @@ namespace Rick.Models
         public const string configPath = "BotConfig.json";
 
         [JsonIgnore]
-        public const string BotVersion = "";
+        public const string BotVersion = "10.2";
 
         [JsonProperty("BotToken")]
         public string BotToken { get; set; }

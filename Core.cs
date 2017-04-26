@@ -22,10 +22,11 @@ namespace Rick
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true,
-                DefaultRetryMode = RetryMode.AlwaysRetry
+                DefaultRetryMode = RetryMode.AlwaysRetry,
+                HandlerTimeout = 5000
             });
             
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));

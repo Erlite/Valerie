@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord;
-using Discord.WebSocket;
 
 namespace Rick.Services
 {
@@ -56,9 +55,9 @@ namespace Rick.Services
         public static void Log(LogSeverity severity, string source, string message)
         {
             NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
-            Append($"[{severity}]", ConsoleColor.DarkRed);
+            Append($"[{severity}]", ConsoleColor.DarkCyan);
             Append($"[{source}] ", ConsoleColor.DarkYellow);
-            Append(message, ConsoleColor.DarkCyan);
+            Append(message, ConsoleColor.DarkRed);
         }
 
         public static void Log(IUserMessage msg)
