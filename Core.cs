@@ -22,11 +22,10 @@ namespace Rick
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
-                LogLevel = LogSeverity.Verbose,
+                LogLevel = LogSeverity.Debug,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true,
-                DefaultRetryMode = RetryMode.AlwaysRetry,
-                HandlerTimeout = 5000
+                DefaultRetryMode = RetryMode.AlwaysRetry
             });
             
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
@@ -39,39 +38,22 @@ namespace Rick
             map.Add(new BotModel());
             handler = new CommandHandler(map);
             await handler.InstallAsync();
-           
-            client.GuildAvailable += CreateGuildConfigAsync;
-            client.LeftGuild += RemoveGuildConfigAsync;
+
+            client.GuildAvailable += EventService.CreateGuildConfigAsync;
+            client.LeftGuild += EventService.RemoveGuildConfigAsync;
+            client.Ready += EventService.OnReady;
+            client.MessageReceived += EventService.LogMessagesAsync;
 
             GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
             BotModel.BotConfig = await BotModel.LoadConfigAsync();
 
             ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} v{BotModel.BotVersion}");
             await MethodService.ProgramUpdater();
-
-            //await client.SetGameAsync(BotModel.BotConfig.BotGame);
+            
             await client.LoginAsync(TokenType.Bot, BotModel.BotConfig.BotToken);
             await client.StartAsync();
 
             await Task.Delay(-1);
-        }
-
-        private async Task CreateGuildConfigAsync(SocketGuild Guild)
-        {
-            var CreateConfig = new GuildModel();
-            GuildModel.GuildConfigs.Add(Guild.Id, CreateConfig);
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs).ConfigureAwait(false);
-        }
-
-        private async Task RemoveGuildConfigAsync(SocketGuild Guild)
-        {
-            ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
-            if (GuildModel.GuildConfigs.ContainsKey(Guild.Id))
-            {
-                GuildModel.GuildConfigs.Remove(Guild.Id);
-            }
-            var path = GuildModel.configPath;
-            await GuildModel.SaveAsync(path, GuildModel.GuildConfigs);
         }
     }
 }

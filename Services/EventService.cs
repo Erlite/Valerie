@@ -3,12 +3,14 @@ using Discord;
 using Discord.WebSocket;
 using Rick.Models;
 using System.Linq;
+using System;
+using System.IO;
 
 namespace Rick.Services
 {
     public class EventService
     {
-        private DiscordSocketClient client;
+        private static DiscordSocketClient client;
         private GuildModel GuildModel;
 
         public EventService(DiscordSocketClient c, GuildModel gldhndler)
@@ -80,20 +82,24 @@ namespace Rick.Services
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
             var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
-            var embed = new EmbedBuilder();
-            embed.Title = "=== User Joined ===";
-            embed.Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}";
-            embed.Color = new Color(83, 219, 207);
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== User Joined ===",
+                Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}",
+                Color = new Color(83, 219, 207)
+            };
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task UserLeftAsync(SocketGuildUser user)
         {
-            var embed = new EmbedBuilder();
-            embed.Title = "=== User Left ===";
-            embed.Description = $"{user.Username}#{user.Discriminator} has left the server! :wave:";
-            embed.Color = new Color(223, 229, 48);
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== User Left ===",
+                Description = $"{user.Username}#{user.Discriminator} has left the server! :wave:",
+                Color = new Color(223, 229, 48)
+            };
             var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
@@ -104,10 +110,12 @@ namespace Rick.Services
             var SockGuildUser = author as SocketGuildUser;
             var Guild = SockGuildUser.Guild;
             if (author.Username == a.Username) return;
-            var embed = new EmbedBuilder();
-            embed.Title = "=== Username Change ====";
-            embed.Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}";
-            embed.Color = new Color(193, 60, 144);
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== Username Change ====",
+                Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}",
+                Color = new Color(193, 60, 144)
+            };
             var getGuild = GuildModel.GuildConfigs[Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
@@ -116,10 +124,12 @@ namespace Rick.Services
         private async Task NickChangeAsync(SocketGuildUser author, SocketGuildUser a)
         {
             if (author.Nickname == a.Nickname) return;
-            var embed = new EmbedBuilder();
-            embed.Title = "=== Nickname Change ====";
-            embed.Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}";
-            embed.Color = new Color(193, 60, 144);
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== Nickname Change ====",
+                Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}",
+                Color = new Color(193, 60, 144)
+            };
             var getGuild = GuildModel.GuildConfigs[author.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
@@ -146,6 +156,39 @@ namespace Rick.Services
             if (msg.Content.Contains(hasValue.Key))
             {
                 await msg.Channel.SendMessageAsync(hasValue.Value);
+            }
+        }
+
+        public async static Task CreateGuildConfigAsync(SocketGuild Guild)
+        {
+            var CreateConfig = new GuildModel();
+            GuildModel.GuildConfigs.Add(Guild.Id, CreateConfig);
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs).ConfigureAwait(false);
+        }
+
+        public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
+        {
+            ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
+            if (GuildModel.GuildConfigs.ContainsKey(Guild.Id))
+            {
+                GuildModel.GuildConfigs.Remove(Guild.Id);
+            }
+            var path = GuildModel.configPath;
+            await GuildModel.SaveAsync(path, GuildModel.GuildConfigs);
+        }
+
+        public async static Task OnReady()
+        {
+            await client.SetGameAsync(BotModel.BotConfig.BotGame);
+        }
+
+        public static async Task LogMessagesAsync(SocketMessage msg)
+        {
+            var gld = (msg.Channel as SocketGuildChannel).Guild;
+            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
+            using (StreamWriter file = new StreamWriter("Logs.txt", true))
+            {
+                await file.WriteLineAsync(log);
             }
         }
     }

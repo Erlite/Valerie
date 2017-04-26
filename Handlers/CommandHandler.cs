@@ -7,6 +7,7 @@ using Discord;
 using Rick.Services;
 using Rick.Models;
 using Discord.Addons.InteractiveCommands;
+using Rick.Attributes;
 
 namespace Rick.Handlers
 {
@@ -141,5 +142,6 @@ namespace Rick.Handlers
                 .WithDescription(result.ErrorReason);
             await context.Channel.SendMessageAsync("", false, embed);
         }
+
     }
 }

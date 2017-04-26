@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Rick.Models;
 
-
 namespace Rick.Attributes
 {
     public class CheckBlacklistAttribute : PreconditionAttribute
