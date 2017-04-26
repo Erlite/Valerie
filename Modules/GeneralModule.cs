@@ -484,11 +484,5 @@ namespace Rick.Modules
                 .WithColor(new Color(109, 242, 122));
             await ReplyAsync("", embed: embed);
         }
-
-        [Command("Test")]
-        public async Task Test([Remainder] string txt)
-        {
-            await ReplyAsync(txt);
-        }
     }
 }

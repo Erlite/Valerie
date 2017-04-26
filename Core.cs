@@ -37,9 +37,6 @@ namespace Rick
             map.Add(new EventService(client, GuildModel));
             map.Add(new BotModel());
 
-            //handler = new CommandHandler(map);
-            //await handler.InstallAsync();
-
             handler = new CommandHandler(map);
             await handler.ConfigureAsync();
 
