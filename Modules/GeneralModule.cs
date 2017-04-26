@@ -486,7 +486,7 @@ namespace Rick.Modules
         }
 
         [Command("Test")]
-        public async Task Test([Remainder, RequiredParameter] string txt)
+        public async Task Test([Remainder] string txt)
         {
             await ReplyAsync(txt);
         }
