@@ -45,7 +45,7 @@ namespace Rick.Handlers
             var AfkList = GuildModel.GuildConfigs[gld.Id].AfkList;
             var OwnerAfk = BotModel.BotConfig.OwnerAfk;
 
-            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content} {msg.Embeds}";
+            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
             using (StreamWriter file = new StreamWriter("Logs.txt", true))
             {
                 await file.WriteLineAsync(log);
