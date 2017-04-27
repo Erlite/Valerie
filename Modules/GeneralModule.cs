@@ -512,7 +512,7 @@ namespace Rick.Modules
         }
 
         [Command("Robohash"), Summary("Bot ExceptionDev"), Remarks("Generates a bot image for your username/name")]
-        public async Task GenBotAsync(string name)
+        public async Task RobohashAsync(string name)
         {
             using (var http = new HttpClient())
             {
@@ -531,6 +531,32 @@ namespace Rick.Modules
                     .WithImageUrl(link);
                 await ReplyAsync("", embed: embed);
             }
+        }
+
+        [Command("Leet"), Summary("Leet text"), Remarks("Generates text in leet language")]
+        public async Task LeetAsync([Remainder] string text)
+        {
+            try
+            {
+                using (var http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Clear();
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("Accept", "text/plain");
+                    var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
+                    var embed = new EmbedBuilder()
+                        .WithAuthor(x =>
+                        {
+                            x.Name = Context.Client.CurrentUser.Username;
+                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                        })
+                        .WithColor(new Color(102, 255, 255))
+                        .WithDescription(get);
+                    await ReplyAsync("", embed: embed);
+                }
+            }
+            catch (Exception e)
+            { await ReplyAsync(e.Message); }
         }
     }
 }
