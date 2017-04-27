@@ -83,8 +83,8 @@ namespace Rick.Services
         public static void Log(string source,string message)
         {
             NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
-            Append($"[{source}] ", ConsoleColor.DarkYellow);
-            Append(message, ConsoleColor.Magenta);
+            Append($"[{source}] ", ConsoleColor.DarkCyan);
+            Append(message, ConsoleColor.DarkYellow);
         }
     }
 }

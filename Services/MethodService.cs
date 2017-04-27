@@ -86,10 +86,10 @@ namespace Rick.Services
                 ConsoleService.Log("Autoupdate", "Checking for updates ...");
                 WebClient web = new WebClient();
                 Stream stream = web.OpenRead("https://exceptiondev.github.io/Docs/Downloads/version.txt");
-                using (StreamReader reader = new System.IO.StreamReader(stream))
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    String version = reader.ReadToEnd();
-                    if (BotModel.BotVersion != version)
+                    double version = Convert.ToDouble(reader.ReadToEnd());
+                    if (BotModel.BotVersion < version)
                     {
                         ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
                         var response = Console.ReadLine().ToLower();
@@ -101,13 +101,13 @@ namespace Rick.Services
                             await Task.Delay(5000);
                             Process.GetCurrentProcess().Kill();
                         }
-                        else
-                            ConsoleService.Log("Autoupdate", "Continuing ...");
                     }
+                    else
+                        ConsoleService.Log("Autoupdate", "Already using the latest version!\n");
                 }
             }
             else
-                ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...");
+                ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
         }
     }
 }

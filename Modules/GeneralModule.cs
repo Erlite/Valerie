@@ -16,6 +16,7 @@ using System.Linq;
 using Rick.Models;
 using Rick.Attributes;
 using System.Text;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -483,6 +484,32 @@ namespace Rick.Modules
                 .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
                 .WithColor(new Color(109, 242, 122));
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Afk"), Summary(""), Remarks("")]
+        public async Task SetAfkAsync(ListProperty prop, [Remainder] string msg)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var List = gldConfig.AfkList;
+
+            switch(prop)
+            {
+                case ListProperty.Add:
+                    List.Add(Context.User.Id, msg);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
+                    break;
+
+                case ListProperty.Remove:
+                    List.Remove(Context.User.Id);
+                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
+                    break;
+
+            }
         }
     }
 }

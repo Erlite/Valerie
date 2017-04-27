@@ -19,7 +19,7 @@ namespace Rick.Models
         public const string configPath = "BotConfig.json";
 
         [JsonIgnore]
-        public const string BotVersion = "10.2";
+        public const double BotVersion = 10.4;
 
         [JsonProperty("BotToken")]
         public string BotToken { get; set; }
@@ -53,6 +53,9 @@ namespace Rick.Models
 
         [JsonProperty("EvalImports")]
         public List<string> EvalImports { get; set; } = new List<string>();
+
+        [JsonProperty("OwnerAfk")]
+        public Dictionary<ulong, string> OwnerAfk { get; set; } = new Dictionary<ulong, string>();
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {

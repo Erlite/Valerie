@@ -61,6 +61,9 @@ namespace Rick.Models
         [JsonProperty("Responses")]
         public Dictionary<string, string> Responses { get; set; } = new Dictionary<string, string>();
 
+        [JsonProperty("AfkList")]
+        public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
+
         public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 

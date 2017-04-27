@@ -15,5 +15,6 @@ namespace Rick.Interfaces
         bool AutoUpdate { get; set; }
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
+        Dictionary<ulong, string> OwnerAfk { get; set; }
     }
 }

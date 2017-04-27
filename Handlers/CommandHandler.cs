@@ -42,13 +42,22 @@ namespace Rick.Handlers
         private async Task HandleCommandsAsync(SocketMessage msg)
         {
             var gld = (msg.Channel as SocketGuildChannel).Guild;
-            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
+            var AfkList = GuildModel.GuildConfigs[gld.Id].AfkList;
+            var OwnerAfk = BotModel.BotConfig.OwnerAfk;
+
+            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content} {msg.Embeds}";
             using (StreamWriter file = new StreamWriter("Logs.txt", true))
             {
                 await file.WriteLineAsync(log);
             }
 
             var message = msg as SocketUserMessage;
+
+            string afkReason = null;
+            SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason) || OwnerAfk.TryGetValue(u.Id, out afkReason));
+            if (gldUser != null)
+                await message.Channel.SendMessageAsync(afkReason);
+
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
@@ -74,7 +83,7 @@ namespace Rick.Handlers
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotModel.BotConfig.DefaultPrefix}{Command.Name} {string.Join("] [", Command.Parameters.Select(x => x.Name))}";
+                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotModel.BotConfig.DefaultPrefix}{Command.Name} {string.Join("", Command.Parameters.Select(x => x.Name))}";
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;

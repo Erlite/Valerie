@@ -20,5 +20,6 @@ namespace Rick.Interfaces
         List<string> RequiredChannelNames { get; set; }
         Dictionary<string, string> Tags { get; set; }
         Dictionary<string, string> Responses { get; set; }
+        Dictionary<ulong, string> AfkList { get; set; }
     }
 }
