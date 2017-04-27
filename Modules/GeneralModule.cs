@@ -527,7 +527,7 @@ namespace Rick.Modules
                         x.Name = Context.Client.CurrentUser.Username;
                         x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
                     })
-                    .WithColor(new Color(102,255,255))
+                    .WithColor(new Color(102, 255, 255))
                     .WithImageUrl(link);
                 await ReplyAsync("", embed: embed);
             }
@@ -552,6 +552,59 @@ namespace Rick.Modules
                         })
                         .WithColor(new Color(102, 255, 255))
                         .WithDescription(get);
+                    await ReplyAsync("", embed: embed);
+                }
+            }
+            catch (Exception e)
+            { await ReplyAsync(e.Message); }
+        }
+
+        [Command("Cookie"), Summary("Normal Command"), Remarks("Gets a random Fortune cookie for you")]
+        public async Task FortuneCookieAsync()
+        {
+            try
+            {
+                using (var http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Clear();
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("Accept", "text/plain");
+                    var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
+                    var embed = new EmbedBuilder()
+                        .WithAuthor(x =>
+                        {
+                            x.Name = Context.Client.CurrentUser.Username;
+                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                        })
+                        .WithColor(new Color(102, 255, 255))
+                        .WithDescription($"```{get}```");
+                    await ReplyAsync("", embed: embed);
+                }
+            }
+            catch (Exception e)
+            { await ReplyAsync(e.Message); }
+        }
+
+        [Command("Ping"), Summary("Ping Google.com"), Remarks("Pings a website")]
+        public async Task PwnedAsync(string search)
+        {
+            try
+            {
+                using (var http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Clear();
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("Accept", "application/json");
+                    var get = JObject.Parse( await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
+                    var time = get["time"].ToString();
+                    var embed = new EmbedBuilder()
+                        .WithAuthor(x =>
+                        {
+                            x.Name = Context.Client.CurrentUser.Username;
+                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                        })
+                        .WithColor(new Color(102, 255, 255))
+                        .WithDescription($"Ping Result: **{time} ms**");
                     await ReplyAsync("", embed: embed);
                 }
             }
