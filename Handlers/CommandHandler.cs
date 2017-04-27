@@ -118,7 +118,6 @@ namespace Rick.Handlers
             }
             else
                 await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
-        }
-        
+        }        
     }
 }
