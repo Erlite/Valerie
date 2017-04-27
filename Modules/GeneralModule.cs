@@ -15,7 +15,6 @@ using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Models;
 using Rick.Attributes;
-using System.Text;
 using Rick.Classes;
 
 namespace Rick.Modules
@@ -24,7 +23,7 @@ namespace Rick.Modules
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-        
+
         public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
@@ -486,14 +485,14 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Afk"), Summary(""), Remarks("")]
+        [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
         public async Task SetAfkAsync(ListProperty prop, [Remainder] string msg)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildModel.GuildConfigs[Guild.Id];
             var List = gldConfig.AfkList;
 
-            switch(prop)
+            switch (prop)
             {
                 case ListProperty.Add:
                     List.Add(Context.User.Id, msg);
@@ -509,6 +508,28 @@ namespace Rick.Modules
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
                     break;
 
+            }
+        }
+
+        [Command("Robohash"), Summary("Bot ExceptionDev"), Remarks("Generates a bot image for your username/name")]
+        public async Task GenBotAsync(string name)
+        {
+            using (var http = new HttpClient())
+            {
+                http.DefaultRequestHeaders.Clear();
+                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                http.DefaultRequestHeaders.Add("Accept", "application/json");
+                var res = JObject.Parse(await http.GetStringAsync($"https://robohash.p.mashape.com/index.php?text={Uri.EscapeUriString(name)}"));
+                var link = res["imageUrl"].ToString();
+                var embed = new EmbedBuilder()
+                    .WithAuthor(x =>
+                    {
+                        x.Name = Context.Client.CurrentUser.Username;
+                        x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                    })
+                    .WithColor(new Color(102,255,255))
+                    .WithImageUrl(link);
+                await ReplyAsync("", embed: embed);
             }
         }
     }
