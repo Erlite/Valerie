@@ -87,16 +87,6 @@ namespace Rick.Handlers
 
             if (ErrorMsg != null)
                 await context.Channel.SendMessageAsync(ErrorMsg);
-
-            if (GuildModel.GuildConfigs[gld.Id].AutoRespond)
-            {
-                var GetResponses = GuildModel.GuildConfigs[gld.Id].Responses;
-                var hasValue = GetResponses.FirstOrDefault(resp => message.Content.Contains(resp.Key));
-                if (message.Content.Contains(hasValue.Key))
-                {
-                    await message.Channel.SendMessageAsync(hasValue.Value);
-                }
-            }
         }
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)

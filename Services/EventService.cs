@@ -150,12 +150,15 @@ namespace Rick.Services
         {
             if (msg.Author.IsBot) return;
             var SocChan = msg.Channel as SocketGuildChannel;
-            var Guild = SocChan.Guild;            
-            var GetResponses = GuildModel.GuildConfigs[Guild.Id].Responses;
-            var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
-            if (msg.Content.Contains(hasValue.Key))
+            var Guild = SocChan.Guild;
+            if (GuildModel.GuildConfigs[Guild.Id].AutoRespond)
             {
-                await msg.Channel.SendMessageAsync(hasValue.Value);
+                var GetResponses = GuildModel.GuildConfigs[Guild.Id].Responses;
+                var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
+                if (msg.Content.Contains(hasValue.Key))
+                {
+                    await msg.Channel.SendMessageAsync(hasValue.Value);
+                }
             }
         }
 
