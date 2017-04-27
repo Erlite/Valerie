@@ -1,40 +1,19 @@
-![Rick](https://exceptiondev.github.io/Docs/_media/rick.png)
+<p align="center"><img src="https://exceptiondev.github.io/Docs/_media/rick.png"/></p>
 
----
-Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.2. Rick likes to help out at times. Please don't bully Rick because Rick is old.
-This bot provides wide range of functionality such as:
-  - Owner Commands
-  - Admin Commands
-  - Fun Commands
-  - Search Commands
-  - Custom Commands
-  - Logging
-  - Auto Responding
-  - NSFW Commands
+Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.2. Rick likes to help out at times. Please don't bully Rick because Rick is old. Rick has over 60+ Commands. For full commands list read the docs.
 
-This bot is as flexible as you want it to be. It is being actively developed on GitHub, you are welcome to open new issues or contribute.
+[Add Rick to your server](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)
 
-## FAQ
----
-
-> Current version = 8.8
-<br>Release = Beta</br>
+> Current version = 10.4
+<br>Release = Stable</br>
 Commands Working = Yes
 <br>Errors = Minimum to None</br>
 Github = https://github.com/ExceptionDev/Rick
 <br>DiscordName = ExceptionDev#6045</br>
 Discord = https://discord.me/ArcaneOps
-<br>Docs = https://exceptiondev.github.io/Docs</br>
+<br>Docs/Guide/Commands/Setup = https://exceptiondev.github.io/Docs</br>
 
-- **Do I need to read docs?**
+### Credits
 
-Have you worked with Visual Studio (VS) before? If yes, you don't need to read docs.
-Else, you do need to read docs and learn C#. I'm not the master of C#.
-
-- **Nuget won't restore packages?**
-
-Did you read docs? It's explained there.
-
-- **I read the docs and followed the "New Console Application" but I can't install nuget packages?**
-
-I didn't design nuget or Visual Studio. If it's says meta data is unavailable please Google the error. Or join Discord API server.
+Thanks to everyone at Discord API and C# server for helping me out.
+This bot uses some methods/ideas from Markus Gordathian and AntiTCB Bot's and also other bot's I saw on Discord.
