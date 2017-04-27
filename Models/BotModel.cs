@@ -36,6 +36,9 @@ namespace Rick.Models
         [JsonProperty("BingAPIKey")]
         public string BingAPIKey { get; set; }
 
+        [JsonProperty("MashepeKey")]
+        public string MashapeKey { get; set; }
+
         [JsonProperty("MentionDefaultPrefix")]
         public bool MentionDefaultPrefix { get; set; }
 

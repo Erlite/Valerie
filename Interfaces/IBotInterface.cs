@@ -9,6 +9,7 @@ namespace Rick.Interfaces
         string BotGame { get; set; }
         string DefaultPrefix { get; set; }
         string BingAPIKey { get; set; }
+        string MashapeKey { get; set; }
         bool MentionDefaultPrefix { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
