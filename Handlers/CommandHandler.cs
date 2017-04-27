@@ -7,6 +7,8 @@ using Discord;
 using Rick.Services;
 using Rick.Models;
 using Discord.Addons.InteractiveCommands;
+using System.IO;
+using System;
 
 namespace Rick.Handlers
 {
@@ -40,11 +42,18 @@ namespace Rick.Handlers
 
         private async Task HandleCommandsAsync(SocketMessage msg)
         {
+            var gld = (msg.Channel as SocketGuildChannel).Guild;
+            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
+            using (StreamWriter file = new StreamWriter("Logs.txt", true))
+            {
+                await file.WriteLineAsync(log);
+            }
+
             var message = msg as SocketUserMessage;
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
-            var gld = context.Guild as SocketGuild;
+
             if (!(message.HasStringPrefix(BotModel.BotConfig.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
 
             var result = await cmds.ExecuteAsync(context, argPos, map, MultiMatchHandling.Best);
@@ -79,6 +88,16 @@ namespace Rick.Handlers
 
             if (ErrorMsg != null)
                 await context.Channel.SendMessageAsync(ErrorMsg);
+
+            if (GuildModel.GuildConfigs[gld.Id].AutoRespond)
+            {
+                var GetResponses = GuildModel.GuildConfigs[gld.Id].Responses;
+                var hasValue = GetResponses.FirstOrDefault(resp => message.Content.Contains(resp.Key));
+                if (message.Content.Contains(hasValue.Key))
+                {
+                    await message.Channel.SendMessageAsync(hasValue.Value);
+                }
+            }
         }
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)

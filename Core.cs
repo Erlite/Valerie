@@ -44,7 +44,6 @@ namespace Rick
             client.GuildAvailable += EventService.CreateGuildConfigAsync;
             client.LeftGuild += EventService.RemoveGuildConfigAsync;
             client.Ready += EventService.OnReady;
-            client.MessageReceived += EventService.LogMessagesAsync;
 
             GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
             BotModel.BotConfig = await BotModel.LoadConfigAsync();

@@ -183,13 +183,13 @@ namespace Rick.Modules
             if (!GuildModel.GuildConfigs[Guild.Id].AutoRespond)
             {
                 gldConfig.AutoRespond = true;
-                Log.EnableAutoRespond();
-                await ReplyAsync("I will now auto respond to certain messages");
+                //Log.EnableAutoRespond();
+                await ReplyAsync(":gear: I will now auto respond to certain messages!");
             }
             else
             {
                 gldConfig.AutoRespond = false;
-                Log.DisableAutoRespond();
+                //Log.DisableAutoRespond();
                 await ReplyAsync(":skull_crossbones: Auto respond have been disabled!");
             }
             GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
