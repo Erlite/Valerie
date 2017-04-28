@@ -10,7 +10,7 @@ Commands Working = Yes
 <br>Errors = Minimum to None</br>
 Github = https://github.com/ExceptionDev/Rick
 <br>DiscordName = ExceptionDev#6045</br>
-Discord = https://discord.me/ArcaneOps
+Discord = https://discord.me/Noegenesis
 <br>Docs/Guide/Commands/Setup = https://exceptiondev.github.io/Docs</br>
 
 ### Credits
