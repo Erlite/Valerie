@@ -4,7 +4,7 @@ Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net
 
 [Add Rick to your server](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)
 
-> Current version = 10.4
+> Current version = 13.7
 <br>Release = Stable</br>
 Commands Working = Yes
 <br>Errors = Minimum to None</br>
@@ -17,3 +17,7 @@ Discord = https://discord.me/Noegenesis
 
 Thanks to everyone at Discord API and C# server for helping me out.
 This bot uses some methods/ideas from Markus Gordathian and AntiTCB Bot's and also other bot's I saw on Discord.
+
+
+### Testimonials
+<p align="center"><img src="http://vvcap.com/img/2Nrq8h0UJ8o.png"/></p>
