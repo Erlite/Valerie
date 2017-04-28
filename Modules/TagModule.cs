@@ -95,9 +95,29 @@ namespace Rick.Modules
         }
 
         [Command("Modify"), Summary("Tag Modify Name/Response"), Remarks("Modifies Tag's info")]
-        public async Task ModifyTagAsync()
+        public async Task ModifyTagAsync(GlobalEnums prop, string Name, string Response)
         {
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var gldTags = gldConfig.TagsList;
+            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
+            if (getTag == null)
+            {
+                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                return;
+            }
+            switch(prop)
+            {
+                case GlobalEnums.TagName:
+                    getTag.TagName = Name;
+                    break;
 
+                case GlobalEnums.TagResponse:
+                    getTag.TagResponse = Response;
+                    break;
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await ReplyAsync(":gears: Done");
         }
 
         [Command("List"), Summary("Tag List"), Remarks("Lists all tags")]
