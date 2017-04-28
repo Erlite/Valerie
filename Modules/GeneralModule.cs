@@ -12,7 +12,6 @@ using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
-using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -297,7 +296,7 @@ namespace Rick.Modules
         }
 
         [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
-        public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg)
+        public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg = "No reason provided!")
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
