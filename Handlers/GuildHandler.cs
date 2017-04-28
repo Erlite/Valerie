@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
+using Rick.Classes;
 
 namespace Rick.Handlers
 {
@@ -56,7 +57,7 @@ namespace Rick.Handlers
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
-        public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string>();
+        public List<Tags> TagsList{ get; set; } = new List<Tags>();
 
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
