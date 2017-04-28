@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 using System.Threading.Tasks;
-using Rick.Models;
+using Rick.Handlers;
 
 namespace Rick.Attributes
 {
@@ -9,7 +9,7 @@ namespace Rick.Attributes
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
             var userId = context.User.Id;
-            var Blacklist = BotModel.BotConfig.Blacklist;
+            var Blacklist = BotHandler.BotConfig.Blacklist;
             var getUser = Blacklist.ContainsKey(userId);
             string reason;
             var getReason = Blacklist.TryGetValue(userId, out reason);

@@ -2,7 +2,7 @@
 using Discord.Commands;
 using System.Linq;
 using System.Threading.Tasks;
-using Rick.Models;
+using Rick.Handlers;
 
 namespace Rick.Attributes
 {
@@ -11,7 +11,7 @@ namespace Rick.Attributes
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
         {
             var user = context.User as IGuildUser;
-            var role = user.RoleIds.Intersect(GuildModel.GuildConfigs[context.Guild.Id].RequiredRoleIDs).Any();
+            var role = user.RoleIds.Intersect(GuildHandler.GuildConfigs[context.Guild.Id].RequiredRoleIDs).Any();
             return await Task.FromResult(role) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"{Format.Bold("ERROR: ")}Role is missing! Please get the appropriate role for this command!");
         }
     }

@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Rick.Models
+namespace Rick.Handlers
 {
-    public class BotModel : IBotInterface
+    public class BotHandler : IBotInterface
     {
         public static IBotInterface BotConfig { get; set; }
 
@@ -67,21 +67,21 @@ namespace Rick.Models
             return m.HasMentionPrefix(c.CurrentUser, ref ap);
         }
 
-        public static async Task<BotModel> LoadConfigAsync()
+        public static async Task<BotHandler> LoadConfigAsync()
         {
             if (File.Exists(configPath))
             {
                 var json = File.ReadAllText(configPath);
-                return JsonConvert.DeserializeObject<BotModel>(json);
+                return JsonConvert.DeserializeObject<BotHandler>(json);
             }
             var newConfig = await CreateNewAsync();
             return newConfig;
         }
 
-        public static async Task<BotModel> CreateNewAsync()
+        public static async Task<BotHandler> CreateNewAsync()
         {
-            BotModel result;
-            result = new BotModel();
+            BotHandler result;
+            result = new BotHandler();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();

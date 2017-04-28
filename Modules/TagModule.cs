@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using System.Text.RegularExpressions;
-using Rick.Models;
+using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Rick.Attributes;
 
@@ -31,20 +31,20 @@ namespace Rick.Modules
             if (TagResponse.Content == "cancel") return;
             string content = TagResponse.Content;
 
-            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var resp = gldConfig.Responses;
             if (resp.ContainsKey(name))
                 await ReplyAsync("A response with the exact name already exist! :skull_crossbones:");
             resp.Add(name, content);
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
 
             var embed = new EmbedBuilder()
                 .WithTitle(name)
                 .WithDescription(content)
                 .WithColor(new Color(255, 255, 255))
                 .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = $"New Tag added by {Context.User.Username}"; });
-                GuildModel.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
+                GuildHandler.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
                 await ReplyAsync("", embed: embed);
         }
 
@@ -52,7 +52,7 @@ namespace Rick.Modules
         public async Task ExecuteTagAsync(string TagName)
         {
             string content;
-            var tagExists = GuildModel.GuildConfigs[Context.Guild.Id].Tags.TryGetValue(TagName, out content);
+            var tagExists = GuildHandler.GuildConfigs[Context.Guild.Id].Tags.TryGetValue(TagName, out content);
             if (tagExists)
             {
                 await ReplyAsync(content);
@@ -66,7 +66,7 @@ namespace Rick.Modules
         [Command("Delete"), Summary("Delete an existing tag")]
         public async Task Delete(string TagName)
         {
-            var tagExists = GuildModel.GuildConfigs[Context.Guild.Id].Tags.Remove(TagName);
+            var tagExists = GuildHandler.GuildConfigs[Context.Guild.Id].Tags.Remove(TagName);
             await ReplyAsync($"{TagName} has been removed!");
         }
     }

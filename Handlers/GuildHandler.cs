@@ -4,11 +4,11 @@ using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Rick.Models
+namespace Rick.Handlers
 {
-    public class GuildModel : IGuildInterface
+    public class GuildHandler : IGuildInterface
     {
-        public static Dictionary<ulong, GuildModel> GuildConfigs { get; set; } = new Dictionary<ulong, GuildModel>();
+        public static Dictionary<ulong, GuildHandler> GuildConfigs { get; set; } = new Dictionary<ulong, GuildHandler>();
 
         [JsonIgnore]
         public const string configPath = "GuildConfig.json";

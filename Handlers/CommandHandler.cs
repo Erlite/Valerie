@@ -5,7 +5,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using Rick.Services;
-using Rick.Models;
+using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using System.IO;
 using System;
@@ -17,16 +17,16 @@ namespace Rick.Handlers
         private IDependencyMap map;
         private DiscordSocketClient client;
         private CommandService cmds;
-        private BotModel config;
-        private GuildModel model;
+        private BotHandler config;
+        private GuildHandler model;
         private EventService Logger;
         private InteractiveService Interactive;
 
         public CommandHandler(IDependencyMap _map)
         {
             client = _map.Get<DiscordSocketClient>();
-            config = _map.Get<BotModel>();
-            model = _map.Get<GuildModel>();
+            config = _map.Get<BotHandler>();
+            model = _map.Get<GuildHandler>();
             Logger = _map.Get<EventService>();
             Interactive = _map.Get<InteractiveService>();
             client.MessageReceived += HandleCommandsAsync;
@@ -42,8 +42,8 @@ namespace Rick.Handlers
         private async Task HandleCommandsAsync(SocketMessage msg)
         {
             var gld = (msg.Channel as SocketGuildChannel).Guild;
-            var AfkList = GuildModel.GuildConfigs[gld.Id].AfkList;
-            var OwnerAfk = BotModel.BotConfig.OwnerAfk;
+            var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
+            var OwnerAfk = BotHandler.BotConfig.OwnerAfk;
 
             string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
             using (StreamWriter file = new StreamWriter("Logs.txt", true))
@@ -62,7 +62,7 @@ namespace Rick.Handlers
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
 
-            if (!(message.HasStringPrefix(BotModel.BotConfig.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildModel.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
+            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildHandler.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
 
             var result = await cmds.ExecuteAsync(context, argPos, map, MultiMatchHandling.Best);
 
@@ -83,7 +83,7 @@ namespace Rick.Handlers
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotModel.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}";
+                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}";
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
@@ -100,7 +100,7 @@ namespace Rick.Handlers
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
         {
-            if (BotModel.BotConfig.DebugMode)
+            if (BotHandler.BotConfig.DebugMode)
             {
                 var embed = new EmbedBuilder();
                 embed.Color = new Color(150, 16, 25);

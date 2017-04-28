@@ -6,7 +6,7 @@ using Discord.WebSocket;
 using System.Net.Http;
 using System.IO;
 using Rick.Services;
-using Rick.Models;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
@@ -70,11 +70,11 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(value))
                 throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             botConfig.BotGame = value;
             await client.SetGameAsync(value);
             await ReplyAsync(":eyes: Done :eyes:");
-            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
         }
 
         [Command("Status"), Summary("Status 3"), Remarks("Changes Bot's status such as setting status to DND")]
@@ -90,7 +90,7 @@ namespace Rick.Modules
         [Command("Latency"), Summary("Normal Command"), Remarks("Enables/Disables monitoring your ping")]
         public async Task LatencyAsync()
         {
-            var Config = BotModel.BotConfig;
+            var Config = BotHandler.BotConfig;
             if (!Config.ClientLatency)
             {
                 Config.ClientLatency = true;
@@ -103,7 +103,7 @@ namespace Rick.Modules
                 Events.DisableLatencyMonitor();
                 await ReplyAsync(":skull_crossbones: Latency monitor disabled");
             }
-            await BotModel.SaveAsync(BotModel.configPath, Config);
+            await BotHandler.SaveAsync(BotHandler.configPath, Config);
         }
 
         [Command("Prefix"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
@@ -111,10 +111,10 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(prefix))
                 throw new NullReferenceException("Prefix can't be left empty!");
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             botConfig.DefaultPrefix = prefix;
             await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
-            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
         }
 
         [Command("Name"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
@@ -122,16 +122,16 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new NullReferenceException("Name can't be left empty!");
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             botConfig.BotName = name;
             await ReplyAsync($":gear: Console window name has been set to: **{name}**");
-            await BotModel.SaveAsync(BotModel.configPath, botConfig);
+            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
         }
 
         [Command("Debug"), Summary("Normal Command"), Remarks("Enables/Disables debug mode")]
         public async Task DebugAsync()
         {
-            var Config = BotModel.BotConfig;
+            var Config = BotHandler.BotConfig;
             if (!Config.DebugMode)
             {
                 Config.DebugMode = true;
@@ -142,13 +142,13 @@ namespace Rick.Modules
                 Config.DebugMode = false;
                 await ReplyAsync(":skull_crossbones: Debug mode has been disbaled!");
             }
-            await BotModel.SaveAsync(BotModel.configPath, Config);
+            await BotHandler.SaveAsync(BotHandler.configPath, Config);
         }
 
         [Command("Mention"), Summary("Normal Command"), Remarks("Enables/Disables mention prefix")]
         public async Task MentionAsync()
         {
-            var Config = BotModel.BotConfig;
+            var Config = BotHandler.BotConfig;
             if (!Config.MentionDefaultPrefix)
             {
                 await ReplyAsync(":gear: Mention Prefix has been enabled!");
@@ -157,7 +157,7 @@ namespace Rick.Modules
             {
                 await ReplyAsync(":skull_crossbones: Mention Prefix has been disbaled!");
             }
-            await BotModel.SaveAsync(BotModel.configPath, Config);
+            await BotHandler.SaveAsync(BotHandler.configPath, Config);
         }
 
     }

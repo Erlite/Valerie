@@ -7,7 +7,7 @@ using System.Xml;
 using System.Linq;
 using System.Reflection;
 using System.Net;
-using Rick.Models;
+using Rick.Handlers;
 using System.Diagnostics;
 
 namespace Rick.Services
@@ -80,7 +80,7 @@ namespace Rick.Services
 
         public static async Task ProgramUpdater()
         {
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             if (botConfig.AutoUpdate)
             {
                 ConsoleService.Log("Autoupdate", "Checking for updates ...");
@@ -89,7 +89,7 @@ namespace Rick.Services
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     double version = Convert.ToDouble(reader.ReadToEnd());
-                    if (BotModel.BotVersion < version)
+                    if (BotHandler.BotVersion < version)
                     {
                         ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
                         var response = Console.ReadLine().ToLower();

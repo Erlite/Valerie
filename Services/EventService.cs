@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Rick.Models;
+using Rick.Handlers;
 using System.Linq;
 using System;
 using System.IO;
@@ -11,9 +11,9 @@ namespace Rick.Services
     public class EventService
     {
         private static DiscordSocketClient client;
-        private GuildModel GuildModel;
+        private GuildHandler GuildModel;
 
-        public EventService(DiscordSocketClient c, GuildModel gldhndler)
+        public EventService(DiscordSocketClient c, GuildHandler gldhndler)
         {
             client = c;
             GuildModel = gldhndler;
@@ -81,7 +81,7 @@ namespace Rick.Services
 
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
-            var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
+            var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             var embed = new EmbedBuilder()
             {
                 Title = "=== User Joined ===",
@@ -100,7 +100,7 @@ namespace Rick.Services
                 Description = $"{user.Username}#{user.Discriminator} has left the server! :wave:",
                 Color = new Color(223, 229, 48)
             };
-            var getGuild = GuildModel.GuildConfigs[user.Guild.Id];
+            var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
         }
@@ -116,7 +116,7 @@ namespace Rick.Services
                 Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}",
                 Color = new Color(193, 60, 144)
             };
-            var getGuild = GuildModel.GuildConfigs[Guild.Id];
+            var getGuild = GuildHandler.GuildConfigs[Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
         }
@@ -130,7 +130,7 @@ namespace Rick.Services
                 Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}",
                 Color = new Color(193, 60, 144)
             };
-            var getGuild = GuildModel.GuildConfigs[author.Guild.Id];
+            var getGuild = GuildHandler.GuildConfigs[author.Guild.Id];
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
         }
@@ -151,9 +151,9 @@ namespace Rick.Services
             if (msg.Author.IsBot) return;
             var SocChan = msg.Channel as SocketGuildChannel;
             var Guild = SocChan.Guild;
-            if (GuildModel.GuildConfigs[Guild.Id].AutoRespond)
+            if (GuildHandler.GuildConfigs[Guild.Id].AutoRespond)
             {
-                var GetResponses = GuildModel.GuildConfigs[Guild.Id].Responses;
+                var GetResponses = GuildHandler.GuildConfigs[Guild.Id].Responses;
                 var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
                 if (msg.Content.Contains(hasValue.Key))
                 {
@@ -164,25 +164,25 @@ namespace Rick.Services
 
         public async static Task CreateGuildConfigAsync(SocketGuild Guild)
         {
-            var CreateConfig = new GuildModel();
-            GuildModel.GuildConfigs.Add(Guild.Id, CreateConfig);
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs).ConfigureAwait(false);
+            var CreateConfig = new GuildHandler();
+            GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs).ConfigureAwait(false);
         }
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
         {
             ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
-            if (GuildModel.GuildConfigs.ContainsKey(Guild.Id))
+            if (GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
             {
-                GuildModel.GuildConfigs.Remove(Guild.Id);
+                GuildHandler.GuildConfigs.Remove(Guild.Id);
             }
-            var path = GuildModel.configPath;
-            await GuildModel.SaveAsync(path, GuildModel.GuildConfigs);
+            var path = GuildHandler.configPath;
+            await GuildHandler.SaveAsync(path, GuildHandler.GuildConfigs);
         }
 
         public async static Task OnReady()
         {
-            await client.SetGameAsync(BotModel.BotConfig.BotGame);
+            await client.SetGameAsync(BotHandler.BotConfig.BotGame);
         }
     }
 }

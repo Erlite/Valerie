@@ -4,7 +4,7 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
-using Rick.Models;
+using Rick.Handlers;
 using Rick.Handlers;
 using Rick.Attributes;
 
@@ -26,7 +26,7 @@ namespace Rick.Modules
             if (user == null)
                 throw new NullReferenceException("Please mention the user you would like to kick!");
 
-            var gldConfig = GuildModel.GuildConfigs[user.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
@@ -48,8 +48,8 @@ namespace Rick.Modules
             else
                 await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
 
-            GuildModel.GuildConfigs[user.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await user.KickAsync();
         }
 
@@ -59,7 +59,7 @@ namespace Rick.Modules
             if (user == null)
                 throw new NullReferenceException("Please mention the user you would like to kick!");
 
-            var gldConfig = GuildModel.GuildConfigs[user.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
@@ -83,8 +83,8 @@ namespace Rick.Modules
             else
                 await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
 
-            GuildModel.GuildConfigs[user.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await user.Guild.AddBanAsync(user);
         }
 
@@ -107,7 +107,7 @@ namespace Rick.Modules
             if (user == null)
                 throw new NullReferenceException("You must mention a user you want to mute!");
             
-            var gldConfig = GuildModel.GuildConfigs[user.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
             var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
             gldConfig.CaseNumber += 1;
 
@@ -115,8 +115,8 @@ namespace Rick.Modules
                 throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
 
             await user.AddRoleAsync(GetMuteRole);
-            GuildModel.GuildConfigs[user.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }
 

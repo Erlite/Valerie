@@ -6,7 +6,6 @@ using Rick.Services;
 using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
-using Rick.Models;
 
 namespace Rick
 {
@@ -15,7 +14,7 @@ namespace Rick
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
         private DiscordSocketClient client;
         private CommandHandler handler;
-        private GuildModel GuildModel;
+        private GuildHandler GuildModel;
 
         public async Task StartAsync()
         {
@@ -33,10 +32,10 @@ namespace Rick
 
             var map = new DependencyMap();
             map.Add(client);
-            map.Add(new GuildModel());
+            map.Add(new GuildHandler());
             map.Add(new InteractiveService(client));
             map.Add(new EventService(client, GuildModel));
-            map.Add(new BotModel());
+            map.Add(new BotHandler());
 
             handler = new CommandHandler(map);
             await handler.ConfigureAsync();
@@ -45,13 +44,13 @@ namespace Rick
             client.LeftGuild += EventService.RemoveGuildConfigAsync;
             client.Ready += EventService.OnReady;
 
-            GuildModel.GuildConfigs = await GuildModel.LoadServerConfigsAsync<GuildModel>();
-            BotModel.BotConfig = await BotModel.LoadConfigAsync();
+            GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
+            BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
-            ConsoleService.TitleCard($"{BotModel.BotConfig.BotName} v{BotModel.BotVersion}");
+            ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodService.ProgramUpdater();
             
-            await client.LoginAsync(TokenType.Bot, BotModel.BotConfig.BotToken);
+            await client.LoginAsync(TokenType.Bot, BotHandler.BotConfig.BotToken);
             await client.StartAsync();
 
             await Task.Delay(-1);

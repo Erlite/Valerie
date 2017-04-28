@@ -12,7 +12,7 @@ using Discord.Addons.InteractiveCommands;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
-using Rick.Models;
+using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
 
@@ -307,7 +307,7 @@ namespace Rick.Modules
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotModel.BotConfig.BingAPIKey);
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {
@@ -448,13 +448,13 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(response))
                 throw new NullReferenceException(":skull: Response content can't be empty!");
 
-            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var resp = gldConfig.Responses;
             if (resp.ContainsKey(name))
                 await ReplyAsync("A response with the exact name already exist! :skull_crossbones:");
             resp.Add(name, response);
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             var embed = new EmbedBuilder()
                 .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
                 .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
@@ -466,22 +466,22 @@ namespace Rick.Modules
         public async Task SetAfkAsync(ListProperty prop, [Remainder] string msg)
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             var List = gldConfig.AfkList;
 
             switch (prop)
             {
                 case ListProperty.Add:
                     List.Add(Context.User.Id, msg);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
                     break;
 
                 case ListProperty.Remove:
                     List.Remove(Context.User.Id);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
                     break;
 
@@ -494,7 +494,7 @@ namespace Rick.Modules
             using (var http = new HttpClient())
             {
                 http.DefaultRequestHeaders.Clear();
-                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
                 http.DefaultRequestHeaders.Add("Accept", "application/json");
                 var res = JObject.Parse(await http.GetStringAsync($"https://robohash.p.mashape.com/index.php?text={Uri.EscapeUriString(name)}"));
                 var link = res["imageUrl"].ToString();
@@ -518,7 +518,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
                     var embed = new EmbedBuilder()
@@ -544,7 +544,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
                     var embed = new EmbedBuilder()
@@ -570,7 +570,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotModel.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse( await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
@@ -594,28 +594,31 @@ namespace Rick.Modules
         {
             if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
 
-            var gldConfig = GuildModel.GuildConfigs[user.GuildId];
+            var gldConfig = GuildHandler.GuildConfigs[user.GuildId];
             var karmalist = gldConfig.Karma;
             if (!karmalist.ContainsKey(user.Id))
             {
                 karmalist.Add(user.Id, 1);
-                GuildModel.GuildConfigs[user.GuildId] = gldConfig;
-                await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                 await ReplyAsync($"Added {user.Username} to Karma List and gave 1 Karma to {user.Username}");
             }
-            int getKarma = karmalist[user.Id];
-            getKarma++;
-            karmalist[user.Id] = getKarma;
+            else
+            {
+                int getKarma = karmalist[user.Id];
+                getKarma++;
+                karmalist[user.Id] = getKarma;
 
-            GuildModel.GuildConfigs[user.GuildId] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
-            await ReplyAsync($"Gave 1 Karma to {user.Username}");
+                GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                await ReplyAsync($"Gave 1 Karma to {user.Username}");
+            }
         }
 
         [Command("Karma"), Summary("Karma"), Remarks("Shows how much Karma you have")]
         public async Task GetKarmaAsync()
         {
-            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             karmalist.TryGetValue(Context.User.Id, out int karma);
             if (karma <= 0)
@@ -633,7 +636,7 @@ namespace Rick.Modules
         [Command("Top"), Summary("Normal Command"), Remarks("Shows users with top Karma")]
         public async Task TopAsync()
         {
-            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(11);
 

@@ -219,8 +219,8 @@
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
     <Compile Include="Interfaces\IGuildInterface.cs" />
-    <Compile Include="Models\BotModel.cs" />
-    <Compile Include="Models\GuildModel.cs" />
+    <Compile Include="Handlers\BotHandler.cs" />
+    <Compile Include="Handlers\GuildHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />

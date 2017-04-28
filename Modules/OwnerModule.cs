@@ -13,7 +13,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Rick.Services;
-using Rick.Models;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
@@ -25,7 +25,7 @@ namespace Rick.Modules
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
         public static IEnumerable<Assembly> Assemblies => MethodService.GetAssemblies();
-        public static IEnumerable<string> Imports => BotModel.BotConfig.EvalImports;
+        public static IEnumerable<string> Imports => BotHandler.BotConfig.EvalImports;
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
@@ -116,15 +116,15 @@ namespace Rick.Modules
         {
             if (user.Id == Context.Client.CurrentUser.Id)
                 await ReplyAsync("Wow, You think this is funny?");
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             var Bl = botConfig.Blacklist;
             if (Bl.ContainsKey(user.Id))
                 await ReplyAsync("This user already exist in the blacklist! :skull_crossbones:");
             else
             {
                 Bl.Add(user.Id, reason);
-                BotModel.BotConfig.Blacklist = Bl;
-                await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+                BotHandler.BotConfig.Blacklist = Bl;
+                await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
                 await ReplyAsync($"{user.Username} has been added to blacklist!");
             }
         }
@@ -132,15 +132,15 @@ namespace Rick.Modules
         [Command("Whitelist"), Summary("Whitelist @username"), Remarks("Removes users from blacklist")]
         public async Task WhitelistAsync(SocketGuildUser user)
         {
-            var botConfig = BotModel.BotConfig;
+            var botConfig = BotHandler.BotConfig;
             var Bl = botConfig.Blacklist;
             if (!Bl.ContainsKey(user.Id))
                 await ReplyAsync("This user is not listed in the Blacklist!");
             else
             {
                 Bl.Remove(user.Id);
-                BotModel.BotConfig.Blacklist = Bl;
-                await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+                BotHandler.BotConfig.Blacklist = Bl;
+                await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
                 await ReplyAsync($"{user.Username} has been removed from the blacklist!");
             }
         }
@@ -217,23 +217,23 @@ namespace Rick.Modules
         [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
         public async Task ListImportsAsync()
         {
-            await ReplyAsync(string.Join(", ", BotModel.BotConfig.EvalImports.Select(x => x)));
+            await ReplyAsync(string.Join(", ", BotHandler.BotConfig.EvalImports.Select(x => x)));
         }
 
         [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
         public async Task RemoveImportAsync(string import)
         {
-            BotModel.BotConfig.EvalImports.Remove(import);
+            BotHandler.BotConfig.EvalImports.Remove(import);
             await ReplyAsync($"Removed {import}");
-            await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+            await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
         }
 
         [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
         public async Task AddImportAsync(string import)
         {
-            BotModel.BotConfig.EvalImports.Add(import);
+            BotHandler.BotConfig.EvalImports.Add(import);
             await ReplyAsync($"Added {import}");
-            await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
+            await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
         }
 
         [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]

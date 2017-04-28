@@ -2,7 +2,7 @@
 using Discord;
 using Discord.Commands;
 using Rick.Services;
-using Rick.Models;
+using Rick.Handlers;
 using Discord.WebSocket;
 using Rick.Classes;
 using Rick.Attributes;
@@ -12,10 +12,10 @@ namespace Rick.Modules
     [Group("Guild"), RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
-        private GuildModel model;
+        private GuildHandler model;
         private EventService Log;
 
-        public GuildModule(GuildModel gld, EventService Logger)
+        public GuildModule(GuildHandler gld, EventService Logger)
         {
             model = gld;
             Log = Logger;
@@ -25,10 +25,10 @@ namespace Rick.Modules
         public async Task SetModLogChannelAsync(ITextChannel channel)
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.ModChannelID = channel.Id;
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync($"Mod Channel has been set to **{channel.Name}**");
         }
 
@@ -36,10 +36,10 @@ namespace Rick.Modules
         public async Task SetPrefixAsync(string prefix)
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.GuildPrefix = prefix;
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
@@ -47,10 +47,10 @@ namespace Rick.Modules
         public async Task WelcomeMessageAsync([Remainder]string msg)
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.WelcomeMessage = msg;
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync($"Guild Welcome Message has been set to:\n```{msg}```");
         }
 
@@ -64,10 +64,10 @@ namespace Rick.Modules
                     x.IconUrl = Guild.IconUrl;
                     x.Name = $"{Guild.Name} || {Guild.Owner.Username}";
                 })
-                .WithDescription($"**Server Mod Channel:** {GuildModel.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildModel.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
-                $"**Welcome Message:** {GuildModel.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildModel.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildModel.GuildConfigs[Guild.Id].LeaveLogs}\n" +
-                $"**Username Change Logging:** {GuildModel.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildModel.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildModel.GuildConfigs[Guild.Id].UserBannedLogged}\n**Auto Respond:** {GuildModel.GuildConfigs[Guild.Id].AutoRespond}")
+                .WithDescription($"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
+                $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
+                $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
+                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}\n**Auto Respond:** {GuildHandler.GuildConfigs[Guild.Id].AutoRespond}")
                 .WithColor(new Color(66, 244, 232));
             await ReplyAsync("", embed: embed);
         }
@@ -76,8 +76,8 @@ namespace Rick.Modules
         public async Task LogJoinsAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].JoinLogs)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].JoinLogs)
             {
                 Log.EnableJoinLogging();
                 gldConfig.JoinLogs = true;
@@ -89,16 +89,16 @@ namespace Rick.Modules
                 gldConfig.JoinLogs = false;
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Leaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
         public async Task LogLeavesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].LeaveLogs)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].LeaveLogs)
             {
                 gldConfig.LeaveLogs = true;
                 Log.EnableLeaveLogging();
@@ -110,16 +110,16 @@ namespace Rick.Modules
                 Log.DisableLeaveLogging();
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Name"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
         public async Task LogNameChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].NameChangesLogged)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged)
             {
                 gldConfig.NameChangesLogged = true;
                 Log.EnableNameChangeLogging();
@@ -131,16 +131,16 @@ namespace Rick.Modules
                 Log.DisableNameChangeLogging();
                 await ReplyAsync(":skull_crossbones:  No longer logging username changes.");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Nick"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
         public async Task LogNickChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].NickChangesLogged)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged)
             {
                 gldConfig.NickChangesLogged = true;
                 Log.EnableNickChangeLogging();
@@ -152,16 +152,16 @@ namespace Rick.Modules
                 Log.DisableNickChangeLogging();
                 await ReplyAsync(":skull_crossbones:   No longer logging nickname changes.");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Bans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
         public async Task BanLogAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].UserBannedLogged)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged)
             {
                 gldConfig.UserBannedLogged = true;
                 await ReplyAsync(":gear:   Now logging bans.");
@@ -171,16 +171,16 @@ namespace Rick.Modules
                 gldConfig.UserBannedLogged = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging bans.");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("AutoRespond"), Summary("Normal Command"), Remarks("Autoresponds to certain words")]
         public async Task AutoRespondAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
-            if (!GuildModel.GuildConfigs[Guild.Id].AutoRespond)
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildHandler.GuildConfigs[Guild.Id].AutoRespond)
             {
                 gldConfig.AutoRespond = true;
                 Log.EnableAutoRespond();
@@ -192,8 +192,8 @@ namespace Rick.Modules
                 Log.DisableAutoRespond();
                 await ReplyAsync(":skull_crossbones: Auto respond have been disabled!");
             }
-            GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
@@ -201,35 +201,35 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var embed = new EmbedBuilder();
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             switch (Prop)
             {
                 case ListProperty.Add:
                     gldConfig.RequiredChannelNames.Add(channel.Name);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Channel **{channel.Name}** has been added to RequiredChannel Attribute.");
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     break;
 
                 case ListProperty.Remove:
                     gldConfig.RequiredChannelNames.Remove(channel.Name);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Channel **{channel.Name}** has been removed from RequiredChannel Attribute.");
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     break;
 
                 case ListProperty.AddId:
                     gldConfig.RequiredRoleIDs.Add(channel.Id);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Channel **{channel.Id}** has been added to RequiredChannel Attribute.");
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     break;
 
                 case ListProperty.RemoveId:
                     gldConfig.RequiredRoleIDs.Remove(channel.Id);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Channel **{channel.Id}** has been removed from RequiredChannel Attribute.");
-                    await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     break;
             }
         }
@@ -238,22 +238,22 @@ namespace Rick.Modules
         public async Task RoleAsync(ListProperty Prop, IRole Role)
         {
             var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildModel.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             switch (Prop)
             {
                 case ListProperty.AddId:
                     gldConfig.RequiredRoleIDs.Add(Role.Id);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Role **{Role.Id}** has been added to RequiredRoleIDs Attribute");
                     break;
 
                 case ListProperty.RemoveId:
                     gldConfig.RequiredRoleIDs.Remove(Role.Id);
-                    GuildModel.GuildConfigs[Context.Guild.Id] = gldConfig;
+                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await ReplyAsync($"Role **{Role.Id}** has been removed to RequiredRoleIDs Attribute");
                     break;
             }
-            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
     }
 }
