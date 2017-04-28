@@ -32,8 +32,8 @@ namespace Rick.Modules
                 var embed = new EmbedBuilder()
                     .WithAuthor(x =>
                     {
-                        x.Name = Context.User.Username;
-                        x.IconUrl = Context.User.GetAvatarUrl();
+                        x.Name = user.Username;
+                        x.IconUrl = user.GetAvatarUrl();
                     })
                 .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}")
                 .WithColor(new Color(232, 226, 53))

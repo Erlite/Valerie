@@ -269,7 +269,7 @@ namespace Rick.Modules
         }
 
         [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
-        public async Task SetAfkAsync(ListProperty prop, [Remainder] string msg)
+        public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -277,14 +277,14 @@ namespace Rick.Modules
 
             switch (prop)
             {
-                case ListProperty.Add:
+                case GlobalEnums.Add:
                     List.Add(Context.User.Id, msg);
                     GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
                     break;
 
-                case ListProperty.Remove:
+                case GlobalEnums.Remove:
                     List.Remove(Context.User.Id);
                     GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
                     await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
