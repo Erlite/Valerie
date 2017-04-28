@@ -217,7 +217,6 @@
     <Compile Include="Classes\ScriptGlobals.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
-    <Compile Include="Handlers\GiftsHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
     <Compile Include="Interfaces\IGuildInterface.cs" />
     <Compile Include="Models\BotModel.cs" />
@@ -232,7 +231,6 @@
     <Compile Include="Modules\TagModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
-    <Compile Include="Services\GiftService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\MethodService.cs" />
   </ItemGroup>

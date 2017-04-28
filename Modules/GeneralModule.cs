@@ -91,9 +91,10 @@ namespace Rick.Modules
             var grl = grp as SocketRole;
             var gls = gld as SocketGuild;
 
-            var embed = new EmbedBuilder();
-            embed.Title = "Role";
-
+            var embed = new EmbedBuilder()
+            {
+                Title = "Role"
+            };
             embed.AddField(x =>
             {
                 x.IsInline = true;
@@ -228,15 +229,16 @@ namespace Rick.Modules
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var obj = JObject.Parse(jsonResponse);
 
-                var embed = new EmbedBuilder();
-                embed.Author = new EmbedAuthorBuilder()
+                var embed = new EmbedBuilder()
                 {
-                    Name = $"{Context.User.Username} searched for {keywords}",
-                    IconUrl = Context.User.GetAvatarUrl()
+                    Author = new EmbedAuthorBuilder()
+                    {
+                        Name = $"{Context.User.Username} searched for {keywords}",
+                        IconUrl = Context.User.GetAvatarUrl()
+                    },
+                    ImageUrl = obj["data"]["image_original_url"].ToString(),
+                    Color = new Color(153, 30, 87)
                 };
-                embed.ImageUrl = obj["data"]["image_original_url"].ToString();
-                embed.Color = new Color(153, 30, 87);
-
                 await ReplyAsync("", false, embed);
             }
         }
@@ -615,8 +617,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
-            int karma;
-            karmalist.TryGetValue(Context.User.Id, out karma);
+            karmalist.TryGetValue(Context.User.Id, out int karma);
             if (karma <= 0)
                 karma = 0;
             var embed = new EmbedBuilder()
@@ -629,18 +630,18 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("TopKarma"), Summary("Normal Command"), Remarks("Shows users with top Karma")]
+        [Command("Top"), Summary("Normal Command"), Remarks("Shows users with top Karma")]
         public async Task TopAsync()
         {
             var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(11);
 
-            await ReplyAsync(String.Join("\n", filter.Select(async x => $"{await Context.Guild.GetUserAsync(x.Key)} with {x.Value} karma")));
-            foreach(var val in filter)
-            {
-                await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
-            }
+            await ReplyAsync(String.Join("\n", filter.Select(async x => $"{(await Context.Guild.GetUserAsync(x.Key)as SocketGuildUser).Username} with {x.Value} karma")));
+            //foreach(var val in filter)
+            //{
+            //    await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
+            //}
         }
     }
 }
