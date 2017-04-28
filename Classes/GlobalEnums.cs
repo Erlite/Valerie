@@ -1,10 +1,12 @@
 ﻿namespace Rick.Classes
 {
-    public enum ListProperty
+    public enum GlobalEnums
     {
         Add,
         Remove,
         AddId,
-        RemoveId
+        RemoveId,
+        TagName,
+        TagResponse
     }
 }
