@@ -19,7 +19,6 @@ namespace Rick.Interfaces
         List<ulong> RequiredChannelIDs { get; set; }
         List<string> RequiredChannelNames { get; set; }
         Dictionary<string, string> Tags { get; set; }
-        Dictionary<string, string> Responses { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
         Dictionary<ulong, int> Karma { get; set; }
     }

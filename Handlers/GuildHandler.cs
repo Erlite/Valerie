@@ -58,9 +58,6 @@ namespace Rick.Handlers
         [JsonProperty("Tags")]
         public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string>();
 
-        [JsonProperty("Responses")]
-        public Dictionary<string, string> Responses { get; set; } = new Dictionary<string, string>();
-
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
 

@@ -59,16 +59,6 @@ namespace Rick.Services
             client.GuildMemberUpdated -= NickChangeAsync;
         }
 
-        public void EnableAutoRespond()
-        {
-            client.MessageReceived += MessageReceivedAsync;
-        }
-
-        public void DisableAutoRespond()
-        {
-            client.MessageReceived -= MessageReceivedAsync;
-        }
-
         public void EnableLatencyMonitor()
         {
             client.LatencyUpdated += LatencyUpdateAsync;
@@ -144,22 +134,6 @@ namespace Rick.Services
                         : UserStatus.Online;
 
             await client.SetStatusAsync(newStatus);
-        }
-
-        private async Task MessageReceivedAsync(SocketMessage msg)
-        {
-            if (msg.Author.IsBot) return;
-            var SocChan = msg.Channel as SocketGuildChannel;
-            var Guild = SocChan.Guild;
-            if (GuildHandler.GuildConfigs[Guild.Id].AutoRespond)
-            {
-                var GetResponses = GuildHandler.GuildConfigs[Guild.Id].Responses;
-                var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
-                if (msg.Content.Contains(hasValue.Key))
-                {
-                    await msg.Channel.SendMessageAsync(hasValue.Value);
-                }
-            }
         }
 
         public async static Task CreateGuildConfigAsync(SocketGuild Guild)

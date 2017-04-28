@@ -19,7 +19,6 @@ namespace Rick.Modules
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-
         public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
@@ -228,7 +227,7 @@ namespace Rick.Modules
         }
 
         [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
-        public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Sorry, I'm too dumb to use an embed command!")
+        public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Idk how to use Embed Command")
         {
             await Context.Message.DeleteAsync();
             var embed = new EmbedBuilder()

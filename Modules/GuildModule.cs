@@ -175,27 +175,6 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("AutoRespond"), Summary("Normal Command"), Remarks("Autoresponds to certain words")]
-        public async Task AutoRespondAsync()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].AutoRespond)
-            {
-                gldConfig.AutoRespond = true;
-                Log.EnableAutoRespond();
-                await ReplyAsync(":gear: I will now auto respond to certain messages!");
-            }
-            else
-            {
-                gldConfig.AutoRespond = false;
-                Log.DisableAutoRespond();
-                await ReplyAsync(":skull_crossbones: Auto respond have been disabled!");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-        }
-
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
         public async Task ChannelAsync(ListProperty Prop, ITextChannel channel)
         {
