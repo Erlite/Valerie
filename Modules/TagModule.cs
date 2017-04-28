@@ -18,37 +18,29 @@ namespace Rick.Modules
             Interactive = Inter;
         }
 
-        [Command("Create", RunMode = RunMode.Async), Summary("Tag Create"), Remarks("Creates a tag for you")]
-        public async Task CreateTagAsync()
+        [Command("Create"), Summary("Tag Create TagName Tag Response"), Remarks("Creates a tag for you")]
+        public async Task CreateTagAsync(string name, [Remainder] string content)
         {
-            await ReplyAsync("**Please enter the name of your tag** _'cancel' to cancel_");
-            var TagName = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(20));
-            if (TagName.Content == "cancel") return;
-            string name = TagName.Content;
-
-            await ReplyAsync("**Please enter the response of your tag** _'cancel' to cancel_");
-            var TagResponse = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(20));
-            if (TagResponse.Content == "cancel") return;
-            string content = TagResponse.Content;
-
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var resp = gldConfig.Responses;
-            if (resp.ContainsKey(name))
+            var tags = gldConfig.Tags;
+            if (tags.ContainsKey(name))
                 await ReplyAsync("A response with the exact name already exist! :skull_crossbones:");
-            resp.Add(name, content);
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            else
+            {
+                tags.Add(name, content);
+                GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
 
-            var embed = new EmbedBuilder()
-                .WithTitle(name)
-                .WithDescription(content)
-                .WithColor(new Color(255, 255, 255))
-                .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = $"New Tag added by {Context.User.Username}"; });
-                GuildHandler.GuildConfigs[Context.Guild.Id].Tags.Add(name, content);
+                var embed = new EmbedBuilder()
+                    .WithTitle(name)
+                    .WithDescription(content)
+                    .WithColor(new Color(255, 255, 255))
+                    .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = $"New Tag added by {Context.User.Username}"; });
                 await ReplyAsync("", embed: embed);
+            }
         }
 
-        [Command("Execute"), Summary("Executes a tag"), Remarks("Tag Execute TagName")]
+        [Command("Execute"), Summary("Tag Execute TagName"), Remarks("Executes a tag")]        
         public async Task ExecuteTagAsync(string TagName)
         {
             string content;
@@ -63,11 +55,20 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Delete"), Summary("Delete an existing tag")]
+        [Command("Delete"), Summary("Tag Delete TagName"), Remarks("Delete an existing tag")]
         public async Task Delete(string TagName)
         {
-            var tagExists = GuildHandler.GuildConfigs[Context.Guild.Id].Tags.Remove(TagName);
-            await ReplyAsync($"{TagName} has been removed!");
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var tags = gldConfig.Tags;
+            if (!tags.ContainsKey(TagName))
+                await ReplyAsync("Tag with **{TagName}** doesn't exist!");
+            else
+            {
+                tags.Remove(TagName);
+                GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                await ReplyAsync($"Tag with **{TagName}** name has been removed!");
+            }
         }
     }
 }

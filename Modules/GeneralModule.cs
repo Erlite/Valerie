@@ -268,28 +268,6 @@ namespace Rick.Modules
 
         }
 
-        [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
-        public async Task ResponseAsync(string name, [Remainder]string response)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new NullReferenceException(":skull: Response name can't be empty!");
-            if (string.IsNullOrWhiteSpace(response))
-                throw new NullReferenceException(":skull: Response content can't be empty!");
-
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var resp = gldConfig.Responses;
-            if (resp.ContainsKey(name))
-                await ReplyAsync("A response with the exact name already exist! :skull_crossbones:");
-            resp.Add(name, response);
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            var embed = new EmbedBuilder()
-                .WithAuthor(x => { x.Name = "New response added!"; x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl(); })
-                .WithDescription($"**Response Trigger:** {name}\n**Response: **{response}")
-                .WithColor(new Color(109, 242, 122));
-            await ReplyAsync("", embed: embed);
-        }
-
         [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
         public async Task SetAfkAsync(ListProperty prop, [Remainder] string msg)
         {

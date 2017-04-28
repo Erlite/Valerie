@@ -5,7 +5,6 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
 using Rick.Handlers;
-using Rick.Handlers;
 using Rick.Attributes;
 
 namespace Rick.Modules
@@ -88,6 +87,24 @@ namespace Rick.Modules
             await user.Guild.AddBanAsync(user);
         }
 
+        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
+        public async Task MuteAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
+        {
+            if (user == null)
+                throw new NullReferenceException("You must mention a user you want to mute!");
+
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
+            var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
+            gldConfig.CaseNumber += 1;
+
+            if (GetMuteRole == null)
+                throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
+
+            await user.AddRoleAsync(GetMuteRole);
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await ReplyAsync("User has been added to Mute Role!");
+        }
+
         [Command("Delete"), Summary("Delete 10"), Remarks("Deletes X amount of messages"), Alias("Del")]
         [RequireBotPermission(GuildPermission.ManageMessages), RequireContext(ContextType.Guild)]
         public async Task DeleteAsync(int range = 0)
@@ -99,25 +116,6 @@ namespace Rick.Modules
             var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
             await Task.Delay(5000);
             await msg.DeleteAsync();
-        }
-
-        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
-        public async Task MuteAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
-        {
-            if (user == null)
-                throw new NullReferenceException("You must mention a user you want to mute!");
-            
-            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
-            var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
-            gldConfig.CaseNumber += 1;
-
-            if (GetMuteRole == null)
-                throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
-
-            await user.AddRoleAsync(GetMuteRole);
-            GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            await ReplyAsync("User has been added to Mute Role!");
         }
 
     }
