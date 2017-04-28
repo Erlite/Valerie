@@ -212,9 +212,10 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="Classes\ListProperty.cs" />
+    <Compile Include="Classes\GlobalEnums.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Classes\ScriptGlobals.cs" />
+    <Compile Include="Classes\Tags.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
