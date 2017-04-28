@@ -11,7 +11,6 @@ using Rick.Handlers;
 using System.Diagnostics;
 using Discord;
 using Discord.WebSocket;
-using Discord.Commands;
 
 namespace Rick.Services
 {

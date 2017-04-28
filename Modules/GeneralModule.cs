@@ -307,19 +307,17 @@ namespace Rick.Modules
             {
                 case GlobalEnums.Add:
                     List.Add(Context.User.Id, msg);
-                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
                     break;
 
                 case GlobalEnums.Remove:
                     List.Remove(Context.User.Id);
-                    GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-                    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
                     break;
-
             }
+
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
     }
 }
