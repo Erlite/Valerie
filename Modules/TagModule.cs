@@ -100,6 +100,14 @@ namespace Rick.Modules
 
         }
 
+        [Command("List"), Summary("Tag List"), Remarks("Lists all tags")]
+        public async Task ListTags()
+        {
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var gldTags = gldConfig.TagsList;
+            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
+        }
+
         public async Task RemoveTag(Tags tag)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
