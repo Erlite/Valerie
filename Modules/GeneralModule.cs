@@ -639,7 +639,7 @@ namespace Rick.Modules
             await ReplyAsync(String.Join("\n", filter.Select(async x => $"{await Context.Guild.GetUserAsync(x.Key)} with {x.Value} karma")));
             foreach(var val in filter)
             {
-                //await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
+                await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
             }
         }
     }
