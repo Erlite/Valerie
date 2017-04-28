@@ -12,6 +12,7 @@ using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -226,6 +227,33 @@ namespace Rick.Modules
 
         }
 
+        [Command("Ping"), Summary("Ping Google.com"), Remarks("Pings a website")]
+        public async Task PwnedAsync(string search)
+        {
+            try
+            {
+                using (var http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Clear();
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("Accept", "application/json");
+                    var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
+                    var time = get["time"].ToString();
+                    var embed = new EmbedBuilder()
+                        .WithAuthor(x =>
+                        {
+                            x.Name = Context.Client.CurrentUser.Username;
+                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                        })
+                        .WithColor(new Color(102, 255, 255))
+                        .WithDescription($"Ping Result: **{time} ms**");
+                    await ReplyAsync("", embed: embed);
+                }
+            }
+            catch (Exception e)
+            { await ReplyAsync(e.Message); }
+        }
+
         [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
         public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Idk how to use Embed Command")
         {
@@ -292,33 +320,6 @@ namespace Rick.Modules
                     break;
 
             }
-        }
-
-        [Command("Ping"), Summary("Ping Google.com"), Remarks("Pings a website")]
-        public async Task PwnedAsync(string search)
-        {
-            try
-            {
-                using (var http = new HttpClient())
-                {
-                    http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
-                    http.DefaultRequestHeaders.Add("Accept", "application/json");
-                    var get = JObject.Parse( await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
-                    var time = get["time"].ToString();
-                    var embed = new EmbedBuilder()
-                        .WithAuthor(x =>
-                        {
-                            x.Name = Context.Client.CurrentUser.Username;
-                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                        })
-                        .WithColor(new Color(102, 255, 255))
-                        .WithDescription($"Ping Result: **{time} ms**");
-                    await ReplyAsync("", embed: embed);
-                }
-            }
-            catch (Exception e)
-            { await ReplyAsync(e.Message); }
         }
     }
 }

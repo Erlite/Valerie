@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using Discord.Addons.InteractiveCommands;
 using Rick.Handlers;
 using Rick.Attributes;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -29,20 +30,9 @@ namespace Rick.Modules
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = user.Username;
-                        x.IconUrl = user.GetAvatarUrl();
-                    })
-                .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}")
-                .WithColor(new Color(232, 226, 53))
-                .WithFooter(x =>
-                {
-                    x.Text = $"Kicked by {Context.User}";
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                });
-                await ReplyAsync("", embed: embed);
+                var emb = MethodService.AdminEmbed(user, 232, 226, 53, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/raw");
+                var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
+                await ModChannel.SendMessageAsync("", embed: emb);
             }
             else
                 await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
@@ -62,22 +52,9 @@ namespace Rick.Modules
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = $"{user.Username} Banned from {user.Guild.Name}";
-                        x.IconUrl = user.GetAvatarUrl();
-                    })
-                    .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}")
-                    .WithColor(new Color(206, 47, 47))
-                    .WithFooter(x =>
-                    {
-                        x.Text = $"Banned by {Context.User}";
-                        x.IconUrl = Context.User.GetAvatarUrl();
-                    })
-                    .WithImageUrl("https://i.redd.it/psv0ndgiqrny.gif");
+                var emb = MethodService.AdminEmbed(user, 206, 46, 47, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://i.redd.it/psv0ndgiqrny.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
-                await ModChannel.SendMessageAsync("", embed: embed);
+                await ModChannel.SendMessageAsync("", embed: emb);
             }
             else
                 await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
@@ -114,7 +91,7 @@ namespace Rick.Modules
             var messageList = await Context.Channel.GetMessagesAsync(range).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
             var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
-            await Task.Delay(5000);
+            await Task.Delay(3000);
             await msg.DeleteAsync();
         }
 

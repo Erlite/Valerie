@@ -9,6 +9,9 @@ using System.Reflection;
 using System.Net;
 using Rick.Handlers;
 using System.Diagnostics;
+using Discord;
+using Discord.WebSocket;
+using Discord.Commands;
 
 namespace Rick.Services
 {
@@ -108,6 +111,26 @@ namespace Rick.Services
             }
             else
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
+        }
+
+        public static EmbedBuilder AdminEmbed(IUser user, int Color1, int Color2, int Color3, string Mod, string ModUrl, string Reason, string ThumbUrl)
+        {
+            var gld = user as SocketGuildUser;
+            var gldConfig = GuildHandler.GuildConfigs[gld.Guild.Id];
+            
+            return new EmbedBuilder()
+                .WithAuthor(x =>
+                {
+                    x.Name = $"{Mod}";
+                    x.IconUrl = ModUrl;
+                })
+                .WithDescription($"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Mod}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}")
+                .WithImageUrl(ThumbUrl)
+                .WithColor(new Color(Color1, Color2, Color3))
+                .WithFooter(x =>
+                {
+                    x.Text = $"Incident Date: {DateTime.Now.ToString()}";
+                });
         }
     }
 }
