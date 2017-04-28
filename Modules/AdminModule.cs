@@ -101,19 +101,6 @@ namespace Rick.Modules
             await msg.DeleteAsync();
         }
 
-        [Command("Gift"), Summary("Gift 50"), Remarks("Gifts everyone x amount of XP")]
-        public async Task Gift(double points)
-        {
-            var guild = Context.Guild;
-            var configs = await GiftsHandler.GetAll();
-            uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
-            foreach (var config in configs)
-            {
-                config.GivePoints(Context.Guild.Id, givePoints);
-            }
-            await ReplyAsync($"Gifted {points} XP to {configs.Count} users.");
-        }
-
         [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
         public async Task MuteAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
@@ -122,11 +109,14 @@ namespace Rick.Modules
             
             var gldConfig = GuildModel.GuildConfigs[user.Guild.Id];
             var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
+            gldConfig.CaseNumber += 1;
 
             if (GetMuteRole == null)
                 throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
 
             await user.AddRoleAsync(GetMuteRole);
+            GuildModel.GuildConfigs[user.Guild.Id] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }
 

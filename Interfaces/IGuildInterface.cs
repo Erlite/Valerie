@@ -21,6 +21,6 @@ namespace Rick.Interfaces
         Dictionary<string, string> Tags { get; set; }
         Dictionary<string, string> Responses { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
-        Dictionary<ulong, string> Karma { get; set; }
+        Dictionary<ulong, int> Karma { get; set; }
     }
 }

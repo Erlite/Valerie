@@ -235,5 +235,15 @@ namespace Rick.Modules
             await ReplyAsync($"Added {import}");
             await BotModel.SaveAsync(BotModel.configPath, BotModel.BotConfig);
         }
+
+        [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]
+        public async Task StopAsync()
+        {
+            var client = Context.Client as DiscordSocketClient;
+            await client.StopAsync();
+            await Task.Delay(5000);
+            await client.StartAsync();
+            await ReplyAsync("Restarted!");
+        }
     }
 }

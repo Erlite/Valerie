@@ -197,7 +197,7 @@ namespace Rick.Modules
         }
 
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
-        public async Task ChannelAsync(ListProperty Prop, ITextChannel channel = null)
+        public async Task ChannelAsync(ListProperty Prop, ITextChannel channel)
         {
             var Guild = Context.Guild as SocketGuild;
             var embed = new EmbedBuilder();

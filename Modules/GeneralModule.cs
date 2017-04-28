@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Discord.WebSocket;
 using System.Diagnostics;
-using Rick.Handlers;
 using System.Collections.Generic;
 using Discord.Addons.InteractiveCommands;
 using AngleSharp;
@@ -439,30 +438,6 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Gift"), Summary("Gift @Username 10"), Remarks("Gifts user X amount of monei"), Cooldown(60)]
-        public async Task GiftAsync(IGuildUser user, double points)
-        {
-            if (user.Id == Context.Client.CurrentUser.Id) return;
-            if (user == Context.User)
-                await ReplyAsync("Can't gift yourself nub");
-            else
-            {
-                var config = await new GiftsHandler(user.Id).Maintain<GiftsHandler>();
-                uint givePoints = points > uint.MaxValue ? uint.MaxValue : (uint)points;
-                config.GivePoints(user.Guild.Id, givePoints);
-                await ReplyAsync($"Gifted {givePoints} XP to {user.Username}");
-            }
-        }
-
-        [Command("Top"), Summary("Normal Command"), Remarks("Shows the top 10 rich people")]
-        public async Task WealthAsync()
-        {
-            var configs = await GiftsHandler.GetAll();
-            var filtered = configs.Where(x => x.XP.ContainsKey(Context.Guild.Id)).OrderByDescending(x => x.XP[Context.Guild.Id]).Take(11);
-            await ReplyAsync($"Showing top 10 wealthiest people\n\n" +
-                            string.Join("\n", filtered.Select(x => $"{Format.Bold(Context.Guild.GetUserAsync(x.UID).ToString() ?? "Not found")} with `{x.XP[Context.Guild.Id]}` XP")));
-        }
-
         [Command("Response"), Summary("Normal Command"), Remarks("Uses Interactiveactive command to create a new response for you")]
         public async Task ResponseAsync(string name, [Remainder]string response)
         {
@@ -610,6 +585,62 @@ namespace Rick.Modules
             }
             catch (Exception e)
             { await ReplyAsync(e.Message); }
+        }
+
+        [Command("Karma"), Summary("Karma @Username"), Remarks("Gives another user karma")]
+        public async Task KarmaAsync(IGuildUser user)
+        {
+            if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
+
+            var gldConfig = GuildModel.GuildConfigs[user.GuildId];
+            var karmalist = gldConfig.Karma;
+            if (!karmalist.ContainsKey(user.Id))
+            {
+                karmalist.Add(user.Id, 1);
+                GuildModel.GuildConfigs[user.GuildId] = gldConfig;
+                await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+                await ReplyAsync($"Added {user.Username} to Karma List and gave 1 Karma to {user.Username}");
+            }
+            int getKarma = karmalist[user.Id];
+            getKarma++;
+            karmalist[user.Id] = getKarma;
+
+            GuildModel.GuildConfigs[user.GuildId] = gldConfig;
+            await GuildModel.SaveAsync(GuildModel.configPath, GuildModel.GuildConfigs);
+            await ReplyAsync($"Gave 1 Karma to {user.Username}");
+        }
+
+        [Command("Karma"), Summary("Karma"), Remarks("Shows how much Karma you have")]
+        public async Task GetKarmaAsync()
+        {
+            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var karmalist = gldConfig.Karma;
+            int karma;
+            karmalist.TryGetValue(Context.User.Id, out karma);
+            if (karma <= 0)
+                karma = 0;
+            var embed = new EmbedBuilder()
+                .WithAuthor(x =>
+                {
+                    x.Name = Context.User.Username;
+                    x.IconUrl = Context.User.GetAvatarUrl();
+                })
+                .WithDescription($"{Context.User.Username} has a total Karma of **{karma}**");
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("TopKarma"), Summary("Normal Command"), Remarks("Shows users with top Karma")]
+        public async Task TopAsync()
+        {
+            var gldConfig = GuildModel.GuildConfigs[Context.Guild.Id];
+            var karmalist = gldConfig.Karma;
+            var filter = karmalist.OrderByDescending(x => x.Value).Take(11);
+
+            await ReplyAsync(String.Join("\n", filter.Select(async x => $"{await Context.Guild.GetUserAsync(x.Key)} with {x.Value} karma")));
+            foreach(var val in filter)
+            {
+                //await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
+            }
         }
     }
 }

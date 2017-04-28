@@ -83,7 +83,7 @@ namespace Rick.Handlers
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotModel.BotConfig.DefaultPrefix}{Command.Name} {string.Join("", Command.Parameters.Select(x => x.Name))}";
+                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotModel.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}";
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
