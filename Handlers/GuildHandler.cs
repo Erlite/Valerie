@@ -72,10 +72,7 @@ namespace Rick.Handlers
         {
             if (File.Exists(path))
             {
-                return
-                    await
-                        Task.Run(() => JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(path))).
-                             ConfigureAwait(false);
+                return await Task.Run(() => JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(path)));
             }
             var newConfig = new Dictionary<ulong, T>();
             await SaveAsync(path, newConfig).ConfigureAwait(false);
