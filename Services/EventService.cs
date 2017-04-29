@@ -36,7 +36,7 @@ namespace Rick.Services
 
         public void DisableLeaveLogging()
         {
-            client.UserLeft += UserLeftAsync;
+            client.UserLeft -= UserLeftAsync;
         }
 
         public void EnableNameChangeLogging()
@@ -46,7 +46,7 @@ namespace Rick.Services
 
         public void DisableNameChangeLogging()
         {
-            client.UserUpdated += NameChangeAsync;
+            client.UserUpdated -= NameChangeAsync;
         }
 
         public void EnableNickChangeLogging()
