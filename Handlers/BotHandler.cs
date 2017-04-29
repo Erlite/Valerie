@@ -137,12 +137,6 @@ namespace Rick.Handlers
             return result;
         }
 
-        public void SaveFile()
-        {
-            var json = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(configPath, json);
-        }
-
         public static async Task SaveAsync(string path, IBotInterface botConfig)
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)));
     }
