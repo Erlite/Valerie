@@ -2,6 +2,8 @@
 
 Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.2. Rick likes to help out at times. Please don't bully Rick because Rick is old. Rick has over 60+ Commands. For full commands list read the docs.
 
+If you clone this project or fork it or like it, please do leave a star. It does help a lot! 
+
 [Add Rick to your server](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)
 
 > Current version = 13.7
