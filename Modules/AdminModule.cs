@@ -30,7 +30,7 @@ namespace Rick.Modules
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
-                var emb = MethodService.AdminEmbed(user, 232, 226, 53, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/raw");
+                var emb = EmbedService.AdminEmbed(user, 232, 226, 53, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/raw");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: emb);
             }
@@ -52,7 +52,7 @@ namespace Rick.Modules
             gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
-                var emb = MethodService.AdminEmbed(user, 206, 46, 47, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://i.redd.it/psv0ndgiqrny.gif");
+                var emb = EmbedService.AdminEmbed(user, 206, 46, 47, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://i.redd.it/psv0ndgiqrny.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: emb);
             }

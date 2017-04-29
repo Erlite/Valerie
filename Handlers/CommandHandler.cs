@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using Rick.Services;
-using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using System.IO;
 using System;

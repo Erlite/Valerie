@@ -67,7 +67,7 @@ namespace Rick.Modules
                 .WithDescription($"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
                 $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}\n**Auto Respond:** {GuildHandler.GuildConfigs[Guild.Id].AutoRespond}")
+                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}\n**Chatter Bot:** {GuildHandler.GuildConfigs[Guild.Id].ChatterBot}")
                 .WithColor(new Color(66, 244, 232));
             await ReplyAsync("", embed: embed);
         }

@@ -212,14 +212,6 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="ChatterBot\ChatterBot.cs" />
-    <Compile Include="ChatterBot\ChatterBotFactory.cs" />
-    <Compile Include="ChatterBot\ChatterBotSession.cs" />
-    <Compile Include="ChatterBot\ChatterBotThought.cs" />
-    <Compile Include="ChatterBot\ChatterBotType.cs" />
-    <Compile Include="ChatterBot\ChatterBotUtils.cs" />
-    <Compile Include="ChatterBot\Cleverbot.cs" />
-    <Compile Include="ChatterBot\Pandorabots.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Classes\ScriptGlobals.cs" />
@@ -242,6 +234,7 @@
     <Compile Include="Modules\TagModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
+    <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\MethodService.cs" />
   </ItemGroup>

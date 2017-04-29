@@ -12,6 +12,7 @@ using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -198,15 +199,9 @@ namespace Rick.Modules
             var UserCreated = usr.CreatedAt;
             var UserJoined = usr.JoinedAt;
             var UserPerms = usr.GuildPermissions;
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = usr.Username;
-                    x.IconUrl = usr.GetAvatarUrl();
-                })
-                .WithDescription($"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n" +
-                $"**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}")
-                .WithColor(new Color(255, 255, 255));
+
+            string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
+            var embed = EmbedService.BasicEmbed(user.Username, user.GetAvatarUrl(), descrption, 255, 255, 255);
             await ReplyAsync("", embed: embed);
         }
 
@@ -216,12 +211,8 @@ namespace Rick.Modules
             var sw = Stopwatch.StartNew();
             var client = Context.Client as DiscordSocketClient;
             var Gateway = client.Latency;
-            var embed = new EmbedBuilder()
-                .WithTitle("Ping Results")
-                .WithDescription($"**Gateway Latency:** { Gateway} ms" +
-                            $"\n**Response Latency:** {sw.ElapsedMilliseconds} ms" +
-                            $"\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms")
-                .WithColor(new Color(244, 66, 125));
+            string descrption = $"**Gateway Latency:** { Gateway} ms\n**Response Latency:** {sw.ElapsedMilliseconds} ms\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms";
+            var embed = EmbedService.BasicEmbed("Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), descrption, 244, 66, 125);
             await ReplyAsync("", embed: embed);
 
         }
@@ -238,14 +229,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
-                    var embed = new EmbedBuilder()
-                        .WithAuthor(x =>
-                        {
-                            x.Name = Context.Client.CurrentUser.Username;
-                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                        })
-                        .WithColor(new Color(102, 255, 255))
-                        .WithDescription($"Ping Result: **{time} ms**");
+                    var embed = EmbedService.BasicEmbed(Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), $"Ping Result: **{time} ms**", 102, 255, 255);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -267,15 +251,8 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = new EmbedBuilder()
-                .WithColor(new Color(255, 255, 255))
-                .WithAuthor(x =>
-                {
-                    x.Name = Context.User.Username;
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                })
-                .WithDescription($"Your unique UUID is: {id}");
-            await ReplyAsync("", false, embed);
+            var embed = EmbedService.BasicEmbed(Context.User.Username, Context.User.GetAvatarUrl(), $"Your unique UUID is: {id}", 255, 255, 255);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Coinflip"), Summary("Coinflip"), Remarks("Flips a coin")]
