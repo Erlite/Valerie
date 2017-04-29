@@ -42,42 +42,27 @@ namespace Rick.Handlers
         private async Task HandleCommandsAsync(SocketMessage msg)
         {
             var gld = (msg.Channel as SocketGuildChannel).Guild;
-            var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
-            var OwnerAfk = BotHandler.BotConfig.OwnerAfk;
-
-            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
-            using (StreamWriter file = new StreamWriter("Logs.txt", true))
-            {
-                await file.WriteLineAsync(log);
-            }
-
             var message = msg as SocketUserMessage;
 
-            string afkReason = null;
-            SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason) || OwnerAfk.TryGetValue(u.Id, out afkReason));
-            if (gldUser != null)
-                await message.Channel.SendMessageAsync(afkReason);
+            LogMessageAsync(message, gld);
+            AfkAsync(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
 
-            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || config.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildHandler.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
+            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildHandler.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
 
             var result = await cmds.ExecuteAsync(context, argPos, map, MultiMatchHandling.Best);
-
             var service = cmds.Search(context, argPos);
-
             CommandInfo Command = null;
 
             if (service.IsSuccess)
                 Command = service.Commands.FirstOrDefault().Command;
-
             if (result.IsSuccess)
                 return;
 
             string ErrorMsg = null;
-
             switch(result)
             {
                 case SearchResult search:
@@ -119,5 +104,23 @@ namespace Rick.Handlers
             else
                 await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
         }        
+
+        private async void LogMessageAsync(SocketUserMessage msg, SocketGuild gld)
+        {
+            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
+            using (StreamWriter file = new StreamWriter("Logs.txt", true))
+            {
+                await file.WriteLineAsync(log);
+            }
+        }
+
+        private async void AfkAsync(SocketUserMessage message, SocketGuild gld)
+        {
+            var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
+            string afkReason = null;
+            SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason) || BotHandler.BotConfig.OwnerAfk.TryGetValue(u.Id, out afkReason));
+            if (gldUser != null)
+                await message.Channel.SendMessageAsync(afkReason);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Discord.WebSocket;
 
 namespace Rick.Interfaces
 {
@@ -17,5 +18,6 @@ namespace Rick.Interfaces
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
         Dictionary<ulong, string> OwnerAfk { get; set; }
+        bool MentionDefaultPrefixEnabled(SocketUserMessage message, DiscordSocketClient client, ref int argPos);
     }
 }
