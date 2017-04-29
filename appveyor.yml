@@ -1,0 +1,28 @@
+version: 13.7.{build}
+
+# clone directory
+clone_folder: c:\projects\Rick
+
+configuration: Release
+platform: x64
+
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+
+build:
+  project: Rick.sln
+  verbosity: normal
+
+# scripts to run after build
+before_build:
+  - nuget restore
+after_build:
+  - cd c:\projects\Rick
+  - copy c:\projects\Rick\bin\Debug\Rick.exe c:\projects\Rick\Rick.exe
+artifacts:
+  - path: Rick.exe
+    name: Rick.exe
