@@ -20,6 +20,7 @@ build:
 # scripts to run after build
 before_build:
   - nuget restore
+  - nuget restore https://www.myget.org/F/discord-net/api/v3/index.json
 after_build:
   - cd c:\projects\Rick
   - copy c:\projects\Rick\bin\Debug\Rick.exe c:\projects\Rick\Rick.exe
