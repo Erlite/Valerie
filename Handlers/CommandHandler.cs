@@ -45,6 +45,7 @@ namespace Rick.Handlers
 
             LogMessageAsync(message, gld);
             AfkAsync(message, gld);
+            LevelUpAsync(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
@@ -112,6 +113,31 @@ namespace Rick.Handlers
             SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason) || BotHandler.BotConfig.OwnerAfk.TryGetValue(u.Id, out afkReason));
             if (gldUser != null)
                 await message.Channel.SendMessageAsync(afkReason);
+        }
+
+        private async void LevelUpAsync(SocketUserMessage message, SocketGuild gld)
+        {
+            if (message.Author.IsBot) return;
+
+            var Guilds = GuildHandler.GuildConfigs[gld.Id];
+            var karmalist = Guilds.Karma;
+            if (!karmalist.ContainsKey(message.Author.Id))
+            {
+                karmalist.Add(message.Author.Id, 1);
+                GuildHandler.GuildConfigs[gld.Id] = Guilds;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                ConsoleService.Log(message.Author.Username, $"Added to {gld.Name} Karma's list");
+            }
+            else
+            {
+                int getKarma = karmalist[message.Author.Id];
+                getKarma++;
+                karmalist[message.Author.Id] = getKarma;
+
+                GuildHandler.GuildConfigs[gld.Id] = Guilds;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                ConsoleService.Log(message.Author.Username, $"[{gld.Name} ]Got 1 Karma");
+            }
         }
     }
 }
