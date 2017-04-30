@@ -63,8 +63,13 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
             var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
-            getTag.TagUses++;
+            if (getTag == null)
+            {
+                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                return;
+            }
             await ReplyAsync(getTag.TagResponse);
+            getTag.TagUses++;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
