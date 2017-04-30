@@ -2,6 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
+using System.Linq;
 
 namespace Rick.Services
 {
@@ -54,6 +55,16 @@ namespace Rick.Services
         public void DisableNickChangeLogging()
         {
             client.GuildMemberUpdated -= NickChangeAsync;
+        }
+
+        public void EnableAutoRespond()
+        {
+            client.MessageReceived += AutoRespondAsync;
+        }
+
+        public void DisableAutoRespond()
+        {
+            client.MessageReceived -= AutoRespondAsync;
         }
 
         public void EnableLatencyMonitor()
@@ -122,6 +133,20 @@ namespace Rick.Services
             };
             var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
             await LogChannel.SendMessageAsync("", embed: embed);
+        }
+
+        private async Task AutoRespondAsync(SocketMessage msg)
+        {
+            var gld = msg.Channel as SocketGuildChannel;
+            var getGuild = GuildHandler.GuildConfigs[gld.Id];
+            if (msg.Author.IsBot || !getGuild.AutoRespond) return;
+
+            var GetResponses = GuildHandler.GuildConfigs[gld.Id].ResponseList;
+            var hasValue = GetResponses.FirstOrDefault(resp => msg.Content.Contains(resp.Key));
+            if (msg.Content.Contains(hasValue.Key))
+            {
+                await msg.Channel.SendMessageAsync(hasValue.Value);
+            }
         }
 
         private async Task LatencyUpdateAsync(int older, int newer)

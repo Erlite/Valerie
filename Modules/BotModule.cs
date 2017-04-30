@@ -10,7 +10,7 @@ using Rick.Handlers;
 
 namespace Rick.Modules
 {
-    [Group("Set"), RequireOwner, RequireContext(ContextType.Guild)]
+    [Group("Bot"), RequireOwner, RequireContext(ContextType.Guild)]
     public class BotModule : ModuleBase
     {
         private EventService Events;

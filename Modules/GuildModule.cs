@@ -67,7 +67,7 @@ namespace Rick.Modules
                 .WithDescription($"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
                 $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}\n**Chatter Bot:** {GuildHandler.GuildConfigs[Guild.Id].ChatterBot}")
+                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}\n**Chatter Bot:** {GuildHandler.GuildConfigs[Guild.Id].AutoRespond}")
                 .WithColor(new Color(66, 244, 232));
             await ReplyAsync("", embed: embed);
         }
@@ -170,6 +170,27 @@ namespace Rick.Modules
             {
                 gldConfig.UserBannedLogged = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging bans.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
+
+        [Command("Autorespond"), Summary("Normal Command"), Remarks("Toggles Autoresponding")]
+        public async Task AutoRespondAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.AutoRespond)
+            {
+                gldConfig.AutoRespond = true;
+                Log.EnableAutoRespond();
+                await ReplyAsync(":gear:  Autoresponding turned on!");
+            }
+            else
+            {
+                gldConfig.AutoRespond = false;
+                Log.DisableAutoRespond();
+                await ReplyAsync(":skull_crossbones:  Autoresponding turned off!");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);

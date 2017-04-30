@@ -15,12 +15,13 @@ namespace Rick.Interfaces
         bool NameChangesLogged { get; set; }
         bool NickChangesLogged { get; set; }
         bool UserBannedLogged { get; set; }
-        bool ChatterBot { get; set; }
+        bool AutoRespond { get; set; }
         List<ulong> RequiredRoleIDs { get; set;}
         List<ulong> RequiredChannelIDs { get; set; }
         List<string> RequiredChannelNames { get; set; }
         List<Tags> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
         Dictionary<ulong, int> Karma { get; set; }
+        Dictionary<string, string> ResponseList { get; set; }
     }
 }

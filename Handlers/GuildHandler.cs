@@ -44,8 +44,8 @@ namespace Rick.Handlers
         [JsonProperty("UserBanned")]
         public bool UserBannedLogged { get; set; }
 
-        [JsonProperty("ChatterBot")]
-        public bool ChatterBot { get; set; }
+        [JsonProperty("Autorespond")]
+        public bool AutoRespond { get; set; }
 
         [JsonProperty("RequiredRoleID")]
         public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
@@ -64,6 +64,9 @@ namespace Rick.Handlers
 
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
+
+        [JsonProperty("ResponseList")]
+        public Dictionary<string, string> ResponseList { get; set; } = new Dictionary<string, string>();
 
         public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));

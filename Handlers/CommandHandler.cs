@@ -86,18 +86,10 @@ namespace Rick.Handlers
         {
             if (BotHandler.BotConfig.DebugMode)
             {
-                var embed = new EmbedBuilder();
-                embed.Color = new Color(150, 16, 25);
-                embed.WithAuthor(x =>
-                {
-                    x.Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
-                    x.IconUrl = client.CurrentUser.GetAvatarUrl();
-                });
-                embed.Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
-                embed.WithFooter(x =>
-                {
-                    x.Text = result.Exception.StackTrace;
-                });
+                string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
+                string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
+                string StackTrace = result.Exception.StackTrace;
+                var embed = EmbedService.Embed(Classes.EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), null, Description, StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
