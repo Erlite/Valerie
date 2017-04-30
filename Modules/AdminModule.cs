@@ -7,6 +7,7 @@ using Discord.Addons.InteractiveCommands;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -20,64 +21,55 @@ namespace Rick.Modules
             inter = inte;
         }
 
-        [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
-        public async Task KickAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
+        [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild"), RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task KickAsync(SocketGuildUser user, [Remainder] string Reason = "No reason provided by the moderator!")
         {
-            if (user == null)
-                throw new NullReferenceException("Please mention the user you would like to kick!");
-
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
-            gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
-                var emb = EmbedService.AdminEmbed(user, 232, 226, 53, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/raw");
+                string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
+                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), null, description, $"Kick Date: { DateTime.Now.ToString()}", null, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
-                await ModChannel.SendMessageAsync("", embed: emb);
+                await ModChannel.SendMessageAsync("", embed: embed);
             }
             else
                 await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
 
+            await user.KickAsync();
+            gldConfig.CaseNumber += 1;
             GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            await user.KickAsync();
         }
 
-        [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
+        [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild"), RequireBotPermission(GuildPermission.KickMembers)]
         public async Task BanAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
-            if (user == null)
-                throw new NullReferenceException("Please mention the user you would like to kick!");
-
-            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
-            gldConfig.CaseNumber += 1;
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];            
             if (gldConfig.UserBannedLogged)
             {
-                var emb = EmbedService.AdminEmbed(user, 206, 46, 47, Context.User.Username, Context.User.GetAvatarUrl(), reason, "https://i.redd.it/psv0ndgiqrny.gif");
+                string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
+                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), null, description, $"Ban Date: { DateTime.Now.ToString()}", null, "https://i.redd.it/psv0ndgiqrny.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
-                await ModChannel.SendMessageAsync("", embed: emb);
+                await ModChannel.SendMessageAsync("", embed: embed);
             }
             else
                 await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
 
+            await user.Guild.AddBanAsync(user);
+            gldConfig.CaseNumber += 1;
             GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            await user.Guild.AddBanAsync(user);
         }
 
-        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
+        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user"), RequireBotPermission(GuildPermission.MuteMembers)]
         public async Task MuteAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
-            if (user == null)
-                throw new NullReferenceException("You must mention a user you want to mute!");
-
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
             var GetMuteRole = user.Guild.GetRole(gldConfig.MuteRoleId);
-            gldConfig.CaseNumber += 1;
-
             if (GetMuteRole == null)
                 throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
-
             await user.AddRoleAsync(GetMuteRole);
+            gldConfig.CaseNumber += 1;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }

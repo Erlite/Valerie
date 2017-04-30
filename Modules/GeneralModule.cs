@@ -201,7 +201,7 @@ namespace Rick.Modules
             var UserPerms = usr.GuildPermissions;
 
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
-            var embed = EmbedService.BasicEmbed(user.Username, user.GetAvatarUrl(), descrption, 255, 255, 255);
+            var embed = EmbedService.Embed(EmbedColors.White, user.Username, user.GetAvatarUrl(), null, descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -212,7 +212,7 @@ namespace Rick.Modules
             var client = Context.Client as DiscordSocketClient;
             var Gateway = client.Latency;
             string descrption = $"**Gateway Latency:** { Gateway} ms\n**Response Latency:** {sw.ElapsedMilliseconds} ms\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms";
-            var embed = EmbedService.BasicEmbed("Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), descrption, 244, 66, 125);
+            var embed = EmbedService.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), null, descrption);
             await ReplyAsync("", embed: embed);
 
         }
@@ -229,7 +229,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
-                    var embed = EmbedService.BasicEmbed(Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), $"Ping Result: **{time} ms**", 102, 255, 255);
+                    var embed = EmbedService.Embed(EmbedColors.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), null, $"Ping Result: **{time} ms**");
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -251,7 +251,7 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = EmbedService.BasicEmbed(Context.User.Username, Context.User.GetAvatarUrl(), $"Your unique UUID is: {id}", 255, 255, 255);
+            var embed = EmbedService.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), null, $"Your unique UUID is: {id}");
             await ReplyAsync("", embed: embed);
         }
 

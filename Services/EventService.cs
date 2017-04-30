@@ -2,9 +2,6 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
-using System.Linq;
-using System;
-using System.IO;
 
 namespace Rick.Services
 {
@@ -72,24 +69,21 @@ namespace Rick.Services
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
-            if (getGuild.JoinLogs)
+            if (!getGuild.JoinLogs) return;
+            var embed = new EmbedBuilder()
             {
-                var embed = new EmbedBuilder()
-                {
-                    Title = "=== User Joined ===",
-                    Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}",
-                    Color = new Color(83, 219, 207)
-                };
-                var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-                await LogChannel.SendMessageAsync("", embed: embed);
-            }
+                Title = "=== User Joined ===",
+                Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}",
+                Color = new Color(83, 219, 207)
+            };
+            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task UserLeftAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
-            if (getGuild.LeaveLogs)
-            {
+            if (!getGuild.LeaveLogs) return;
                 var embed = new EmbedBuilder()
                 {
                     Title = "=== User Left ===",
@@ -98,7 +92,6 @@ namespace Rick.Services
                 };
                 var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
                 await LogChannel.SendMessageAsync("", embed: embed);
-            }
         }
 
         private async Task NameChangeAsync(SocketUser author, SocketUser a)
@@ -106,33 +99,29 @@ namespace Rick.Services
             var SockGuildUser = author as SocketGuildUser;
             var Guild = SockGuildUser.Guild;
             var getGuild = GuildHandler.GuildConfigs[Guild.Id];
-            if (author.Username == a.Username) return;
-            if (getGuild.NameChangesLogged) { 
-                var embed = new EmbedBuilder()
-                {
-                    Title = "=== Username Change ====",
-                    Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}",
-                    Color = new Color(193, 60, 144)
-                };
-                var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-                await LogChannel.SendMessageAsync("", embed: embed); }
+            if (author.Username == a.Username || !getGuild.NameChangesLogged) return;
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== Username Change ====",
+                Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}",
+                Color = new Color(193, 60, 144)
+            };
+            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task NickChangeAsync(SocketGuildUser author, SocketGuildUser a)
         {
-            if (author.Nickname == a.Nickname) return;
             var getGuild = GuildHandler.GuildConfigs[author.Guild.Id];
-            if (getGuild.NickChangesLogged)
+            if (author.Nickname == a.Nickname || !getGuild.NickChangesLogged) return;
+            var embed = new EmbedBuilder()
             {
-                var embed = new EmbedBuilder()
-                {
-                    Title = "=== Nickname Change ====",
-                    Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}",
-                    Color = new Color(193, 60, 144)
-                };
-                var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-                await LogChannel.SendMessageAsync("", embed: embed);
-            }
+                Title = "=== Nickname Change ====",
+                Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}",
+                Color = new Color(193, 60, 144)
+            };
+            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
+            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task LatencyUpdateAsync(int older, int newer)

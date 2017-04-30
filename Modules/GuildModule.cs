@@ -9,7 +9,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
+    [Group("Guild"), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
         private GuildHandler model;
@@ -77,7 +77,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].JoinLogs)
+            if (!gldConfig.JoinLogs)
             {
                 Log.EnableJoinLogging();
                 gldConfig.JoinLogs = true;
@@ -98,7 +98,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].LeaveLogs)
+            if (!gldConfig.LeaveLogs)
             {
                 gldConfig.LeaveLogs = true;
                 Log.EnableLeaveLogging();
@@ -119,7 +119,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged)
+            if (!gldConfig.NameChangesLogged)
             {
                 gldConfig.NameChangesLogged = true;
                 Log.EnableNameChangeLogging();
@@ -140,7 +140,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged)
+            if (!gldConfig.NickChangesLogged)
             {
                 gldConfig.NickChangesLogged = true;
                 Log.EnableNickChangeLogging();
@@ -161,7 +161,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged)
+            if (!gldConfig.UserBannedLogged)
             {
                 gldConfig.UserBannedLogged = true;
                 await ReplyAsync(":gear:   Now logging bans.");

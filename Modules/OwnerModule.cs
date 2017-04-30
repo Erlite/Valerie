@@ -237,7 +237,7 @@ namespace Rick.Modules
         }
 
         [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]
-        public async Task StopAsync()
+        public async Task ReconnectAsync()
         {
             var client = Context.Client as DiscordSocketClient;
             await client.StopAsync();

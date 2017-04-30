@@ -39,9 +39,6 @@ namespace Rick.Handlers
         [JsonProperty("MashepeKey")]
         public string MashapeKey { get; set; }
 
-        [JsonProperty("MentionDefaultPrefix")]
-        public bool MentionDefaultPrefix { get; set; }
-
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
@@ -51,14 +48,17 @@ namespace Rick.Handlers
         [JsonProperty("AutoUpdate")]
         public bool AutoUpdate { get; set; }
 
+        [JsonProperty("MentionDefaultPrefix")]
+        public bool MentionDefaultPrefix { get; set; }
+
         [JsonProperty("Blacklist")]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
 
-        [JsonProperty("EvalImports")]
-        public List<string> EvalImports { get; set; } = new List<string>();
-
         [JsonProperty("OwnerAfk")]
         public Dictionary<ulong, string> OwnerAfk { get; set; } = new Dictionary<ulong, string>();
+
+        [JsonProperty("EvalImports")]
+        public List<string> EvalImports { get; set; } = new List<string>();
 
         public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
