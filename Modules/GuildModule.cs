@@ -9,7 +9,7 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Guild"), CheckBlacklist]
+    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
         private GuildHandler model;
