@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.IO;
-
-namespace Rick.Classes
+﻿namespace Rick.Classes
 {
     public class UsersProfile
     {
         public ulong UserID { get; set; }
-        public string ProfileMsg { get; set; } = "Who am I? What am I???";
+        public string ProfileMsg { get; set; }
         public double Karma { get; set; }
-        public double Level { get; set; }
-    
+        public double Level { get; set; }    
     }
 }

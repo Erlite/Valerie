@@ -21,6 +21,5 @@ namespace Rick.Interfaces
         List<Tags> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
         Dictionary<ulong, int> Karma { get; set; }
-        List<UsersProfile> KarmaDB { get; set; }
     }
 }

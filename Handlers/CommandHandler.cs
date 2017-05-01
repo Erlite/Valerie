@@ -21,6 +21,7 @@ namespace Rick.Handlers
         private GuildHandler model;
         private EventService Logger;
         private InteractiveService Interactive;
+        private ProfilesHandler Profiles;
 
         public CommandHandler(IDependencyMap _map)
         {
@@ -29,6 +30,7 @@ namespace Rick.Handlers
             model = _map.Get<GuildHandler>();
             Logger = _map.Get<EventService>();
             Interactive = _map.Get<InteractiveService>();
+            Profiles = _map.Get<ProfilesHandler>();
             client.MessageReceived += HandleCommandsAsync;
             cmds = new CommandService();
             map = _map;
@@ -47,6 +49,7 @@ namespace Rick.Handlers
             await LogMessageAsync(message, gld);
             await AfkAsync(message, gld);
             await LevelUpAsync(message, gld);
+            await Profiles.ProfileKarma(message, gld);
             //ProfileKarma(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
@@ -144,44 +147,5 @@ namespace Rick.Handlers
                 ConsoleService.Log(message.Author.Username, $"[{gld.Name}] Got 1 Karma");
             }
         }
-
-        //private async void ProfileKarma(SocketUserMessage message, SocketGuild gld)
-        //{
-        //    if (message.Author.IsBot) return;
-
-        //    var Guilds = GuildHandler.GuildConfigs[gld.Id];
-        //    var KarmaDB = Guilds.KarmaDB;
-        //    Random rand = new Random();
-        //    double XP = rand.Next(1, 5);
-
-        //    var Profile = new UsersProfile
-        //    {
-        //        UserID = message.Author.Id,
-        //        Karma = GetLevelXP(XP),
-        //        ProfileMsg = "",
-        //        Level = GetLevelFromXP(XP)
-        //    };
-        //    KarmaDB.Add(Profile);
-        //    GuildHandler.GuildConfigs[gld.Id] = Guilds;
-        //    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-
-        //}
-
-        //private double GetLevelXP(double XP)
-        //{
-        //    return 5 * (Math.Pow(2.0, XP)) + 50 * XP + 100;
-        //}
-
-        //private double GetLevelFromXP(double XP)
-        //{
-        //    int Level = 0;
-        //    while(XP >= GetLevelXP(Level))
-        //    {
-        //        XP -= GetLevelXP(Level);
-        //        Level += 1;
-        //    }
-        //    return Level;
-
-        //}
     }
 }

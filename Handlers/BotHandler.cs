@@ -124,8 +124,6 @@ namespace Rick.Handlers
                 default: result.MentionDefaultPrefix = false; break;
             }
 
-            string directory = Directory.GetCurrentDirectory();
-
             using (var configStream = File.Create(Path.Combine(Directory.GetCurrentDirectory(), configPath)))
             {
                 using (var configWriter = new StreamWriter(configStream))

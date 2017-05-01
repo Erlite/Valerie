@@ -240,6 +240,7 @@
     <Compile Include="Classes\Tags.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
+    <Compile Include="Handlers\ProfilesHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
     <Compile Include="Interfaces\IGuildInterface.cs" />
     <Compile Include="Handlers\BotHandler.cs" />

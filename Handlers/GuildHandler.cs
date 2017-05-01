@@ -62,9 +62,6 @@ namespace Rick.Handlers
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
 
-        [JsonProperty("KarmaDB")]
-        public List<UsersProfile> KarmaDB { get; set; } = new List<UsersProfile>();
-
         public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 

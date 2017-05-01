@@ -33,9 +33,10 @@ namespace Rick
             var map = new DependencyMap();
             map.Add(client);
             map.Add(new GuildHandler());
+            map.Add(new BotHandler());
+            map.Add(new ProfilesHandler());
             map.Add(new InteractiveService(client));
             map.Add(new EventService(client, GuildModel));
-            map.Add(new BotHandler());
 
             handler = new CommandHandler(map);
             await handler.ConfigureAsync();
@@ -46,6 +47,7 @@ namespace Rick
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
+            await ProfilesHandler.LoadDatabaseAsync();
 
             ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodService.ProgramUpdater();
