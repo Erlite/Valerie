@@ -44,9 +44,9 @@ namespace Rick.Handlers
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
 
-            LogMessageAsync(message, gld);
-            AfkAsync(message, gld);
-            LevelUpAsync(message, gld);
+            await LogMessageAsync(message, gld);
+            await AfkAsync(message, gld);
+            await LevelUpAsync(message, gld);
             //ProfileKarma(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
@@ -65,12 +65,15 @@ namespace Rick.Handlers
                 return;
 
             string ErrorMsg = null;
+            Embed embed = null;
             switch(result)
             {
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $":x: Failed to provide required parameters!\n**Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}";
+                    ErrorMsg = $"User failed to provide paramaters!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
+                        $"You can get more info on how to use {Command.Name} by using:\n{BotHandler.BotConfig.DefaultPrefix}Help {Command.Name}";
+                    embed = EmbedService.Embed(EmbedColors.Red, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), null, null, ErrorMsg);
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
@@ -82,7 +85,7 @@ namespace Rick.Handlers
             }
 
             if (ErrorMsg != null)
-                await context.Channel.SendMessageAsync(ErrorMsg);
+                await context.Channel.SendMessageAsync("", embed: embed);
         }
 
         private async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
@@ -92,14 +95,14 @@ namespace Rick.Handlers
                 string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
                 string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
                 string StackTrace = result.Exception.StackTrace;
-                var embed = EmbedService.Embed(EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), null, Description, StackTrace);
+                var embed = EmbedService.Embed(EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), null, null, Description, StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
                 await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
         }        
 
-        private async void LogMessageAsync(SocketUserMessage msg, SocketGuild gld)
+        private async Task LogMessageAsync(SocketUserMessage msg, SocketGuild gld)
         {
             string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
             using (StreamWriter file = new StreamWriter("Logs.txt", true))
@@ -108,7 +111,7 @@ namespace Rick.Handlers
             }
         }
 
-        private async void AfkAsync(SocketUserMessage message, SocketGuild gld)
+        private async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
         {
             var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
             string afkReason = null;
@@ -117,7 +120,7 @@ namespace Rick.Handlers
                 await message.Channel.SendMessageAsync(afkReason);
         }
 
-        private async void LevelUpAsync(SocketUserMessage message, SocketGuild gld)
+        private async Task LevelUpAsync(SocketUserMessage message, SocketGuild gld)
         {
             if (message.Author.IsBot) return;
 

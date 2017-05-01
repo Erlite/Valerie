@@ -28,7 +28,7 @@ namespace Rick.Modules
             if (gldConfig.UserBannedLogged)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
-                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), null, description, $"Kick Date: { DateTime.Now.ToString()}", null, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
+                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), null,  description, $"Kick Date: { DateTime.Now.ToString()}", null, "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: embed);
             }
