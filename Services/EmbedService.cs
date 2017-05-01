@@ -1,7 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
-using Rick.Handlers;
-using System;
 using Rick.Classes;
 
 namespace Rick.Services

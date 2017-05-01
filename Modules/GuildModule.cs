@@ -58,17 +58,11 @@ namespace Rick.Modules
         public async Task ListLogActionsAsync()
         {
             var Guild = Context.Guild as SocketGuild;
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.IconUrl = Guild.IconUrl;
-                    x.Name = $"{Guild.Name} || {Guild.Owner.Username}";
-                })
-                .WithDescription($"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n"  +
+            string Description = $"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n" +
                 $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}")
-                .WithColor(new Color(66, 244, 232));
+                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}";
+            var embed = EmbedService.Embed(EmbedColors.Teal, $"{Guild.Name} || {Guild.Owner.Username}", Guild.IconUrl, null, Description);
             await ReplyAsync("", embed: embed);
         }
 

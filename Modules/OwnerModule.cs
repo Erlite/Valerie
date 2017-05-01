@@ -151,7 +151,7 @@ namespace Rick.Modules
             var client = Context.Client as DiscordSocketClient;
             var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
             var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait...");
-            var _globals = new ScriptGlobals { client = Context.Client as DiscordSocketClient };
+            var _globals = new ScriptGlobals { Client = Context.Client as DiscordSocketClient };
             value = value.Trim('`');
             try
             {

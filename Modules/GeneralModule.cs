@@ -26,9 +26,13 @@ namespace Rick.Modules
         }
 
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
-        public async Task GuildInfoAsync()
+        public async Task GuildInfoAsync(ulong ID = 0)
         {
             var gld = Context.Guild;
+            var client = Context.Client as DiscordSocketClient;
+            if (ID != 0)
+                gld = client.GetGuild(ID);
+
             var GuildID = gld.Id;
             var GuildOwner = gld.GetOwnerAsync().GetAwaiter().GetResult().Mention;
             var GuildDefault = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention.ToUpper();
@@ -185,10 +189,8 @@ namespace Rick.Modules
         }
 
         [Command("Userinfo"), Summary("Userinfo @Username"), Remarks("Displays information about a User"), Alias("UI")]
-        public async Task UserInfoAsync(IUser user = null)
+        public async Task UserInfoAsync(IUser user)
         {
-            if (user == null)
-                throw new NullReferenceException("You must mention a user for me to display information!");
             var usr = user as IGuildUser ?? Context.Message.Author as IGuildUser;
             var userNick = usr.Nickname ?? usr.Nickname;
             var userDisc = usr.DiscriminatorValue;
@@ -294,6 +296,12 @@ namespace Rick.Modules
 
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
+
+        [Command("Rank")]
+        public async Task ProfileAsync()
+        {
+
         }
     }
 }

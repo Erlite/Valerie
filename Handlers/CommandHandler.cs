@@ -8,6 +8,7 @@ using Rick.Services;
 using Discord.Addons.InteractiveCommands;
 using System.IO;
 using System;
+using Rick.Classes;
 
 namespace Rick.Handlers
 {
@@ -46,6 +47,7 @@ namespace Rick.Handlers
             LogMessageAsync(message, gld);
             AfkAsync(message, gld);
             LevelUpAsync(message, gld);
+            //ProfileKarma(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
@@ -90,7 +92,7 @@ namespace Rick.Handlers
                 string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
                 string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
                 string StackTrace = result.Exception.StackTrace;
-                var embed = EmbedService.Embed(Classes.EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), null, Description, StackTrace);
+                var embed = EmbedService.Embed(EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), null, Description, StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
@@ -136,8 +138,47 @@ namespace Rick.Handlers
 
                 GuildHandler.GuildConfigs[gld.Id] = Guilds;
                 await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-                ConsoleService.Log(message.Author.Username, $"[{gld.Name} ]Got 1 Karma");
+                ConsoleService.Log(message.Author.Username, $"[{gld.Name}] Got 1 Karma");
             }
         }
+
+        //private async void ProfileKarma(SocketUserMessage message, SocketGuild gld)
+        //{
+        //    if (message.Author.IsBot) return;
+
+        //    var Guilds = GuildHandler.GuildConfigs[gld.Id];
+        //    var KarmaDB = Guilds.KarmaDB;
+        //    Random rand = new Random();
+        //    double XP = rand.Next(1, 5);
+
+        //    var Profile = new UsersProfile
+        //    {
+        //        UserID = message.Author.Id,
+        //        Karma = GetLevelXP(XP),
+        //        ProfileMsg = "",
+        //        Level = GetLevelFromXP(XP)
+        //    };
+        //    KarmaDB.Add(Profile);
+        //    GuildHandler.GuildConfigs[gld.Id] = Guilds;
+        //    await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+
+        //}
+
+        //private double GetLevelXP(double XP)
+        //{
+        //    return 5 * (Math.Pow(2.0, XP)) + 50 * XP + 100;
+        //}
+
+        //private double GetLevelFromXP(double XP)
+        //{
+        //    int Level = 0;
+        //    while(XP >= GetLevelXP(Level))
+        //    {
+        //        XP -= GetLevelXP(Level);
+        //        Level += 1;
+        //    }
+        //    return Level;
+
+        //}
     }
 }

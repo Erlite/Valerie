@@ -5,6 +5,8 @@ using System;
 using Discord.WebSocket;
 using System.Linq;
 using Rick.Handlers;
+using Rick.Services;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -44,13 +46,7 @@ namespace Rick.Modules
             karmalist.TryGetValue(Context.User.Id, out int karma);
             if (karma <= 0)
                 karma = 0;
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = Context.User.Username;
-                    x.IconUrl = Context.User.GetAvatarUrl();
-                })
-                .WithDescription($"{Context.User.Username} has a total Karma of **{karma}**");
+            var embed = EmbedService.Embed(Classes.EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), null, $"{Context.User.Username} has a total Karma of **{karma}**");
             await ReplyAsync("", embed: embed);
         }
 
@@ -61,11 +57,14 @@ namespace Rick.Modules
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(11);
 
-            await ReplyAsync(String.Join("\n", filter.Select(async x => $"{(await Context.Guild.GetUserAsync(x.Key) as SocketGuildUser).Username} with {x.Value} karma")));
-            //foreach(var val in filter)
-            //{
-            //    await ReplyAsync($"{await Context.Guild.GetUserAsync(val.Key)} with {val.Value} karma");
-            //}
+            StringBuilder Builder = new StringBuilder();
+            foreach (var val in filter)
+            {
+                var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
+                Builder.AppendLine($"**{user.Username}** with {val.Value} karma");
+            }
+            var embed = EmbedService.Embed(Classes.EmbedColors.Maroon, $"Top 10 Users", Context.Guild.IconUrl, null, Builder.ToString());
+            await ReplyAsync("", embed: embed);
         }
     }
 }
