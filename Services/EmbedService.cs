@@ -65,17 +65,19 @@ namespace Rick.Services
             return embed;
         }
 
-        public static  EmbedBuilder Embed(EmbedColors Color, string AuthorName = null, string AuthorPic = null, string Title = null, string Description = null, string FooterText = null, string FooterIcon = null, string ImageUrl = null)
+        public static  EmbedBuilder Embed(EmbedColors Color, string AuthorName = null, string AuthorPic = null, string AuthorUrl = null, string Title = null, string Description = null, string FooterText = null, string FooterIcon = null, string ImageUrl = null)
         {
             return Embed(Color)
                 .WithAuthor(x =>
                 {
                     x.Name = AuthorName;
                     x.IconUrl = AuthorPic;
+                    x.Url = AuthorUrl;
                 })
                 .WithTitle(Title)
                 .WithDescription(Description)
                 .WithImageUrl(ImageUrl)
+                .WithThumbnailUrl(ImageUrl)
                 .WithFooter(x =>
                 {
                     x.Text = FooterText;

@@ -247,6 +247,7 @@
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
+    <Compile Include="Modules\GithubModule.cs" />
     <Compile Include="Modules\GuildModule.cs" />
     <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="Modules\KarmaModule.cs" />
