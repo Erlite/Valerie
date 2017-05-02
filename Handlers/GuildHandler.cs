@@ -44,6 +44,9 @@ namespace Rick.Handlers
         [JsonProperty("UserBanned")]
         public bool UserBannedLogged { get; set; }
 
+        [JsonProperty("ChatKarma")]
+        public bool ChatKarma { get; set; }
+
         [JsonProperty("RequiredRoleID")]
         public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
 

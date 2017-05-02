@@ -111,5 +111,22 @@ namespace Rick.Services
             else
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
         }
+
+        public static double GiveXP(double xp)
+        {
+            return (Math.Pow(xp, 2) + 25 * xp) / 5;
+        }
+
+        public static double GetLevelFromXP(double XP)
+        {
+            double RemainingXP = XP;
+            double Level = 0;
+            while (RemainingXP >= GiveXP(XP))
+            {
+                RemainingXP -= GiveXP(XP);
+                Level += 1;
+            }
+            return Level;
+        }
     }
 }

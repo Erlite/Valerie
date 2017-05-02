@@ -2,7 +2,6 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
-using System.Linq;
 
 namespace Rick.Services
 {

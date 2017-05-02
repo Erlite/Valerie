@@ -21,7 +21,6 @@ namespace Rick.Handlers
         private GuildHandler model;
         private EventService Logger;
         private InteractiveService Interactive;
-        private ProfilesHandler Profiles;
 
         public CommandHandler(IDependencyMap _map)
         {
@@ -30,7 +29,6 @@ namespace Rick.Handlers
             model = _map.Get<GuildHandler>();
             Logger = _map.Get<EventService>();
             Interactive = _map.Get<InteractiveService>();
-            Profiles = _map.Get<ProfilesHandler>();
             client.MessageReceived += HandleCommandsAsync;
             cmds = new CommandService();
             map = _map;
@@ -48,9 +46,7 @@ namespace Rick.Handlers
 
             await LogMessageAsync(message, gld);
             await AfkAsync(message, gld);
-            await LevelUpAsync(message, gld);
-            await Profiles.ProfileKarma(message, gld);
-            //ProfileKarma(message, gld);
+            await ChatKarma(message, gld);
 
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
             int argPos = 0;
@@ -76,7 +72,7 @@ namespace Rick.Handlers
                 case ParseResult parse:
                     ErrorMsg = $"User failed to provide paramaters!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
                         $"You can get more info on how to use {Command.Name} by using:\n{BotHandler.BotConfig.DefaultPrefix}Help {Command.Name}";
-                    embed = EmbedService.Embed(EmbedColors.Red, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), null, null, ErrorMsg);
+                    embed = EmbedService.Embed(EmbedColors.Red, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
@@ -123,28 +119,26 @@ namespace Rick.Handlers
                 await message.Channel.SendMessageAsync(afkReason);
         }
 
-        private async Task LevelUpAsync(SocketUserMessage message, SocketGuild gld)
+        private async Task ChatKarma(SocketUserMessage message, SocketGuild gld)
         {
-            if (message.Author.IsBot) return;
-
             var Guilds = GuildHandler.GuildConfigs[gld.Id];
-            var karmalist = Guilds.Karma;
-            if (!karmalist.ContainsKey(message.Author.Id))
+            if (message.Author.IsBot) return;
+            Random rand = new Random();
+            double RandomKarma = rand.Next(1, 25);
+            RandomKarma = MethodService.GiveXP(RandomKarma);
+            if (Guilds.ChatKarma)
             {
-                karmalist.Add(message.Author.Id, 1);
+                var karmalist = Guilds.Karma;
+                if (!karmalist.ContainsKey(message.Author.Id))
+                    karmalist.Add(message.Author.Id, 1);
+                else
+                {
+                    int getKarma = karmalist[message.Author.Id];
+                    getKarma += Convert.ToInt32(RandomKarma);
+                    karmalist[message.Author.Id] = getKarma;
+                }
                 GuildHandler.GuildConfigs[gld.Id] = Guilds;
                 await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-                ConsoleService.Log(message.Author.Username, $"Added to {gld.Name} Karma's list");
-            }
-            else
-            {
-                int getKarma = karmalist[message.Author.Id];
-                getKarma++;
-                karmalist[message.Author.Id] = getKarma;
-
-                GuildHandler.GuildConfigs[gld.Id] = Guilds;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-                ConsoleService.Log(message.Author.Username, $"[{gld.Name}] Got 1 Karma");
             }
         }
     }

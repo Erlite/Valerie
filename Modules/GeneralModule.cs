@@ -20,11 +20,9 @@ namespace Rick.Modules
     public class GeneralModule : ModuleBase
     {
         private InteractiveService Interactive;
-        private ProfilesHandler Profile;
-        public GeneralModule(InteractiveService Inter, ProfilesHandler ProfilesHandler)
+        public GeneralModule(InteractiveService Inter)
         {
             Interactive = Inter;
-            Profile = ProfilesHandler;
         }
 
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
@@ -300,20 +298,5 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Rank")]
-        public async Task RankAsync(SocketGuildUser user = null)
-        {
-            var usr = user;
-            if (user == null)
-                usr = Context.User as SocketGuildUser;
-
-            var getUser = Profile.ProfilesDatabase.FirstOrDefault(x => x.UserID == Context.User.Id);
-            if (getUser == null)
-                throw new NullReferenceException("User not found in current database!");
-
-            string Description = $"**Total Karma:** {getUser.Karma}\n**Current Level:** {getUser.Level}\n**Profile Message:** {getUser.ProfileMsg}";
-            var embed = EmbedService.Embed(EmbedColors.Pastle, $"{usr.Username} Profile Card", usr.GetAvatarUrl(), null, Description, null,null, null, usr.GetAvatarUrl());
-            await ReplyAsync("", embed: embed);
-        }
     }
 }

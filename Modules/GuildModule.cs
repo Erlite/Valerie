@@ -220,5 +220,24 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
+
+        [Command("EnableKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
+        public async Task EnableKarmaAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.ChatKarma)
+            {
+                gldConfig.ChatKarma = true;
+                await ReplyAsync(":gear: Users will now be awarded random Karma based on their chat activity!");
+            }
+            else
+            {
+                gldConfig.ChatKarma = false;
+                await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
     }
 }

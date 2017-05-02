@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using System;
 using Discord.WebSocket;
 using System.Linq;
 using Rick.Handlers;
 using Rick.Services;
 using System.Text;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -22,8 +22,6 @@ namespace Rick.Modules
             if (!karmalist.ContainsKey(user.Id))
             {
                 karmalist.Add(user.Id, 1);
-                GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                 await ReplyAsync($"Added {user.Username} to Karma List and gave 1 Karma to {user.Username}");
             }
             else
@@ -31,11 +29,10 @@ namespace Rick.Modules
                 int getKarma = karmalist[user.Id];
                 getKarma++;
                 karmalist[user.Id] = getKarma;
-
-                GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
                 await ReplyAsync($"Gave 1 Karma to {user.Username}");
             }
+            GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Karma"), Summary("Karma"), Remarks("Shows how much Karma you have")]
@@ -44,9 +41,13 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             karmalist.TryGetValue(Context.User.Id, out int karma);
-            if (karma <= 0)
-                karma = 0;
-            var embed = EmbedService.Embed(Classes.EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), null, $"{Context.User.Username} has a total Karma of **{karma}**");
+            if (karma <= 0 || !karmalist.ContainsKey(Context.User.Id))
+                await ReplyAsync("User doesn't exist or no Karma was found!");
+
+            var Level = MethodService.GetLevelFromXP(karma);
+            string Description = $"{Context.User.Username} has a total Karma of **{karma}** and User level is {Level}";
+
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), null, Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -61,9 +62,10 @@ namespace Rick.Modules
             foreach (var val in filter)
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
-                Builder.AppendLine($"**{user.Username}** with {val.Value} karma");
+                var Level = MethodService.GetLevelFromXP(val.Value);
+                Builder.AppendLine($"**{user.Username}** with {val.Value} karma and current level is **{Level}**");
             }
-            var embed = EmbedService.Embed(Classes.EmbedColors.Maroon, $"Top 10 Users", Context.Guild.IconUrl, null, Builder.ToString());
+            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl, null, Builder.ToString());
             await ReplyAsync("", embed: embed);
         }
     }
