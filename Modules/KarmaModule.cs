@@ -35,7 +35,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Karma"), Summary("Karma"), Remarks("Shows how much Karma you have")]
+        [Command("Rank"), Summary("Karma"), Remarks("Shows how much Karma you have")]
         public async Task GetKarmaAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];

@@ -54,7 +54,7 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Welcome Message has been set to:\n```{msg}```");
         }
 
-        [Command("Logs"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
+        [Command("Actions"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
         public async Task ListLogActionsAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -66,7 +66,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Joins"), Summary("Normal Command"), Remarks("Toggles Join logging")]
+        [Command("ToggleJoins"), Summary("Normal Command"), Remarks("Toggles Join logging")]
         public async Task LogJoinsAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -87,7 +87,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Leaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
+        [Command("ToggleLeaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
         public async Task LogLeavesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -108,7 +108,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Name"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
+        [Command("ToggleUsername"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
         public async Task LogNameChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -129,7 +129,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Nick"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
+        [Command("ToggleNicknames"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
         public async Task LogNickChangesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -150,7 +150,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Bans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
+        [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
         public async Task BanLogAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -221,7 +221,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("EnableKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
+        [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
         public async Task EnableKarmaAsync()
         {
             var Guild = Context.Guild as SocketGuild;

@@ -8,6 +8,7 @@ using Discord.Addons.InteractiveCommands;
 using Rick.Attributes;
 using Rick.Classes;
 using System.Linq;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -35,10 +36,8 @@ namespace Rick.Modules
             MakeTags.Add(tag);
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            var embed = new EmbedBuilder()
-                .WithDescription($"**Tag Response:** {response}")
-                .WithColor(new Color(255, 255, 255))
-                .WithAuthor(x => { x.IconUrl = Context.User.GetAvatarUrl(); x.Name = $"Tag **{Name}** by {Context.User.Username}"; });
+            string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
+            var embed = EmbedService.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), null, Description);
             await ReplyAsync("", embed: embed);
         }
 

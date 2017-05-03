@@ -13,7 +13,7 @@ namespace Rick.Modules
     [RequireChannel, CheckBlacklist]
     public class NSFWModule : ModuleBase
     {
-        [Command("Boobs"), Remarks("Fetches Female breasts from the api.")]
+        [Command("Boobs"), Summary("MotherOfGod"), Remarks("Fetches Female breasts from the api.")]
         public async Task BoobsAsync()
         {
             try

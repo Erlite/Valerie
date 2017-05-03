@@ -52,10 +52,10 @@ namespace Rick.Services
             Console.Write(Environment.NewLine + text);
         }
 
-        public static void Log(LogSeverity severity, string source, string message)
+        public static void Log(LogSeverity Severity, string source, string message)
         {
             NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
-            Append($"[{severity}]", ConsoleColor.DarkCyan);
+            Append($"[{Severity}]", ConsoleColor.DarkCyan);
             Append($"[{source}] ", ConsoleColor.DarkYellow);
             Append(message, ConsoleColor.DarkRed);
         }

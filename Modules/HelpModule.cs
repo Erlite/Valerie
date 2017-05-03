@@ -3,6 +3,8 @@ using Discord.Commands;
 using Discord;
 using System.Linq;
 using Rick.Attributes;
+using Rick.Services;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -19,27 +21,18 @@ namespace Rick.Modules
         [Command("Help")]
         public async Task HelpAsync()
         {
-            var builder = new EmbedBuilder()
-            {
-                Color = new Color(179, 56, 216),
-                Description = $"**Admin Module:** Kick, Ban, Serverlist, Response, Leave, Delete, Gift" +
-                "\n**Bot Module:** [Group = Set] Username, Nickname, Avatar, Game, Status" +
-                "\n**General Module:** Guildinfo, Gif, Urban, Ping, Gift, Top, Roleinfo" + 
-                "\n**Help Module:** Help, Help" + 
-                "\n**Log Module:** [Group = Log] ModChannel, ServerChannel, Actions, Joins, Leaves, NameChange, NickChange, Banlog, Latency, AutoRespond",
-                Author = new EmbedAuthorBuilder()
-                {
-                    Name = "Command List",
-                    IconUrl = Context.Client.CurrentUser.GetAvatarUrl()
-                },
-                Footer = new EmbedFooterBuilder()
-                {
-                    IconUrl = "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-help-circled-128.png",
-                    Text = "What is this, 90's Conan?"
-                }
-            };
-
-            await ReplyAsync("", false, builder.Build());
+            string Description = "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
+                "**Bot Commands:** [Group Name = Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n" +
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk\n" + 
+                "**Github Commands:** [Group Name = Github] Userinfo\n" +
+                "**Guild Commands:** [Group Name = Guild] Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleUsername, ToggleNicknames, ToggleBans, Channel, Role, ToggleKarma\n" +
+                "**Karma Commands:** Karma, Rank, Top\n" + 
+                "**Nsfw Commands:** Boobs, Bum, E621\n" +
+                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect\n" +
+                "**Search Commands:** Gif, Urban, Image, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
+                "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List\n\n For more info on command use: ?>Help CommandName";
+            var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), null, Description, "Full Command List: https://exceptiondev.github.io/Docs");
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Help")]

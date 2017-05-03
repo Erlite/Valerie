@@ -24,9 +24,12 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new NullReferenceException("Value cannot be empty");
+            var botConfig = BotHandler.BotConfig;
+            botConfig.BotName = value;
             var client = Context.Client as DiscordSocketClient;
             await Context.Client.CurrentUser.ModifyAsync(x => x.Username = value);
             await ReplyAsync(":eyes: Done :eyes:");
+            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
         }
 
         [Command("Nickname"), Summary("Nickname XD"), Remarks("Changes Bot's nickname")]
@@ -114,17 +117,6 @@ namespace Rick.Modules
             var botConfig = BotHandler.BotConfig;
             botConfig.DefaultPrefix = prefix;
             await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
-            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
-        }
-
-        [Command("Name"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
-        public async Task BotNameAsync([Remainder]string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new NullReferenceException("Name can't be left empty!");
-            var botConfig = BotHandler.BotConfig;
-            botConfig.BotName = name;
-            await ReplyAsync($":gear: Console window name has been set to: **{name}**");
             await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
         }
 

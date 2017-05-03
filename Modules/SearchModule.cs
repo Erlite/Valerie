@@ -14,7 +14,6 @@ namespace Rick.Modules
 {
     public class SearchModule : ModuleBase
     {
-
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
         public async Task GifsAsync([Remainder] string keywords = null)
         {
