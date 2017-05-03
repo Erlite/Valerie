@@ -125,7 +125,7 @@ namespace Rick.Handlers
             if (message.Author.IsBot) return;
             Random rand = new Random();
             double RandomKarma = rand.Next(1, 25);
-            RandomKarma = MethodService.GiveXP(RandomKarma);
+            RandomKarma = MethodService.GiveKarma(RandomKarma);
             if (Guilds.ChatKarma)
             {
                 var karmalist = Guilds.Karma;

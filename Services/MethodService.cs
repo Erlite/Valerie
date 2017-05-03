@@ -112,18 +112,18 @@ namespace Rick.Services
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
         }
 
-        public static double GiveXP(double xp)
+        public static double GiveKarma(double karma)
         {
-            return (Math.Pow(xp, 2) + 25 * xp) / 5;
+            return (Math.Pow(karma, 2) + 10 * karma) / 5;
         }
 
-        public static double GetLevelFromXP(double XP)
+        public static double GetLevelFromXP(double karma)
         {
-            double RemainingXP = XP;
+            double RemainingXP = karma;
             double Level = 0;
-            while (RemainingXP >= GiveXP(XP))
+            while (RemainingXP >= GiveKarma(karma))
             {
-                RemainingXP -= GiveXP(XP);
+                RemainingXP -= GiveKarma(karma);
                 Level += 1;
             }
             return Level;
