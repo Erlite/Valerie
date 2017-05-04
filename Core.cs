@@ -21,8 +21,8 @@ namespace Rick
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
-                LogLevel = LogSeverity.Verbose,
-                MessageCacheSize = 10000,
+                LogLevel = LogSeverity.Debug,
+                MessageCacheSize = 100000,
                 AlwaysDownloadUsers = true,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
                 HandlerTimeout = 5000

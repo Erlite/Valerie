@@ -55,8 +55,8 @@ namespace Rick.Services
         public static void Log(LogSeverity Severity, string source, string message)
         {
             NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
-            Append($"[{Severity}]", ConsoleColor.DarkCyan);
-            Append($"[{source}] ", ConsoleColor.DarkYellow);
+            Append($"[{Severity}]", ConsoleColor.Cyan);
+            Append($"[{source}] ", ConsoleColor.Yellow);
             Append(message, ConsoleColor.DarkRed);
         }
 
