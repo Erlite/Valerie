@@ -9,8 +9,6 @@ using System.Reflection;
 using System.Net;
 using Rick.Handlers;
 using System.Diagnostics;
-using Discord;
-using Discord.WebSocket;
 
 namespace Rick.Services
 {
