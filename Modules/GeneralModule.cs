@@ -319,5 +319,24 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
+        //[Command("Memegen"), Summary("Memegen TopText BottomText"), Remarks("Generates a meme for you")]
+        //public async Task MemeGenAsync([Remainder]string TopText, [Remainder]string BottomText, string MemeType)
+        //{
+        //    try
+        //    {
+        //        using (var Http = new HttpClient())
+        //        {
+        //            Http.DefaultRequestHeaders.Clear();
+        //            Http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+        //            Http.DefaultRequestHeaders.Add("Accept", "application/json");
+        //            var RequestUrl = await Http.GetStringAsync($"https://ronreiter-meme-generator.p.mashape.com/meme?bottom={BottomText}&font=Impact&font_size=30&meme={MemeType}&top={TopText}");
+        //        }
+        //    }
+        //    catch(Exception Exc)
+        //    {
+        //        await ReplyAsync(Exc.ToString());
+        //    }
+        //}
+
     }
 }
