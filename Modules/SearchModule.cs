@@ -108,7 +108,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("A search term should be provided for me to search!");
             using (var httpClient = new HttpClient())
             {
-                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=moderate";
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
                 httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
@@ -124,7 +124,7 @@ namespace Rick.Modules
                     return;
                 }
                 JObject image = (JObject)arr[0];
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), null, null, null, null, null, (string)image["contentUrl"]);
+                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), null, null, null, null, (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
 
@@ -135,7 +135,7 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(search))
                 throw new NullReferenceException("Search terms can't be empty!");
-            string SearchUrl = $"https://api.cognitive.microsoft.com/bing/v5.0/search?q={search}&count=10&offset=0&mkt=en-us&safesearch=Off";
+            string SearchUrl = $"https://api.cognitive.microsoft.com/bing/v5.0/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=moderate";
             using (var Http = new HttpClient())
             {
                 Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);

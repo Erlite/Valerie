@@ -48,11 +48,12 @@ namespace Rick.Handlers
             await AfkAsync(message, gld);
             await ChatKarma(message, gld);
 
-            if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot) return;
+            if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot || GuildHandler.GuildConfigs[gld.Id].GuildPrefix == null) return;
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
 
-            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildHandler.GuildConfigs[gld.Id].GuildPrefix, ref argPos))) return;
+            string GuildPrefix = GuildHandler.GuildConfigs[gld.Id].GuildPrefix;
+            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
 
             var result = await cmds.ExecuteAsync(context, argPos, map, MultiMatchHandling.Best);
             var service = cmds.Search(context, argPos);

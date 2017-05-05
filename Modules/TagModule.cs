@@ -129,7 +129,10 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
+            if (!gldTags.Any())
+                await ReplyAsync($"{Context.Guild.Name} has no tags!");
+            else
+                await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
         public async Task RemoveTag(Tags tag)

@@ -36,7 +36,7 @@ namespace Rick.Handlers
         [JsonProperty("BingAPIKey")]
         public string BingAPIKey { get; set; }
 
-        [JsonProperty("MashepeKey")]
+        [JsonProperty("MashapeKey")]
         public string MashapeKey { get; set; }
 
         [JsonProperty("DebugMode")]
