@@ -86,6 +86,9 @@ namespace Rick.Modules
                 }
                 var getString = await GetRequest.Content.ReadAsStringAsync();
                 var Convert = JToken.Parse(getString).ToObject<VideoRoot>();
+                var Random = new Random();
+                var getRandom = Random.Next(Convert.value.Count);
+
                 var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), null, $"Total Results: {Convert.totalEstimatedMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
