@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Discord.Commands;
 using Rick.Services;
 using Rick.Handlers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Net.Providers.WS4Net;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Discord.Commands;
 
 namespace Rick
 {
@@ -30,14 +32,9 @@ namespace Rick
             
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
 
-            var map = new DependencyMap();
-            map.Add(client);
-            map.Add(new GuildHandler());
-            map.Add(new BotHandler());
-            map.Add(new InteractiveService(client));
-            map.Add(new EventService(client, GuildModel));
+            var ServiceProdivder = ConfigureServices();
 
-            handler = new CommandHandler(map);
+            handler = new CommandHandler(ServiceProdivder);
             await handler.ConfigureAsync();
 
             client.GuildAvailable += EventService.CreateGuildConfigAsync;
@@ -54,6 +51,23 @@ namespace Rick
             await client.StartAsync();
 
             await Task.Delay(-1);
+        }
+
+        private IServiceProvider ConfigureServices()
+        {
+            var Services = new ServiceCollection()
+                .AddSingleton(client)
+                .AddSingleton(new GuildHandler())
+                .AddSingleton(new BotHandler())
+                .AddSingleton(new EventService(client, GuildModel))
+                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false }))
+                .AddSingleton(new InteractiveService(client));
+
+            var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
+            Provider.GetService<GuildHandler>();
+            Provider.GetService<BotHandler>();
+            Provider.GetService<EventService>();
+            return Provider;
         }
     }
 }

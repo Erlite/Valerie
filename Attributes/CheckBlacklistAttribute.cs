@@ -1,12 +1,13 @@
 ﻿using Discord.Commands;
 using System.Threading.Tasks;
 using Rick.Handlers;
+using System;
 
 namespace Rick.Attributes
 {
     public class CheckBlacklistAttribute : PreconditionAttribute
     {
-        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
+        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             var userId = context.User.Id;
             var Blacklist = BotHandler.BotConfig.Blacklist;

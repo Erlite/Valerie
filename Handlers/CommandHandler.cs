@@ -9,29 +9,31 @@ using Discord.Addons.InteractiveCommands;
 using System.IO;
 using System;
 using Rick.Classes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Rick.Handlers
 {
     public class CommandHandler
     {
-        private IDependencyMap map;
+        private IServiceProvider Provider;
         private DiscordSocketClient client;
         private CommandService cmds;
-        private BotHandler config;
-        private GuildHandler model;
-        private EventService Logger;
+        private BotHandler BotHandler;
+        private GuildHandler GuildHandler;
+        private EventService EventHandler;
         private InteractiveService Interactive;
 
-        public CommandHandler(IDependencyMap _map)
+        public CommandHandler(IServiceProvider prod)
         {
-            client = _map.Get<DiscordSocketClient>();
-            config = _map.Get<BotHandler>();
-            model = _map.Get<GuildHandler>();
-            Logger = _map.Get<EventService>();
-            Interactive = _map.Get<InteractiveService>();
+            Provider = prod;
+            client = Provider.GetService<DiscordSocketClient>();
+            BotHandler = Provider.GetService<BotHandler>();
+            GuildHandler = Provider.GetService<GuildHandler>();
+            EventHandler = Provider.GetService<EventService>();
+            Interactive = Provider.GetService<InteractiveService>();
+
             client.MessageReceived += HandleCommandsAsync;
-            cmds = new CommandService();
-            map = _map;
+            cmds = Provider.GetService<CommandService>();
         }
 
         public async Task ConfigureAsync()
@@ -55,7 +57,7 @@ namespace Rick.Handlers
             string GuildPrefix = GuildHandler.GuildConfigs[gld.Id].GuildPrefix;
             if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
 
-            var result = await cmds.ExecuteAsync(context, argPos, map, MultiMatchHandling.Best);
+            var result = await cmds.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
             var service = cmds.Search(context, argPos);
             CommandInfo Command = null;
 
