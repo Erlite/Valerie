@@ -233,6 +233,7 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
+    <Compile Include="Classes\Bing.cs" />
     <Compile Include="Classes\EmbedColors.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
     <Compile Include="Classes\Message.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="Handlers\BotHandler.cs" />
     <Compile Include="Handlers\GuildHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
+    <Compile Include="Modules\BingModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
     <Compile Include="Modules\GithubModule.cs" />

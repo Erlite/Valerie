@@ -9,8 +9,6 @@ using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Handlers;
-using Rick.Services;
-using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -99,65 +97,6 @@ namespace Rick.Modules
             });
 
             await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Image"), Summary("Image rick and morty"), Remarks("Searches Bing for your image.")]
-        public async Task ImageAsync([Remainder] string search)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("A search term should be provided for me to search!");
-            using (var httpClient = new HttpClient())
-            {
-                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
-                var res = await httpClient.GetAsync(link);
-                if (!res.IsSuccessStatusCode)
-                {
-                    await ReplyAsync($"An error occurred: {res.ReasonPhrase}");
-                    return;
-                }
-                JObject result = JObject.Parse(await res.Content.ReadAsStringAsync());
-                JArray arr = (JArray)result["value"];
-                if (arr.Count == 0)
-                {
-                    await ReplyAsync("No results found.");
-                    return;
-                }
-                JObject image = (JObject)arr[0];
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), null, null, null, null, (string)image["contentUrl"]);
-                await ReplyAsync("", embed: embed);
-            }
-
-        }
-
-        [Command("Bing"), Summary("Bing Search term"), Remarks("Searches Bing for your terms")]
-        public async Task BingAsync([Remainder]string search)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("Search terms can't be empty!");
-            string SearchUrl = $"https://api.cognitive.microsoft.com/bing/v5.0/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=moderate";
-            using (var Http = new HttpClient())
-            {
-                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
-                var GetRequest = await Http.GetAsync(SearchUrl);
-                if (!GetRequest.IsSuccessStatusCode)
-                {
-                    await ReplyAsync(GetRequest.ReasonPhrase);
-                    return;
-                }
-                JObject result = JObject.Parse(await GetRequest.Content.ReadAsStringAsync());
-                JArray arr = (JArray)result["value"];
-                if (arr.Count == 0)
-                {
-                    await ReplyAsync("No results found.");
-                    return;
-                }
-                JObject content = (JObject)arr[0];
-                var Name = (string)content["name"];
-                var Snippet = (string)content["snippet"];
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Name, Snippet);
-                await ReplyAsync("", embed: embed);
-            }
         }
 
         [Command("Lmgtfy"), Summary("Lmgtfy How To Google"), Remarks("Googles something for that special person who is crippled")]
