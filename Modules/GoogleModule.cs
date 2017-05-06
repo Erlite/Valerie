@@ -8,13 +8,16 @@ using Rick.Attributes;
 using Rick.Handlers;
 using Google.Apis.Customsearch.v1;
 using Google.Apis.Services;
+using System.Net.Http;
+using System;
+using Newtonsoft.Json.Linq;
 
 namespace Rick.Modules
 {
-    [Group("Google"), CheckBlacklist]
+    [CheckBlacklist]
     public class GoogleModule : ModuleBase
     {
-        [Command("Search"), Summary("Google Seach Very wow"), Remarks("Seaches google for your terms")]
+        [Command("Google"), Summary("Google Very wow"), Remarks("Seaches google for your terms"), Alias("G")]
         public async Task SearchAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
@@ -35,10 +38,21 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Image"), Summary("Google Image doges"), Remarks("Searches google for your image")]
+        [Command("GImage"), Summary("GImage doges"), Remarks("Searches google for your image")]
         public async Task ImageAsync([Remainder] string search)
         {
-
+            using (var http = new HttpClient())
+            {
+                var rng = new Random();
+                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={BotHandler.BotConfig.GoogleAPIKey}";
+                var obj = JObject.Parse(await http.GetStringAsync(reqString));
+                var items = obj["items"] as JArray;
+                var image = items[0]["link"].ToString();
+                var embed = EmbedService.Embed(EmbedColors.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), null, null, null, null, image);
+                await ReplyAsync("", embed: embed);
+            }
         }
+
+        [Command("Youtube"), Summary("")]
     }
 }
