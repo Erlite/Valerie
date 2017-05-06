@@ -23,7 +23,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("A search term should be provided for me to search!");
             using (var httpClient = new HttpClient())
             {
-                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=10&offset=0&mkt=en-us&safeSearch=Off";
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=50&offset=0&mkt=en-us&safeSearch=Off";
                 httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
@@ -38,7 +38,9 @@ namespace Rick.Modules
                     await ReplyAsync("No results found.");
                     return;
                 }
-                JObject image = (JObject)arr[0];
+                var Random = new Random();
+                var RandomNum = Random.Next(1, 50);
+                JObject image = (JObject)arr[RandomNum];
                 var embed = EmbedService.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), null, null, null, null, (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
@@ -67,30 +69,6 @@ namespace Rick.Modules
                     str.AppendLine($"**{result.name}**\n{result.snippet}\n{result.displayUrl}\n");
                 }
                 var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), null, str.ToString(), $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
-                await ReplyAsync("", embed: embed);
-            }
-        }
-
-        [Command("Video"), Summary("Bing Video Gitting Gud"), Remarks("Searches Bing for your video")]
-        public async Task VideoAsync([Remainder] string search)
-        {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("Search terms can't be empty!");
-            using (var Http = new HttpClient())
-            {
-                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
-                var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/videos/search?q{search}&count=10&offset=0&mkt=en-us&safeSearch=moderate");
-                if (!GetRequest.IsSuccessStatusCode)
-                {
-                    await ReplyAsync(GetRequest.ReasonPhrase);
-                    return;
-                }
-                var getString = await GetRequest.Content.ReadAsStringAsync();
-                var Convert = JToken.Parse(getString).ToObject<VideoRoot>();
-                var Random = new Random();
-                var getRandom = Random.Next(Convert.value.Count);
-
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), null, $"Total Results: {Convert.totalEstimatedMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
         }
