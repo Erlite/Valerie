@@ -45,7 +45,7 @@ namespace Rick.Modules
 
         }
 
-        [Command, Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
+        [Command("Search"), Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
         public async Task SearchAsync([Remainder]string search)
         {
             if (string.IsNullOrWhiteSpace(search))
