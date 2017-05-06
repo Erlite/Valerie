@@ -57,7 +57,6 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(11);
-
             StringBuilder Builder = new StringBuilder();
             foreach (var val in filter)
             {
