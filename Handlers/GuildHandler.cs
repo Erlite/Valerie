@@ -50,9 +50,6 @@ namespace Rick.Handlers
         [JsonProperty("RequiredRoleID")]
         public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
 
-        [JsonProperty("RequiredChannelIDs")]
-        public List<ulong> RequiredChannelIDs { get; set; } = new List<ulong>();
-
         [JsonProperty("RequiredChannelNames")]
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 

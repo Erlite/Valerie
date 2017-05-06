@@ -3,10 +3,11 @@ using Discord.Commands;
 using Octokit;
 using Rick.Services;
 using Rick.Classes;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Github")]
+    [Group("Github"), CheckBlacklist]
     public class GithubModule : ModuleBase
     {
         [Command("Userinfo")]

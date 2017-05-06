@@ -7,9 +7,11 @@ using Rick.Handlers;
 using Rick.Services;
 using System.Text;
 using Rick.Classes;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
+    [CheckBlacklist]
     public class KarmaModule : ModuleBase
     {
         [Command("Karma"), Summary("Karma @Username"), Remarks("Gives another user karma")]

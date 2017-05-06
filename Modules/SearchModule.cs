@@ -9,9 +9,11 @@ using AngleSharp;
 using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Handlers;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
+    [CheckBlacklist]
     public class SearchModule : ModuleBase
     {
         [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
@@ -151,7 +153,7 @@ namespace Rick.Modules
             using (var http = new HttpClient())
             {
                 http.DefaultRequestHeaders.Clear();
-                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                 http.DefaultRequestHeaders.Add("Accept", "application/json");
                 var res = JObject.Parse(await http.GetStringAsync($"https://robohash.p.mashape.com/index.php?text={Uri.EscapeUriString(name)}"));
                 var link = res["imageUrl"].ToString();
@@ -175,7 +177,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
                     var embed = new EmbedBuilder()
@@ -201,7 +203,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
                     var embed = new EmbedBuilder()

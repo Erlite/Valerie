@@ -17,7 +17,6 @@ namespace Rick.Interfaces
         bool UserBannedLogged { get; set; }
         bool ChatKarma { get; set; }
         List<ulong> RequiredRoleIDs { get; set;}
-        List<ulong> RequiredChannelIDs { get; set; }
         List<string> RequiredChannelNames { get; set; }
         List<Tags> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }

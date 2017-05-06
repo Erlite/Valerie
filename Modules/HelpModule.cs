@@ -22,6 +22,7 @@ namespace Rick.Modules
         public async Task HelpAsync()
         {
             string Description = "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
+                "**Bing Commands:** [Group Name = Bing] Image, Bing, Video" +
                 "**Bot Commands:** [Group Name = Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n" +
                 "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk\n" + 
                 "**Github Commands:** [Group Name = Github] Userinfo\n" +
@@ -29,7 +30,7 @@ namespace Rick.Modules
                 "**Karma Commands:** Karma, Rank, Top\n" + 
                 "**Nsfw Commands:** Boobs, Bum, E621\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect\n" +
-                "**Search Commands:** Gif, Urban, Image, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
+                "**Search Commands:** Gif, Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
                 "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List\n\n For more info on command use: ?>Help CommandName";
             var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), null, Description, "Full Command List: https://exceptiondev.github.io/Docs");
             await ReplyAsync("", embed: embed);

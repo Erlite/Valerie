@@ -9,10 +9,11 @@ using Rick.Handlers;
 using Rick.Services;
 using Rick.Classes;
 using System.Text;
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Bing")]
+    [Group("Bing"), CheckBlacklist]
     public class BingModule : ModuleBase
     {
         [Command("Image"), Summary("Bing Image rick and morty"), Remarks("Searches Bing for your image.")]
@@ -44,7 +45,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Search"), Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
+        [Command, Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
         public async Task SearchAsync([Remainder]string search)
         {
             if (string.IsNullOrWhiteSpace(search))

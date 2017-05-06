@@ -36,8 +36,11 @@ namespace Rick.Handlers
         [JsonProperty("BingAPIKey")]
         public string BingAPIKey { get; set; }
 
-        [JsonProperty("MashapeKey")]
-        public string MashapeKey { get; set; }
+        [JsonProperty("MashapeAPIKey")]
+        public string MashapeAPIKey { get; set; }
+
+        [JsonProperty("GoogleAPIKey")]
+        public string GoogleAPIKey { get; set; }
 
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
@@ -53,9 +56,6 @@ namespace Rick.Handlers
 
         [JsonProperty("Blacklist")]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
-
-        [JsonProperty("OwnerAfk")]
-        public Dictionary<ulong, string> OwnerAfk { get; set; } = new Dictionary<ulong, string>();
 
         [JsonProperty("EvalImports")]
         public List<string> EvalImports { get; set; } = new List<string>();
@@ -83,11 +83,16 @@ namespace Rick.Handlers
             BotHandler result;
             result = new BotHandler();
 
+            ConsoleService.Log("Welcome to Bot's Setup!", "Please enter the details for following: ");
+
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Token: ");
             result.BotToken = Console.ReadLine();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Name: ");
             result.BotName = Console.ReadLine();
+
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Game: ");
+            result.BotGame = Console.ReadLine();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();
@@ -95,7 +100,13 @@ namespace Rick.Handlers
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bing API Key: ");
             result.BingAPIKey = Console.ReadLine();
 
-            ConsoleService.Log(LogSeverity.Info, "Config", "Yes = y and No = n");
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Mashape API Key: ");
+            result.MashapeAPIKey = Console.ReadLine();
+
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Google API Key: ");
+            result.GoogleAPIKey = Console.ReadLine();
+
+            ConsoleService.Log("Config", "Enable = Y || Disable = N");
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enable autoupdate? ");
             char update = Console.ReadLine().ToLower()[0];
@@ -115,7 +126,7 @@ namespace Rick.Handlers
                 default: result.DebugMode = false; break;
             }
 
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enable Bot mention? ");
+            ConsoleService.Log(LogSeverity.Info, "Config", "Enable Bot mention Prefix? ");
             char input = Console.ReadLine().ToLower()[0];
             switch (input)
             {

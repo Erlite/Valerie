@@ -228,7 +228,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();

@@ -25,7 +25,7 @@ namespace Rick.Services
             card.Add($"└{new string('─', 12)}{new string('─', title.Count())}{new string('─', 12)}┘");
 
             Console.Title = title;
-            NewLine(string.Join(Environment.NewLine, card));
+            Console.Write(Environment.NewLine + (string.Join(Environment.NewLine, card)));
         }
 
         public static void Append(string text, ConsoleColor? foreground = null, ConsoleColor? background = null)
@@ -40,49 +40,17 @@ namespace Rick.Services
             Console.Write(text);
         }
 
-        public static void NewLine(string text = "", ConsoleColor? foreground = null, ConsoleColor? background = null)
-        {
-            if (foreground == null)
-                foreground = ConsoleColor.White;
-            if (background == null)
-                background = ConsoleColor.Black;
-
-            Console.ForegroundColor = (ConsoleColor)foreground;
-            Console.BackgroundColor = (ConsoleColor)background;
-            Console.Write(Environment.NewLine + text);
-        }
-
         public static void Log(LogSeverity Severity, string source, string message)
         {
-            NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
+            Console.Write(Environment.NewLine);
             Append($"[{Severity}]", ConsoleColor.Cyan);
             Append($"[{source}] ", ConsoleColor.Yellow);
             Append(message, ConsoleColor.DarkRed);
         }
 
-        public static void Log(IUserMessage msg)
+        public static void Log(string source, string message)
         {
-            var channel = (msg.Channel as IGuildChannel);
-            NewLine($"{DateTime.Now.ToString("hh:mm:ss")} ", ConsoleColor.Gray);
-
-            if (channel?.Guild == null)
-                Append($"PM ", ConsoleColor.DarkRed);
-            else
-                Append($"{channel.Guild.Name} #{channel.Name} => ", ConsoleColor.DarkRed);
-
-            Append($"{msg.Author}: ", ConsoleColor.Green);
-            Append(msg.Content, ConsoleColor.White);
-        }
-
-        public static void ResetColors()
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.Black;
-        }
-
-        public static void Log(string source,string message)
-        {
-            NewLine($"[{DateTime.Now.ToString("hh:mm")}]", ConsoleColor.Gray);
+            Console.Write(Environment.NewLine);
             Append($"[{source}] ", ConsoleColor.DarkCyan);
             Append(message, ConsoleColor.DarkYellow);
         }
