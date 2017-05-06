@@ -78,6 +78,9 @@
     <Reference Include="Google.Apis.Core, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>packages\Google.Apis.Core.1.25.0\lib\net45\Google.Apis.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Google.Apis.Customsearch.v1, Version=1.25.0.466, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>packages\Google.Apis.Customsearch.v1.1.25.0.466\lib\net45\Google.Apis.Customsearch.v1.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Apis.PlatformServices, Version=1.25.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>packages\Google.Apis.1.25.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
     </Reference>
