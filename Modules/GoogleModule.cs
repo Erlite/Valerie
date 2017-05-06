@@ -12,7 +12,6 @@ using System.Net.Http;
 using System;
 using Newtonsoft.Json.Linq;
 using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
 
 namespace Rick.Modules
 {
