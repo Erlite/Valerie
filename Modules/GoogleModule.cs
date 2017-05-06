@@ -11,6 +11,8 @@ using Google.Apis.Services;
 using System.Net.Http;
 using System;
 using Newtonsoft.Json.Linq;
+using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
 
 namespace Rick.Modules
 {
@@ -18,7 +20,7 @@ namespace Rick.Modules
     public class GoogleModule : ModuleBase
     {
         [Command("Google"), Summary("Google Very wow"), Remarks("Seaches google for your terms"), Alias("G")]
-        public async Task SearchAsync([Remainder] string search)
+        public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
             var Service = new CustomsearchService(new BaseClientService.Initializer
@@ -39,7 +41,7 @@ namespace Rick.Modules
         }
 
         [Command("GImage"), Summary("GImage doges"), Remarks("Searches google for your image")]
-        public async Task ImageAsync([Remainder] string search)
+        public async Task GImageAsync([Remainder] string search)
         {
             using (var http = new HttpClient())
             {
@@ -53,6 +55,20 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Youtube"), Summary("")]
+        [Command("Youtube"), Summary("Youtube SomeVideo Name"), Remarks("Searches youtube for your video")]
+        public async Task YoutubeAsync([Remainder] string search)
+        {
+            var Service = new YouTubeService(new BaseClientService.Initializer
+            {
+                ApiKey = BotHandler.BotConfig.GoogleAPIKey
+            });
+            var SearchRequest = Service.Search.List("snippet");
+            SearchRequest.Q = search;
+            SearchRequest.MaxResults = 1;
+            SearchRequest.Type = "video";
+            var SearchResponse = (await SearchRequest.ExecuteAsync()).Items.Select(x => "http://www.youtube.com/watch?v=" + x.Id.VideoId).FirstOrDefault();
+            await ReplyAsync(SearchResponse);
+
+        }
     }
 }
