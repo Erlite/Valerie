@@ -1,6 +1,8 @@
 <p align="center"><img src="https://s25.postimg.org/kfiu232fz/Rick.png"/></p>
+<p align="center"><img src="https://travis-ci.org/ExceptionDev/DNA.svg?branch=master"/>
+<br>Porting to .Net Core soon:tm:</br></p>
 
-Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.2. Rick likes to help out at times. Please don't bully Rick because Rick is old. Rick has over 60+ Commands which include Admin, Owner, Fun, Search, Karma, Tags, Github, NSFW and many more!
+Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.1. Rick likes to help out at times. Please don't bully Rick because Rick is old. Rick has over 60+ Commands which include Admin, Owner, Fun, Search, Karma, Tags, Github, NSFW and many more! You can also use .Net Framework 4.7 and if interested I'm porting Rick to [.Net Core app](https://github.com/ExceptionDev/DNA) for Non Windows users.
 
 Rick also logs every message that it receives and also gives user random Karma for their messages (This can be enabled/disabled in the guild settings).
 
