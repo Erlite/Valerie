@@ -73,12 +73,13 @@ namespace Rick.Handlers
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $"User failed to provide paramaters!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
+                    ErrorMsg = $"User failed to provide required paramaters for {Command.Name}!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
                         $"You can get more info on how to use {Command.Name} by using:\n{BotHandler.BotConfig.DefaultPrefix}Help {Command.Name}";
-                    embed = EmbedService.Embed(EmbedColors.Red, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
+                    embed = EmbedService.Embed(EmbedColors.Red, "Parsing Failed!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
+                    embed = EmbedService.Embed(EmbedColors.Red, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
                     break;
                 case ExecuteResult exe:
                     var exeresult = (ExecuteResult)result;

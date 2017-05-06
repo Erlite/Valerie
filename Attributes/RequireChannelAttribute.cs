@@ -1,6 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord.Commands;
 using System.Threading.Tasks;
 using Rick.Handlers;
 using System;
@@ -12,8 +10,7 @@ namespace Rick.Attributes
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             var ChannelName = GuildHandler.GuildConfigs[context.Guild.Id].RequiredChannelNames.Contains(context.Channel.Name);
-            var gld = context.Guild as SocketGuild;
-            return await Task.FromResult(ChannelName) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"{Format.Bold("ERROR: ")}This command cannot be used in this channel!");
+            return await Task.FromResult(ChannelName) ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"This command cannot be used in this channel! Please make sure you are in the correct channel first!");
         }
     }
 }
