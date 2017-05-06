@@ -12,6 +12,7 @@ namespace Rick.Interfaces
         string BingAPIKey { get; set; }
         string MashapeAPIKey { get; set; }
         string GoogleAPIKey { get; set; }
+        string SearchEngineID { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
         bool AutoUpdate { get; set; }

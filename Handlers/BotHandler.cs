@@ -42,6 +42,9 @@ namespace Rick.Handlers
         [JsonProperty("GoogleAPIKey")]
         public string GoogleAPIKey { get; set; }
 
+        [JsonProperty("SearchEngineID")]
+        public string SearchEngineID { get; set; }
+
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
