@@ -270,9 +270,7 @@ namespace Rick.Modules
                 case 1:
                     await ReplyAsync("TAAAILS");
                     break;
-
             }
-
         }
 
         [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
@@ -314,29 +312,10 @@ namespace Rick.Modules
             var API = DiscordConfig.APIVersion.ToString();
             string Description = $"{Name} is written by @ExceptionDev#6045 in C# using Discord.Net 1.0 library and using .Net Framework 4.6.2!\n" +
                 $"{Name} is Open Source on Github [https://github.com/ExceptionDev/Rick]. If you like {Name} please do leave a Star on Github! It helps a lot!\n" +
-                $"**Total Servers:** {TotalServers}\n**Total Users:** {TotalUsers}\n**Total Channels:** {TotalChannels}\n**Library Version:** {Library}\n**API Version:**{API}\n**Heap Size:** {Heap}\n**Uptime:** {Uptime}\n**Runtime Info:** {Runtime}";
+                $"**Total Servers:** {TotalServers}\n**Total Users:** {TotalUsers}\n**Total Channels:** {TotalChannels}\n**Library Version:** {Library}\n**API Version:** {API}\n**Heap Size:** {Heap}\n**Uptime:** {Uptime}\n**Runtime Info:** {Runtime}";
             var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), null, Description);
             await ReplyAsync("", embed: embed);
         }
-
-        //[Command("Memegen"), Summary("Memegen TopText BottomText"), Remarks("Generates a meme for you")]
-        //public async Task MemeGenAsync([Remainder]string TopText, [Remainder]string BottomText, string MemeType)
-        //{
-        //    try
-        //    {
-        //        using (var Http = new HttpClient())
-        //        {
-        //            Http.DefaultRequestHeaders.Clear();
-        //            Http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeKey);
-        //            Http.DefaultRequestHeaders.Add("Accept", "application/json");
-        //            var RequestUrl = await Http.GetStringAsync($"https://ronreiter-meme-generator.p.mashape.com/meme?bottom={BottomText}&font=Impact&font_size=30&meme={MemeType}&top={TopText}");
-        //        }
-        //    }
-        //    catch(Exception Exc)
-        //    {
-        //        await ReplyAsync(Exc.ToString());
-        //    }
-        //}
 
     }
 }

@@ -80,31 +80,32 @@ namespace Rick.Services
 
         public static async Task ProgramUpdater()
         {
-            var botConfig = BotHandler.BotConfig;
-            if (botConfig.AutoUpdate)
+            var BotConfig = BotHandler.BotConfig;
+            if (BotConfig.AutoUpdate)
             {
                 ConsoleService.Log("Autoupdate", "Checking for updates ...");
-                WebClient web = new WebClient();
-                Stream stream = web.OpenRead("https://exceptiondev.github.io/Docs/Downloads/version.txt");
-                using (StreamReader reader = new StreamReader(stream))
+                var Http = new HttpClient();
+                var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Docs/Downloads/version.txt");
+                double version = Convert.ToDouble(GetUrl);
+                if (BotHandler.BotVersion < version)
                 {
-                    double version = Convert.ToDouble(reader.ReadToEnd());
-                    if (BotHandler.BotVersion < version)
+                    ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
+                    ConsoleService.Log("Autoupdate", "Please type Yes to update! ");
+                    var Response = Console.ReadLine().ToLower();
+                    if (Response == "yes")
                     {
-                        ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
-                        var response = Console.ReadLine().ToLower();
-                        if (response == "yes")
-                        {
-                            ConsoleService.Log("Autoupdate", "Downloading update ...");
-                            web.DownloadFile("https://exceptiondev.github.io/Docs/Downloads/Installer.bat", "Installer.bat");
-                            Process.Start("Installer.bat");
-                            await Task.Delay(5000);
-                            Process.GetCurrentProcess().Kill();
-                        }
+                        ConsoleService.Log("Autoupdate", "Downloading update ...");
+                        Uri url = new Uri("https://exceptiondev.github.io/Docs/Downloads/Installer.bat");
+                        await Http.DownloadAsync(url, "Installer.bat");
+                        Process.Start("Installer.bat");
+                        await Task.Delay(5000);
+                        Process.GetCurrentProcess().Kill();
                     }
                     else
-                        ConsoleService.Log("Autoupdate", "Already using the latest version!\n");
+                        ConsoleService.Log("Autoupdate", "Wrong response! Continuing...");
                 }
+                else
+                    ConsoleService.Log("Autoupdate", "Already using the latest version!\n");
             }
             else
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
