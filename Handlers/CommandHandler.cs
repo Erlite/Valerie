@@ -46,7 +46,6 @@ namespace Rick.Handlers
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
 
-            await LogMessageAsync(message, gld);
             await AfkAsync(message, gld);
             await ChatKarma(message, gld);
 
@@ -103,15 +102,6 @@ namespace Rick.Handlers
             }
             else
                 await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
-        }
-
-        private async Task LogMessageAsync(SocketUserMessage msg, SocketGuild gld)
-        {
-            string log = $"[{DateTime.Now.ToString("hh:mm")}] [{gld.Name} || {gld.Id}] [{msg.Channel.Name} || {msg.Channel.Id}] [{msg.Author.Username} || {msg.Author.Id}] [{msg.Id}] {msg.Content}";
-            using (StreamWriter file = new StreamWriter("Logs.txt", true))
-            {
-                await file.WriteLineAsync(log);
-            }
         }
 
         private async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
