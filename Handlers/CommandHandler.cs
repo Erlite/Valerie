@@ -46,9 +46,6 @@ namespace Rick.Handlers
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
 
-            await AfkAsync(message, gld);
-            await ChatKarma(message, gld);
-
             if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot || GuildHandler.GuildConfigs[gld.Id].GuildPrefix == null) return;
             int argPos = 0;
             var context = new SocketCommandContext(client, message);
@@ -102,38 +99,6 @@ namespace Rick.Handlers
             }
             else
                 await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
-        }
-
-        private async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
-        {
-            var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
-            string afkReason = null;
-            SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason));
-            if (gldUser != null)
-                await message.Channel.SendMessageAsync(afkReason);
-        }
-
-        private async Task ChatKarma(SocketUserMessage message, SocketGuild gld)
-        {
-            var Guilds = GuildHandler.GuildConfigs[gld.Id];
-            if (message.Author.IsBot) return;
-            Random rand = new Random();
-            double RandomKarma = rand.Next(1, 5);
-            RandomKarma = MethodService.GiveKarma(RandomKarma);
-            if (Guilds.ChatKarma)
-            {
-                var karmalist = Guilds.Karma;
-                if (!karmalist.ContainsKey(message.Author.Id))
-                    karmalist.Add(message.Author.Id, 1);
-                else
-                {
-                    int getKarma = karmalist[message.Author.Id];
-                    getKarma += Convert.ToInt32(RandomKarma);
-                    karmalist[message.Author.Id] = getKarma;
-                }
-                GuildHandler.GuildConfigs[gld.Id] = Guilds;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            }
         }
     }
 }

@@ -153,6 +153,14 @@ namespace Rick.Services
             await GuildHandler.SaveAsync(path, GuildHandler.GuildConfigs);
         }
 
+        public async static Task MessageServicesAsync(SocketMessage msg) => await Task.Run(async () =>
+         {
+             var gld = (msg.Channel as SocketGuildChannel).Guild;
+             var message = msg as SocketUserMessage;
+             await MethodService.AfkAsync(message, gld);
+             await MethodService.ChatKarma(message, gld);
+         });
+
         public async static Task OnReady()
         {
             await client.SetGameAsync(BotHandler.BotConfig.BotGame);
