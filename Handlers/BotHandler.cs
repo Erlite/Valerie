@@ -45,6 +45,9 @@ namespace Rick.Handlers
         [JsonProperty("SearchEngineID")]
         public string SearchEngineID { get; set; }
 
+        [JsonProperty("CleverBotAPIKey")]
+        public string CleverBotAPIKey { get; set; }
+
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
@@ -63,7 +66,7 @@ namespace Rick.Handlers
         [JsonProperty("EvalImports")]
         public List<string> EvalImports { get; set; } = new List<string>();
 
-        public bool MentionDefaultPrefixEnabled(SocketUserMessage m, DiscordSocketClient c, ref int ap)
+        public bool MentionPrefix(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
             if (!MentionDefaultPrefix)
                 return false;

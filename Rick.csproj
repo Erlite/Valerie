@@ -42,6 +42,9 @@
     <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>packages\AngleSharp.0.9.9\lib\net45\AngleSharp.dll</HintPath>
     </Reference>
+    <Reference Include="CleverbotLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CleverbotLib.1.0.1\lib\net452\CleverbotLib.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Addons.InteractiveCommands, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Discord.Addons.InteractiveCommands.1.2.2\lib\netstandard1.3\Discord.Addons.InteractiveCommands.dll</HintPath>
     </Reference>
@@ -107,9 +110,6 @@
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\NAudio.1.8.0\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -296,7 +296,6 @@
     <Compile Include="Modules\GuildModule.cs" />
     <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="Modules\KarmaModule.cs" />
-    <Compile Include="Modules\MusicModule.cs" />
     <Compile Include="Modules\NSFWModule.cs" />
     <Compile Include="Modules\OwnerModule.cs" />
     <Compile Include="Modules\SearchModule.cs" />
@@ -306,7 +305,6 @@
     <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\MethodService.cs" />
-    <Compile Include="Services\MusicService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

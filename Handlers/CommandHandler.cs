@@ -51,7 +51,7 @@ namespace Rick.Handlers
             var context = new SocketCommandContext(client, message);
 
             string GuildPrefix = GuildHandler.GuildConfigs[gld.Id].GuildPrefix;
-            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionDefaultPrefixEnabled(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
+            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionPrefix(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
 
             var result = await cmds.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
             var service = cmds.Search(context, argPos);

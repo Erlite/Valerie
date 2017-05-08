@@ -16,6 +16,7 @@ namespace Rick.Interfaces
         bool NickChangesLogged { get; set; }
         bool UserBannedLogged { get; set; }
         bool ChatKarma { get; set; }
+        bool ChatterBot { get; set;  }
         List<ulong> RequiredRoleIDs { get; set;}
         List<string> RequiredChannelNames { get; set; }
         List<Tags> TagsList { get; set; }

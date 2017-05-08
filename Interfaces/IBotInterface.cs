@@ -13,12 +13,13 @@ namespace Rick.Interfaces
         string MashapeAPIKey { get; set; }
         string GoogleAPIKey { get; set; }
         string SearchEngineID { get; set; }
+        string CleverBotAPIKey { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
         bool AutoUpdate { get; set; }
         bool MentionDefaultPrefix { get; set; }
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
-        bool MentionDefaultPrefixEnabled(SocketUserMessage message, DiscordSocketClient client, ref int argPos);
+        bool MentionPrefix(SocketUserMessage message, DiscordSocketClient client, ref int argPos);
     }
 }

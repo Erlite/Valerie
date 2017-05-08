@@ -10,6 +10,7 @@ using System.Net;
 using Rick.Handlers;
 using System.Diagnostics;
 using Discord.WebSocket;
+using CleverbotLib.Models;
 
 namespace Rick.Services
 {
@@ -144,7 +145,7 @@ namespace Rick.Services
             if (message.Author.IsBot) return;
             Random rand = new Random();
             double RandomKarma = rand.Next(1, 5);
-            RandomKarma = MethodService.GiveKarma(RandomKarma);
+            RandomKarma = GiveKarma(RandomKarma);
             if (Guilds.ChatKarma)
             {
                 var karmalist = Guilds.Karma;
@@ -159,6 +160,15 @@ namespace Rick.Services
                 GuildHandler.GuildConfigs[gld.Id] = Guilds;
                 await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             }
+        }
+
+        public static async Task CleverBot(SocketUserMessage message, SocketGuild gld)
+        {
+            var IsEnabled = GuildHandler.GuildConfigs[gld.Id].ChatterBot;
+            if (!IsEnabled || message.Author.IsBot || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
+            CleverbotResponse Response = null;
+            Response = CleverbotLib.Core.Talk(message.Content, Response);
+            await message.Channel.SendMessageAsync(Response.Output);
         }
     }
 }

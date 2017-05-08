@@ -159,6 +159,7 @@ namespace Rick.Services
              var message = msg as SocketUserMessage;
              await MethodService.AfkAsync(message, gld);
              await MethodService.ChatKarma(message, gld);
+             await MethodService.CleverBot(message, gld);
          });
 
         public async static Task OnReady()
