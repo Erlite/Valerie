@@ -118,16 +118,9 @@ namespace Rick.Services
             return (Math.Pow(karma, 2) + 10 * karma) / 5;
         }
 
-        public static double GetLevelFromXP(double karma)
+        public static int GetLevelFromXP(double karma)
         {
-            double RemainingXP = karma;
-            double Level = 0;
-            while (RemainingXP >= GiveKarma(karma))
-            {
-                RemainingXP -= GiveKarma(karma);
-                Level += 1;
-            }
-            return Level;
+            return Convert.ToInt32(Math.Sqrt(karma) / 5);
         }
 
         public static async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
