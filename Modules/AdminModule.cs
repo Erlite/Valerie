@@ -8,6 +8,7 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Classes;
+using System.Linq;
 
 namespace Rick.Modules
 {

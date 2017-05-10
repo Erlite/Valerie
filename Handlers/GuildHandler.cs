@@ -4,7 +4,6 @@ using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
 using Rick.Classes;
-using Newtonsoft.Json.Linq;
 
 namespace Rick.Handlers
 {
@@ -31,24 +30,19 @@ namespace Rick.Handlers
         public int CaseNumber { get; set; }
 
         [JsonProperty("JoinLogs")]
-        //public bool JoinLogs { get; set; }
-        public List<EventWrapper> JoinLogs { get; set; } = new List<EventWrapper>();
+        public bool JoinLogs { get; set; }
 
         [JsonProperty("LeaveLogs")]
-        //public bool LeaveLogs { get; set; }
-        public List<EventWrapper> LeaveLogs { get; set; } = new List<EventWrapper>();
+        public bool LeaveLogs { get; set; }
 
         [JsonProperty("NameChanges")]
-        //public bool NameChangesLogged { get; set; }
-        public List<EventWrapper> NameChangesLogged { get; set; } = new List<EventWrapper>();
+        public bool NameChangesLogged { get; set; }
 
         [JsonProperty("NickChanges")]
-        //public bool NickChangesLogged { get; set; }
-        public List<EventWrapper> NickChangesLogged { get; set; } = new List<EventWrapper>();
+        public bool NickChangesLogged { get; set; }
 
         [JsonProperty("UserBanned")]
-        //public bool UserBannedLogged { get; set; }
-        public List<EventWrapper> UserBannedLogged { get; set; } = new List<EventWrapper>();
+        public bool UserBannedLogged { get; set; }
 
         [JsonProperty("ChatKarma")]
         public bool ChatKarma { get; set; }
@@ -63,7 +57,7 @@ namespace Rick.Handlers
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
-        public List<Tags> TagsList { get; set; } = new List<Tags>();
+        public List<Tags> TagsList{ get; set; } = new List<Tags>();
 
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
@@ -74,7 +68,7 @@ namespace Rick.Handlers
         public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 
-        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T>(string path = configPath) where T : IGuildInterface, new()
+        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T> (string path = configPath) where T : IGuildInterface, new()
         {
             if (File.Exists(path))
             {
@@ -84,6 +78,5 @@ namespace Rick.Handlers
             await SaveAsync(path, newConfig).ConfigureAwait(false);
             return newConfig;
         }
-
     }
 }
