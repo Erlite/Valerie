@@ -4,6 +4,7 @@ using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
 using Rick.Classes;
+using Newtonsoft.Json.Linq;
 
 namespace Rick.Handlers
 {
@@ -30,7 +31,8 @@ namespace Rick.Handlers
         public int CaseNumber { get; set; }
 
         [JsonProperty("JoinLogs")]
-        public bool JoinLogs { get; set; }
+        //public bool JoinLogs { get; set; }
+        public List<EventWrapper> JoinLogs { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("LeaveLogs")]
         public bool LeaveLogs { get; set; }
@@ -78,5 +80,6 @@ namespace Rick.Handlers
             await SaveAsync(path, newConfig).ConfigureAwait(false);
             return newConfig;
         }
+
     }
 }

@@ -10,7 +10,8 @@ namespace Rick.Interfaces
         ulong ModChannelID { get; set; }
         ulong MuteRoleId { get; set; }
         int CaseNumber { get; set; }
-        bool JoinLogs { get; set; }
+        //bool JoinLogs { get; set; }
+        List<EventWrapper> JoinLogs { get; set; }
         bool LeaveLogs { get; set; }
         bool NameChangesLogged { get; set; }
         bool NickChangesLogged { get; set; }
