@@ -35,16 +35,20 @@ namespace Rick.Handlers
         public List<EventWrapper> JoinLogs { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("LeaveLogs")]
-        public bool LeaveLogs { get; set; }
+        //public bool LeaveLogs { get; set; }
+        public List<EventWrapper> LeaveLogs { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("NameChanges")]
-        public bool NameChangesLogged { get; set; }
+        //public bool NameChangesLogged { get; set; }
+        public List<EventWrapper> NameChangesLogged { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("NickChanges")]
-        public bool NickChangesLogged { get; set; }
+        //public bool NickChangesLogged { get; set; }
+        public List<EventWrapper> NickChangesLogged { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("UserBanned")]
-        public bool UserBannedLogged { get; set; }
+        //public bool UserBannedLogged { get; set; }
+        public List<EventWrapper> UserBannedLogged { get; set; } = new List<EventWrapper>();
 
         [JsonProperty("ChatKarma")]
         public bool ChatKarma { get; set; }
@@ -59,7 +63,7 @@ namespace Rick.Handlers
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
-        public List<Tags> TagsList{ get; set; } = new List<Tags>();
+        public List<Tags> TagsList { get; set; } = new List<Tags>();
 
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
@@ -70,7 +74,7 @@ namespace Rick.Handlers
         public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
             => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 
-        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T> (string path = configPath) where T : IGuildInterface, new()
+        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T>(string path = configPath) where T : IGuildInterface, new()
         {
             if (File.Exists(path))
             {
