@@ -139,7 +139,10 @@ namespace Rick.Services
         {
             var CreateConfig = new GuildHandler();
             GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs).ConfigureAwait(false);
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await client.StopAsync();
+            await Task.Delay(1000);
+            await client.StartAsync();
         }
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)

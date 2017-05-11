@@ -241,7 +241,7 @@ namespace Rick.Modules
         {
             var client = Context.Client as DiscordSocketClient;
             await client.StopAsync();
-            await Task.Delay(5000);
+            await Task.Delay(1000);
             await client.StartAsync();
             await ReplyAsync("Restarted!");
         }
