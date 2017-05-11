@@ -278,7 +278,6 @@
     <Compile Include="Classes\Bing.cs" />
     <Compile Include="Classes\EmbedColors.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
-    <Compile Include="Classes\Wrappers.cs" />
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Classes\ScriptGlobals.cs" />
     <Compile Include="Classes\Tags.cs" />
