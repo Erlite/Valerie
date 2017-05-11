@@ -16,7 +16,6 @@ namespace Rick
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
         private DiscordSocketClient client;
         private CommandHandler handler;
-        private GuildHandler GuildModel;
 
         public async Task StartAsync()
         {
@@ -61,8 +60,8 @@ namespace Rick
                 .AddSingleton(client)
                 .AddSingleton(new GuildHandler())
                 .AddSingleton(new BotHandler())
-                .AddSingleton(new EventService(client, GuildModel))
-                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false }))
+                .AddSingleton(new EventService(client))
+                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose}))
                 .AddSingleton(new InteractiveService(client));
 
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);

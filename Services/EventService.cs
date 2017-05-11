@@ -8,12 +8,10 @@ namespace Rick.Services
     public class EventService
     {
         private static DiscordSocketClient client;
-        private GuildHandler GuildModel;
 
-        public EventService(DiscordSocketClient c, GuildHandler gldhndler)
+        public EventService(DiscordSocketClient c)
         {
             client = c;
-            GuildModel = gldhndler;
         }
 
         public void EnableJoinLogging()
