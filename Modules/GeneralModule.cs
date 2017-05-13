@@ -316,6 +316,5 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), null, Description);
             await ReplyAsync("", embed: embed);
         }
-
     }
 }
