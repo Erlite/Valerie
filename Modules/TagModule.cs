@@ -37,7 +37,7 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedService.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), null, Description);
+            var embed = EmbedService.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

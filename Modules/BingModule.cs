@@ -3,8 +3,6 @@ using Discord.Commands;
 using System;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Linq;
 using Rick.Handlers;
 using Rick.Services;
 using Rick.Classes;
@@ -13,10 +11,10 @@ using Rick.Attributes;
 
 namespace Rick.Modules
 {
-    [Group("Bing"), CheckBlacklist]
+    [CheckBlacklist]
     public class BingModule : ModuleBase
     {
-        [Command("Image"), Summary("Bing Image rick and morty"), Remarks("Searches Bing for your image.")]
+        [Command("BImage"), Summary("Bing Image rick and morty"), Remarks("Searches Bing for your image.")]
         public async Task ImageAsync([Remainder] string search)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -47,7 +45,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Search"), Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
+        [Command("BSearch"), Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
         public async Task SearchAsync([Remainder]string search)
         {
             if (string.IsNullOrWhiteSpace(search))
