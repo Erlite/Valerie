@@ -19,30 +19,23 @@ namespace Rick.Modules
         }
 
         [Command("Commands"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
-        public async Task HelpAsync()
+        public async Task CommandsAsync()
         {
-            string Description = "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
-                "**Bing Commands:** [Group Name = Bing] Image, Bing, Video" +
+            string Description = 
+                "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
+                "**Bing Commands:** BImage, BSearch\n" +
                 "**Bot Commands:** [Group Name = Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk\n" + 
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt\n" + 
                 "**Github Commands:** [Group Name = Github] Userinfo\n" +
+                "**Google Commands:** Google, GImage, Youtube\n" +
                 "**Guild Commands:** [Group Name = Guild] Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleUsername, ToggleNicknames, ToggleBans, Channel, Role, ToggleKarma\n" +
                 "**Karma Commands:** Karma, Rank, Top\n" + 
                 "**Nsfw Commands:** Boobs, Bum, E621\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect\n" +
                 "**Search Commands:** Gif, Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
-                "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List\n\n For more info on command use: ?>Help CommandName";
-            var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "Full Command List: https://exceptiondev.github.io/Docs");
+                "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List";
+            var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
             await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Commands"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
-        public async Task CommandsAsync()
-        {
-            int argPos = 0;
-            var Result = _service.Modules.FirstOrDefault().Commands.FirstOrDefault();
-            string Msg = Result.Name;
-            await ReplyAsync(Msg);
         }
 
         [Command("Help")]
