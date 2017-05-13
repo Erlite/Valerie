@@ -316,5 +316,17 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), null, Description);
             await ReplyAsync("", embed: embed);
         }
+
+        [Command("Encrypt"), Summary("Encrypt Some String"), Remarks("Encrypts a string for you")]
+        public async Task EncryptAsync([Remainder] string Text, string Password)
+        {
+            await ReplyAsync(EncryptionService.EncryptString(Text, Password));
+        }
+
+        [Command("Decrypt"), Summary("Decrypt Some String Password"), Remarks("Decrypt a string for you")]
+        public async Task DecryptAsync([Remainder] string Text, string Password)
+        {
+            await ReplyAsync(EncryptionService.DecryptString(Text, Password));
+        }
     }
 }
