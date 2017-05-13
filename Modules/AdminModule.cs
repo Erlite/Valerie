@@ -92,9 +92,12 @@ namespace Rick.Modules
         [Command("Antiraid"), Summary("Antiraid"), Remarks("Disables all channels")]
         public async Task AntiRaidAsync()
         {
-            var build = new StringBuilder();
             var Guild = Context.Guild;
-            var GetChannels = (await Guild.GetChannelsAsync() as SocketGuildChannel).GetPermissionOverwrite();
+            var GuildUsers = await Guild.GetCurrentUserAsync();
+            var GetChannels = await Guild.GetChannelsAsync() as SocketGuildChannel;
+            var PermOver = GetChannels.GetPermissionOverwrite(GuildUsers);
+            var SendMessages = PermOver.Value.SendMessages;
+            //ugh idk man
         }
     }
 }
