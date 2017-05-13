@@ -297,34 +297,31 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Info"), Summary("Normal Command"), Remarks("Shows info about Bot")]
+        [Command("About"), Summary("Normal Command"), Remarks("Shows info about Bot")]
         public async Task InfoAsync()
         {
             var client = Context.Client as DiscordSocketClient;
-            var Name = client.CurrentUser.Username;
-            var TotalServers = client.Guilds.Count;
-            var TotalUsers = client.Guilds.Sum(x => x.Users.Count);
-            var TotalChannels = client.Guilds.Sum(x => x.TextChannels.Count + x.VoiceChannels.Count);
-            var Library = DiscordConfig.Version;
-            var Heap = $"{Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2)}MB";
-            var Runtime = $"{RuntimeInformation.FrameworkDescription}{ RuntimeInformation.OSArchitecture}";
-            var Uptime = $"{(DateTime.Now - Process.GetCurrentProcess().StartTime)}";
-            var API = DiscordConfig.APIVersion.ToString();
-            string Description = $"{Name} is written by @ExceptionDev#6045 in C# using Discord.Net 1.0 library and using .Net Framework 4.6.2!\n" +
-                $"{Name} is Open Source on Github [https://github.com/ExceptionDev/Rick]. If you like {Name} please do leave a Star on Github! It helps a lot!\n" +
-                $"**Total Servers:** {TotalServers}\n**Total Users:** {TotalUsers}\n**Total Channels:** {TotalChannels}\n**Library Version:** {Library}\n**API Version:** {API}\n**Heap Size:** {Heap}\n**Uptime:** {Uptime}\n**Runtime Info:** {Runtime}";
-            var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), null, Description);
+            var AppInfo = await client.GetApplicationInfoAsync();
+            string Description = $"Hello! I'm {AppInfo.Name} written by {AppInfo.Owner}! I'm also open source on Github! [https://github.com/ExceptionDev/Rick].\n" +
+                $"If you plan to copy code from my source please do put {AppInfo.Owner} in your credits/help/info/about command/website and if you copy/clone my repo please don't remove this command!\n" +
+                $"Also, leaving a star on my repo won't hurt you!\n" +
+                $"Please user the {BotHandler.BotConfig.DefaultPrefix}Cmds for commands list and {BotHandler.BotConfig.DefaultPrefix}Help CommandName for more info on a command!\n" +
+                $"**Services**\n" +
+                $"I offer wide range of commands for admins and the users! Ranging from Basic commands such as Getting user/guild info to Google/Bing search commands! " +
+                $"Wanna get naughty and keep your hands busy?! I've some NSFW commands as well to keep you entertained! " +
+                $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!";
+            var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Encrypt"), Summary("Encrypt Some String"), Remarks("Encrypts a string for you")]
-        public async Task EncryptAsync([Remainder] string Text, string Password)
+        [Command("Encrypt"), Summary("Encrypt Password Some String"), Remarks("Encrypts a string for you")]
+        public async Task EncryptAsync(string Password, [Remainder] string Text)
         {
             await ReplyAsync(EncryptionService.EncryptString(Text, Password));
         }
 
-        [Command("Decrypt"), Summary("Decrypt Some String Password"), Remarks("Decrypt a string for you")]
-        public async Task DecryptAsync([Remainder] string Text, string Password)
+        [Command("Decrypt"), Summary("Decrypt Password Some string"), Remarks("Decrypt a string for you")]
+        public async Task DecryptAsync(string Password, [Remainder] string Text)
         {
             await ReplyAsync(EncryptionService.DecryptString(Text, Password));
         }

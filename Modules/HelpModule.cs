@@ -18,7 +18,7 @@ namespace Rick.Modules
             _service = service;
         }
 
-        [Command("Help")]
+        [Command("Commands"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
         public async Task HelpAsync()
         {
             string Description = "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
@@ -32,8 +32,17 @@ namespace Rick.Modules
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect\n" +
                 "**Search Commands:** Gif, Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
                 "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List\n\n For more info on command use: ?>Help CommandName";
-            var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), null, Description, "Full Command List: https://exceptiondev.github.io/Docs");
+            var embed = EmbedService.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "Full Command List: https://exceptiondev.github.io/Docs");
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Commands"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
+        public async Task CommandsAsync()
+        {
+            int argPos = 0;
+            var Result = _service.Modules.FirstOrDefault().Commands.FirstOrDefault();
+            string Msg = Result.Name;
+            await ReplyAsync(Msg);
         }
 
         [Command("Help")]
