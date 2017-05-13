@@ -8,8 +8,6 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Classes;
-using System.Linq;
-using System.Text;
 
 namespace Rick.Modules
 {
@@ -87,17 +85,6 @@ namespace Rick.Modules
             var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
             await Task.Delay(3000);
             await msg.DeleteAsync();
-        }
-
-        [Command("Antiraid"), Summary("Antiraid"), Remarks("Disables all channels")]
-        public async Task AntiRaidAsync()
-        {
-            var Guild = Context.Guild;
-            var GuildUsers = await Guild.GetCurrentUserAsync();
-            var GetChannels = await Guild.GetChannelsAsync() as SocketGuildChannel;
-            var PermOver = GetChannels.GetPermissionOverwrite(GuildUsers);
-            var SendMessages = PermOver.Value.SendMessages;
-            //ugh idk man
         }
     }
 }
