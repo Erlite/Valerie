@@ -135,7 +135,7 @@ namespace Rick.Services
         public static async Task ChatKarma(SocketUserMessage message, SocketGuild gld)
         {
             var Guilds = GuildHandler.GuildConfigs[gld.Id];
-            if (message.Author.IsBot) return;
+            if (message.Author.IsBot || !Guilds.ChatKarma) return;
             Random rand = new Random();
             double RandomKarma = rand.Next(1, 5);
             RandomKarma = GiveKarma(RandomKarma);
@@ -158,7 +158,7 @@ namespace Rick.Services
         public static async Task CleverBot(SocketUserMessage message, SocketGuild gld)
         {
             var IsEnabled = GuildHandler.GuildConfigs[gld.Id].ChatterBot;
-            if (!IsEnabled || message.Author.IsBot || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
+            if (message.Author.IsBot || !message.Content.StartsWith(BotHandler.BotConfig.BotName) || !IsEnabled) return;
             CleverbotResponse Response = null;
             Response = CleverbotLib.Core.Talk(message.Content, Response);
             await message.Channel.SendMessageAsync(Response.Output);
