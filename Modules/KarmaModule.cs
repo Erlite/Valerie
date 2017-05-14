@@ -47,7 +47,7 @@ namespace Rick.Modules
                 await ReplyAsync("User doesn't exist or no Karma was found!");
             int Level =  MethodService.GetLevelFromXP(karma);
             string Description = $"{Context.User.Username} has a total Karma of **{karma}** and User level is **{Level}**";
-            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), null, Description);
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -64,7 +64,7 @@ namespace Rick.Modules
                 var Level = MethodService.GetLevelFromXP(val.Value);
                 Builder.AppendLine($"**{user.Username}** with **{val.Value}** karma and current level is **{Level}**");
             }
-            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl, null, Builder.ToString());
+            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl, Description: Builder.ToString());
             await ReplyAsync("", embed: embed);
         }
     }

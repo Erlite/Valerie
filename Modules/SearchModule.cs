@@ -10,6 +10,8 @@ using AngleSharp.Dom.Html;
 using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
+using Rick.Services;
+using Rick.Classes;
 
 namespace Rick.Modules
 {
@@ -21,7 +23,6 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(keywords))
                 throw new NullReferenceException("Please enter what you are trying to search for!");
-
             var getUrl = new Uri("http://api.giphy.com/");
             using (var client = new HttpClient())
             {
@@ -30,17 +31,7 @@ namespace Rick.Modules
                 response.EnsureSuccessStatusCode();
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var obj = JObject.Parse(jsonResponse);
-
-                var embed = new EmbedBuilder()
-                {
-                    Author = new EmbedAuthorBuilder()
-                    {
-                        Name = $"{Context.User.Username} searched for {keywords}",
-                        IconUrl = Context.User.GetAvatarUrl()
-                    },
-                    ImageUrl = obj["data"]["image_original_url"].ToString(),
-                    Color = new Color(153, 30, 87)
-                };
+                var embed = EmbedService.Embed(EmbedColors.Teal, $"{Context.User.Username} searched for {keywords}", Context.User.GetAvatarUrl(), ImageUrl: obj["data"]["image_original_url"].ToString());
                 await ReplyAsync("", false, embed);
             }
         }
@@ -120,17 +111,7 @@ namespace Rick.Modules
             if (img?.Source == null)
                 return;
             var source = img.Source.Replace("b.", ".");
-
-            var embed = new EmbedBuilder()
-                .WithColor(new Color(66, 244, 191))
-                .WithAuthor(x =>
-                {
-                    x.IconUrl = "https://s25.postimg.org/mi3j4sppb/imgur_1.png";
-                    x.Name = $"Searched for: {search}";
-                    x.Url = BaseUrl;
-                })
-                .WithDescription(source)
-                .WithImageUrl(source);
+            var embed = EmbedService.Embed(EmbedColors.Orange, $"Searched for: {search}", "https://s25.postimg.org/mi3j4sppb/imgur_1.png", source, ImageUrl: source);
             await ReplyAsync("", embed: embed);
         }
 
