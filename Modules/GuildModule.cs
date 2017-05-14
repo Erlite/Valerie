@@ -67,7 +67,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleJoins"), Summary("Normal Command"), Remarks("Toggles Join logging")]
-        public async Task LogJoinsAsync()
+        public async Task ToggleJoinsAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -88,7 +88,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleLeaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
-        public async Task LogLeavesAsync()
+        public async Task ToggleLeavesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -109,7 +109,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleUsername"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
-        public async Task LogNameChangesAsync()
+        public async Task ToggleUsernamesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -130,7 +130,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleNicknames"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
-        public async Task LogNickChangesAsync()
+        public async Task ToggleNicknamesAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -151,7 +151,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
-        public async Task BanLogAsync()
+        public async Task ToggleBansAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -222,7 +222,7 @@ namespace Rick.Modules
         }
 
         [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
-        public async Task EnableKarmaAsync()
+        public async Task ToggleKarmaAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -235,6 +235,25 @@ namespace Rick.Modules
             {
                 gldConfig.ChatKarma = false;
                 await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
+
+        [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
+        public async Task ToggleChatterBotAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.ChatterBot)
+            {
+                gldConfig.ChatterBot = true;
+                await ReplyAsync(":gear: Chatterbot enabled!");
+            }
+            else
+            {
+                gldConfig.ChatterBot = false;
+                await ReplyAsync(":skull_crossbones: Chatterbot disabled!");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
