@@ -158,9 +158,9 @@ namespace Rick.Services
          {
              var gld = (msg.Channel as SocketGuildChannel).Guild;
              var message = msg as SocketUserMessage;
-             await MethodService.AfkAsync(message, gld);
-             await MethodService.ChatKarma(message, gld);
-             await MethodService.CleverBot(message, gld);
+             await MsgsService.AfkAsync(message, gld);
+             await MsgsService.ChatKarmaAsync(message, gld);
+             await MsgsService.CleverBotAsync(message, gld);
          });
 
         public async static Task OnReady()
