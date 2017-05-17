@@ -12,6 +12,7 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Classes;
+using Newtonsoft.Json;
 
 namespace Rick.Modules
 {
@@ -190,5 +191,27 @@ namespace Rick.Modules
             { await ReplyAsync(e.Message); }
         }
 
+        [Command("Wiki"), Summary("Wiki Kendrick Lamar"), Remarks("Searches wikipedia for your terms")]
+        public async Task WikiAsync([Remainder]string search)
+        {
+            HttpClient HttpClient = new HttpClient();
+            var GetResult = HttpClient.GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}").Result;
+            var GetContent = GetResult.Content.ReadAsStringAsync().Result;
+            dynamic responseObject = JsonConvert.DeserializeObject(GetContent);
+            try
+            {
+                string title = responseObject[1][0];
+                string url = responseObject[3][0];
+                string firstParagraph = responseObject[2][0];
+
+                string Description = firstParagraph;
+                var embed = EmbedService.Embed(EmbedColors.Pastle, $"Searched for: {search.ToUpper()}", Context.User.GetAvatarUrl(), Description: Description, ImageUrl: url);
+                await ReplyAsync("", false, embed);
+            }
+            catch(ArgumentException args)
+            {
+                await ReplyAsync(args.ToString());
+            }
+        }
     }
 }
