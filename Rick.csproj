@@ -264,6 +264,7 @@
     <Compile Include="Classes\Message.cs" />
     <Compile Include="Classes\ScriptGlobals.cs" />
     <Compile Include="Classes\Tags.cs" />
+    <Compile Include="Classes\Watson.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
@@ -288,7 +289,7 @@
     <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EncryptionService.cs" />
     <Compile Include="Services\EventService.cs" />
-    <Compile Include="Services\MethodService.cs" />
+    <Compile Include="Services\StaticMethodService.cs" />
     <Compile Include="Services\MsgsService.cs" />
   </ItemGroup>
   <ItemGroup>
