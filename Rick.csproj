@@ -289,6 +289,7 @@
     <Compile Include="Services\EncryptionService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\MethodService.cs" />
+    <Compile Include="Services\MsgsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
