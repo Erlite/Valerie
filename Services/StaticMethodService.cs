@@ -8,10 +8,13 @@ using System.Linq;
 using System.Reflection;
 using Rick.Handlers;
 using System.Diagnostics;
+using Rick.Classes;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Rick.Services
 {
-    public static class MethodService
+    public static class StaticMethodService
     {
         public static async Task DownloadAsync(this HttpClient client, Uri requestUri, string filename)
         {
@@ -102,6 +105,33 @@ namespace Rick.Services
             }
             else
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
+        }
+
+        public static async Task<Watson> Translate(string dest, string text)
+        {
+            string json = null;
+
+            using (var client = new HttpClient())
+            {
+                var message = new HttpRequestMessage();
+                message.Method = HttpMethod.Post;
+                message.Content = new StringContent(text, Encoding.UTF8, "text/plain");
+                message.RequestUri = new Uri("https://watson-api-explorer.mybluemix.net/language-translator/api/v2/identify");
+                message.Headers.Add("Accept", "text/plain");
+                message.Headers.Add("accept", "text/plain");
+                var result = await client.SendAsync(message);
+                string lang = await result.Content.ReadAsStringAsync();
+                message = new HttpRequestMessage();
+                message.Method = HttpMethod.Post;
+                message.Content = new StringContent("{\"source\":\"" + lang + "\",\"target\": \"" + dest + "\", \"text\":[\"" + text + "\"]}", Encoding.UTF8, "application/json");
+                message.RequestUri = new Uri("https://watson-api-explorer.mybluemix.net/language-translator/api/v2/translate");
+                message.Headers.Add("Accept", "application/json");
+                message.Headers.Add("accept", "application/json");
+                result = await client.SendAsync(message);
+                json = await result.Content.ReadAsStringAsync();
+            }
+
+            return JsonConvert.DeserializeObject<Watson>(json);
         }
     }
 }

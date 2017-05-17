@@ -325,5 +325,21 @@ namespace Rick.Modules
         {
             await ReplyAsync(EncryptionService.DecryptString(Text, Password));
         }
+
+        [Command("Rate"), Summary("Rate Pizza"), Remarks("Rates something out of 10")]
+        public async Task Rate([Remainder] string text)
+        {
+            await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
+        }
+
+        [Command("Translate"), Summary("Translate Spanish What the Pizza?"), Remarks("Translates a Given Sentence")]
+        public async Task Translate(string Language, [Remainder] string Text)
+        {
+            var result = await StaticMethodService.Translate(Language, Text);
+            string Description = $"**Input:** {Text}\n" +
+                $"**In {Language}:** {result.Translations[0].Translation}";
+            var embed = EmbedService.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
+        }
     }
 }
