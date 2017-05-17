@@ -31,25 +31,17 @@ namespace Rick.Modules
         public async Task ServerListAsync()
         {
             var client = Context.Client as DiscordSocketClient;
-            var embed = new EmbedBuilder();
+            var Info = await client.GetApplicationInfoAsync();
+
+            var String = new StringBuilder();
             foreach (SocketGuild guild in client.Guilds)
             {
-                embed.AddField(x =>
-                {
-                    x.Name = $"{guild.Name} || {guild.Id}";
-                    x.Value = $"Guild Owner: { guild.Owner} || { guild.OwnerId}\nGuild Members: {guild.MemberCount}";
-                    x.IsInline = true;
-                });
+                string List = $"{guild.Name} || {guild.Id}\n" +
+                    $"**Guild Owner:** {guild.Owner.Username} || {guild.OwnerId}\n" +
+                    $"==========================================";
+                String.AppendLine(List);
             }
-            embed.Title = "=== Server List ===";
-            embed.Color = new Color(244, 66, 113);
-            embed.Footer = new EmbedFooterBuilder()
-            {
-                Text = $"Total Guilds: {client.Guilds.Count.ToString()}",
-                IconUrl = "http://tabard.gnomeregan.info/result/faction_Alliance_icon_emblem_00_border_border_00_iconcolor_ffffff_bgcolor_000000_bordercolor_ffffff.png"
-            };
-
-            await ReplyAsync("", embed: embed);
+            await (await Info.Owner.CreateDMChannelAsync()).SendMessageAsync(String.ToString());
         }
 
         [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
