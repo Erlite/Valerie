@@ -99,7 +99,7 @@ namespace Rick.Modules
         }
 
         [Command("Imgur"), Summary("Imgur XD"), Remarks("Searches imgure for your image")]
-        public async Task ImgurAsync([Remainder]string search)
+        public async Task ImgurAsync([Remainder] string search)
         {
             var BaseUrl = $"http://imgur.com/search?q={search}";
             var config = Configuration.Default.WithDefaultLoader();
@@ -161,14 +161,8 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
-                    var embed = new EmbedBuilder()
-                        .WithAuthor(x =>
-                        {
-                            x.Name = Context.Client.CurrentUser.Username;
-                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                        })
-                        .WithColor(new Color(102, 255, 255))
-                        .WithDescription(get);
+                    string Description = get;
+                    var embed = EmbedService.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -187,14 +181,8 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
-                    var embed = new EmbedBuilder()
-                        .WithAuthor(x =>
-                        {
-                            x.Name = Context.Client.CurrentUser.Username;
-                            x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                        })
-                        .WithColor(new Color(102, 255, 255))
-                        .WithDescription($"```{get}```");
+                    string Description = $"```{get}```";
+                    var embed = EmbedService.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
                     await ReplyAsync("", embed: embed);
                 }
             }
