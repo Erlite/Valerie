@@ -11,7 +11,7 @@ using Rick.Classes;
 
 namespace Rick.Modules
 {
-    [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
+    [RequireUserPermission(GuildPermission.Administrator),CheckBlacklist]
     public class AdminModule : ModuleBase
     {
         private InteractiveService inter;
@@ -21,7 +21,7 @@ namespace Rick.Modules
             inter = inte;
         }
 
-        [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild"), RequireBotPermission(GuildPermission.BanMembers)]
+        [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
         public async Task KickAsync(SocketGuildUser user, [Remainder] string Reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
@@ -41,7 +41,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild"), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
         public async Task BanAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];            
@@ -61,7 +61,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
-        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user"), RequireBotPermission(GuildPermission.MuteMembers)]
+        [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
         public async Task MuteAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
@@ -75,7 +75,6 @@ namespace Rick.Modules
         }
 
         [Command("Delete"), Summary("Delete 10"), Remarks("Deletes X amount of messages"), Alias("Del")]
-        [RequireBotPermission(GuildPermission.ManageMessages), RequireContext(ContextType.Guild)]
         public async Task DeleteAsync(int range = 0)
         {
             if (range <= 0)
@@ -85,6 +84,24 @@ namespace Rick.Modules
             var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
             await Task.Delay(3000);
             await msg.DeleteAsync();
+        }
+
+        [Command("Addrole"), Summary("Addrole @Username @RoleName"), Remarks("Adds role to a user"), Alias("Arole")]
+        public async Task AroleAsync(SocketGuildUser User, SocketRole Role)
+        {
+            await User.AddRoleAsync(Role);
+            string Description = $"{User.Username} has been added to {Role.Name}!";
+            var embed = EmbedService.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Removerole"), Summary("RemoveRole @Username @RoleName"), Remarks("Removes role from a user"), Alias("Rrole")]
+        public async Task RemoveRoleAsync(SocketGuildUser User, SocketRole Role)
+        {
+            await User.RemoveRoleAsync(Role);
+            string Description = $"{User.Username} has been removed from {Role.Name}!";
+            var embed = EmbedService.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
         }
     }
 }
