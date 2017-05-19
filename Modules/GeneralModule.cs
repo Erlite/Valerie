@@ -202,6 +202,9 @@ namespace Rick.Modules
             var UserJoined = usr.JoinedAt;
             var UserPerms = usr.GuildPermissions;
 
+            if (string.IsNullOrEmpty(userNick))
+                userNick = "User has no nickname!";
+
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
             var embed = EmbedService.Embed(EmbedColors.White, user.Username, user.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
