@@ -14,6 +14,8 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Rick.Services;
 using Rick.Handlers;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Rick.Modules
 {
@@ -236,6 +238,28 @@ namespace Rick.Modules
             await Task.Delay(1000);
             await client.StartAsync();
             await ReplyAsync("Restarted!");
+        }
+
+        [Command("Info"), Summary("Normal Command"), Remarks("Shows application info")]
+        public async Task InfoAsync()
+        {
+            var application = await Context.Client.GetApplicationInfoAsync();
+            long length = new FileInfo(BotHandler.configPath).Length + new FileInfo(GuildHandler.configPath).Length;
+            string Description = $"{Format.Bold("Info")}\n" +
+                                $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n" +
+                                $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
+                                $"- Runtime: {RuntimeInformation.FrameworkDescription} {RuntimeInformation.OSArchitecture}\n" +
+                                $"- Uptime: {(DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss")}\n\n" +
+
+                                $"{Format.Bold("Stats")}\n" +
+                                $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
+                                $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
+                                $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
+                                $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
+                                $"- Databse Size: {length} Bytes";
+
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
         }
     }
 }
