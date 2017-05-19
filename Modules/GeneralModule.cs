@@ -13,7 +13,6 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
 using Rick.Services;
-using System.Runtime.InteropServices;
 
 namespace Rick.Modules
 {
@@ -315,15 +314,27 @@ namespace Rick.Modules
         }
 
         [Command("Encrypt"), Summary("Encrypt Password Some String"), Remarks("Encrypts a string for you")]
-        public async Task EncryptAsync(string Password, [Remainder] string Text)
+        public async Task EncryptAsync([Remainder] string Text)
         {
-            await ReplyAsync(EncryptionService.EncryptString(Text, Password));
+            string Get = EncryptionService.EncryptString(Text);
+            if (string.IsNullOrWhiteSpace(Get))
+            {
+                await ReplyAsync("Null result");
+                return;
+            }
+            await ReplyAsync(Get);
         }
 
         [Command("Decrypt"), Summary("Decrypt Password Some string"), Remarks("Decrypt a string for you")]
-        public async Task DecryptAsync(string Password, [Remainder] string Text)
+        public async Task DecryptAsync([Remainder] string Text)
         {
-            await ReplyAsync(EncryptionService.DecryptString(Text, Password));
+            string Get = EncryptionService.DecryptString(Text);
+            if (string.IsNullOrWhiteSpace(Get))
+            {
+                await ReplyAsync("Null result");
+                return;
+            }
+            await ReplyAsync(Get);
         }
 
         [Command("Rate"), Summary("Rate Pizza"), Remarks("Rates something out of 10")]

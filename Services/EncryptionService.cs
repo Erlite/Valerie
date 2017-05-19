@@ -9,12 +9,13 @@ namespace Rick.Services
     {
         private const string initVector = "##MuchWow69x0x";
         private const int keysize = 256;
+        public const string Password = "###DogePowerUltimateMuchWow123###";
 
-        public static string EncryptString(string plainText, string passPhrase)
+        public static string EncryptString(string plainText)
         {
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(initVector);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null);
+            PasswordDeriveBytes password = new PasswordDeriveBytes(Password, null);
             byte[] keyBytes = password.GetBytes(keysize / 8);
             RijndaelManaged symmetricKey = new RijndaelManaged();
             symmetricKey.Mode = CipherMode.CBC;
@@ -29,11 +30,11 @@ namespace Rick.Services
             return Convert.ToBase64String(cipherTextBytes);
         }
 
-        public static string DecryptString(string cipherText, string passPhrase)
+        public static string DecryptString(string cipherText)
         {
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(initVector);
             byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null);
+            PasswordDeriveBytes password = new PasswordDeriveBytes(Password, null);
             byte[] keyBytes = password.GetBytes(keysize / 8);
             RijndaelManaged symmetricKey = new RijndaelManaged();
             symmetricKey.Mode = CipherMode.CBC;
