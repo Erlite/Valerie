@@ -11,7 +11,7 @@ using Rick.Classes;
 
 namespace Rick.Modules
 {
-    [RequireUserPermission(GuildPermission.Administrator),CheckBlacklist]
+    [ CheckBlacklist, PermissionCheck(GuildPermission.Administrator, GuildPermission.BanMembers, GuildPermission.KickMembers, GuildPermission.ManageMessages, GuildPermission.ManageRoles)]
     public class AdminModule : ModuleBase
     {
         private InteractiveService inter;
