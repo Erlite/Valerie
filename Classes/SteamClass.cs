@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Rick.Classes
 {
@@ -23,5 +19,60 @@ namespace Rick.Classes
     public class SteamAppNews
     {
         public Appnews appnews { get; set; }
+    }
+
+
+    // Player Summary
+    public class SteamPlayer
+    {
+        public string personaname { get; set; }
+        public int lastlogoff { get; set; }
+        public string profileurl { get; set; }
+        public string avatarfull { get; set; }
+        public int personastate { get; set; }
+        public string realname { get; set; }
+        public string primaryclanid { get; set; }
+        public int timecreated { get; set; }
+        public string loccountrycode { get; set; }
+        public string locstatecode { get; set; }
+    }
+
+    public class SummarResponse
+    {
+        public List<SteamPlayer> players { get; set; }
+    }
+
+    public class PlayerSummary
+    {
+        public SummarResponse response { get; set; }
+    }
+
+
+    // Get owned games
+    public class GamesResponse
+    {
+        public int game_count { get; set; }
+    }
+
+    public class OwnedGames
+    {
+        public GamesResponse response { get; set; }
+    }
+
+    // Get recently played
+    public class Game
+    {
+        public string name { get; set; }
+    }
+
+    public class RecentGames
+    {
+        public int total_count { get; set; }
+        public List<Game> games { get; set; }
+    }
+
+    public class GetRecent
+    {
+        public RecentGames response { get; set; }
     }
 }
