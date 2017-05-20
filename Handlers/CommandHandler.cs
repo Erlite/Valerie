@@ -6,7 +6,6 @@ using Discord.Commands;
 using Discord;
 using Rick.Services;
 using Discord.Addons.InteractiveCommands;
-using System.IO;
 using System;
 using Rick.Classes;
 using Microsoft.Extensions.DependencyInjection;
