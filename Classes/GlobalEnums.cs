@@ -6,6 +6,7 @@
         Remove,
         AddId,
         RemoveId,
+        Modify,
         TagName,
         TagResponse
     }
