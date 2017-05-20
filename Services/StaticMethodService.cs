@@ -81,7 +81,7 @@ namespace Rick.Services
             {
                 ConsoleService.Log("Autoupdate", "Checking for updates ...");
                 var Http = new HttpClient();
-                var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Docs/Downloads/version.txt");
+                var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
                 double version = Convert.ToDouble(GetUrl);
                 if (BotHandler.BotVersion < version)
                 {
@@ -91,7 +91,7 @@ namespace Rick.Services
                     if (Response == "yes")
                     {
                         ConsoleService.Log("Autoupdate", "Downloading update ...");
-                        Uri url = new Uri("https://exceptiondev.github.io/Docs/Downloads/Installer.bat");
+                        Uri url = new Uri("https://exceptiondev.github.io/Downloads/Installer.bat");
                         await Http.DownloadAsync(url, "Installer.bat");
                         Process.Start("Installer.bat");
                         await Task.Delay(5000);

@@ -259,13 +259,14 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="Classes\Bing.cs" />
+    <Compile Include="Classes\BingClass.cs" />
     <Compile Include="Classes\EmbedColors.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
-    <Compile Include="Classes\Message.cs" />
+    <Compile Include="Classes\MsgClass.cs" />
     <Compile Include="Classes\ScriptGlobals.cs" />
-    <Compile Include="Classes\Tags.cs" />
-    <Compile Include="Classes\Watson.cs" />
+    <Compile Include="Classes\SteamClass.cs" />
+    <Compile Include="Classes\TagsClass.cs" />
+    <Compile Include="Classes\WatsonClass.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
@@ -284,6 +285,7 @@
     <Compile Include="Modules\NSFWModule.cs" />
     <Compile Include="Modules\OwnerModule.cs" />
     <Compile Include="Modules\SearchModule.cs" />
+    <Compile Include="Modules\SteamModule.cs" />
     <Compile Include="Modules\TagModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConsoleService.cs" />
