@@ -141,6 +141,13 @@ namespace Rick.Services
             await client.StopAsync();
             await Task.Delay(1000);
             await client.StartAsync();
+            string Prefix = BotHandler.BotConfig.DefaultPrefix;
+            string Msg = $"Hello! I'm {client.CurrentUser.Username} written by ExceptionDev!\n" +
+                $"For commands list please type `{Prefix}Commands or {Prefix}Cmds`. If you need info on how to use a command please type `{Prefix}Help CommandName`\n" +
+                $"Github: https://github.com/ExceptionDev/Rick\n" +
+                $"Please help support this Bot's development by leaving a star on the repo! That would be great! " +
+                $"If you come across any issues please feel free to join my guild: `https://discord.me/Noegenesis` or open a new issue on the repo! Thank you for choosing me!";
+            await (await Guild.Owner.CreateDMChannelAsync()).SendMessageAsync(Msg);
         }
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
