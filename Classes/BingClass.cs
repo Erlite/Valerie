@@ -19,18 +19,4 @@ namespace Rick.Classes
     {
         public SearchWebPages webPages { get; set; }
     }
-
-    public class VideoValue
-    {
-        public string name { get; set; }
-        public string thumbnailUrl { get; set; }
-        public string contentUrl { get; set; }
-    }
-
-    public class VideoRoot
-    {
-        public int totalEstimatedMatches { get; set; }
-        public List<VideoValue> value { get; set; }
-    }
-
 }
