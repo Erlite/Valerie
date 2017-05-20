@@ -343,18 +343,106 @@ namespace Rick.Modules
         }
 
         [Command("Rate"), Summary("Rate Pizza"), Remarks("Rates something out of 10")]
-        public async Task Rate([Remainder] string text)
+        public async Task RateAsync([Remainder] string text)
         {
             await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
         }
 
         [Command("Translate"), Summary("Translate Spanish What the Pizza?"), Remarks("Translates a Given Sentence")]
-        public async Task Translate(string Language, [Remainder] string Text)
+        public async Task TranslateAsync(string Language, [Remainder] string Text)
         {
             var result = await StaticMethodService.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
             var embed = EmbedService.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Slotmachine"), Summary("Slotmachine 100"), Remarks("Slot machine!")]
+        public async Task SlotMachineAsync(int Bet = 666)
+        {
+            string[] Slots = new string[]
+            {
+                ":heart:",
+                ":eggplant:",
+                ":poo:",
+                ":eyes:",
+                ":star2:",
+                ":peach:",
+                ":pizza:"
+            };
+            var Rand = new Random(DateTime.Now.Millisecond);
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            gldConfig.Karma.TryGetValue(Context.User.Id, out int Credits);
+
+            if (Credits <= 0 || Credits < Bet)
+            {
+                await ReplyAsync("You don't have enough karma for slot machine!");
+                return;
+            }
+            if (Bet <= 0)
+            {
+                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 666!");
+                return;
+            }
+
+            var embed = new EmbedBuilder();
+
+            int[] s = new int[]
+            {
+                Rand.Next(0, Slots.Length),
+                Rand.Next(0, Slots.Length),
+                Rand.Next(0, Slots.Length)
+            };
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 1";
+                x.Value = Slots[s[0]];
+                x.IsInline = true;
+            });
+
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 2";
+                x.Value = Slots[s[1]];
+                x.IsInline = true;
+            });
+
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 3";
+                x.Value = Slots[s[2]];
+                x.IsInline = true;
+            });
+
+            int win = 0;
+            if (s[0] == s[1] & s[0] == s[2]) win = 10;
+            else if (s[0] == s[1] || s[0] == s[2] || s[1] == s[2]) win = 2;
+
+            if (win == 0)
+            {
+                Credits -= Bet;
+                embed.Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"{Context.User.Username} Lost!",
+                    IconUrl = Context.User.GetAvatarUrl()
+                };
+                embed.Description = $"You lost {Bet}! Better luck next time! :weary:\nYour current Karma is {Credits}";
+                embed.Color = new Color(0xff0000);
+            }
+            else
+            {
+                Credits += Bet;
+                embed.Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"{Context.User.Username} won!",
+                    IconUrl = Context.User.GetAvatarUrl()
+                };
+                embed.Description = $"You WOOOON {Bet}! :tada:\nYour current Karma is {Credits}";
+                embed.Color = new Color(0xff0000);
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync("", embed: embed);
         }
     }
