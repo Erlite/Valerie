@@ -107,7 +107,7 @@ namespace Rick.Services
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
         }
 
-        public static async Task<Watson> Translate(string dest, string text)
+        public static async Task<WatsonClass> Translate(string dest, string text)
         {
             string json = null;
 
@@ -131,7 +131,7 @@ namespace Rick.Services
                 json = await result.Content.ReadAsStringAsync();
             }
 
-            return JsonConvert.DeserializeObject<Watson>(json);
+            return JsonConvert.DeserializeObject<WatsonClass>(json);
         }
     }
 }

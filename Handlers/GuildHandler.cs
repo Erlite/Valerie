@@ -57,7 +57,7 @@ namespace Rick.Handlers
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
-        public List<Tags> TagsList{ get; set; } = new List<Tags>();
+        public List<TagsClass> TagsList{ get; set; } = new List<TagsClass>();
 
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();

@@ -1,6 +1,6 @@
 ﻿namespace Rick.Classes
 {
-    public class Tags
+    public class TagsClass
     {
         public string TagName { get; set; }
         public string TagResponse { get; set; }

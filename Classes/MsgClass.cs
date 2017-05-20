@@ -2,7 +2,7 @@
 
 namespace Rick.Classes
 {
-    public class Message
+    public class MsgClass
     {
         public string Author;
         public string Content;

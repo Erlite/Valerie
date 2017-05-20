@@ -19,7 +19,7 @@ namespace Rick.Interfaces
         bool ChatterBot { get; set;  }
         List<ulong> RequiredRoleIDs { get; set;}
         List<string> RequiredChannelNames { get; set; }
-        List<Tags> TagsList { get; set; }
+        List<TagsClass> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
         Dictionary<ulong, int> Karma { get; set; }
     }

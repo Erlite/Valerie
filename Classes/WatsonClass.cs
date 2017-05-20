@@ -2,7 +2,7 @@
 
 namespace Rick.Classes
 {
-    public class Watson
+    public class WatsonClass
     {
         [JsonProperty("word_count")]
         public int WordCount { get; set; }

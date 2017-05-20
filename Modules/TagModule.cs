@@ -26,7 +26,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var MakeTags = gldConfig.TagsList;
-            var tag = new Tags
+            var tag = new TagsClass
             {
                 TagName = Name,
                 TagResponse = response,
@@ -135,7 +135,7 @@ namespace Rick.Modules
                 await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
-        public async Task RemoveTag(Tags tag)
+        public async Task RemoveTag(TagsClass tag)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;

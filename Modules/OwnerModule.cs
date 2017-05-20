@@ -96,9 +96,9 @@ namespace Rick.Modules
             if (channelToArchive != null)
             {
                 var listOfMessages = new List<IMessage>(await channelToArchive.GetMessagesAsync(amount).Flatten());
-                List<Message> list = new List<Message>(listOfMessages.Capacity);
+                List<MsgClass> list = new List<MsgClass>(listOfMessages.Capacity);
                 foreach (var message in listOfMessages)
-                    list.Add(new Message { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
+                    list.Add(new MsgClass { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
                 var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
                 await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
