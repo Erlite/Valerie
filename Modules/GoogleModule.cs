@@ -35,7 +35,7 @@ namespace Rick.Modules
                 Str.AppendLine($"**=> {result.Title}**\n{result.Link}");
             }
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Search for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
@@ -54,7 +54,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Youtube"), Summary("Youtube SomeVideo Name"), Remarks("Searches youtube for your video")]
+        [Command("Youtube"), Summary("Youtube SomeVideo Name"), Remarks("Searches youtube for your video"), Alias("Yt")]
         public async Task YoutubeAsync([Remainder] string search)
         {
             var Service = new YouTubeService(new BaseClientService.Initializer
