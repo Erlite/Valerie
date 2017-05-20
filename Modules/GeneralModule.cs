@@ -311,7 +311,9 @@ namespace Rick.Modules
                 $"**Services**\n" +
                 $"I offer wide range of commands for admins and the users! Ranging from Basic commands such as Getting user/guild info to Google/Bing search commands! " +
                 $"Wanna get naughty and keep your hands busy?! I've some NSFW commands as well to keep you entertained! " +
-                $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!";
+                $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!\n" +
+                $"**Invite URL:** https://discordapp.com/oauth2/authorize?client_id={AppInfo.Id}&scope=bot&permissions=2146958591\n" +
+                $"**Help Guild:** https://discord.me/Noegenesis";
             var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
