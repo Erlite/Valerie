@@ -19,7 +19,7 @@ namespace Rick.Handlers
         public const string configPath = "BotConfig.json";
 
         [JsonIgnore]
-        public const double BotVersion = 20.2;
+        public const double BotVersion = 33.7;
 
         [JsonProperty("BotToken")]
         public string BotToken { get; set; }
