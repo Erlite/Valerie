@@ -48,6 +48,9 @@ namespace Rick.Handlers
         [JsonProperty("CleverBotAPIKey")]
         public string CleverBotAPIKey { get; set; }
 
+        [JsonProperty("SteamAPIKey")]
+        public string SteamAPIKey { get; set; }
+
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 

@@ -14,6 +14,7 @@ namespace Rick.Interfaces
         string GoogleAPIKey { get; set; }
         string SearchEngineID { get; set; }
         string CleverBotAPIKey { get; set; }
+        string SteamAPIKey { get; set; }
         bool DebugMode { get; set; }
         bool ClientLatency { get; set; }
         bool AutoUpdate { get; set; }
