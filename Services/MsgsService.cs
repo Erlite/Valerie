@@ -25,7 +25,7 @@ namespace Rick.Services
             string afkReason = null;
             SocketUser gldUser = message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason));
             if (gldUser != null)
-                await message.Channel.SendMessageAsync(afkReason);
+                await message.Channel.SendMessageAsync($"**Message left from {gldUser.Username}:** {afkReason}");
         }
 
         public static async Task ChatKarmaAsync(SocketUserMessage message, SocketGuild gld)

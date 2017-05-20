@@ -282,6 +282,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             var List = gldConfig.AfkList;
 
+
             switch (prop)
             {
                 case GlobalEnums.Add:
@@ -292,6 +293,11 @@ namespace Rick.Modules
                 case GlobalEnums.Remove:
                     List.Remove(Context.User.Id);
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
+                    break;
+
+                case GlobalEnums.Modify:
+                    List[Context.User.Id] = msg;
+                    await ReplyAsync("Your message has been modified!");
                     break;
             }
 
