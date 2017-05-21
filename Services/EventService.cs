@@ -2,6 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
+using System.IO;
 
 namespace Rick.Services
 {
@@ -138,9 +139,10 @@ namespace Rick.Services
             var CreateConfig = new GuildHandler();
             GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-            await client.StopAsync();
-            await Task.Delay(1000);
-            await client.StartAsync();
+        }
+
+        public async static Task JoinedGuildAsync(SocketGuild Guild)
+        {
             string Prefix = BotHandler.BotConfig.DefaultPrefix;
             string Msg = $"Hello! I'm {client.CurrentUser.Username} written by ExceptionDev!\n" +
                 $"For commands list please type `{Prefix}Commands or {Prefix}Cmds`. If you need info on how to use a command please type `{Prefix}Help CommandName`\n" +
@@ -148,6 +150,7 @@ namespace Rick.Services
                 $"Please help support this Bot's development by leaving a star on the repo! That would be great! " +
                 $"If you come across any issues please feel free to join my guild: `https://discord.me/Noegenesis` or open a new issue on the repo! Thank you for choosing me!";
             await (await Guild.Owner.CreateDMChannelAsync()).SendMessageAsync(Msg);
+            GuildHandler.RestartApp();
         }
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
@@ -170,7 +173,7 @@ namespace Rick.Services
              await MsgsService.CleverBotAsync(message, gld);
          });
 
-        public async static Task OnReady()
+        public async static Task OnReadyAsync()
         {
             await client.SetGameAsync(BotHandler.BotConfig.BotGame);
         }

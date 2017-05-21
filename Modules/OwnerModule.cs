@@ -244,6 +244,13 @@ namespace Rick.Modules
         public async Task InfoAsync()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
+            var AppInfo = Process.GetCurrentProcess();
+            var S = new StringBuilder();
+            var Is64BitStr = Environment.Is64BitProcess ? "Yes" : "No";
+            var Is64Bit = IntPtr.Size == 8 ? "Yes" : "No";
+            var IsOS64 = Environment.Is64BitOperatingSystem ? "Yes" : "No";
+            var isMono = Environment.Is64BitOperatingSystem ? "Yes" : "No";
+
             long length = new FileInfo(BotHandler.configPath).Length + new FileInfo(GuildHandler.configPath).Length;
             string Description = $"{Format.Bold("Info")}\n" +
                                 $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n" +
@@ -256,9 +263,27 @@ namespace Rick.Modules
                                 $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
                                 $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
                                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
-                                $"- Databse Size: {length} Bytes";
+                                $"- Databse Size: {length} Bytes\n\n" +
 
-            var embed = EmbedService.Embed(EmbedColors.Gold, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
+                                $"{Format.Bold("Full dump of all diagnostic information about this instance.")}\n" +
+                                $"- PID: {AppInfo.Id}\n" +
+                                $"- Is 64-bit: {Is64BitStr}\n" +
+                                $"- Is 64-bit: {Is64Bit}\n" +
+                                $"- Thread count: {AppInfo.Threads.Count}\n" +
+                                $"- Total processor time: {AppInfo.TotalProcessorTime:c}\n" +
+                                $"- User processor time: {AppInfo.UserProcessorTime:c}\n" +
+                                $"- Privileged processor time: {AppInfo.PrivilegedProcessorTime:c}\n" +
+                                $"- Handle count: {AppInfo.HandleCount:#,##0}\n" +
+                                $"- Working set: {AppInfo.WorkingSet64.ToString()}\n" +
+                                $"- Virtual memory size: {AppInfo.VirtualMemorySize64.ToString()}\n" +
+                                $"- Paged memory size: {AppInfo.PagedMemorySize64.ToString()}\n\n" +
+
+                                $"{Format.Bold("OS and .Net")}" +
+                                $"- OS platform: {Environment.OSVersion.Platform.ToString()}\n" +
+                                $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
+                                $"- OS is 64-bit: {IsOS64}\n" +
+                                $"- .NET is Mono: {isMono}\n";
+            var embed = EmbedService.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
     }

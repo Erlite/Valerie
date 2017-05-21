@@ -44,8 +44,8 @@ namespace Rick.Services
         {
             Console.Write(Environment.NewLine);
             Append($"[{Severity}]", ConsoleColor.Cyan);
-            Append($"[{source}] ", ConsoleColor.Yellow);
-            Append(message, ConsoleColor.DarkRed);
+            Append($"[{source}] ", ConsoleColor.Red);
+            Append(message, ConsoleColor.Yellow);
         }
 
         public static void Log(string source, string message)

@@ -26,7 +26,7 @@ namespace Rick
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
-                HandlerTimeout = 5000
+                HandlerTimeout = 1000
             });
             
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
@@ -37,9 +37,10 @@ namespace Rick
             await handler.ConfigureAsync();
 
             client.GuildAvailable += EventService.CreateGuildConfigAsync;
+            client.JoinedGuild += EventService.JoinedGuildAsync;
             client.LeftGuild += EventService.RemoveGuildConfigAsync;
             client.MessageReceived += EventService.MessageServicesAsync;
-            client.Ready += EventService.OnReady;
+            client.Ready += EventService.OnReadyAsync;
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();

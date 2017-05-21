@@ -4,6 +4,9 @@ using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
 using Rick.Classes;
+using System.Diagnostics;
+using System;
+using System.Reflection;
 
 namespace Rick.Handlers
 {
@@ -15,10 +18,10 @@ namespace Rick.Handlers
         public const string configPath = "GuildConfig.json";
 
         [JsonProperty("GuildPrefix")]
-        public string GuildPrefix { get; set; }
+        public string GuildPrefix { get; set; } = "?>";
 
         [JsonProperty("WelcomeMessage")]
-        public string WelcomeMessage { get; set; }
+        public string WelcomeMessage { get; set; } = "Welcome to our server! All weapons stay outside!";
 
         [JsonProperty("ModChannelID")]
         public ulong ModChannelID { get; set; }
@@ -77,6 +80,12 @@ namespace Rick.Handlers
             var newConfig = new Dictionary<ulong, T>();
             await SaveAsync(path, newConfig).ConfigureAwait(false);
             return newConfig;
+        }
+
+        public static void RestartApp()
+        {
+            Process.Start(Assembly.GetExecutingAssembly().Location);
+            Environment.Exit(0);
         }
     }
 }
