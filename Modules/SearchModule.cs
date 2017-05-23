@@ -13,6 +13,7 @@ using Rick.Attributes;
 using Rick.Services;
 using Rick.Classes;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Rick.Modules
 {
@@ -132,23 +133,11 @@ namespace Rick.Modules
         [Command("Robohash"), Summary("Bot ExceptionDev"), Remarks("Generates a bot image for your username/name")]
         public async Task RobohashAsync(string name)
         {
-            using (var http = new HttpClient())
-            {
-                http.DefaultRequestHeaders.Clear();
-                http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
-                http.DefaultRequestHeaders.Add("Accept", "application/json");
-                var res = JObject.Parse(await http.GetStringAsync($"https://robohash.p.mashape.com/index.php?text={Uri.EscapeUriString(name)}"));
-                var link = res["imageUrl"].ToString();
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = Context.Client.CurrentUser.Username;
-                        x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                    })
-                    .WithColor(new Color(102, 255, 255))
-                    .WithImageUrl(link);
-                await ReplyAsync("", embed: embed);
-            }
+            string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
+            var GetRandom = Sets[new Random().Next(0, Sets.Length)];
+            string URL = $"https://robohash.org/{name}{GetRandom}";
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: Url);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Leet"), Summary("Leet text"), Remarks("Generates text in leet language")]
