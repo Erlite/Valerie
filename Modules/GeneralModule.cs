@@ -365,7 +365,7 @@ namespace Rick.Modules
         }
 
         [Command("Slotmachine"), Summary("Slotmachine 100"), Remarks("Slot machine!")]
-        public async Task SlotMachineAsync(int Bet = 666)
+        public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
             {
@@ -433,7 +433,7 @@ namespace Rick.Modules
                     Name = $"{Context.User.Username} Lost!",
                     IconUrl = Context.User.GetAvatarUrl()
                 };
-                embed.Description = $"You lost {Bet}! Better luck next time! :weary:\nYour current Karma is {Credits}";
+                embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {Credits}";
                 embed.Color = new Color(0xff0000);
             }
             else
@@ -444,8 +444,8 @@ namespace Rick.Modules
                     Name = $"{Context.User.Username} won!",
                     IconUrl = Context.User.GetAvatarUrl()
                 };
-                embed.Description = $"You WOOOON {Bet}! :tada:\nYour current Karma is {Credits}";
-                embed.Color = new Color(0xff0000);
+                embed.Description = $":tada: Your current Karma is {Credits} :tada:";
+                embed.Color = new Color(0x93ff89);
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
