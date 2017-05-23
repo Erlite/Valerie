@@ -13,6 +13,7 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
 using Rick.Services;
+using System.Web;
 
 namespace Rick.Modules
 {
@@ -450,6 +451,15 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Trump"), Summary("Normal Command"), Remarks("Gives random trump quote")]
+        public async Task TrumpAsync()
+        {
+            var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
+            var embed = EmbedService.Embed(EmbedColors.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
+            await ReplyAsync("", embed: embed);
+
         }
     }
 }
