@@ -286,5 +286,11 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
+
+        [Command("SendMsg"), Summary("SendMsg GuildID Msg"), Remarks("Sends messages to a guild")]
+        public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
+        {
+            var GetGuild = (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
+        }
     }
 }
