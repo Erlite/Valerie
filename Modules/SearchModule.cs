@@ -202,5 +202,13 @@ namespace Rick.Modules
                 await ReplyAsync(args.ToString());
             }
         }
+
+        [Command("AdorableAvatar"), Summary("AdorableAvatar Name"), Remarks("Generates an avatar from provided name/string"), Alias("AA")]
+        public async Task AdorableAvatarAsync(string Name)
+        {
+            string MainUrl = $"https://api.adorable.io/avatars/500/{Name}.png";
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
+            await ReplyAsync("", embed: embed);
+        }
     }
 }
