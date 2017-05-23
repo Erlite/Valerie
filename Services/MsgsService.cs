@@ -11,10 +11,10 @@ namespace Rick.Services
     {
         public static double GiveKarma(double karma)
         {
-            return (Math.Pow(karma, 2) + 10 * karma) / 5;
+            return (Math.Pow(karma, 2) + 50 * karma) / 5;
         }
 
-        public static int GetLevelFromXP(double karma)
+        public static int GetLevelFromKarma(double karma)
         {
             return Convert.ToInt32(Math.Sqrt(karma) / 5);
         }
