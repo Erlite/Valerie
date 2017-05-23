@@ -136,7 +136,7 @@ namespace Rick.Modules
             string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
             var GetRandom = Sets[new Random().Next(0, Sets.Length)];
             string URL = $"https://robohash.org/{name}{GetRandom}";
-            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: Url);
+            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
