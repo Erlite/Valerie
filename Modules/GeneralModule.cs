@@ -13,7 +13,6 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Classes;
 using Rick.Services;
-using System.Web;
 using System.Text;
 
 namespace Rick.Modules
@@ -380,8 +379,9 @@ namespace Rick.Modules
                 ":pizza:"
             };
             var Rand = new Random(DateTime.Now.Millisecond);
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            gldConfig.Karma.TryGetValue(Context.User.Id, out int Credits);
+            var Guilds = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var karmalist = Guilds.Karma;
+            int Credits = karmalist[Context.User.Id];
 
             if (Credits <= 0 || Credits < Bet)
             {
@@ -449,7 +449,7 @@ namespace Rick.Modules
                 embed.Description = $":tada: Your current Karma is {Credits} :tada:";
                 embed.Color = new Color(0x93ff89);
             }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            karmalist[Context.User.Id] = Credits;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
             await ReplyAsync("", embed: embed);
         }
@@ -464,7 +464,7 @@ namespace Rick.Modules
         }
 
         [Command("Docs"), Summary("Docs Attributes"), Remarks("Searches Microsoft docs for terms")]
-        public async Task MSDocsAsync([Remainder] string Search)
+        public async Task DocsAsync([Remainder] string Search)
         {
             var client = new HttpClient();
             var Builder = new StringBuilder();
