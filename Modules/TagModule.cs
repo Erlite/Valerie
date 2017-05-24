@@ -26,6 +26,12 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var MakeTags = gldConfig.TagsList;
+            var Exists = MakeTags.FirstOrDefault(x => x.TagName == Name);
+            if (MakeTags.Contains(Exists))
+            {
+                await ReplyAsync("Tag already exists in the dictionary!");
+                return;
+            }
             var tag = new TagsClass
             {
                 TagName = Name,
