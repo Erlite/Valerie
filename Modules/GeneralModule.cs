@@ -478,7 +478,7 @@ namespace Rick.Modules
                 Builder.AppendLine($"**{result.displayName}**\n" +
                     $"**Kind: **{result.itemKind} || **Type: **{result.itemType}\n" +
                     $"**Summary: **{result.description}\n" +
-                    $"**URL: **{MethodsService.ShortenUrl(result.url)}");
+                    $"**URL: **{MethodsService.ShortenUrl(result.url)}\n");
             }
             var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);

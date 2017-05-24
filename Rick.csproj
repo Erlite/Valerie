@@ -295,7 +295,7 @@
     <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EncryptionService.cs" />
     <Compile Include="Services\EventService.cs" />
-    <Compile Include="Services\StaticMethodService.cs" />
+    <Compile Include="Services\MethodsService.cs" />
     <Compile Include="Services\MsgsService.cs" />
   </ItemGroup>
   <ItemGroup>

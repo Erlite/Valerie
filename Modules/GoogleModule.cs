@@ -32,7 +32,7 @@ namespace Rick.Modules
             var items = RequestList.Execute().Items.Take(5);
             foreach (var result in items)
             {
-                Str.AppendLine($"**=> {result.Title}**\n{result.Link}");
+                Str.AppendLine($"**=> {result.Title}**\n{MethodsService.ShortenUrl( result.Link)}");
             }
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
             var embed = EmbedService.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);

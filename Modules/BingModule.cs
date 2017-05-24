@@ -64,7 +64,7 @@ namespace Rick.Modules
                 var str = new StringBuilder();
                 foreach (var result in Convert.webPages.value)
                 {
-                    str.AppendLine($"**{result.name}**\n{result.snippet}\n{result.displayUrl}\n");
+                    str.AppendLine($"**{result.name}**\n{result.snippet}\n{MethodsService.ShortenUrl(result.displayUrl)}\n");
                 }
                 var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
