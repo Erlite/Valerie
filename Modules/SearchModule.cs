@@ -20,11 +20,13 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class SearchModule : ModuleBase
     {
-        [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches gif for your Gifs??")]
+        [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches Giphy for your Gifs??"), Alias("Giphy")]
         public async Task GifsAsync([Remainder] string keywords)
         {
-            if (string.IsNullOrWhiteSpace(keywords))
-                throw new NullReferenceException("Please enter what you are trying to search for!");
+            if (string.IsNullOrWhiteSpace(keywords)){
+                await ReplyAsync("Please enter what you are trying to search for!");
+                return;
+                }
             var getUrl = new Uri("http://api.giphy.com/");
             using (var client = new HttpClient())
             {
@@ -41,8 +43,8 @@ namespace Rick.Modules
         [Command("Urban"), Summary("Urban IE"), Remarks("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string urban)
         {
-            if (string.IsNullOrWhiteSpace(urban))
-                throw new NullReferenceException("A search term should be provided for me to search!");
+            if (string.IsNullOrWhiteSpace(urban)){
+                await ReplyAsync("A search term should be provided for me to search!"); return;}
             var embed = new EmbedBuilder();
             var vc = new HttpClient();
             embed.WithAuthor(x =>
