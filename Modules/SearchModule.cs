@@ -13,7 +13,6 @@ using Rick.Attributes;
 using Rick.Services;
 using Rick.Classes;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Rick.Modules
 {
