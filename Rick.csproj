@@ -259,7 +259,7 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="Classes\BingClass.cs" />
+    <Compile Include="Classes\MicrosoftClass.cs" />
     <Compile Include="Classes\EmbedColors.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
     <Compile Include="Classes\MsgClass.cs" />
