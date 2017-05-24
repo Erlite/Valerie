@@ -150,7 +150,7 @@ namespace Rick.Services
                 $"Please help support this Bot's development by leaving a star on the repo! That would be great! " +
                 $"If you come across any issues please feel free to join my guild: `https://discord.me/Noegenesis` or open a new issue on the repo! Thank you for choosing me!";
             await (await Guild.Owner.CreateDMChannelAsync()).SendMessageAsync(Msg);
-            GuildHandler.RestartApp();
+            //GuildHandler.RestartApp();
         }
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
