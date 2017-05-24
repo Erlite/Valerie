@@ -16,7 +16,7 @@ using Google.Apis.Services;
 
 namespace Rick.Services
 {
-    public static class StaticMethodService
+    public static class MethodsService
     {
         public static async Task DownloadAsync(this HttpClient client, Uri requestUri, string filename)
         {

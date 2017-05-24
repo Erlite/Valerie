@@ -360,7 +360,7 @@ namespace Rick.Modules
         [Command("Translate"), Summary("Translate Spanish What the Pizza?"), Remarks("Translates a Given Sentence")]
         public async Task TranslateAsync(string Language, [Remainder] string Text)
         {
-            var result = await StaticMethodService.Translate(Language, Text);
+            var result = await MethodsService.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
             var embed = EmbedService.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
@@ -478,7 +478,7 @@ namespace Rick.Modules
                 Builder.AppendLine($"**{result.displayName}**\n" +
                     $"**Kind: **{result.itemKind} || **Type: **{result.itemType}\n" +
                     $"**Summary: **{result.description}\n" +
-                    $"**URL: **{result.url}");
+                    $"**URL: **{MethodsService.ShortenUrl(result.url)}");
             }
             var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
