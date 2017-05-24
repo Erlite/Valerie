@@ -14,6 +14,7 @@ using Rick.Attributes;
 using Rick.Classes;
 using Rick.Services;
 using System.Web;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -460,6 +461,28 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
             await ReplyAsync("", embed: embed);
 
+        }
+
+        [Command("Docs"), Summary("Docs Attributes"), Remarks("Searches Microsoft docs for terms")]
+        public async Task MSDocsAsync([Remainder] string Search)
+        {
+            var client = new HttpClient();
+            var Builder = new StringBuilder();
+            string response = await client.GetStringAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
+            var Convert = JToken.Parse(response).ToObject<DocsMain>();
+            if (Convert.count < 0)
+            {
+                await ReplyAsync("Nothing found!");
+                return;
+            }
+            foreach(var Obj in Convert.results)
+            {
+                Builder.AppendLine($"**{Obj.displayName}**\n" +
+                    $"**Type: **{Obj.itemType} || **Kind: **{Obj.itemKind}\n" +
+                    $"**Description:** {Obj.description}\n({Obj.url})\n");
+            }
+            var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {Convert.count.ToString()}");
+            await ReplyAsync("", embed: embed);
         }
     }
 }
