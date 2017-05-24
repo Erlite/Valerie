@@ -20,19 +20,39 @@ namespace Rick.Classes
         public SearchWebPages webPages { get; set; }
     }
 
-    public class DocsResult
+    public class DocsMembers
     {
         public string displayName { get; set; }
         public string url { get; set; }
-        public string itemType { get; set; }
-        public string itemKind { get; set; }
+        public DocsType itemType { get; set; }
+        public DocsKind itemKind { get; set; }
         public string description { get; set; }
     }
 
-    public class DocsMain
+    public class DocsRoot
     {
-        public List<DocsResult> results { get; set; }
+        public List<DocsMembers> results { get; set; }
         public int count { get; set; }
-        public string @nextLink { get; set; }
+    }
+
+    public enum DocsType
+    {
+        Type,
+        Namespace,
+        Member,
+    }
+    public enum DocsKind
+    {
+        Namespace,
+        Class,
+        Enumeration,
+        Method,
+        Structure,
+        Property,
+        Constructor,
+        Field,
+        Event,
+        Interface,
+        Delegate
     }
 }

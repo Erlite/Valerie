@@ -14,6 +14,8 @@ using Rick.Attributes;
 using Rick.Classes;
 using Rick.Services;
 using System.Text;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace Rick.Modules
 {
@@ -466,22 +468,19 @@ namespace Rick.Modules
         [Command("Docs"), Summary("Docs Attributes"), Remarks("Searches Microsoft docs for terms")]
         public async Task DocsAsync([Remainder] string Search)
         {
-            var client = new HttpClient();
             var Builder = new StringBuilder();
-            string response = await client.GetStringAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
-            var Convert = JToken.Parse(response).ToObject<DocsMain>();
-            if (Convert.count < 0)
+            var Response = await new HttpClient().GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
+            if (!Response.IsSuccessStatusCode)
+                throw new WebException(Response.ReasonPhrase);
+            var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
+            foreach(var result in ConvertedJson.results.Take(5).OrderBy(x => x.displayName))
             {
-                await ReplyAsync("Nothing found!");
-                return;
+                Builder.AppendLine($"**{result.displayName}**\n" +
+                    $"**Kind: **{result.itemKind} || **Type: **{result.itemType}\n" +
+                    $"**Summary: **{result.description}\n" +
+                    $"**URL: **{result.url}");
             }
-            foreach(var Obj in Convert.results)
-            {
-                Builder.AppendLine($"**{Obj.displayName}**\n" +
-                    $"**Type: **{Obj.itemType} || **Kind: **{Obj.itemKind}\n" +
-                    $"**Description:** {Obj.description}\n({Obj.url})\n");
-            }
-            var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {Convert.count.ToString()}");
+            var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
     }
