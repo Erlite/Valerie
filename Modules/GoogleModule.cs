@@ -69,5 +69,11 @@ namespace Rick.Modules
             await ReplyAsync(SearchResponse);
 
         }
+
+        [Command("Shorten"), Summary("Shorten https://github.com/ExceptionDev"), Remarks("Shortens a url")]
+        public async Task ShortenAsync([Remainder] string URL)
+        {
+            await ReplyAsync(MethodsService.ShortenUrl($"Here is your shortened URL: <{URL}>"));
+        }
     }
 }

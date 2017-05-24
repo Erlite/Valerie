@@ -111,8 +111,8 @@ namespace Rick.Modules
             Builder.AddInlineField("Display Name", $"{Info.personaname}");
             Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");
             Builder.AddInlineField("Person State", State);
-            Builder.AddInlineField("Profile Created", StaticMethodService.UnixTimeStampToDateTime(Info.timecreated));
-            Builder.AddInlineField("Last Online", StaticMethodService.UnixTimeStampToDateTime(Info.lastlogoff));
+            Builder.AddInlineField("Profile Created", MethodsService.UnixTimeStampToDateTime(Info.timecreated));
+            Builder.AddInlineField("Last Online", MethodsService.UnixTimeStampToDateTime(Info.lastlogoff));
             Builder.AddInlineField("Primary Clan ID", Info.primaryclanid);
             Builder.AddInlineField("Owned Games", OGamesConvert.response.game_count);
             Builder.AddInlineField("Recently Played Games", RGamesConvert.response.total_count);

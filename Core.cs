@@ -46,7 +46,7 @@ namespace Rick
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
             ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
-            await StaticMethodService.ProgramUpdater();
+            await MethodsService.ProgramUpdater();
 
             CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.CleverBotAPIKey);
             await client.LoginAsync(TokenType.Bot, BotHandler.BotConfig.BotToken);

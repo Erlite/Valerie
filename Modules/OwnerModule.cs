@@ -26,7 +26,7 @@ namespace Rick.Modules
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
-        public static IEnumerable<Assembly> Assemblies => StaticMethodService.GetAssemblies();
+        public static IEnumerable<Assembly> Assemblies => MethodsService.GetAssemblies();
         public static IEnumerable<string> Imports => BotHandler.BotConfig.EvalImports;
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]

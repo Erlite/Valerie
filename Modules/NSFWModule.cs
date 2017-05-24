@@ -55,7 +55,7 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(search))
                 throw new NullReferenceException("Please provide me a search term!");
             search = search?.Trim() ?? "";
-            var url = await StaticMethodService.GetE621ImageLink(search);
+            var url = await MethodsService.GetE621ImageLink(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else

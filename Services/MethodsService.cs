@@ -11,6 +11,8 @@ using System.Diagnostics;
 using Rick.Classes;
 using System.Text;
 using Newtonsoft.Json;
+using Google.Apis.Urlshortener.v1;
+using Google.Apis.Services;
 
 namespace Rick.Services
 {
@@ -139,6 +141,17 @@ namespace Rick.Services
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
+        }
+
+        public static string ShortenUrl(string URL)
+        {
+            var Service = new UrlshortenerService(new BaseClientService.Initializer()
+            {
+                ApiKey = BotHandler.BotConfig.GoogleAPIKey,
+            });
+            var Refer = new Google.Apis.Urlshortener.v1.Data.Url();
+            Refer.LongUrl = URL;
+            return Service.Url.Insert(Refer).Execute().Id;
         }
     }
 }
