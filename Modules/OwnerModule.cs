@@ -290,7 +290,7 @@ namespace Rick.Modules
         [Command("SendMsg"), Summary("SendMsg GuildID Msg"), Remarks("Sends messages to a guild")]
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
         {
-            var GetGuild = (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
+            var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
         }
     }
 }
