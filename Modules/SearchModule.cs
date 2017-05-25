@@ -19,26 +19,6 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class SearchModule : ModuleBase
     {
-        [Command("Gif"), Summary("Gif Cute kittens"), Remarks("Searches Giphy for your Gifs??"), Alias("Giphy")]
-        public async Task GifsAsync([Remainder] string keywords)
-        {
-            if (string.IsNullOrWhiteSpace(keywords)){
-                await ReplyAsync("Please enter what you are trying to search for!");
-                return;
-                }
-            var getUrl = new Uri("http://api.giphy.com/");
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = getUrl;
-                var response = await client.GetAsync(Uri.EscapeDataString($"v1/gifs/random?api_key=dc6zaTOxFJmzC&tag={Uri.UnescapeDataString(keywords)}"));
-                response.EnsureSuccessStatusCode();
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                var obj = JObject.Parse(jsonResponse);
-                var embed = EmbedService.Embed(EmbedColors.Teal, $"{Context.User.Username} searched for {keywords}", Context.User.GetAvatarUrl(), ImageUrl: obj["data"]["image_original_url"].ToString());
-                await ReplyAsync("", false, embed);
-            }
-        }
-
         [Command("Urban"), Summary("Urban IE"), Remarks("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string urban)
         {
