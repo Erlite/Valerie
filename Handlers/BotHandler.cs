@@ -51,6 +51,9 @@ namespace Rick.Handlers
         [JsonProperty("SteamAPIKey")]
         public string SteamAPIKey { get; set; }
 
+        [JsonProperty("GiphyAPIKey")]
+        public string GiphyAPIKey { get; set; } = "dc6zaTOxFJmzC";
+
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
