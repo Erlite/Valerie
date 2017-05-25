@@ -2,7 +2,6 @@
 using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
-using System.IO;
 
 namespace Rick.Services
 {
@@ -164,14 +163,14 @@ namespace Rick.Services
             await GuildHandler.SaveAsync(path, GuildHandler.GuildConfigs);
         }
 
-        public async static Task MessageServicesAsync(SocketMessage msg) => await Task.Run(async () =>
-         {
-             var gld = (msg.Channel as SocketGuildChannel).Guild;
-             var message = msg as SocketUserMessage;
-             await MsgsService.AfkAsync(message, gld);
-             await MsgsService.ChatKarmaAsync(message, gld);
-             await MsgsService.CleverBotAsync(message, gld);
-         });
+        public async static Task MessageServicesAsync(SocketMessage msg)
+        {
+            var gld = (msg.Channel as SocketGuildChannel).Guild;
+            var message = msg as SocketUserMessage;
+            await Task.Run(() => MsgsService.AfkAsync(message, gld));
+            await Task.Run(() => MsgsService.ChatKarmaAsync(message, gld));
+            await MsgsService.CleverBotAsync(message, gld);
+        }
 
         public async static Task OnReadyAsync()
         {
