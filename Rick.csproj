@@ -262,6 +262,7 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
+    <Compile Include="Classes\GiphyClass.cs" />
     <Compile Include="Classes\MicrosoftClass.cs" />
     <Compile Include="Classes\EmbedColors.cs" />
     <Compile Include="Classes\GlobalEnums.cs" />
@@ -280,6 +281,7 @@
     <Compile Include="Modules\BingModule.cs" />
     <Compile Include="Modules\BotModule.cs" />
     <Compile Include="Modules\GeneralModule.cs" />
+    <Compile Include="Modules\GiphyModule.cs" />
     <Compile Include="Modules\GithubModule.cs" />
     <Compile Include="Modules\GoogleModule.cs" />
     <Compile Include="Modules\GuildModule.cs" />
