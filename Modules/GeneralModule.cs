@@ -471,7 +471,10 @@ namespace Rick.Modules
             var Builder = new StringBuilder();
             var Response = await new HttpClient().GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
             if (!Response.IsSuccessStatusCode)
-                throw new WebException(Response.ReasonPhrase);
+            {
+                await ReplyAsync(Response.ReasonPhrase);
+                return;
+            }
             var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
             foreach(var result in ConvertedJson.results.Take(5).OrderBy(x => x.displayName))
             {
