@@ -264,6 +264,7 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
+    <Compile Include="Handlers\ProfilesHandler.cs" />
     <Compile Include="Models\GiphyModel.cs" />
     <Compile Include="Models\MicrosoftModel.cs" />
     <Compile Include="Models\EmbedModel.cs" />

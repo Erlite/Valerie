@@ -493,8 +493,7 @@ namespace Rick.Modules
             ProfileService.DownloadImage(new Uri(User.GetAvatarUrl()), User.Username);
             ProfileService.EditImage(User.Username);
             await beforeMsg.DeleteAsync();
-            string GetImage = $"{ProfileService.EditImages}/{User.Username}.png";
-            await Context.Channel.SendFileAsync(GetImage);
+            await Context.Channel.SendFileAsync(ProfileService.GetProfile(User.Username));
         }
     }
 }
