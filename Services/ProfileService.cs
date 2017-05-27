@@ -8,6 +8,7 @@ using System.Net;
 using System.Web;
 using Rick.Handlers;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 
 namespace Rick.Services
@@ -16,6 +17,7 @@ namespace Rick.Services
     {
         static string CacheFolder = Path.Combine(BotHandler.Data, "Cache");
         static string UserImages = Path.Combine(CacheFolder, "Downloads");
+        static string Resources = Path.Combine(CacheFolder, "Resources");
         public static string EditImages = Path.Combine(CacheFolder, "Edits");
 
         public static void DownloadImage(Uri Link, string Name)
@@ -23,6 +25,7 @@ namespace Rick.Services
             string FileName = Path.Combine(UserImages, $"{Name}.png");
             var Client = new WebClient();
            Client.DownloadFile(Link, FileName);
+            Client.Dispose();
         }
 
         public static void DirectoryCheck()
@@ -42,6 +45,11 @@ namespace Rick.Services
                 Directory.CreateDirectory(UserImages);
                 ConsoleService.Log("Config", "Creating User Images Folder ...");
             }
+            if (!Directory.Exists(Resources))
+            {
+                Directory.CreateDirectory(Resources);
+                ConsoleService.Log("Config", "Creating Resources Folder ...");
+            }
             if (!Directory.Exists(EditImages))
             {
                 Directory.CreateDirectory(EditImages);
@@ -58,12 +66,20 @@ namespace Rick.Services
         public static void EditImage(string UserImage)
         {
             string GetImage = $"{UserImages}/{UserImage}.png";
-            Image Img = Image.FromFile(GetImage);
-            using (Graphics g = Graphics.FromImage(Img))
-                g.DrawLine(Pens.Black, 10, 10, 20, 20);
             string SavePath = $"{EditImages}/{UserImage}.png";
-            Img.Save(SavePath);
+            Image User = Image.FromFile(GetImage);
 
+            var image = new Bitmap(600, 400, PixelFormat.Format32bppArgb);
+            using (var g = Graphics.FromImage(image))
+            {
+                g.Clear(Color.Transparent);
+                g.DrawImage(User, 470, 60);
+            }
+            image.Save(SavePath);
+
+            image.Dispose();
+
+            User.Dispose();
         }
 
     }
