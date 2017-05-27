@@ -44,6 +44,7 @@ namespace Rick
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
+            ProfileService.DirectoryCheck();
 
             ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodsService.ProgramUpdater();

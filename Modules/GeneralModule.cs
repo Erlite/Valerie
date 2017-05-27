@@ -486,5 +486,11 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
+
+        [Command("Profile"), Summary("Profile"), Remarks("")]
+        public async Task ProfileAsync(SocketGuildUser User)
+        {
+
+        }
     }
 }
