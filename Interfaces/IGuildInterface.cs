@@ -1,4 +1,4 @@
-﻿using Rick.Classes;
+﻿using Rick.Models;
 using System.Collections.Generic;
 
 namespace Rick.Interfaces
@@ -19,7 +19,7 @@ namespace Rick.Interfaces
         bool ChatterBot { get; set;  }
         List<ulong> RequiredRoleIDs { get; set;}
         List<string> RequiredChannelNames { get; set; }
-        List<TagsClass> TagsList { get; set; }
+        List<TagsModel> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
         Dictionary<ulong, int> Karma { get; set; }
     }

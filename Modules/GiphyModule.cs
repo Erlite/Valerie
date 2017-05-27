@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Rick.Classes;
+using Rick.Models;
 using Rick.Attributes;
 using Rick.Services;
 using System.Net.Http;

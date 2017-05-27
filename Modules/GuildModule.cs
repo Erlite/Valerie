@@ -4,7 +4,7 @@ using Discord.Commands;
 using Rick.Services;
 using Rick.Handlers;
 using Discord.WebSocket;
-using Rick.Classes;
+using Rick.Models;
 using Rick.Attributes;
 
 namespace Rick.Modules
@@ -62,7 +62,7 @@ namespace Rick.Modules
                 $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
                 $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
                 $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}";
-            var embed = EmbedService.Embed(EmbedColors.Teal, $"{Guild.Name} || {Guild.Owner.Username}", Guild.IconUrl, null, Description);
+            var embed = EmbedService.Embed(EmbedModel.Teal, $"{Guild.Name} || {Guild.Owner.Username}", Guild.IconUrl, null, Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -170,28 +170,28 @@ namespace Rick.Modules
         }
 
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
-        public async Task ChannelAsync(GlobalEnums Prop, ITextChannel channel)
+        public async Task ChannelAsync(GlobalModel Prop, ITextChannel channel)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             switch (Prop)
             {
-                case GlobalEnums.Add:
+                case GlobalModel.Add:
                     gldConfig.RequiredChannelNames.Add(channel.Name);
                     await ReplyAsync($"Channel **{channel.Name}** has been added to RequiredChannel Attribute.");
                     break;
 
-                case GlobalEnums.Remove:
+                case GlobalModel.Remove:
                     gldConfig.RequiredChannelNames.Remove(channel.Name);
                     await ReplyAsync($"Channel **{channel.Name}** has been removed from RequiredChannel Attribute.");
                     break;
 
-                case GlobalEnums.AddId:
+                case GlobalModel.AddId:
                     gldConfig.RequiredRoleIDs.Add(channel.Id);
                     await ReplyAsync($"Channel **{channel.Id}** has been added to RequiredChannel Attribute.");
                     break;
 
-                case GlobalEnums.RemoveId:
+                case GlobalModel.RemoveId:
                     gldConfig.RequiredRoleIDs.Remove(channel.Id);                    
                     await ReplyAsync($"Channel **{channel.Id}** has been removed from RequiredChannel Attribute.");
                     break;
@@ -201,18 +201,18 @@ namespace Rick.Modules
         }
 
         [Command("Role"), Summary("Role AddId RoleName"), Remarks("Adds/Removes role ids from the list")]
-        public async Task RoleAsync(GlobalEnums Prop, IRole Role)
+        public async Task RoleAsync(GlobalModel Prop, IRole Role)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             switch (Prop)
             {
-                case GlobalEnums.AddId:
+                case GlobalModel.AddId:
                     gldConfig.RequiredRoleIDs.Add(Role.Id);
                     await ReplyAsync($"Role **{Role.Id}** has been added to RequiredRoleIDs Attribute");
                     break;
 
-                case GlobalEnums.RemoveId:
+                case GlobalModel.RemoveId:
                     gldConfig.RequiredRoleIDs.Remove(Role.Id);
                     await ReplyAsync($"Role **{Role.Id}** has been removed to RequiredRoleIDs Attribute");
                     break;

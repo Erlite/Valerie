@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Rick.Classes
+namespace Rick.Models
 {
     public class ScriptGlobals
     {

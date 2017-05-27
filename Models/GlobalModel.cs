@@ -1,6 +1,6 @@
-﻿namespace Rick.Classes
+﻿namespace Rick.Models
 {
-    public enum GlobalEnums
+    public enum GlobalModel
     {
         Add,
         Remove,

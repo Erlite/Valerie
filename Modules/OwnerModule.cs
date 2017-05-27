@@ -8,7 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.IO;
-using Rick.Classes;
+using Rick.Models;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -96,9 +96,9 @@ namespace Rick.Modules
             if (channelToArchive != null)
             {
                 var listOfMessages = new List<IMessage>(await channelToArchive.GetMessagesAsync(amount).Flatten());
-                List<MsgClass> list = new List<MsgClass>(listOfMessages.Capacity);
+                List<MessageModel> list = new List<MessageModel>(listOfMessages.Capacity);
                 foreach (var message in listOfMessages)
-                    list.Add(new MsgClass { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
+                    list.Add(new MessageModel { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
                 var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
                 await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
@@ -283,7 +283,7 @@ namespace Rick.Modules
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
-            var embed = EmbedService.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
+            var embed = EmbedService.Embed(EmbedModel.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

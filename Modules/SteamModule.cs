@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Rick.Attributes;
-using Rick.Classes;
+using Rick.Models;
 using Discord;
 using Discord.Commands;
 using Rick.Services;

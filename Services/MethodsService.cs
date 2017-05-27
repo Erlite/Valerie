@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Rick.Handlers;
 using System.Diagnostics;
-using Rick.Classes;
+using Rick.Models;
 using System.Text;
 using Newtonsoft.Json;
 using Google.Apis.Urlshortener.v1;
@@ -109,7 +109,7 @@ namespace Rick.Services
                 ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
         }
 
-        public static async Task<WatsonClass> Translate(string dest, string text)
+        public static async Task<WatsonModel> Translate(string dest, string text)
         {
             string json = null;
 
@@ -133,7 +133,7 @@ namespace Rick.Services
                 json = await result.Content.ReadAsStringAsync();
             }
 
-            return JsonConvert.DeserializeObject<WatsonClass>(json);
+            return JsonConvert.DeserializeObject<WatsonModel>(json);
         }
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)

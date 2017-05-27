@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Rick.Classes
+namespace Rick.Models
 {
-    public class MsgClass
+    public class MessageModel
     {
         public string Author;
         public string Content;

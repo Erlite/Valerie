@@ -146,6 +146,8 @@
     <Reference Include="System.Diagnostics.StackTrace, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Diagnostics.StackTrace.4.3.0\lib\net46\System.Diagnostics.StackTrace.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Globalization.Calendars, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Globalization.Calendars.4.3.0\lib\net46\System.Globalization.Calendars.dll</HintPath>
     </Reference>
@@ -262,15 +264,16 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="Classes\GiphyClass.cs" />
-    <Compile Include="Classes\MicrosoftClass.cs" />
-    <Compile Include="Classes\EmbedColors.cs" />
-    <Compile Include="Classes\GlobalEnums.cs" />
-    <Compile Include="Classes\MsgClass.cs" />
-    <Compile Include="Classes\ScriptGlobals.cs" />
-    <Compile Include="Classes\SteamClass.cs" />
-    <Compile Include="Classes\TagsClass.cs" />
-    <Compile Include="Classes\WatsonClass.cs" />
+    <Compile Include="Models\GiphyModel.cs" />
+    <Compile Include="Models\MicrosoftModel.cs" />
+    <Compile Include="Models\EmbedModel.cs" />
+    <Compile Include="Models\GlobalModel.cs" />
+    <Compile Include="Models\MessageModel.cs" />
+    <Compile Include="Models\ProfileModel.cs" />
+    <Compile Include="Models\ScriptGlobals.cs" />
+    <Compile Include="Models\SteamModel.cs" />
+    <Compile Include="Models\TagsModel.cs" />
+    <Compile Include="Models\WatsonModel.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />

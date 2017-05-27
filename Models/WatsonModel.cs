@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Rick.Classes
+namespace Rick.Models
 {
-    public class WatsonClass
+    public class WatsonModel
     {
         [JsonProperty("word_count")]
         public int WordCount { get; set; }

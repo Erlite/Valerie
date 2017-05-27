@@ -11,7 +11,7 @@ using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
-using Rick.Classes;
+using Rick.Models;
 using Newtonsoft.Json;
 
 namespace Rick.Modules
@@ -94,7 +94,7 @@ namespace Rick.Modules
             if (img?.Source == null)
                 return;
             var source = img.Source.Replace("b.", ".");
-            var embed = EmbedService.Embed(EmbedColors.Orange, $"Searched for: {search}", "https://s25.postimg.org/mi3j4sppb/imgur_1.png", source, ImageUrl: source);
+            var embed = EmbedService.Embed(EmbedModel.Orange, $"Searched for: {search}", "https://s25.postimg.org/mi3j4sppb/imgur_1.png", source, ImageUrl: source);
             await ReplyAsync("", embed: embed);
         }
 
@@ -117,7 +117,7 @@ namespace Rick.Modules
             string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
             var GetRandom = Sets[new Random().Next(0, Sets.Length)];
             string URL = $"https://robohash.org/{name}{GetRandom}";
-            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: URL);
+            var embed = EmbedService.Embed(EmbedModel.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
@@ -133,7 +133,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
                     string Description = get;
-                    var embed = EmbedService.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
+                    var embed = EmbedService.Embed(EmbedModel.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -153,7 +153,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
                     string Description = $"```{get}```";
-                    var embed = EmbedService.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
+                    var embed = EmbedService.Embed(EmbedModel.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -175,7 +175,7 @@ namespace Rick.Modules
                 string firstParagraph = responseObject[2][0];
 
                 string Description = firstParagraph;
-                var embed = EmbedService.Embed(EmbedColors.Pastle, $"Searched for: {search.ToUpper()}", Context.User.GetAvatarUrl(), Description: Description, ImageUrl: url);
+                var embed = EmbedService.Embed(EmbedModel.Pastle, $"Searched for: {search.ToUpper()}", Context.User.GetAvatarUrl(), Description: Description, ImageUrl: url);
                 await ReplyAsync("", false, embed);
             }
             catch(ArgumentException args)
@@ -188,7 +188,7 @@ namespace Rick.Modules
         public async Task AdorableAvatarAsync(string Name)
         {
             string MainUrl = $"https://api.adorable.io/avatars/500/{Name}.png";
-            var embed = EmbedService.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
+            var embed = EmbedService.Embed(EmbedModel.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
             await ReplyAsync("", embed: embed);
         }
     }
