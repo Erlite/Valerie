@@ -81,11 +81,5 @@ namespace Rick.Handlers
             await SaveAsync(path, newConfig).ConfigureAwait(false);
             return newConfig;
         }
-
-        public static void RestartApp()
-        {
-            Process.Start(Assembly.GetExecutingAssembly().Location);
-            Environment.Exit(0);
-        }
     }
 }
