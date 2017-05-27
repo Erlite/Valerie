@@ -63,6 +63,7 @@ namespace Rick
                 .AddSingleton(client)
                 .AddSingleton(new GuildHandler())
                 .AddSingleton(new BotHandler())
+                .AddSingleton(new ProfilesHandler())
                 .AddSingleton(new EventService(client))
                 .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose}))
                 .AddSingleton(new InteractiveService(client));
@@ -70,7 +71,10 @@ namespace Rick
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
             Provider.GetService<GuildHandler>();
             Provider.GetService<BotHandler>();
+            Provider.GetService<ProfilesHandler>();
             Provider.GetService<EventService>();
+            Provider.GetService<MsgsService>();
+            Provider.GetService<ProfileService>();
             return Provider;
         }
     }
