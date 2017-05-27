@@ -15,8 +15,10 @@ namespace Rick.Handlers
     {
         public static IBotInterface BotConfig { get; set; }
 
+        public static string Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+
         [JsonIgnore]
-        public const string configPath = "BotConfig.json";
+        public const string configPath = "Data/BotConfig.json";
 
         [JsonIgnore]
         public const double BotVersion = 33.7;

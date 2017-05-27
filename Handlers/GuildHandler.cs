@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
-using Rick.Classes;
+using Rick.Models;
 using System.Diagnostics;
 using System;
 using System.Reflection;
@@ -15,7 +15,7 @@ namespace Rick.Handlers
         public static Dictionary<ulong, GuildHandler> GuildConfigs { get; set; } = new Dictionary<ulong, GuildHandler>();
 
         [JsonIgnore]
-        public const string configPath = "GuildConfig.json";
+        public const string configPath = "Data/GuildConfig.json";
 
         [JsonProperty("GuildPrefix")]
         public string GuildPrefix { get; set; } = "?>";
@@ -60,7 +60,7 @@ namespace Rick.Handlers
         public List<string> RequiredChannelNames { get; set; } = new List<string>();
 
         [JsonProperty("Tags")]
-        public List<TagsClass> TagsList{ get; set; } = new List<TagsClass>();
+        public List<TagsModel> TagsList{ get; set; } = new List<TagsModel>();
 
         [JsonProperty("AfkList")]
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
