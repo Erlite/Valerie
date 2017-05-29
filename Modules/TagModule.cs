@@ -141,13 +141,5 @@ namespace Rick.Modules
                 await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
-        public async Task RemoveTag(TagsModel tag)
-        {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            gldTags.Remove(tag);
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
-        }
     }
 }
