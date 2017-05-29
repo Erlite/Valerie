@@ -131,15 +131,35 @@ namespace Rick.Modules
         }
 
         [Command("List"), Summary("Tag List"), Remarks("Lists all tags")]
-        public async Task ListTags()
+        public async Task ListAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
             if (!gldTags.Any())
+            {
                 await ReplyAsync($"{Context.Guild.Name} has no tags!");
-            else
-                await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
+                return;
+            }
+            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
+        [Command("Find"), Summary("Tag Find A"), Remarks("Finds all the tags with a specified letter")]
+        public async Task FindAsync()
+        {
+            var GldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var GetTags = GldConfig.TagsList;
+            if (!GetTags.Any())
+                await ReplyAsync($"{Context.Guild.Name} has no tags!");
+        }
+
+
+        public async Task RemoveTag(TagsModel tag)
+        {
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var gldTags = gldConfig.TagsList;
+            gldTags.Remove(tag);
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
     }
 }
