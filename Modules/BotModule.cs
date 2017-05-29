@@ -29,7 +29,7 @@ namespace Rick.Modules
             var client = Context.Client as DiscordSocketClient;
             await Context.Client.CurrentUser.ModifyAsync(x => x.Username = value);
             await ReplyAsync(":eyes: Done :eyes:");
-            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
+            await BotHandler.SaveAsync(botConfig);
         }
 
         [Command("Nickname"), Summary("Nickname XD"), Remarks("Changes Bot's nickname")]
@@ -77,7 +77,7 @@ namespace Rick.Modules
             botConfig.BotGame = value;
             await client.SetGameAsync(value);
             await ReplyAsync(":eyes: Done :eyes:");
-            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
+            await BotHandler.SaveAsync(botConfig);
         }
 
         [Command("Status"), Summary("Status 3"), Remarks("Changes Bot's status such as setting status to DND")]
@@ -106,7 +106,7 @@ namespace Rick.Modules
                 Events.DisableLatencyMonitor();
                 await ReplyAsync(":skull_crossbones: Latency monitor disabled");
             }
-            await BotHandler.SaveAsync(BotHandler.configPath, Config);
+            await BotHandler.SaveAsync(Config);
         }
 
         [Command("Prefix"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
@@ -117,7 +117,7 @@ namespace Rick.Modules
             var botConfig = BotHandler.BotConfig;
             botConfig.DefaultPrefix = prefix;
             await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
-            await BotHandler.SaveAsync(BotHandler.configPath, botConfig);
+            await BotHandler.SaveAsync(botConfig);
         }
 
         [Command("Debug"), Summary("Normal Command"), Remarks("Enables/Disables debug mode")]
@@ -134,7 +134,7 @@ namespace Rick.Modules
                 Config.DebugMode = false;
                 await ReplyAsync(":skull_crossbones: Debug mode has been disbaled!");
             }
-            await BotHandler.SaveAsync(BotHandler.configPath, Config);
+            await BotHandler.SaveAsync(Config);
         }
 
         [Command("Mention"), Summary("Normal Command"), Remarks("Enables/Disables mention prefix")]
@@ -149,7 +149,7 @@ namespace Rick.Modules
             {
                 await ReplyAsync(":skull_crossbones: Mention Prefix has been disbaled!");
             }
-            await BotHandler.SaveAsync(BotHandler.configPath, Config);
+            await BotHandler.SaveAsync(Config);
         }
 
     }

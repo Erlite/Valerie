@@ -118,7 +118,7 @@ namespace Rick.Modules
             {
                 Bl.Add(user.Id, reason);
                 BotHandler.BotConfig.Blacklist = Bl;
-                await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
+                await BotHandler.SaveAsync(botConfig);
                 await ReplyAsync($"{user.Username} has been added to blacklist!");
             }
         }
@@ -134,7 +134,7 @@ namespace Rick.Modules
             {
                 Bl.Remove(user.Id);
                 BotHandler.BotConfig.Blacklist = Bl;
-                await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
+                await BotHandler.SaveAsync(botConfig);
                 await ReplyAsync($"{user.Username} has been removed from the blacklist!");
             }
         }
@@ -219,7 +219,7 @@ namespace Rick.Modules
         {
             BotHandler.BotConfig.EvalImports.Remove(import);
             await ReplyAsync($"Removed {import}");
-            await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
+            await BotHandler.SaveAsync(BotHandler.BotConfig);
         }
 
         [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
@@ -227,7 +227,7 @@ namespace Rick.Modules
         {
             BotHandler.BotConfig.EvalImports.Add(import);
             await ReplyAsync($"Added {import}");
-            await BotHandler.SaveAsync(BotHandler.configPath, BotHandler.BotConfig);
+            await BotHandler.SaveAsync(BotHandler.BotConfig);
         }
 
         [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]
@@ -291,6 +291,13 @@ namespace Rick.Modules
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
         {
             var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
+        }
+
+        [Command("Games")]
+        public async Task GamesAsync(string Name)
+        {
+            BotHandler.BotConfig.Games.Add(Name);
+            await BotHandler.SaveAsync(BotHandler.BotConfig);
         }
     }
 }
