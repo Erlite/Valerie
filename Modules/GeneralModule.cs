@@ -475,7 +475,7 @@ namespace Rick.Modules
                 return;
             }
             var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
-            foreach(var result in ConvertedJson.results.Take(5).OrderBy(x => x.displayName))
+            foreach (var result in ConvertedJson.results.Take(5).OrderBy(x => x.displayName))
             {
                 Builder.AppendLine($"**{result.displayName}**\n" +
                     $"**Kind: **{result.itemKind} || **Type: **{result.itemType}\n" +
