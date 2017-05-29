@@ -153,5 +153,6 @@ namespace Rick.Services
             Refer.LongUrl = URL;
             return Service.Url.Insert(Refer).Execute().Id;
         }
+
     }
 }

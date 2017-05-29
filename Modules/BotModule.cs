@@ -74,7 +74,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
             var botConfig = BotHandler.BotConfig;
-            botConfig.BotGame = value;
+            botConfig.Games.Add(value);
             await client.SetGameAsync(value);
             await ReplyAsync(":eyes: Done :eyes:");
             await BotHandler.SaveAsync(botConfig);

@@ -293,11 +293,5 @@ namespace Rick.Modules
             var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
         }
 
-        [Command("Games")]
-        public async Task GamesAsync(string Name)
-        {
-            BotHandler.BotConfig.Games.Add(Name);
-            await BotHandler.SaveAsync(BotHandler.BotConfig);
-        }
     }
 }
