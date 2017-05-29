@@ -18,9 +18,7 @@ namespace Rick
         private CommandHandler handler;
 
         public async Task StartAsync()
-        {
-            ProfilesHandler.DirectoryCheck();
-
+        {     
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
@@ -46,7 +44,6 @@ namespace Rick
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
-            await ProfilesHandler.LoadProfilesAsync();
 
             ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodsService.ProgramUpdater();
@@ -64,7 +61,6 @@ namespace Rick
                 .AddSingleton(client)
                 .AddSingleton(new GuildHandler())
                 .AddSingleton(new BotHandler())
-                .AddSingleton(new ProfilesHandler())
                 .AddSingleton(new EventService(client))
                 .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose}))
                 .AddSingleton(new InteractiveService(client));
@@ -72,10 +68,8 @@ namespace Rick
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
             Provider.GetService<GuildHandler>();
             Provider.GetService<BotHandler>();
-            Provider.GetService<ProfilesHandler>();
             Provider.GetService<EventService>();
             Provider.GetService<MsgsService>();
-            Provider.GetService<ProfileService>();
             return Provider;
         }
     }

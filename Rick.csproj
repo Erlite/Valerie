@@ -264,13 +264,11 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
-    <Compile Include="Handlers\ProfilesHandler.cs" />
     <Compile Include="Models\GiphyModel.cs" />
     <Compile Include="Models\MicrosoftModel.cs" />
     <Compile Include="Models\EmbedModel.cs" />
     <Compile Include="Models\GlobalModel.cs" />
     <Compile Include="Models\MessageModel.cs" />
-    <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\ScriptGlobals.cs" />
     <Compile Include="Models\SteamModel.cs" />
     <Compile Include="Models\TagsModel.cs" />
@@ -303,7 +301,6 @@
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\MethodsService.cs" />
     <Compile Include="Services\MsgsService.cs" />
-    <Compile Include="Services\ProfileService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

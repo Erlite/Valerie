@@ -485,15 +485,5 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedModel.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
-
-        [Command("Profile"), Summary("Profile"), Remarks("")]
-        public async Task ProfileAsync(SocketGuildUser User)
-        {
-            var beforeMsg = await ReplyAsync("Working ...");
-            ProfileService.DownloadImage(new Uri(User.GetAvatarUrl()), User.Username);
-            ProfileService.EditImage(User.Username);
-            await beforeMsg.DeleteAsync();
-            await Context.Channel.SendFileAsync(ProfileService.GetProfile(User.Username));
-        }
     }
 }
