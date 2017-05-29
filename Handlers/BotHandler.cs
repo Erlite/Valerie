@@ -29,9 +29,6 @@ namespace Rick.Handlers
         [JsonProperty("BotName")]
         public string BotName { get; set; }
 
-        [JsonProperty("BotGame")]
-        public string BotGame { get; set; }
-
         [JsonProperty("DefaultPrefix")]
         public string DefaultPrefix { get; set; }
 
@@ -74,6 +71,9 @@ namespace Rick.Handlers
         [JsonProperty("EvalImports")]
         public List<string> EvalImports { get; set; } = new List<string>();
 
+        [JsonProperty("Games")]
+        public List<string> Games { get; set; } = new List<string>();
+
         public bool MentionPrefix(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
             if (!MentionDefaultPrefix)
@@ -104,9 +104,6 @@ namespace Rick.Handlers
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Name: ");
             result.BotName = Console.ReadLine();
-
-            ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot Game: ");
-            result.BotGame = Console.ReadLine();
 
             ConsoleService.Log(LogSeverity.Info, "Config", "Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();
@@ -160,7 +157,14 @@ namespace Rick.Handlers
             return result;
         }
 
-        public static async Task SaveAsync(string path, IBotInterface botConfig)
-            => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)));
+        public static async Task SaveAsync(IBotInterface botConfig)
+            => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)));
+
+        public static void DirectoryCheck()
+        {
+            var Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+            if (!Directory.Exists(Data))
+                Directory.CreateDirectory(Data);
+        }
     }
 }

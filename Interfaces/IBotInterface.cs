@@ -7,7 +7,6 @@ namespace Rick.Interfaces
     {
         string BotToken { get; set; }
         string BotName { get; set; }
-        string BotGame { get; set; }
         string DefaultPrefix { get; set; }
         string BingAPIKey { get; set; }
         string MashapeAPIKey { get; set; }
@@ -22,6 +21,7 @@ namespace Rick.Interfaces
         bool MentionDefaultPrefix { get; set; }
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
+        List<string> Games { get; set; }
         bool MentionPrefix(SocketUserMessage message, DiscordSocketClient client, ref int argPos);
     }
 }

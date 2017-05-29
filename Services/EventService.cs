@@ -1,13 +1,15 @@
-﻿using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
+using System;
+using System.Threading.Tasks;
 
 namespace Rick.Services
 {
     public class EventService
     {
         private static DiscordSocketClient client;
+        private static Random Random = new Random();
 
         public EventService(DiscordSocketClient c)
         {
@@ -174,7 +176,15 @@ namespace Rick.Services
 
         public async static Task OnReadyAsync()
         {
-            await client.SetGameAsync(BotHandler.BotConfig.BotGame);
+            var GameCount = BotHandler.BotConfig.Games.Count;
+            var GetGame = BotHandler.BotConfig.Games[Random.Next(GameCount)];
+            if (GameCount != 0)
+            {
+                await client.SetGameAsync(GetGame);
+            }
+            else
+                await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
+
         }
     }
 }
