@@ -9,6 +9,8 @@ using Rick.Attributes;
 using Rick.Models;
 using System.Linq;
 using Rick.Services;
+using System.Text;
+using System.Collections.Generic;
 
 namespace Rick.Modules
 {
@@ -143,13 +145,22 @@ namespace Rick.Modules
             await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
-        [Command("Find"), Summary("Tag Find A"), Remarks("Finds all the tags with a specified letter")]
-        public async Task FindAsync()
+        [Command("Find"), Summary("Tag Find Meme"), Remarks("Finds all the tags with a specified Name")]
+        public async Task FindAsync(string name)
         {
             var GldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var GetTags = GldConfig.TagsList;
-            if (!GetTags.Any())
-                await ReplyAsync($"{Context.Guild.Name} has no tags!");
+            if (!GetTags.Any() || (GetTags.Where(x => !x.TagName.Contains(name)) == null))
+            {
+                await ReplyAsync($"No tags were found matching: **{name}** OR **{Context.Guild.Name}** doesn't have any tags!");
+                return;
+            }
+            var Sb = new StringBuilder();
+            foreach(var Name in GetTags.Where(x => x.TagName.Contains(name)))
+            {
+                Sb.Append($"{Name.TagName}, ");
+            }
+            await ReplyAsync($"Tags matching **{name}**: \n{Sb.ToString()}");
         }
 
 
