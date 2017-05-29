@@ -18,7 +18,9 @@ namespace Rick
         private CommandHandler handler;
 
         public async Task StartAsync()
-        {     
+        {
+            BotHandler.DirectoryCheck();
+
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 WebSocketProvider = WS4NetProvider.Instance,
@@ -28,11 +30,9 @@ namespace Rick
                 DefaultRetryMode = RetryMode.AlwaysRetry,
                 HandlerTimeout = 1000
             });
-            
             client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
 
             var ServiceProdivder = ConfigureServices();
-
             handler = new CommandHandler(ServiceProdivder);
             await handler.ConfigureAsync();
 
@@ -62,7 +62,7 @@ namespace Rick
                 .AddSingleton(new GuildHandler())
                 .AddSingleton(new BotHandler())
                 .AddSingleton(new EventService(client))
-                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose}))
+                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose }))
                 .AddSingleton(new InteractiveService(client));
 
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
