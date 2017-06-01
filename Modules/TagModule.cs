@@ -36,7 +36,7 @@ namespace Rick.Modules
             await ReplyAsync(getTag.TagResponse);
             getTag.TagUses++;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Create"), Summary("Tag Create TagName Tag Response"), Remarks("Creates a tag for you")]
@@ -59,7 +59,7 @@ namespace Rick.Modules
             };
             MakeTags.Add(tag);
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
             var embed = EmbedService.Embed(EmbedModel.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
@@ -127,7 +127,7 @@ namespace Rick.Modules
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync(":gears: Done");
         }
 
@@ -168,7 +168,7 @@ namespace Rick.Modules
             var gldTags = gldConfig.TagsList;
             gldTags.Remove(tag);
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
 }

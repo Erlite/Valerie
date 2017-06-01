@@ -304,7 +304,7 @@ namespace Rick.Modules
             }
 
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("About"), Summary("Normal Command"), Remarks("Shows info about Bot")]
@@ -451,7 +451,7 @@ namespace Rick.Modules
                 embed.Color = new Color(0x93ff89);
             }
             karmalist[Context.User.Id] = Credits;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("", embed: embed);
         }
 

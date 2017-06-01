@@ -47,7 +47,7 @@ namespace Rick.Services
                     karmalist[message.Author.Id] = getKarma;
                 }
                 GuildHandler.GuildConfigs[gld.Id] = Guilds;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             }
         }
 

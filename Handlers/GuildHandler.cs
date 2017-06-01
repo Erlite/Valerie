@@ -68,8 +68,8 @@ namespace Rick.Handlers
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
 
-        public static async Task SaveAsync<T>(string path, Dictionary<ulong, T> configs) where T : IGuildInterface
-            => File.WriteAllText(path, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
+        public static async Task SaveAsync<T>(Dictionary<ulong, T> configs) where T : IGuildInterface
+            => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)));
 
         public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T> (string path = configPath) where T : IGuildInterface, new()
         {
@@ -78,7 +78,7 @@ namespace Rick.Handlers
                 return await Task.Run(() => JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(path)));
             }
             var newConfig = new Dictionary<ulong, T>();
-            await SaveAsync(path, newConfig).ConfigureAwait(false);
+            await SaveAsync(newConfig).ConfigureAwait(false);
             return newConfig;
         }
     }

@@ -46,7 +46,7 @@ namespace Rick.Modules
                 await ReplyAsync($"Gave {Karma} Karma to {user.Username}");
             }
             GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Rank"), Summary("Normal Command"), Remarks("Shows how much Karma you have")]

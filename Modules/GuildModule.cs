@@ -29,7 +29,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.ModChannelID = channel.Id;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync($"Mod Channel has been set to **{channel.Name}**");
         }
 
@@ -40,7 +40,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.GuildPrefix = prefix;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
@@ -51,7 +51,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.WelcomeMessage = msg;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync($"Guild Welcome Message has been set to:\n```{msg}```");
         }
 
@@ -111,7 +111,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleLeaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
@@ -132,7 +132,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleUsername"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
@@ -153,7 +153,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones:  No longer logging username changes.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleNicknames"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
@@ -174,7 +174,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones:   No longer logging nickname changes.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
@@ -193,7 +193,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones:  No longer logging bans.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
@@ -224,7 +224,7 @@ namespace Rick.Modules
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Role"), Summary("Role AddId RoleName"), Remarks("Adds/Removes role ids from the list")]
@@ -245,7 +245,7 @@ namespace Rick.Modules
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
@@ -264,7 +264,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
@@ -283,7 +283,7 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones: Chatterbot disabled!");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
 }

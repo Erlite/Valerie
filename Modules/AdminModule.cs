@@ -47,7 +47,7 @@ namespace Rick.Modules
             }
             await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
@@ -66,7 +66,7 @@ namespace Rick.Modules
             await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
 
             GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         [Command("Mute"), Summary("Mute @User This is a reason"), Remarks("Mutes a user")]
@@ -78,7 +78,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("Mute Role ID is null! Add Mute Role ID in guild Config!");
             await user.AddRoleAsync(GetMuteRole);
             gldConfig.CaseNumber += 1;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }
 
@@ -123,7 +123,7 @@ namespace Rick.Modules
             {
                 var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
                 GuildConfig.MuteRoleId = CreateNew.Id;
-                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
                 foreach (var user in GetUsers)
                 {
                     await user.AddRoleAsync(MuteRole);
@@ -152,7 +152,7 @@ namespace Rick.Modules
             {
                 GldCfg.Karma[Key] += Karma;
             }
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             if (Karma > 300)
                 await ReplyAsync("That was a massive money shot boiiii! :money_mouth: ");
             else
