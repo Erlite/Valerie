@@ -391,7 +391,7 @@ namespace Rick.Modules
             }
             if (Bet <= 0)
             {
-                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 666!");
+                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
                 return;
             }
 
