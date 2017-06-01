@@ -9,7 +9,7 @@ using Rick.Services;
 
 namespace Rick.Modules
 {
-    [RequireChannel, CheckBlacklist]
+    [RequireNsfw ,CheckBlacklist]
     public class NSFWModule : ModuleBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Remarks("I can't believe you need help with this command.."), Alias("Tits")]
