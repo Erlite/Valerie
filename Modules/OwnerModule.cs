@@ -33,8 +33,6 @@ namespace Rick.Modules
         public async Task ServerListAsync()
         {
             var client = Context.Client as DiscordSocketClient;
-            var Info = await client.GetApplicationInfoAsync();
-
             var String = new StringBuilder();
             foreach (SocketGuild guild in client.Guilds)
             {
@@ -43,7 +41,7 @@ namespace Rick.Modules
                     $"==========================================";
                 String.AppendLine(List);
             }
-            await (await Info.Owner.CreateDMChannelAsync()).SendMessageAsync(String.ToString());
+            await (await Context.User.CreateDMChannelAsync()).SendMessageAsync(String.ToString());
         }
 
         [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
