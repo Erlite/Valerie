@@ -33,7 +33,7 @@ namespace Rick.Services
             var Guilds = GuildHandler.GuildConfigs[gld.Id];
             if (message.Author.IsBot || !Guilds.ChatKarma) return;
             Random rand = new Random();
-            double RandomKarma = rand.Next(1, 5);
+            double RandomKarma = rand.Next(1, 10);
             RandomKarma = GiveKarma(RandomKarma);
             if (Guilds.ChatKarma)
             {
