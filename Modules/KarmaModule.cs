@@ -15,12 +15,24 @@ namespace Rick.Modules
     public class KarmaModule : ModuleBase
     {
         [Command("Karma"), Summary("Karma @Username"), Remarks("Gives another user karma")]
-        public async Task KarmaAsync(IGuildUser user)
+        public async Task KarmaAsync(IGuildUser user, int Karma)
         {
             if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
-
             var gldConfig = GuildHandler.GuildConfigs[user.GuildId];
             var karmalist = gldConfig.Karma;
+            int UserKarma = karmalist[Context.User.Id];
+
+            if (Karma <= 0)
+            {
+                await ReplyAsync("Karma can't be <= 0!");
+                return;
+            }
+
+            if(UserKarma < Karma || UserKarma <= 0)
+            {
+                await ReplyAsync("You don't have enough karma!");
+                return;
+            }
             if (!karmalist.ContainsKey(user.Id))
             {
                 karmalist.Add(user.Id, 1);
@@ -29,9 +41,9 @@ namespace Rick.Modules
             else
             {
                 int getKarma = karmalist[user.Id];
-                getKarma++;
+                getKarma += Karma;
                 karmalist[user.Id] = getKarma;
-                await ReplyAsync($"Gave 1 Karma to {user.Username}");
+                await ReplyAsync($"Gave {Karma} Karma to {user.Username}");
             }
             GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
