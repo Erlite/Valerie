@@ -8,6 +8,7 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Models;
+using System.Linq;
 
 namespace Rick.Modules
 {
@@ -112,6 +113,36 @@ namespace Rick.Modules
             string Description = $"{User.Username} has been removed from {Role.Name}!";
             var embed = EmbedService.Embed(EmbedModel.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Antiraid"), Summary("Antiraid"), Remarks("Mutes everyone in the guild")]
+        public async Task AntiRadeAsync()
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            IRole MuteRole = Context.Guild.GetRole(GuildConfig.MuteRoleId);
+            var GetUsers = await Context.Guild.GetUsersAsync();
+
+            if (GuildConfig.MuteRoleId == 0 || Context.Guild.GetRole(GuildConfig.MuteRoleId) == null)
+            {
+                var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
+                GuildConfig.MuteRoleId = CreateNew.Id;
+                await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+                foreach (var user in GetUsers)
+                {
+                    await user.AddRoleAsync(MuteRole);
+                }
+
+                await ReplyAsync("Muted everyone!");
+            }
+            else
+            {
+                foreach (var user in GetUsers)
+                {
+                    await user.AddRoleAsync(MuteRole);
+                }
+
+                await ReplyAsync("Muted everyone!");
+            }
         }
     }
 }
