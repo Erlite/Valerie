@@ -7,13 +7,12 @@ using System.Net.Http;
 using Rick.Attributes;
 using Rick.Services;
 
-
 namespace Rick.Modules
 {
     [RequireChannel, CheckBlacklist]
     public class NSFWModule : ModuleBase
     {
-        [Command("Boobs"), Summary("MotherOfGod"), Remarks("Fetches Female breasts from the api.")]
+        [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Remarks("I can't believe you need help with this command.."), Alias("Tits")]
         public async Task BoobsAsync()
         {
             try
@@ -31,7 +30,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Bum"), Summary("MotherOfGod"), Remarks("I can't believe you need help with this command..")]
+        [Command("Ass"), Summary("Oh my, you naughty lilttle boiii!"), Remarks("I can't believe you need help with this command.."), Alias("Butt")]
         public async Task BumsAsync()
         {
             try
@@ -50,10 +49,13 @@ namespace Rick.Modules
         }
 
         [Command("E621"), Summary("E621 Kawaii"), Remarks("Never used this command. Don't ask me")]
-        public async Task E621Async(string search = null)
+        public async Task E621Async(string search)
         {
             if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("Please provide me a search term!");
+            {
+                await ReplyAsync("Please provide me a search term!");
+                return;
+            }
             search = search?.Trim() ?? "";
             var url = await MethodsService.GetE621ImageLink(search);
             if (url == null)
