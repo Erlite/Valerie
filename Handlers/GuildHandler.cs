@@ -4,9 +4,6 @@ using Rick.Interfaces;
 using System.Threading.Tasks;
 using System.IO;
 using Rick.Models;
-using System.Diagnostics;
-using System;
-using System.Reflection;
 
 namespace Rick.Handlers
 {
