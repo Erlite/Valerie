@@ -8,7 +8,6 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Models;
-using System.Linq;
 
 namespace Rick.Modules
 {
@@ -35,7 +34,9 @@ namespace Rick.Modules
         [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
         public async Task KickAsync(SocketGuildUser user, [Remainder] string Reason = "No reason provided by the moderator!")
         {
-            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
+            await user.KickAsync();            
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
@@ -43,19 +44,17 @@ namespace Rick.Modules
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: embed);
             }
-            else
-                await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
-
-            await user.KickAsync();
-            gldConfig.CaseNumber += 1;
-            GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
+            await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Ban"), Summary("Ban @Username This is a reason"), Remarks("Bans a user from the guild")]
         public async Task BanAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the moderator!")
         {
-            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];            
+            var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
+            await user.Guild.AddBanAsync(user);
+            gldConfig.CaseNumber += 1;
             if (gldConfig.UserBannedLogged)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
@@ -63,11 +62,8 @@ namespace Rick.Modules
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: embed);
             }
-            else
-                await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
+            await ReplyAsync($"***{user.Username + '#' + user.Discriminator} GOT BENT*** :hammer: ");
 
-            await user.Guild.AddBanAsync(user);
-            gldConfig.CaseNumber += 1;
             GuildHandler.GuildConfigs[user.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
