@@ -22,6 +22,23 @@ namespace Rick.Modules
             Interactive = Inter;
         }
 
+        [Command, Summary("Tag Execute TagName"), Remarks("Execute a tag"), Priority(0)]
+        public async Task TagAsync(string Name)
+        {
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var gldTags = gldConfig.TagsList;
+            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
+            if (getTag == null)
+            {
+                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                return;
+            }
+            await ReplyAsync(getTag.TagResponse);
+            getTag.TagUses++;
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+        }
+
         [Command("Create"), Summary("Tag Create TagName Tag Response"), Remarks("Creates a tag for you")]
         public async Task CreateAsync(string Name, [Remainder] string response)
         {
@@ -61,23 +78,6 @@ namespace Rick.Modules
             }
             await RemoveTag(getTag);
             await ReplyAsync("Tag Removed :put_litter_in_its_place: ");
-        }
-
-        [Command("Execute"), Summary("Tag Execute TagName"), Remarks("Execute a tag")]
-        public async Task ExecuteAsync(string Name)
-        {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
-            if (getTag == null)
-            {
-                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
-                return;
-            }
-            await ReplyAsync(getTag.TagResponse);
-            getTag.TagUses++;
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
         }
 
         [Command("Info"), Summary("Tag Info TagName"), Remarks("Returns Tag info")]
@@ -161,7 +161,6 @@ namespace Rick.Modules
             }
             await ReplyAsync($"Tags matching **{name}**: \n{Sb.ToString()}");
         }
-
 
         public async Task RemoveTag(TagsModel tag)
         {
