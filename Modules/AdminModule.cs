@@ -8,6 +8,7 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Models;
+using System.Linq;
 
 namespace Rick.Modules
 {
@@ -139,6 +140,23 @@ namespace Rick.Modules
 
                 await ReplyAsync("Muted everyone!");
             }
+        }
+
+        [Command("MoneyShot"), Summary("Normal Command"), Remarks("Gives everyone random karma")]
+        public async Task MoneyShotAsync()
+        {
+            var Random = new Random();
+            int Karma = Random.Next(100, 500);
+            var GldCfg = GuildHandler.GuildConfigs[Context.Guild.Id];
+            foreach(var Key in GldCfg.Karma.Keys.ToList())
+            {
+                GldCfg.Karma[Key] += Karma;
+            }
+            await GuildHandler.SaveAsync(GuildHandler.configPath, GuildHandler.GuildConfigs);
+            if (Karma > 300)
+                await ReplyAsync("That was a massive money shot boiiii! :money_mouth: ");
+            else
+                await ReplyAsync("It was a decent money shot :point_up: ");
         }
     }
 }
