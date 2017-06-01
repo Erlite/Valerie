@@ -33,15 +33,26 @@ namespace Rick.Modules
         public async Task ServerListAsync()
         {
             var client = Context.Client as DiscordSocketClient;
-            var String = new StringBuilder();
+
+            var embed = new EmbedBuilder()
+            {
+                Color = new Color(123,45,14)
+            };
+            var Sb = new StringBuilder();
             foreach (SocketGuild guild in client.Guilds)
             {
-                string List = $"{guild.Name} || {guild.Id}\n" +
-                    $"**Guild Owner:** {guild.Owner.Username} || {guild.OwnerId}\n" +
-                    $"==========================================";
-                String.AppendLine(List);
+                embed.AddField(x =>
+                {
+                    x.Name = $"{guild.Name} ({guild.Id})";
+                    x.Value = $"Owner: {guild.Owner.Username} ({guild.Owner.Id})\n" +
+                    $"Total Users: {guild.MemberCount}";
+                    x.IsInline = false;
+                });
             }
-            await (await Context.User.CreateDMChannelAsync()).SendMessageAsync(String.ToString());
+            await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("", embed: embed);
+
+
+
         }
 
         [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
