@@ -12,16 +12,7 @@ using System.Linq;
 
 namespace Rick.Modules
 {
-    [ 
-        CheckBlacklist, 
-        PermissionCheck
-        (
-        GuildPermission.Administrator, 
-        GuildPermission.BanMembers, 
-        GuildPermission.KickMembers, 
-        GuildPermission.ManageMessages, 
-        GuildPermission.ManageRoles
-        )]
+    [ CheckBlacklist, RequireBotPermission(GuildPermission.Administrator)]
 
     public class AdminModule : ModuleBase
     {
