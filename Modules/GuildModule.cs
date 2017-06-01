@@ -6,6 +6,7 @@ using Rick.Handlers;
 using Discord.WebSocket;
 using Rick.Models;
 using Rick.Attributes;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -57,12 +58,38 @@ namespace Rick.Modules
         [Command("Actions"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
         public async Task ListLogActionsAsync()
         {
-            var Guild = Context.Guild as SocketGuild;
-            string Description = $"**Server Mod Channel:** {GuildHandler.GuildConfigs[Guild.Id].ModChannelID}\n**Guild Prefix:** {GuildHandler.GuildConfigs[Guild.Id].GuildPrefix}\n" +
-                $"**Welcome Message:** {GuildHandler.GuildConfigs[Guild.Id].WelcomeMessage}\n**User Join Logging:** {GuildHandler.GuildConfigs[Guild.Id].JoinLogs}\n**User Leave Logging:** {GuildHandler.GuildConfigs[Guild.Id].LeaveLogs}\n" +
-                $"**Username Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NameChangesLogged}\n **Nickname Change Logging:** {GuildHandler.GuildConfigs[Guild.Id].NickChangesLogged}\n" +
-                $"**User Ban Logging:** {GuildHandler.GuildConfigs[Guild.Id].UserBannedLogged}";
-            var embed = EmbedService.Embed(EmbedModel.Teal, $"{Guild.Name} || {Guild.Owner.Username}", Guild.IconUrl, null, Description);
+            var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+            var Joins = GConfig.JoinLogs ? "Enabled" : "Disabled";
+            var Leaves = GConfig.LeaveLogs ? "Enabled" : "Disabled";
+            var Username = GConfig.NameChangesLogged ? "Enabled" : "Disabled";
+            var Nickname = GConfig.NickChangesLogged ? "Enabled" : "Disabled";
+            var Bans = GConfig.UserBannedLogged ? "Enabled" : "Disabled";
+            var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
+            var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
+            var SB = new StringBuilder();
+            foreach(var Names in GConfig.RequiredChannelNames)
+            {
+                SB.AppendLine(Names);
+            }
+            if (string.IsNullOrWhiteSpace(SB.ToString()))
+                SB = SB.AppendLine("No channels found in required channel list.");
+            string Description =
+                                $"**Guild Prefix:** {GConfig.GuildPrefix}\n" +
+                                $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
+                                $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
+                                $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
+                                $"**User Join Logging:** {Joins}\n" +
+                                $"**User Leave Logging:** {Leaves}\n" +
+                                $"**Username Change Logging:** {Username}\n" +
+                                $"**Nickname Change Logging:** {Nickname}\n" +
+                                $"**User Ban Logging:** {Bans}\n" +
+                                $"**Chat Karma:** {Karma}\n" +
+                                $"**Chatter Bot:** {Chatterbot}\n" +
+                                $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
+                                $"**AFK Members:** {GConfig.AfkList.Count}\n" +
+                                $"**Total Tags:** {GConfig.TagsList.Count}\n" +
+                                $"**Required Channels for NSFW:** {SB.ToString()}";
+            var embed = EmbedService.Embed(EmbedModel.Teal, $"{Context.Guild.Name} || {(await Context.Guild.GetOwnerAsync()).Username}", Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
             await ReplyAsync("", embed: embed);
         }
 
@@ -192,7 +219,7 @@ namespace Rick.Modules
                     break;
 
                 case GlobalModel.RemoveId:
-                    gldConfig.RequiredRoleIDs.Remove(channel.Id);                    
+                    gldConfig.RequiredRoleIDs.Remove(channel.Id);
                     await ReplyAsync($"Channel **{channel.Id}** has been removed from RequiredChannel Attribute.");
                     break;
             }
