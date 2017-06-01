@@ -39,7 +39,7 @@ namespace Rick
             client.GuildAvailable += EventService.CreateGuildConfigAsync;
             client.JoinedGuild += EventService.JoinedGuildAsync;
             client.LeftGuild += EventService.RemoveGuildConfigAsync;
-            await Task.Run(() => client.MessageReceived += EventService.MessageServicesAsync);
+            Task.Run(() => client.MessageReceived += EventService.MessageServicesAsync);
             client.Ready += EventService.OnReadyAsync;
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
