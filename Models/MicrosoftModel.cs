@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Rick.Enums;
 
 namespace Rick.Models
 {
@@ -33,26 +34,5 @@ namespace Rick.Models
     {
         public List<DocsMembers> results { get; set; }
         public int count { get; set; }
-    }
-
-    public enum DocsType
-    {
-        Type,
-        Namespace,
-        Member,
-    }
-    public enum DocsKind
-    {
-        Namespace,
-        Class,
-        Enumeration,
-        Method,
-        Structure,
-        Property,
-        Constructor,
-        Field,
-        Event,
-        Interface,
-        Delegate
     }
 }
