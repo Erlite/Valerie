@@ -1,6 +1,6 @@
-﻿namespace Rick.Models
+﻿namespace Rick.Enums
 {
-    public enum EmbedModel
+    public enum EmbedColor
     {
         Red,
         Maroon,

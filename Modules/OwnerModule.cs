@@ -292,7 +292,7 @@ namespace Rick.Modules
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
-            var embed = EmbedService.Embed(EmbedModel.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
+            var embed = EmbedService.Embed(EmbedColor.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

@@ -70,11 +70,11 @@ namespace Rick.Handlers
                 case ParseResult parse:
                     ErrorMsg = $"User failed to provide required paramaters for {Command.Name}!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
                         $"You can get more info on how to use {Command.Name} by using:\n{BotHandler.BotConfig.DefaultPrefix}Help {Command.Name}";
-                    embed = EmbedService.Embed(EmbedModel.Maroon, "Parsing Failed!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
+                    embed = EmbedService.Embed(EmbedColor.Maroon, "Parsing Failed!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
-                    embed = EmbedService.Embed(EmbedModel.Maroon, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), Description: ErrorMsg);
+                    embed = EmbedService.Embed(EmbedColor.Maroon, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), Description: ErrorMsg);
                     break;
                 case ExecuteResult exe:
                     var exeresult = (ExecuteResult)result;
@@ -93,7 +93,7 @@ namespace Rick.Handlers
                 string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
                 string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
                 string StackTrace = result.Exception.StackTrace;
-                var embed = EmbedService.Embed(EmbedModel.Red, Name, client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: StackTrace);
+                var embed = EmbedService.Embed(EmbedColor.Red, Name, client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else

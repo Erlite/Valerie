@@ -61,7 +61,7 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedService.Embed(EmbedModel.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedService.Embed(EmbedColor.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -106,7 +106,7 @@ namespace Rick.Modules
         }
 
         [Command("Modify"), Summary("Tag Modify Name/Response"), Remarks("Modifies Tag's info")]
-        public async Task ModifyTagAsync(GlobalModel prop, string Name, string Response)
+        public async Task ModifyTagAsync(GlobalEnums prop, string Name, string Response)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
@@ -118,11 +118,11 @@ namespace Rick.Modules
             }
             switch(prop)
             {
-                case GlobalModel.TagName:
+                case GlobalEnums.TagName:
                     getTag.TagName = Name;
                     break;
 
-                case GlobalModel.TagResponse:
+                case GlobalEnums.TagResponse:
                     getTag.TagResponse = Response;
                     break;
             }

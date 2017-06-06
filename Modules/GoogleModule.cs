@@ -35,7 +35,7 @@ namespace Rick.Modules
                 Str.AppendLine($"**=> {result.Title}**\n{MethodsService.ShortenUrl( result.Link)}");
             }
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            var embed = EmbedService.Embed(EmbedModel.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            var embed = EmbedService.Embed(EmbedColor.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
@@ -49,7 +49,7 @@ namespace Rick.Modules
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
-                var embed = EmbedService.Embed(EmbedModel.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
+                var embed = EmbedService.Embed(EmbedColor.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
                 await ReplyAsync("", embed: embed);
             }
         }

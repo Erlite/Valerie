@@ -276,8 +276,8 @@
     <Compile Include="Enums\LogType.cs" />
     <Compile Include="Models\GiphyModel.cs" />
     <Compile Include="Models\MicrosoftModel.cs" />
-    <Compile Include="Models\EmbedModel.cs" />
-    <Compile Include="Models\GlobalModel.cs" />
+    <Compile Include="Enums\EmbedColor.cs" />
+    <Compile Include="Enums\GlobalEnums.cs" />
     <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\ScriptGlobals.cs" />
     <Compile Include="Models\SteamModel.cs" />

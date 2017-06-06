@@ -208,7 +208,7 @@ namespace Rick.Modules
                 userNick = "User has no nickname!";
 
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
-            var embed = EmbedService.Embed(EmbedModel.White, user.Username, user.GetAvatarUrl(), Description: descrption);
+            var embed = EmbedService.Embed(EmbedColor.White, user.Username, user.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -219,7 +219,7 @@ namespace Rick.Modules
             var client = Context.Client as DiscordSocketClient;
             var Gateway = client.Latency;
             string descrption = $"**Gateway Latency:** { Gateway} ms\n**Response Latency:** {sw.ElapsedMilliseconds} ms\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms";
-            var embed = EmbedService.Embed(EmbedModel.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
+            var embed = EmbedService.Embed(EmbedColor.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
 
         }
@@ -236,7 +236,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
-                    var embed = EmbedService.Embed(EmbedModel.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: $"Ping Result: **{time} ms**");
+                    var embed = EmbedService.Embed(EmbedColor.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: $"Ping Result: **{time} ms**");
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -258,7 +258,7 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = EmbedService.Embed(EmbedModel.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
+            var embed = EmbedService.Embed(EmbedColor.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -278,7 +278,7 @@ namespace Rick.Modules
         }
 
         [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
-        public async Task SetAfkAsync(GlobalModel prop, [Remainder] string msg = "No reason provided!")
+        public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg = "No reason provided!")
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -287,17 +287,17 @@ namespace Rick.Modules
 
             switch (prop)
             {
-                case GlobalModel.Add:
+                case GlobalEnums.Add:
                     List.Add(Context.User.Id, msg);
                     await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
                     break;
 
-                case GlobalModel.Remove:
+                case GlobalEnums.Remove:
                     List.Remove(Context.User.Id);
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
                     break;
 
-                case GlobalModel.Modify:
+                case GlobalEnums.Modify:
                     List[Context.User.Id] = msg;
                     await ReplyAsync("Your message has been modified!");
                     break;
@@ -322,7 +322,7 @@ namespace Rick.Modules
                 $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!\n" +
                 $"**Invite URL:** https://discordapp.com/oauth2/authorize?client_id={AppInfo.Id}&scope=bot&permissions=2146958591\n" +
                 $"**Help Guild:** https://discord.me/Noegenesis";
-            var embed = EmbedService.Embed(EmbedModel.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
+            var embed = EmbedService.Embed(EmbedColor.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -362,7 +362,7 @@ namespace Rick.Modules
             var result = await MethodsService.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
-            var embed = EmbedService.Embed(EmbedModel.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedService.Embed(EmbedColor.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -459,7 +459,7 @@ namespace Rick.Modules
         public async Task TrumpAsync()
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
-            var embed = EmbedService.Embed(EmbedModel.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
+            var embed = EmbedService.Embed(EmbedColor.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
             await ReplyAsync("", embed: embed);
 
         }
@@ -482,7 +482,7 @@ namespace Rick.Modules
                     $"**Summary: **{result.description}\n" +
                     $"**URL: **{MethodsService.ShortenUrl(result.url)}\n");
             }
-            var embed = EmbedService.Embed(EmbedModel.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
+            var embed = EmbedService.Embed(EmbedColor.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
     }

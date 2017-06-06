@@ -16,7 +16,7 @@ namespace Rick.Modules
             var github = new GitHubClient(new ProductHeaderValue("Rick"));
             var usr= await github.User.Get(user);
             string Description = $"**Bio:** {usr.Bio}\n**Public Repositories:** {usr.PublicRepos}\n**Private Repositories:** {usr.TotalPrivateRepos}\n**Followers:** {usr.Followers}\n**Company:** {usr.Company}";
-            var embed = EmbedService.Embed(EmbedModel.Pastle, usr.Name, usr.AvatarUrl, Description: Description);
+            var embed = EmbedService.Embed(EmbedColor.Pastle, usr.Name, usr.AvatarUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
     }
