@@ -8,6 +8,7 @@ using Discord.Net.Providers.WS4Net;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Discord.Commands;
+using Rick.Enums;
 
 namespace Rick
 {
@@ -30,7 +31,7 @@ namespace Rick
                 DefaultRetryMode = RetryMode.AlwaysRetry,
                 HandlerTimeout = 1000
             });
-            client.Log += (log) => Task.Run(() => ConsoleService.Log(log.Severity, log.Source, log.Exception?.ToString() ?? log.Message));
+            client.Log += (log) => Task.Run(() => ConsoleService.Log(LogType.Info, LogSource.Client, log.Exception?.ToString() ?? log.Message));
 
             var ServiceProdivder = ConfigureServices();
             handler = new CommandHandler(ServiceProdivder);

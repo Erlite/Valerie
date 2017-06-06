@@ -13,6 +13,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Google.Apis.Urlshortener.v1;
 using Google.Apis.Services;
+using Rick.Enums;
 
 namespace Rick.Services
 {
@@ -81,18 +82,18 @@ namespace Rick.Services
             var BotConfig = BotHandler.BotConfig;
             if (BotConfig.AutoUpdate)
             {
-                ConsoleService.Log("Autoupdate", "Checking for updates ...");
+                ConsoleService.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
                 var Http = new HttpClient();
                 var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
                 double version = Convert.ToDouble(GetUrl);
                 if (BotHandler.BotVersion < version)
                 {
-                    ConsoleService.Log("Autoupdate", $"New version is available! Version: {version}.\nWould you like to update now? ");
-                    ConsoleService.Log("Autoupdate", "Please type Yes to update! ");
+                    ConsoleService.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
+                    ConsoleService.Log(LogType.Info, LogSource.Configuration, "Type Yes to update!");
                     var Response = Console.ReadLine().ToLower();
                     if (Response == "yes")
                     {
-                        ConsoleService.Log("Autoupdate", "Downloading update ...");
+                        ConsoleService.Log(LogType.Info, LogSource.Configuration, $"Downloading Update .... ");
                         Uri url = new Uri("https://exceptiondev.github.io/Downloads/Installer.bat");
                         await Http.DownloadAsync(url, "Installer.bat");
                         Process.Start("Installer.bat");
@@ -100,13 +101,13 @@ namespace Rick.Services
                         Process.GetCurrentProcess().Kill();
                     }
                     else
-                        ConsoleService.Log("Autoupdate", "Wrong response! Continuing...");
+                        ConsoleService.Log(LogType.Critical, LogSource.Configuration, $"Ignoring Update ...");
                 }
                 else
-                    ConsoleService.Log("Autoupdate", "Already using the latest version!\n");
+                    ConsoleService.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: ");
             }
             else
-                ConsoleService.Log("Autoupdate", "Autoupdate is disabled! Continuing ...\n");
+                ConsoleService.Log(LogType.Warning, LogSource.Configuration, $"Update is disabled! Continuing..");
         }
 
         public static async Task<WatsonModel> Translate(string dest, string text)

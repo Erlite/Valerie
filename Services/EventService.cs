@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Rick.Handlers;
 using System;
 using System.Threading.Tasks;
+using Rick.Enums;
 
 namespace Rick.Services
 {
@@ -158,7 +159,7 @@ namespace Rick.Services
 
         public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
         {
-            ConsoleService.Log(LogSeverity.Warning, Guild.Name, "Config Deleted!");
+            ConsoleService.Log(LogType.Warning, LogSource.Client, $"{Guild.Name} Config's deleted!");
             if (GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
             {
                 GuildHandler.GuildConfigs.Remove(Guild.Id);

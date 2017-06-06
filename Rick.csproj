@@ -47,6 +47,9 @@
     <Reference Include="CleverbotLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\CleverbotLib.1.0.1\lib\net452\CleverbotLib.dll</HintPath>
     </Reference>
+    <Reference Include="Colorful.Console, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Colorful.Console.1.0.7\lib\net461\Colorful.Console.dll</HintPath>
+    </Reference>
     <Reference Include="Discord.Addons.InteractiveCommands, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Discord.Addons.InteractiveCommands.1.2.3\lib\netstandard1.3\Discord.Addons.InteractiveCommands.dll</HintPath>
     </Reference>

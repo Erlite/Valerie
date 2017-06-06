@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord;
+using Rick.Enums;
+using System.Drawing;
+using Console = Colorful.Console;
 
 namespace Rick.Services
 {
@@ -28,31 +30,67 @@ namespace Rick.Services
             Console.Write(Environment.NewLine + (string.Join(Environment.NewLine, card)));
         }
 
-        public static void Append(string text, ConsoleColor? foreground = null, ConsoleColor? background = null)
+        static void Append(string text, Color foreground)
         {
-            if (foreground == null)
-                foreground = ConsoleColor.White;
-            if (background == null)
-                background = ConsoleColor.Black;
-
-            Console.ForegroundColor = (ConsoleColor)foreground;
-            Console.BackgroundColor = (ConsoleColor)background;
+            Console.ForegroundColor = foreground;
             Console.Write(text);
         }
 
-        public static void Log(LogSeverity Severity, string source, string message)
+        public static void Log(LogType Severity, LogSource Source, string message)
         {
             Console.Write(Environment.NewLine);
-            Append($"[{Severity}]", ConsoleColor.Cyan);
-            Append($"[{source}] ", ConsoleColor.Red);
-            Append(message, ConsoleColor.Yellow);
-        }
 
-        public static void Log(string source, string message)
-        {
-            Console.Write(Environment.NewLine);
-            Append($"[{source}] ", ConsoleColor.DarkCyan);
-            Append(message, ConsoleColor.DarkYellow);
+            switch (Severity)
+            {
+                case LogType.Critical:
+                    Append($"[{Severity}]", Color.Red);
+                    break;
+
+                case LogType.Error:
+                    Append($"[{Severity}]", Color.Maroon);
+                    break;
+
+                case LogType.Execute:
+                    Append($"[{Severity}]", Color.OrangeRed);
+                    break;
+
+                case LogType.Info:
+                    Append($"[{Severity}]", Color.Coral);
+                    break;
+
+                case LogType.Received:
+                    Append($"[{Severity}]", Color.ForestGreen);
+                    break;
+
+                case LogType.Warning:
+                    Append($"[{Severity}]", Color.Yellow);
+                    break;
+
+            }
+
+            switch (Source)
+            {
+                case LogSource.Client:
+                    Append($"[{Source}]", Color.Plum);
+                    break;
+                case LogSource.CommandExecution:
+                    Append($"[{Source}]", Color.MediumOrchid);
+                    break;
+                case LogSource.Configuration:
+                    Append($"[{Source}]", Color.Turquoise);
+                    break;
+                case LogSource.ExecutionError:
+                    Append($"[{Severity}]", Color.HotPink);
+                    break;
+                case LogSource.ParseError:
+                    Append($"[{Severity}]", Color.HotPink);
+                    break;
+                case LogSource.PreConditionError:
+                    Append($"[{Severity}]", Color.HotPink);
+                    break;
+            }
+
+            Append($" {message}", Color.DimGray);
         }
     }
 }
