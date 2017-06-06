@@ -70,7 +70,7 @@ namespace Rick.Services
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
-            if (getGuild.JoinLogs == false) return;
+            if (!getGuild.JoinLogs) return;
             var embed = new EmbedBuilder()
             {
                 Title = "=== User Joined ===",
