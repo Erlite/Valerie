@@ -1,6 +1,6 @@
 ﻿namespace Rick.Enums
 {
-    public enum EmbedColor
+    public enum EmbedColors
     {
         Red,
         Maroon,

@@ -4,7 +4,7 @@ using Discord.Commands;
 using Rick.Services;
 using Rick.Handlers;
 using Discord.WebSocket;
-using Rick.Models;
+using Rick.Enums;
 using Rick.Attributes;
 using System.Text;
 
@@ -89,7 +89,7 @@ namespace Rick.Modules
                                 $"**AFK Members:** {GConfig.AfkList.Count}\n" +
                                 $"**Total Tags:** {GConfig.TagsList.Count}\n" +
                                 $"**Required Channels for NSFW:** {SB.ToString()}";
-            var embed = EmbedService.Embed(EmbedColor.Teal, $"{Context.Guild.Name} || {(await Context.Guild.GetOwnerAsync()).Username}", Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
+            var embed = EmbedService.Embed(EmbedColors.Teal, $"{Context.Guild.Name} || {(await Context.Guild.GetOwnerAsync()).Username}", Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
             await ReplyAsync("", embed: embed);
         }
 

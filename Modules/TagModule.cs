@@ -10,6 +10,7 @@ using Rick.Models;
 using System.Linq;
 using Rick.Services;
 using System.Text;
+using Rick.Enums;
 
 namespace Rick.Modules
 {
@@ -61,7 +62,7 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedService.Embed(EmbedColor.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedService.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
