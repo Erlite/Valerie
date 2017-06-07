@@ -293,6 +293,7 @@
     <Compile Include="Interfaces\IServer.cs" />
     <Compile Include="Handlers\BotHandler.cs" />
     <Compile Include="Handlers\GuildHandler.cs" />
+    <Compile Include="Models\WrapperModel.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\BingModule.cs" />
     <Compile Include="Modules\BotModule.cs" />

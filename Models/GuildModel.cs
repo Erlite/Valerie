@@ -56,5 +56,8 @@ namespace Rick.Models
 
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
+
+        [JsonProperty("Join")]
+        public WrapperModel Join { get; set; } = new WrapperModel( );
     }
 }
