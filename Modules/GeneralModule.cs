@@ -486,23 +486,5 @@ namespace Rick.Modules
             var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
-
-        [Command("Test")]
-        public async Task TestAsync(ITextChannel Channel)
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            GuildConfig.Join.TextChannel = Channel.Id;
-            GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync("Saved!");
-        }
-
-        [Command("Test1")]
-        public async Task TestoneAsync()
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var Channel = await Context.Guild.GetChannelAsync(GuildConfig.Join.TextChannel);
-            await ReplyAsync(Channel.Name);
-        }
     }
 }
