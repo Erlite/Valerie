@@ -88,14 +88,14 @@ namespace Rick.Services
             await client.SetStatusAsync(newStatus);
         }
 
-        public async static Task CreateGuildConfigAsync(SocketGuild Guild)
+        public static async Task CreateGuildConfigAsync(SocketGuild Guild)
         {
             var CreateConfig = new GuildModel();
             GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        public async static Task JoinedGuildAsync(SocketGuild Guild)
+        public static async Task JoinedGuildAsync(SocketGuild Guild)
         {
             string Prefix = BotHandler.BotConfig.DefaultPrefix;
             string Msg = $"Hello! I'm {client.CurrentUser.Username} written by ExceptionDev!\n" +
@@ -109,7 +109,7 @@ namespace Rick.Services
             await client.StartAsync();            
         }
 
-        public async static Task RemoveGuildConfigAsync(SocketGuild Guild)
+        public static async Task RemoveGuildConfigAsync(SocketGuild Guild)
         {
             ConsoleService.Log(LogType.Warning, LogSource.Client, $"{Guild.Name} Config's deleted!");
             if (GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
@@ -120,16 +120,16 @@ namespace Rick.Services
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        public async static Task MessageServicesAsync(SocketMessage msg)
+        public static async Task MessageServicesAsync(SocketMessage msg)
         {
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
-            Task.Run(() => MsgsService.AfkAsync(message, gld));
+            Task.Run(() => MsgsService.AfkAsync(message, gld)); 
             Task.Run(() => MsgsService.ChatKarmaAsync(message, gld));
-            Task.Run(() => MsgsService.CleverBotAsync(message, gld));
+            Task.Run(() => MsgsService.CleverBot(message, gld));
         }
 
-        public async static Task OnReadyAsync()
+        public static async Task OnReadyAsync()
         {
             var GameCount = BotHandler.BotConfig.Games.Count;
             var GetGame = BotHandler.BotConfig.Games[Random.Next(GameCount)];
