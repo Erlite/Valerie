@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
-using Rick.Models;
 using Rick.Attributes;
-using Rick.Services;
 using System.Net.Http;
-using Newtonsoft.Json.Linq;
 using Rick.Handlers;
 using Newtonsoft.Json;
+using Rick.JsonResponse;
 
 namespace Rick.Modules
 {

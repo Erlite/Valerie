@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Rick.Models
+namespace Rick.JsonResponse
 {
     public class WatsonModel
     {

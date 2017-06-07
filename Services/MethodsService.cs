@@ -8,12 +8,12 @@ using System.Linq;
 using System.Reflection;
 using Rick.Handlers;
 using System.Diagnostics;
-using Rick.Models;
 using System.Text;
 using Newtonsoft.Json;
 using Google.Apis.Urlshortener.v1;
 using Google.Apis.Services;
 using Rick.Enums;
+using Rick.JsonResponse;
 
 namespace Rick.Services
 {

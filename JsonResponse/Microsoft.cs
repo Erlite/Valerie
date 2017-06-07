@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Rick.Enums;
 
-namespace Rick.Models
+namespace Rick.JsonResponse
 {
     public class SearchValue
     {

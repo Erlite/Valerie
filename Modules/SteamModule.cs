@@ -2,13 +2,13 @@
 using System.Text;
 using System.Threading.Tasks;
 using Rick.Attributes;
-using Rick.Models;
 using Discord;
 using Discord.Commands;
 using Rick.Services;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using Rick.Handlers;
+using Rick.JsonResponse;
 
 namespace Rick.Modules
 {

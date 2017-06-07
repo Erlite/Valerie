@@ -11,11 +11,11 @@ using Discord.Addons.InteractiveCommands;
 using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
-using Rick.Models;
 using Rick.Services;
 using System.Text;
 using Newtonsoft.Json;
 using Rick.Enums;
+using Rick.JsonResponse;
 
 namespace Rick.Modules
 {

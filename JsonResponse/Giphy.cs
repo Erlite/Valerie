@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Rick.Models
+namespace Rick.JsonResponse
 {
     public class Datum
     {

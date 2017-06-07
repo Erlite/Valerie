@@ -5,10 +5,10 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using Rick.Handlers;
 using Rick.Services;
-using Rick.Models;
 using System.Text;
 using Rick.Attributes;
 using Rick.Enums;
+using Rick.JsonResponse;
 
 namespace Rick.Modules
 {

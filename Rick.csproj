@@ -272,17 +272,19 @@
     <Compile Include="Attributes\RequireChannelAttribute.cs" />
     <Compile Include="Attributes\CheckBlacklistAttribute.cs" />
     <Compile Include="Attributes\RequiredRoleAttribute.cs" />
+    <Compile Include="Enums\DocsKind.cs" />
+    <Compile Include="Enums\DocsType.cs" />
     <Compile Include="Enums\LogSource.cs" />
     <Compile Include="Enums\LogType.cs" />
-    <Compile Include="Models\GiphyModel.cs" />
-    <Compile Include="Models\MicrosoftModel.cs" />
+    <Compile Include="JsonResponse\Giphy.cs" />
+    <Compile Include="JsonResponse\Microsoft.cs" />
     <Compile Include="Enums\EmbedColors.cs" />
     <Compile Include="Enums\GlobalEnums.cs" />
     <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\ScriptGlobals.cs" />
-    <Compile Include="Models\SteamModel.cs" />
+    <Compile Include="JsonResponse\Steam.cs" />
     <Compile Include="Models\TagsModel.cs" />
-    <Compile Include="Models\WatsonModel.cs" />
+    <Compile Include="JsonResponse\Watson.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Interfaces\IBotInterface.cs" />
@@ -309,6 +311,7 @@
     <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EncryptionService.cs" />
     <Compile Include="Services\EventService.cs" />
+    <Compile Include="Services\EventWrapper.cs" />
     <Compile Include="Services\MethodsService.cs" />
     <Compile Include="Services\MsgsService.cs" />
   </ItemGroup>
