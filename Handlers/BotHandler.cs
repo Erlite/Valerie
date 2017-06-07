@@ -15,10 +15,8 @@ namespace Rick.Handlers
 
         public static string Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
 
-        [JsonIgnore]
         public const string configPath = "Data/BotConfig.json";
 
-        [JsonIgnore]
         public const double BotVersion = 41.0;
 
         public static async Task<BotModel> LoadConfigAsync()
