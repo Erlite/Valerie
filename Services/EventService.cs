@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Rick.Enums;
 using Rick.Models;
+using System.Linq;
 
 namespace Rick.Services
 {
@@ -135,10 +136,13 @@ namespace Rick.Services
             if (GameCount != 0)
             {
                 await client.SetGameAsync(GetGame);
+                ConsoleService.Log(LogType.Info, LogSource.Client, $"Current Game: {GetGame}");
             }
             else
                 await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
-
+            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Guilds: {client.Guilds.Count}");
+            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Users: {client.Guilds.Sum(x => x.Users.Count)}");
+            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Channels: {client.Guilds.Sum(x => x.Channels.Count)}");
         }
     }
 }
