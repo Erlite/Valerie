@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Rick.Modules
 {
-    [Group("Guild"), RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
+    [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
         private GuildHandler model;
@@ -69,6 +69,10 @@ namespace Rick.Modules
             {
                 SB.AppendLine(Names);
             }
+            var JoinChannel = (await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel)) as ITextChannel;
+            var LeaveChannel = (await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel)) as ITextChannel;
+            var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;        
+
             if (string.IsNullOrWhiteSpace(SB.ToString()))
                 SB = SB.AppendLine("No channels found in required channel list.");
             string Description =
@@ -76,9 +80,9 @@ namespace Rick.Modules
                                 $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
                                 $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
                                 $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
-                                $"**User Join Logging:** {Joins}\n" +
-                                $"**User Leave Logging:** {Leaves}\n" +
-                                $"**User Ban Logging:** {Bans}\n" +
+                                $"**User Join Logging:** {Joins} ({JoinChannel.Mention})\n" +
+                                $"**User Leave Logging:** {Leaves} ({LeaveChannel.Mention})\n" +
+                                $"**User Ban Logging:** {Bans} ({BanChannel})\n" +
                                 $"**Chat Karma:** {Karma}\n" +
                                 $"**Chatter Bot:** {Chatterbot}\n" +
                                 $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
@@ -89,16 +93,17 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("ToggleJoins"), Summary("Normal Command"), Remarks("Toggles Join logging")]
-        public async Task ToggleJoinsAsync()
+        [Command("ToggleJoins"), Summary("ToggleJoins #ChannelName"), Remarks("Toggles Join logging")]
+        public async Task ToggleJoinsAsync(ITextChannel Channel = null)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             if (!gldConfig.JoinEvent.IsEnabled)
             {
-                Log.EnableJoinLogging();
                 gldConfig.JoinEvent.IsEnabled = true;
-                await ReplyAsync(":gear:   Now logging joins.");
+                gldConfig.JoinEvent.TextChannel = Channel.Id;
+                Log.EnableJoinLogging();
+                await ReplyAsync(":gear: Joins logging enabled!");
             }
             else
             {
@@ -110,14 +115,15 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleLeaves"), Summary("Normal Command"), Remarks("Toggle Leaves logging")]
-        public async Task ToggleLeavesAsync()
+        [Command("ToggleLeaves"), Summary("ToggleLeaves #ChannelName"), Remarks("Toggle Leaves logging")]
+        public async Task ToggleLeavesAsync(ITextChannel Channel = null)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             if (!gldConfig.LeaveEvent.IsEnabled)
             {
                 gldConfig.LeaveEvent.IsEnabled = true;
+                gldConfig.LeaveEvent.TextChannel = Channel.Id;
                 Log.EnableLeaveLogging();
                 await ReplyAsync(":gear:   Now logging leaves.");
             }
