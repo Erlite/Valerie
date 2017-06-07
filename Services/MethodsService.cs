@@ -85,7 +85,8 @@ namespace Rick.Services
                 ConsoleService.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
                 var Http = new HttpClient();
                 var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
-                double version = Convert.ToDouble(GetUrl);
+                int version = 0;
+                Int32.TryParse(GetUrl, out version);
                 if (BotHandler.BotVersion < version)
                 {
                     ConsoleService.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
