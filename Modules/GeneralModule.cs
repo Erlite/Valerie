@@ -480,5 +480,46 @@ namespace Rick.Modules
             var embed = EmbedExtension.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
+
+        [Command("Flip"), Summary("Flip Heads 200"), Remarks("Flips a coin! DON'T FORGOT TO BET MONEY!")]
+        public async Task FlipAsync(string Side, int Bet = 50)
+        {
+            var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
+            GC.Karma.TryGetValue(Context.User.Id, out int Karma);
+            if(GC.ChatKarma == false)
+            {
+                await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
+                return;
+            }
+
+            if(Karma < Bet || Karma <=0)
+            {
+                await ReplyAsync("You don't have enough karma!");
+                return;
+            }
+
+            if (Bet <= 0)
+            {
+                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
+                return;
+            }
+
+            string[] Sides = { "Heads", "Tails"};
+            var GetSide = Sides[new Random().Next(0, Sides.Length)];
+            
+            if(Side.ToLower() == GetSide.ToLower())
+            {
+                Karma += Bet;
+                await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {Karma}.");
+            }
+            else
+            {
+                Karma -= Bet;
+                await ReplyAsync($"You lost {Bet}! :frowning: Your current Karma is {Karma}.");
+            }
+
+            GuildHandler.GuildConfigs[Context.Guild.Id] = GC;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
     }
 }
