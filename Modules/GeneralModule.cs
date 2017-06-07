@@ -379,6 +379,12 @@ namespace Rick.Modules
             var karmalist = Guilds.Karma;
             int Credits = karmalist[Context.User.Id];
 
+            if (Guilds.ChatKarma == false)
+            {
+                await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
+                return;
+            }
+
             if (Credits <= 0 || Credits < Bet)
             {
                 await ReplyAsync("You don't have enough karma for slot machine!");
