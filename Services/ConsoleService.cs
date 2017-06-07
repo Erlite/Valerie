@@ -71,7 +71,7 @@ namespace Rick.Services
             switch (Source)
             {
                 case LogSource.Client:
-                    Append($"[{Source}]", Color.Plum);
+                    Append($"[{Source}]", Color.Firebrick);
                     break;
                 case LogSource.CommandExecution:
                     Append($"[{Source}]", Color.MediumOrchid);
@@ -83,10 +83,10 @@ namespace Rick.Services
                     Append($"[{Severity}]", Color.HotPink);
                     break;
                 case LogSource.ParseError:
-                    Append($"[{Severity}]", Color.HotPink);
+                    Append($"[{Severity}]", Color.Ivory);
                     break;
                 case LogSource.PreConditionError:
-                    Append($"[{Severity}]", Color.HotPink);
+                    Append($"[{Severity}]", Color.IndianRed);
                     break;
             }
 
