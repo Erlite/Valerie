@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Rick.Attributes;
 using Discord;
 using Discord.Commands;
-using Rick.Services;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using Rick.Handlers;
 using Rick.JsonResponse;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -111,8 +111,8 @@ namespace Rick.Modules
             Builder.AddInlineField("Display Name", $"{Info.personaname}");
             Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");
             Builder.AddInlineField("Person State", State);
-            Builder.AddInlineField("Profile Created", MethodsService.UnixTimeStampToDateTime(Info.timecreated));
-            Builder.AddInlineField("Last Online", MethodsService.UnixTimeStampToDateTime(Info.lastlogoff));
+            Builder.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.timecreated));
+            Builder.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.lastlogoff));
             Builder.AddInlineField("Primary Clan ID", Info.primaryclanid);
             Builder.AddInlineField("Owned Games", OGamesConvert.response.game_count);
             Builder.AddInlineField("Recently Played Games", RGamesConvert.response.total_count);

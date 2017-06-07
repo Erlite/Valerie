@@ -273,6 +273,7 @@
     <Compile Include="Enums\DocsType.cs" />
     <Compile Include="Enums\LogSource.cs" />
     <Compile Include="Enums\LogType.cs" />
+    <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="JsonResponse\Giphy.cs" />
     <Compile Include="JsonResponse\Microsoft.cs" />
     <Compile Include="Enums\EmbedColors.cs" />
