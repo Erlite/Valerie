@@ -40,7 +40,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("Create"), Summary("Tag Create TagName Tag Response"), Remarks("Creates a tag for you")]
+        [Command("Create"), Summary("Tag Create TagName Tag Response"), Remarks("Creates a tag for you"), Priority(1)]
         public async Task CreateAsync(string Name, [Remainder] string response)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -66,7 +66,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Remove"), Summary("Tag Delete TagName"), Remarks("Delete an existing tag")]
+        [Command("Remove"), Summary("Tag Delete TagName"), Remarks("Delete an existing tag"), Priority(1)]
         public async Task RemoveAsync(string Name)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -81,7 +81,7 @@ namespace Rick.Modules
             await ReplyAsync("Tag Removed :put_litter_in_its_place: ");
         }
 
-        [Command("Info"), Summary("Tag Info TagName"), Remarks("Returns Tag info")]
+        [Command("Info"), Summary("Tag Info TagName"), Remarks("Returns Tag info"), Priority(1)]
         public async Task TagInfoAsync(string Name)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -106,7 +106,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Modify"), Summary("Tag Modify Name/Response"), Remarks("Modifies Tag's info")]
+        [Command("Modify"), Summary("Tag Modify Name/Response"), Remarks("Modifies Tag's info"), Priority(1)]
         public async Task ModifyTagAsync(GlobalEnums prop, string Name, string Response)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -132,7 +132,7 @@ namespace Rick.Modules
             await ReplyAsync(":gears: Done");
         }
 
-        [Command("List"), Summary("Tag List"), Remarks("Lists all tags")]
+        [Command("List"), Summary("Tag List"), Remarks("Lists all tags"), Priority(1)]
         public async Task ListAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -145,7 +145,7 @@ namespace Rick.Modules
             await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
         }
 
-        [Command("Find"), Summary("Tag Find Meme"), Remarks("Finds all the tags with a specified Name")]
+        [Command("Find"), Summary("Tag Find Meme"), Remarks("Finds all the tags with a specified Name"), Priority(1)]
         public async Task FindAsync(string name)
         {
             var GldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];

@@ -280,6 +280,8 @@
     <Compile Include="JsonResponse\Microsoft.cs" />
     <Compile Include="Enums\EmbedColors.cs" />
     <Compile Include="Enums\GlobalEnums.cs" />
+    <Compile Include="Models\BotModel.cs" />
+    <Compile Include="Models\GuildModel.cs" />
     <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\ScriptGlobals.cs" />
     <Compile Include="JsonResponse\Steam.cs" />
@@ -287,8 +289,8 @@
     <Compile Include="JsonResponse\Watson.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
-    <Compile Include="Interfaces\IBotInterface.cs" />
-    <Compile Include="Interfaces\IGuildInterface.cs" />
+    <Compile Include="Interfaces\IClient.cs" />
+    <Compile Include="Interfaces\IServer.cs" />
     <Compile Include="Handlers\BotHandler.cs" />
     <Compile Include="Handlers\GuildHandler.cs" />
     <Compile Include="Modules\AdminModule.cs" />
@@ -311,7 +313,6 @@
     <Compile Include="Services\EmbedService.cs" />
     <Compile Include="Services\EncryptionService.cs" />
     <Compile Include="Services\EventService.cs" />
-    <Compile Include="Services\EventWrapper.cs" />
     <Compile Include="Services\MethodsService.cs" />
     <Compile Include="Services\MsgsService.cs" />
   </ItemGroup>

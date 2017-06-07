@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace Rick.Interfaces
 {
-    public interface IBotInterface
+    public interface IClient
     {
         string BotToken { get; set; }
         string BotName { get; set; }

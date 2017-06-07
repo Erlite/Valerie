@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Discord.Commands;
 using Rick.Enums;
+using Rick.Models;
 
 namespace Rick
 {
@@ -43,7 +44,7 @@ namespace Rick
             Task.Run(() => client.MessageReceived += EventService.MessageServicesAsync);
             client.Ready += EventService.OnReadyAsync;
 
-            GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildHandler>();
+            GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildModel>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
             ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");

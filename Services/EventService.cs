@@ -4,6 +4,7 @@ using Rick.Handlers;
 using System;
 using System.Threading.Tasks;
 using Rick.Enums;
+using Rick.Models;
 
 namespace Rick.Services
 {
@@ -138,7 +139,7 @@ namespace Rick.Services
 
         public async static Task CreateGuildConfigAsync(SocketGuild Guild)
         {
-            var CreateConfig = new GuildHandler();
+            var CreateConfig = new GuildModel();
             GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }

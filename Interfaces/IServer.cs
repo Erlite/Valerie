@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Rick.Interfaces
 {
-    public interface IGuildInterface
+    public interface IServer
     {
         string GuildPrefix { get; set; }
         string WelcomeMessage { get; set; }

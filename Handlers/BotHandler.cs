@@ -1,20 +1,17 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Rick.Interfaces;
 using Rick.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Rick.Enums;
+using Rick.Models;
 
 namespace Rick.Handlers
 {
-    public class BotHandler : IBotInterface
+    public class BotHandler
     {
-        public static IBotInterface BotConfig { get; set; }
+        public static IClient BotConfig { get; set; }
 
         public static string Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
 
@@ -24,79 +21,20 @@ namespace Rick.Handlers
         [JsonIgnore]
         public const double BotVersion = 41.0;
 
-        [JsonProperty("BotToken")]
-        public string BotToken { get; set; }
-
-        [JsonProperty("BotName")]
-        public string BotName { get; set; }
-
-        [JsonProperty("DefaultPrefix")]
-        public string DefaultPrefix { get; set; }
-
-        [JsonProperty("BingAPIKey")]
-        public string BingAPIKey { get; set; }
-
-        [JsonProperty("MashapeAPIKey")]
-        public string MashapeAPIKey { get; set; }
-
-        [JsonProperty("GoogleAPIKey")]
-        public string GoogleAPIKey { get; set; }
-
-        [JsonProperty("SearchEngineID")]
-        public string SearchEngineID { get; set; }
-
-        [JsonProperty("CleverBotAPIKey")]
-        public string CleverBotAPIKey { get; set; }
-
-        [JsonProperty("SteamAPIKey")]
-        public string SteamAPIKey { get; set; }
-
-        [JsonProperty("GiphyAPIKey")]
-        public string GiphyAPIKey { get; set; } = "dc6zaTOxFJmzC";
-
-        [JsonProperty("DebugMode")]
-        public bool DebugMode { get; set; }
-
-        [JsonProperty("ClientLatency")]
-        public bool ClientLatency { get; set; }
-
-        [JsonProperty("AutoUpdate")]
-        public bool AutoUpdate { get; set; }
-
-        [JsonProperty("MentionDefaultPrefix")]
-        public bool MentionDefaultPrefix { get; set; }
-
-        [JsonProperty("Blacklist")]
-        public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
-
-        [JsonProperty("EvalImports")]
-        public List<string> EvalImports { get; set; } = new List<string>();
-
-        [JsonProperty("Games")]
-        public List<string> Games { get; set; } = new List<string>();
-
-        public bool MentionPrefix(SocketUserMessage m, DiscordSocketClient c, ref int ap)
-        {
-            if (!MentionDefaultPrefix)
-                return false;
-            return m.HasMentionPrefix(c.CurrentUser, ref ap);
-        }
-
-        public static async Task<BotHandler> LoadConfigAsync()
+        public static async Task<BotModel> LoadConfigAsync()
         {
             if (File.Exists(configPath))
             {
                 var json = File.ReadAllText(configPath);
-                return JsonConvert.DeserializeObject<BotHandler>(json);
+                return JsonConvert.DeserializeObject<BotModel>(json);
             }
             var newConfig = await CreateNewAsync();
             return newConfig;
         }
 
-        public static async Task<BotHandler> CreateNewAsync()
+        public static async Task<BotModel> CreateNewAsync()
         {
-            BotHandler result;
-            result = new BotHandler();
+            BotModel result = new BotModel();
 
             ConsoleService.Log(LogType.Info, LogSource.Configuration, "Enter Bot's Token: ");
             result.BotToken = Console.ReadLine();
@@ -156,7 +94,7 @@ namespace Rick.Handlers
             return result;
         }
 
-        public static async Task SaveAsync(IBotInterface botConfig)
+        public static async Task SaveAsync(IClient botConfig)
             => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)));
 
         public static void DirectoryCheck()
