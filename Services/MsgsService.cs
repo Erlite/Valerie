@@ -39,7 +39,7 @@ namespace Rick.Services
             {
                 var karmalist = Guilds.Karma;
                 if (!karmalist.ContainsKey(message.Author.Id))
-                    karmalist.Add(message.Author.Id, 1);
+                    karmalist.Add(message.Author.Id, Convert.ToInt32(RandomKarma));
                 else
                 {
                     int getKarma = karmalist[message.Author.Id];
