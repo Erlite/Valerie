@@ -4,7 +4,6 @@ using Discord;
 using Discord.Commands;
 using System.Text.RegularExpressions;
 using Rick.Handlers;
-using Discord.Addons.InteractiveCommands;
 using Rick.Attributes;
 using Rick.Models;
 using System.Linq;
@@ -17,12 +16,6 @@ namespace Rick.Modules
     [Group("Tag"), CheckBlacklist]
     public class TagModule : ModuleBase
     {
-        private readonly InteractiveService Interactive;
-        public TagModule(InteractiveService Inter)
-        {
-            Interactive = Inter;
-        }
-
         [Command, Summary("Tag Execute TagName"), Remarks("Execute a tag"), Priority(0)]
         public async Task TagAsync(string Name)
         {

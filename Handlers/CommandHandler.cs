@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
 using System.Reflection;
 using System.Linq;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
 using Rick.Services;
-using Discord.Addons.InteractiveCommands;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using Rick.Enums;
 
 namespace Rick.Handlers
@@ -20,7 +19,6 @@ namespace Rick.Handlers
         private BotHandler BotHandler;
         private GuildHandler GuildHandler;
         private EventService EventHandler;
-        private InteractiveService Interactive;
 
         public CommandHandler(IServiceProvider prod)
         {
@@ -29,7 +27,6 @@ namespace Rick.Handlers
             BotHandler = Provider.GetService<BotHandler>();
             GuildHandler = Provider.GetService<GuildHandler>();
             EventHandler = Provider.GetService<EventService>();
-            Interactive = Provider.GetService<InteractiveService>();
 
             client.MessageReceived += HandleCommandsAsync;
             cmds = Provider.GetService<CommandService>();

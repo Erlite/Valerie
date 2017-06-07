@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
-using Rick.Services;
-using Rick.Handlers;
-using Discord.Addons.InteractiveCommands;
-using Discord.Net.Providers.WS4Net;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Discord;
+using Discord.WebSocket;
 using Discord.Commands;
+using Discord.Net.Providers.WS4Net;
+using Rick.Services;
+using Rick.Handlers;
 using Rick.Enums;
 using Rick.Models;
 
@@ -64,8 +63,7 @@ namespace Rick
                 .AddSingleton(new GuildHandler())
                 .AddSingleton(new BotHandler())
                 .AddSingleton(new EventService(client))
-                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose }))
-                .AddSingleton(new InteractiveService(client));
+                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose }));
 
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
             Provider.GetService<GuildHandler>();

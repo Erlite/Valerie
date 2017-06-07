@@ -7,7 +7,6 @@ using System.Net.Http;
 using Discord.WebSocket;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Discord.Addons.InteractiveCommands;
 using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
@@ -22,12 +21,6 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class GeneralModule : ModuleBase
     {
-        private InteractiveService Interactive;
-        public GeneralModule(InteractiveService Inter)
-        {
-            Interactive = Inter;
-        }
-
         [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
         public async Task GuildInfoAsync(ulong ID = 0)
         {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Linq;
 using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
-using Discord.Addons.InteractiveCommands;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Services;
 using Rick.Enums;
-using System.Linq;
 
 namespace Rick.Modules
 {
@@ -16,13 +15,6 @@ namespace Rick.Modules
 
     public class AdminModule : ModuleBase
     {
-        private InteractiveService inter;
-
-        public AdminModule(InteractiveService inte)
-        {
-            inter = inte;
-        }
-
         [Command("Kick"), Summary("Kick @Username This is a reason"), Remarks("Kicks a user from the guild")]
         public async Task KickAsync(SocketGuildUser user, [Remainder] string Reason = "No reason provided by the moderator!")
         {
