@@ -12,6 +12,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using Google.Apis.YouTube.v3;
 using Rick.Enums;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -35,7 +36,7 @@ namespace Rick.Modules
                 Str.AppendLine($"**=> {result.Title}**\n{MethodsService.ShortenUrl( result.Link)}");
             }
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            var embed = EmbedService.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
@@ -49,7 +50,7 @@ namespace Rick.Modules
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
-                var embed = EmbedService.Embed(EmbedColors.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
+                var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
                 await ReplyAsync("", embed: embed);
             }
         }

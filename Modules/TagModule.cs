@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Linq;
 using Discord;
 using Discord.Commands;
-using System.Text.RegularExpressions;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Models;
-using System.Linq;
-using Rick.Services;
-using System.Text;
+using Rick.Extensions;
 using Rick.Enums;
 
 namespace Rick.Modules
@@ -55,7 +55,7 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedService.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

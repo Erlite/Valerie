@@ -9,6 +9,7 @@ using System.Text;
 using Rick.Attributes;
 using Rick.Enums;
 using Rick.JsonResponse;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -40,7 +41,7 @@ namespace Rick.Modules
                 var Random = new Random();
                 var RandomNum = Random.Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
 
@@ -67,7 +68,7 @@ namespace Rick.Modules
                 {
                     str.AppendLine($"**{result.name}**\n{result.snippet}\n{MethodsService.ShortenUrl(result.displayUrl)}\n");
                 }
-                var embed = EmbedService.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
         }

@@ -15,6 +15,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Rick.Enums;
 using Rick.JsonResponse;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -202,7 +203,7 @@ namespace Rick.Modules
                 userNick = "User has no nickname!";
 
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
-            var embed = EmbedService.Embed(EmbedColors.White, user.Username, user.GetAvatarUrl(), Description: descrption);
+            var embed = EmbedExtension.Embed(EmbedColors.White, user.Username, user.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -213,7 +214,7 @@ namespace Rick.Modules
             var client = Context.Client as DiscordSocketClient;
             var Gateway = client.Latency;
             string descrption = $"**Gateway Latency:** { Gateway} ms\n**Response Latency:** {sw.ElapsedMilliseconds} ms\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms";
-            var embed = EmbedService.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
 
         }
@@ -230,7 +231,7 @@ namespace Rick.Modules
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
-                    var embed = EmbedService.Embed(EmbedColors.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: $"Ping Result: **{time} ms**");
+                    var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: $"Ping Result: **{time} ms**");
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -252,7 +253,7 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = EmbedService.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -316,7 +317,7 @@ namespace Rick.Modules
                 $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!\n" +
                 $"**Invite URL:** https://discordapp.com/oauth2/authorize?client_id={AppInfo.Id}&scope=bot&permissions=2146958591\n" +
                 $"**Help Guild:** https://discord.me/Noegenesis";
-            var embed = EmbedService.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -356,7 +357,7 @@ namespace Rick.Modules
             var result = await MethodsService.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
-            var embed = EmbedService.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -453,7 +454,7 @@ namespace Rick.Modules
         public async Task TrumpAsync()
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
-            var embed = EmbedService.Embed(EmbedColors.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
+            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
             await ReplyAsync("", embed: embed);
 
         }
@@ -476,7 +477,7 @@ namespace Rick.Modules
                     $"**Summary: **{result.description}\n" +
                     $"**URL: **{MethodsService.ShortenUrl(result.url)}\n");
             }
-            var embed = EmbedService.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
+            var embed = EmbedExtension.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
     }

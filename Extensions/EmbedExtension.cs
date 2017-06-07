@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Rick.Enums;
 
-namespace Rick.Services
+namespace Rick.Extensions
 {
-    public class EmbedService
+    public class EmbedExtension
     {
         public static  EmbedBuilder Embed(EmbedColors Color)
         {

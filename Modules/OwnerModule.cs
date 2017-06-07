@@ -17,6 +17,7 @@ using Rick.Handlers;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Rick.Enums;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -293,7 +294,7 @@ namespace Rick.Modules
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
-            var embed = EmbedService.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

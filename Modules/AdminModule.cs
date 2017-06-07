@@ -6,8 +6,8 @@ using Discord;
 using Discord.WebSocket;
 using Rick.Handlers;
 using Rick.Attributes;
-using Rick.Services;
 using Rick.Enums;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -24,7 +24,7 @@ namespace Rick.Modules
             if (gldConfig.UserBanned.IsEnabled)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
-                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: embed);
             }
@@ -42,7 +42,7 @@ namespace Rick.Modules
             if (gldConfig.UserBanned.IsEnabled)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
-                var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
                 var ModChannel = user.Guild.GetChannel(gldConfig.ModChannelID) as ITextChannel;
                 await ModChannel.SendMessageAsync("", embed: embed);
             }
@@ -82,7 +82,7 @@ namespace Rick.Modules
         {
             await User.AddRoleAsync(Role);
             string Description = $"{User.Username} has been added to {Role.Name}!";
-            var embed = EmbedService.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -91,7 +91,7 @@ namespace Rick.Modules
         {
             await User.RemoveRoleAsync(Role);
             string Description = $"{User.Username} has been removed from {Role.Name}!";
-            var embed = EmbedService.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
