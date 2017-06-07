@@ -50,9 +50,6 @@
     <Reference Include="Colorful.Console, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Colorful.Console.1.0.7\lib\net461\Colorful.Console.dll</HintPath>
     </Reference>
-    <Reference Include="Discord.Addons.InteractiveCommands, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Discord.Addons.InteractiveCommands.1.2.3\lib\netstandard1.3\Discord.Addons.InteractiveCommands.dll</HintPath>
-    </Reference>
     <Reference Include="Discord.Net.Commands, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Discord.Net.Commands.1.0.0-rc3-00746\lib\netstandard1.1\Discord.Net.Commands.dll</HintPath>
     </Reference>
