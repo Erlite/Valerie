@@ -17,7 +17,11 @@ namespace Rick.Handlers
 
         public const string configPath = "Data/BotConfig.json";
 
+<<<<<<< Updated upstream
         public const int BotVersion = 545;
+=======
+        public const int BotVersion = 553;
+>>>>>>> Stashed changes
 
         public static async Task<BotModel> LoadConfigAsync()
         {
