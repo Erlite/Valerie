@@ -29,7 +29,7 @@ namespace Rick.Modules
             await user.KickAsync();            
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             gldConfig.CaseNumber += 1;
-            if (gldConfig.UserBannedLogged)
+            if (gldConfig.UserBanned.IsEnabled)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
                 var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
@@ -47,7 +47,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[user.Guild.Id];
             await user.Guild.AddBanAsync(user);
             gldConfig.CaseNumber += 1;
-            if (gldConfig.UserBannedLogged)
+            if (gldConfig.UserBanned.IsEnabled)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
                 var embed = EmbedService.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");

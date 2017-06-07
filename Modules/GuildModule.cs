@@ -59,11 +59,9 @@ namespace Rick.Modules
         public async Task ListLogActionsAsync()
         {
             var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var Joins = GConfig.JoinLogs ? "Enabled" : "Disabled";
-            var Leaves = GConfig.LeaveLogs ? "Enabled" : "Disabled";
-            var Username = GConfig.NameChangesLogged ? "Enabled" : "Disabled";
-            var Nickname = GConfig.NickChangesLogged ? "Enabled" : "Disabled";
-            var Bans = GConfig.UserBannedLogged ? "Enabled" : "Disabled";
+            var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
+            var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
+            var Bans = GConfig.UserBanned.IsEnabled ? "Enabled" : "Disabled";
             var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
             var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
             var SB = new StringBuilder();
@@ -80,8 +78,6 @@ namespace Rick.Modules
                                 $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
                                 $"**User Join Logging:** {Joins}\n" +
                                 $"**User Leave Logging:** {Leaves}\n" +
-                                $"**Username Change Logging:** {Username}\n" +
-                                $"**Nickname Change Logging:** {Nickname}\n" +
                                 $"**User Ban Logging:** {Bans}\n" +
                                 $"**Chat Karma:** {Karma}\n" +
                                 $"**Chatter Bot:** {Chatterbot}\n" +
@@ -98,16 +94,16 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.JoinLogs)
+            if (!gldConfig.JoinEvent.IsEnabled)
             {
                 Log.EnableJoinLogging();
-                gldConfig.JoinLogs = true;
+                gldConfig.JoinEvent.IsEnabled = true;
                 await ReplyAsync(":gear:   Now logging joins.");
             }
             else
             {
                 Log.DisableJoinLogging();
-                gldConfig.JoinLogs = false;
+                gldConfig.JoinEvent.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
@@ -119,59 +115,17 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.LeaveLogs)
+            if (!gldConfig.LeaveEvent.IsEnabled)
             {
-                gldConfig.LeaveLogs = true;
+                gldConfig.LeaveEvent.IsEnabled = true;
                 Log.EnableLeaveLogging();
                 await ReplyAsync(":gear:   Now logging leaves.");
             }
             else
             {
-                gldConfig.LeaveLogs = false;
+                gldConfig.LeaveEvent.IsEnabled = false;
                 Log.DisableLeaveLogging();
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("ToggleUsername"), Summary("Normal Command"), Remarks("Toggles Name change logging")]
-        public async Task ToggleUsernamesAsync()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.NameChangesLogged)
-            {
-                gldConfig.NameChangesLogged = true;
-                Log.EnableNameChangeLogging();
-                await ReplyAsync(":gear:   Now logging username changes.");
-            }
-            else
-            {
-                gldConfig.NameChangesLogged = false;
-                Log.DisableNameChangeLogging();
-                await ReplyAsync(":skull_crossbones:  No longer logging username changes.");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("ToggleNicknames"), Summary("Normal Command"), Remarks("Toggles Nickname changes loggig")]
-        public async Task ToggleNicknamesAsync()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.NickChangesLogged)
-            {
-                gldConfig.NickChangesLogged = true;
-                Log.EnableNickChangeLogging();
-                await ReplyAsync(":gear:   Now logging nickname changes.");
-            }
-            else
-            {
-                gldConfig.NickChangesLogged = false;
-                Log.DisableNickChangeLogging();
-                await ReplyAsync(":skull_crossbones:   No longer logging nickname changes.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
@@ -182,14 +136,14 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.UserBannedLogged)
+            if (!gldConfig.UserBanned.IsEnabled)
             {
-                gldConfig.UserBannedLogged = true;
+                gldConfig.UserBanned.IsEnabled = true;
                 await ReplyAsync(":gear:   Now logging bans.");
             }
             else
             {
-                gldConfig.UserBannedLogged = false;
+                gldConfig.UserBanned.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging bans.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;

@@ -38,26 +38,6 @@ namespace Rick.Services
             client.UserLeft -= UserLeftAsync;
         }
 
-        public void EnableNameChangeLogging()
-        {
-            client.UserUpdated += NameChangeAsync;
-        }
-
-        public void DisableNameChangeLogging()
-        {
-            client.UserUpdated -= NameChangeAsync;
-        }
-
-        public void EnableNickChangeLogging()
-        {
-            client.GuildMemberUpdated += NickChangeAsync;
-        }
-
-        public void DisableNickChangeLogging()
-        {
-            client.GuildMemberUpdated -= NickChangeAsync;
-        }
-
         public void EnableLatencyMonitor()
         {
             client.LatencyUpdated += LatencyUpdateAsync;
@@ -71,7 +51,7 @@ namespace Rick.Services
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
-            if (!getGuild.JoinLogs) return;
+            if (!getGuild.JoinEvent.IsEnabled) return;
             var embed = new EmbedBuilder()
             {
                 Title = "=== User Joined ===",
@@ -85,7 +65,7 @@ namespace Rick.Services
         private async Task UserLeftAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
-            if (!getGuild.LeaveLogs) return;
+            if (!getGuild.LeaveEvent.IsEnabled) return;
                 var embed = new EmbedBuilder()
                 {
                     Title = "=== User Left ===",
@@ -94,36 +74,6 @@ namespace Rick.Services
                 };
                 var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
                 await LogChannel.SendMessageAsync("", embed: embed);
-        }
-
-        private async Task NameChangeAsync(SocketUser author, SocketUser a)
-        {
-            var SockGuildUser = author as SocketGuildUser;
-            var Guild = SockGuildUser.Guild;
-            var getGuild = GuildHandler.GuildConfigs[Guild.Id];
-            if (author.Username == a.Username || !getGuild.NameChangesLogged) return;
-            var embed = new EmbedBuilder()
-            {
-                Title = "=== Username Change ====",
-                Description = $"**Old Username: **{author.Username}#{author.Discriminator}\n**New Username: **{a.Username}\n**ID: **{author.Id}",
-                Color = new Color(193, 60, 144)
-            };
-            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-            await LogChannel.SendMessageAsync("", embed: embed);
-        }
-
-        private async Task NickChangeAsync(SocketGuildUser author, SocketGuildUser a)
-        {
-            var getGuild = GuildHandler.GuildConfigs[author.Guild.Id];
-            if (author.Nickname == a.Nickname || !getGuild.NickChangesLogged) return;
-            var embed = new EmbedBuilder()
-            {
-                Title = "=== Nickname Change ====",
-                Description = $"**Old Nickname: **{author.Nickname ?? author.Username}\n**New Nickname: **{a.Nickname}\n**ID: **{author.Id}",
-                Color = new Color(193, 60, 144)
-            };
-            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-            await LogChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task LatencyUpdateAsync(int older, int newer)
