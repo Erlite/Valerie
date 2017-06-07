@@ -21,26 +21,20 @@ namespace Rick.Models
         [JsonProperty("CaseNumber")]
         public int CaseNumber { get; set; }
 
-        [JsonProperty("JoinLogs")]
-        public bool JoinLogs { get; set; }
-
-        [JsonProperty("LeaveLogs")]
-        public bool LeaveLogs { get; set; }
-
-        [JsonProperty("NameChanges")]
-        public bool NameChangesLogged { get; set; }
-
-        [JsonProperty("NickChanges")]
-        public bool NickChangesLogged { get; set; }
-
-        [JsonProperty("UserBanned")]
-        public bool UserBannedLogged { get; set; }
-
         [JsonProperty("ChatKarma")]
         public bool ChatKarma { get; set; }
 
         [JsonProperty("ChatterBot")]
         public bool ChatterBot { get; set; }
+
+        [JsonProperty("JoinEvent")]
+        public WrapperModel JoinEvent { get; set; } = new WrapperModel();
+
+        [JsonProperty("LeaveEvent")]
+        public WrapperModel LeaveEvent { get; set; } = new WrapperModel();
+
+        [JsonProperty("UserBanned")]
+        public WrapperModel UserBanned { get; set; } = new WrapperModel();
 
         [JsonProperty("RequiredRoleID")]
         public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
@@ -56,8 +50,5 @@ namespace Rick.Models
 
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
-
-        [JsonProperty("Join")]
-        public WrapperModel Join { get; set; } = new WrapperModel( );
     }
 }
