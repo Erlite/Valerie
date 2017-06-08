@@ -11,7 +11,6 @@ namespace Rick.Services
 {
     public class MsgsService
     {
-
         static List<ulong> WaitList = new List<ulong>();
 
         public static double GiveKarma(double karma)
@@ -80,9 +79,14 @@ namespace Rick.Services
         public static async Task CleverBot(SocketUserMessage message, SocketGuild gld)
         {
             var IsEnabled = GuildHandler.GuildConfigs[gld.Id].ChatterBot;
-            if (message.Author.IsBot || !message.Content.StartsWith(BotHandler.BotConfig.BotName) || !IsEnabled) return;
+            if (message.Author.IsBot ||  !IsEnabled || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
+            string UserMsg = null;
+            if (message.Content.Contains(BotHandler.BotConfig.BotName))
+            {
+                UserMsg = message.Content.Replace(BotHandler.BotConfig.BotName, "");
+            }
             CleverbotResponse Response = null;
-            Response = CleverbotLib.Core.Talk(message.Content, Response);
+            Response = CleverbotLib.Core.Talk(UserMsg, Response);
             await message.Channel.SendMessageAsync(Response.Output);
         }
     }
