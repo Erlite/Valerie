@@ -7,7 +7,7 @@ using Console = Colorful.Console;
 
 namespace Rick.Services
 {
-    public class ConsoleService
+    public class Logger
     {
         public static void TitleCard(string title, string version = null, ConsoleColor? color = null)
         {
