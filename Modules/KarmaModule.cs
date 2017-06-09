@@ -57,7 +57,11 @@ namespace Rick.Modules
             var karmalist = gldConfig.Karma;
             karmalist.TryGetValue(Context.User.Id, out int karma);
             if (karma <= 0 || !karmalist.ContainsKey(Context.User.Id))
+            {
                 await ReplyAsync("User doesn't exist or no Karma was found!");
+                return;
+            }
+
             int Level =  MsgsService.GetLevelFromKarma(karma);
             string Description = $"{Context.User.Username} has a total Karma of **{karma}** and User level is **{Level}**";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
