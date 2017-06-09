@@ -82,19 +82,19 @@ namespace Rick.Services
             var BotConfig = BotHandler.BotConfig;
             if (BotConfig.AutoUpdate)
             {
-                ConsoleService.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
+                Logger.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
                 var Http = new HttpClient();
                 var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
                 int version = 0;
                 Int32.TryParse(GetUrl, out version);
                 if (BotHandler.BotVersion < version)
                 {
-                    ConsoleService.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
-                    ConsoleService.Log(LogType.Info, LogSource.Configuration, "Type Yes to update!");
+                    Logger.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
+                    Logger.Log(LogType.Info, LogSource.Configuration, "Type Yes to update!");
                     var Response = Console.ReadLine().ToLower();
                     if (Response == "yes")
                     {
-                        ConsoleService.Log(LogType.Info, LogSource.Configuration, $"Downloading Update .... ");
+                        Logger.Log(LogType.Info, LogSource.Configuration, $"Downloading Update .... ");
                         Uri url = new Uri("https://exceptiondev.github.io/Downloads/Installer.bat");
                         await Http.DownloadAsync(url, "Installer.bat");
                         Process.Start("Installer.bat");
@@ -102,13 +102,13 @@ namespace Rick.Services
                         Process.GetCurrentProcess().Kill();
                     }
                     else
-                        ConsoleService.Log(LogType.Critical, LogSource.Configuration, $"Ignoring Update ...");
+                        Logger.Log(LogType.Critical, LogSource.Configuration, $"Ignoring Update ...");
                 }
                 else
-                    ConsoleService.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: ");
+                    Logger.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: ");
             }
             else
-                ConsoleService.Log(LogType.Warning, LogSource.Configuration, $"Update is disabled! Continuing..");
+                Logger.Log(LogType.Warning, LogSource.Configuration, $"Update is disabled! Continuing..");
         }
 
         public static async Task<WatsonModel> Translate(string dest, string text)
