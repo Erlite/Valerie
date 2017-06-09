@@ -8,6 +8,7 @@ using Rick.Enums;
 using Rick.Attributes;
 using System.Text;
 using Rick.Extensions;
+using System;
 
 namespace Rick.Modules
 {
@@ -59,39 +60,46 @@ namespace Rick.Modules
         [Command("Actions"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
         public async Task ListLogActionsAsync()
         {
-            var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Bans = GConfig.UserBanned.IsEnabled ? "Enabled" : "Disabled";
-            var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
-            var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
-            var SB = new StringBuilder();
-            foreach(var Names in GConfig.RequiredChannelNames)
+            try
             {
-                SB.AppendLine(Names);
-            }
-            var JoinChannel = (await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel)) as ITextChannel;
-            var LeaveChannel = (await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel)) as ITextChannel;
-            var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;        
+                var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+                var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
+                var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
+                var Bans = GConfig.UserBanned.IsEnabled ? "Enabled" : "Disabled";
+                var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
+                var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
+                var SB = new StringBuilder();
+                foreach (var Names in GConfig.RequiredChannelNames)
+                {
+                    SB.AppendLine(Names);
+                }
+                var JoinChannel = (await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel)) as ITextChannel;
+                var LeaveChannel = (await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel)) as ITextChannel;
+                var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;
 
-            if (string.IsNullOrWhiteSpace(SB.ToString()))
-                SB = SB.AppendLine("No channels found in required channel list.");
-            string Description =
-                                $"**Guild Prefix:** {GConfig.GuildPrefix}\n" +
-                                $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
-                                $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
-                                $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
-                                $"**User Join Logging:** {Joins} ({JoinChannel.Mention})\n" +
-                                $"**User Leave Logging:** {Leaves} ({LeaveChannel.Mention})\n" +
-                                $"**User Ban Logging:** {Bans} ({BanChannel})\n" +
-                                $"**Chat Karma:** {Karma}\n" +
-                                $"**Chatter Bot:** {Chatterbot}\n" +
-                                $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
-                                $"**AFK Members:** {GConfig.AfkList.Count}\n" +
-                                $"**Total Tags:** {GConfig.TagsList.Count}\n" +
-                                $"**Required Channels for NSFW:** {SB.ToString()}";
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, $"{Context.Guild.Name} || {(await Context.Guild.GetOwnerAsync()).Username}", Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
-            await ReplyAsync("", embed: embed);
+                if (string.IsNullOrWhiteSpace(SB.ToString()))
+                    SB = SB.AppendLine("No channels found in required channel list.");
+                string Description =
+                                    $"**Guild Prefix:** {GConfig.GuildPrefix}\n" +
+                                    $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
+                                    $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
+                                    $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
+                                    $"**User Join Logging:** {Joins} ({JoinChannel.Mention})\n" +
+                                    $"**User Leave Logging:** {Leaves} ({LeaveChannel.Mention})\n" +
+                                    $"**User Ban Logging:** {Bans} ({BanChannel})\n" +
+                                    $"**Chat Karma:** {Karma}\n" +
+                                    $"**Chatter Bot:** {Chatterbot}\n" +
+                                    $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
+                                    $"**AFK Members:** {GConfig.AfkList.Count}\n" +
+                                    $"**Total Tags:** {GConfig.TagsList.Count}\n" +
+                                    $"**Required Channels for NSFW:** {SB.ToString()}";
+                var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
+                await ReplyAsync("", embed: embed);
+            }
+            catch (Exception e)
+            {
+                await ReplyAsync(e.StackTrace);
+            }
         }
 
         [Command("ToggleJoins"), Summary("ToggleJoins #ChannelName"), Remarks("Toggles Join logging")]
