@@ -178,13 +178,14 @@ namespace Rick.Modules
         }
 
         [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
-        public async Task ToggleBansAsync()
+        public async Task ToggleBansAsync(ITextChannel Channel = null)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             if (!gldConfig.UserBanned.IsEnabled)
             {
                 gldConfig.UserBanned.IsEnabled = true;
+                gldConfig.UserBanned.TextChannel = Channel.Id;
                 await ReplyAsync(":gear:   Now logging bans.");
             }
             else
