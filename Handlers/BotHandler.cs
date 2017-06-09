@@ -34,27 +34,27 @@ namespace Rick.Handlers
         {
             BotModel result = new BotModel();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration, "Enter Bot's Token: ");
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Bot's Token: ");
             result.BotToken = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enter Bot Name: ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bot Name: ");
             result.BotName = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enter Bot DefaultPrefix: ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enter Bing API Key: ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bing API Key: ");
             result.BingAPIKey = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enter Mashape API Key: ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Mashape API Key: ");
             result.MashapeAPIKey = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enter Google API Key: ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Google API Key: ");
             result.GoogleAPIKey = Console.ReadLine();
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration, "Yes = Y || No = N");
+            Logger.Log(LogType.Info, LogSource.Configuration, "Yes = Y || No = N");
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enable autoupdate? ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enable autoupdate? ");
             char update = Console.ReadLine().ToLower()[0];
             switch (update)
             {
@@ -63,7 +63,7 @@ namespace Rick.Handlers
                 default: result.AutoUpdate = false; break;
             }
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enable Debug mode for commands? ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enable Debug mode for commands? ");
             char debug = Console.ReadLine().ToLower()[0];
             switch (debug)
             {
@@ -72,7 +72,7 @@ namespace Rick.Handlers
                 default: result.DebugMode = false; break;
             }
 
-            ConsoleService.Log(LogType.Info, LogSource.Configuration,"Enable Bot mention Prefix? ");
+            Logger.Log(LogType.Info, LogSource.Configuration,"Enable Bot mention Prefix? ");
             char input = Console.ReadLine().ToLower()[0];
             switch (input)
             {
