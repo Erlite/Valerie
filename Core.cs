@@ -31,7 +31,7 @@ namespace Rick
                 DefaultRetryMode = RetryMode.AlwaysRetry,
                 HandlerTimeout = 1000
             });
-            client.Log += (log) => Task.Run(() => ConsoleService.Log(LogType.Info, LogSource.Client, log.Exception?.ToString() ?? log.Message));
+            client.Log += (log) => Task.Run(() => Logger.Log(LogType.Info, LogSource.Client, log.Exception?.ToString() ?? log.Message));
 
             var ServiceProdivder = ConfigureServices();
             handler = new CommandHandler(ServiceProdivder);
@@ -40,13 +40,14 @@ namespace Rick
             client.GuildAvailable += EventService.CreateGuildConfigAsync;
             client.JoinedGuild += EventService.JoinedGuildAsync;
             client.LeftGuild += EventService.RemoveGuildConfigAsync;
+            client.UserLeft += EventService.HandleGuildsTasks;
             Task.Run(() => client.MessageReceived += EventService.MessageServicesAsync);
             client.Ready += EventService.OnReadyAsync;
 
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildModel>();
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
-            ConsoleService.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
+            Logger.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodsService.ProgramUpdater();
 
             CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.CleverBotAPIKey);
