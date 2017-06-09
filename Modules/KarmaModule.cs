@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
+using Discord.WebSocket;
 using System.Linq;
 using Rick.Handlers;
 using Rick.Services;
@@ -8,14 +9,12 @@ using System.Text;
 using Rick.Enums;
 using Rick.Attributes;
 using Rick.Extensions;
-using Discord.WebSocket;
 
 namespace Rick.Modules
 {
     [CheckBlacklist]
     public class KarmaModule : ModuleBase
     {
-
         [Command("Karma"), Summary("Karma @Username"), Remarks("Gives another user karma")]
         public async Task KarmaAsync(IGuildUser user, int Karma)
         {
@@ -30,7 +29,7 @@ namespace Rick.Modules
                 return;
             }
 
-            if (UserKarma < Karma || UserKarma <= 0)
+            if(UserKarma < Karma || UserKarma <= 0)
             {
                 await ReplyAsync("You don't have enough karma!");
                 return;
@@ -59,7 +58,7 @@ namespace Rick.Modules
             karmalist.TryGetValue(Context.User.Id, out int karma);
             if (karma <= 0 || !karmalist.ContainsKey(Context.User.Id))
                 await ReplyAsync("User doesn't exist or no Karma was found!");
-            int Level = MsgsService.GetLevelFromKarma(karma);
+            int Level =  MsgsService.GetLevelFromKarma(karma);
             string Description = $"{Context.User.Username} has a total Karma of **{karma}** and User level is **{Level}**";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
@@ -72,13 +71,6 @@ namespace Rick.Modules
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
             StringBuilder Builder = new StringBuilder();
-
-            if (karmalist.Count <= 0)
-            {
-                await ReplyAsync("Karma list is empty!");
-                return;
-            }
-
             foreach (var val in filter)
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;

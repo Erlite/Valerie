@@ -498,13 +498,7 @@ namespace Rick.Modules
                 return;
             }
 
-            if (int.TryParse(Side, out int res))
-            {
-                await ReplyAsync("Side can't be a number. Use help command for more information!");
-                return;
-            }
-
-            if (Karma < Bet || Karma <=0)
+            if(Karma < Bet || Karma <=0)
             {
                 await ReplyAsync("You don't have enough karma!");
                 return;
@@ -515,7 +509,6 @@ namespace Rick.Modules
                 await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
                 return;
             }
-
 
             string[] Sides = { "Heads", "Tails"};
             var GetSide = Sides[new Random().Next(0, Sides.Length)];

@@ -140,15 +140,5 @@ namespace Rick.Modules
             else
                 await ReplyAsync("It was a decent money shot :point_up: ");
         }
-
-        [Command("Clear"), Summary("Normal Command"), Remarks("Clears Karma list")]
-        public async Task ClearAsync()
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            GuildConfig.Karma.Clear();
-            GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync("Karma Leaderboard has been cleared!");
-        }
     }
 }
