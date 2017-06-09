@@ -156,7 +156,7 @@ namespace Rick.Modules
             await ReplyAsync($"Tags matching **{name}**: \n{Sb.ToString()}");
         }
 
-        public async Task RemoveTag(TagsModel tag)
+        private async Task RemoveTag(TagsModel tag)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
