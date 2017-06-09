@@ -59,39 +59,77 @@ namespace Rick.Modules
         [Command("Actions"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
         public async Task ListLogActionsAsync()
         {
+            var SB = new StringBuilder();
             var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+
+            string AFKList = null;
+            if (GConfig.AfkList.Count <= 0)
+                AFKList = $"{Context.Guild.Name}'s AFK list is empty.";
+            else
+                AFKList = $"{Context.Guild.Name}'s AFK list contains {GConfig.AfkList.Count} members.";
+
+            string TagList = null;
+            if (GConfig.TagsList.Count <= 0)
+                TagList = $"{Context.Guild.Name}'s Tag list is empty.";
+            else
+                TagList = $"{Context.Guild.Name}'s Tag list contains {GConfig.TagsList.Count} tags.";
+
+            string KarmaList = null;
+            if (GConfig.Karma.Count <= 0)
+                KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
+            else
+                KarmaList = $"{Context.Guild.Name}'s Karma list contains {GConfig.Karma.Count} members.";
+
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
             var Bans = GConfig.UserBanned.IsEnabled ? "Enabled" : "Disabled";
             var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
             var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
-            var SB = new StringBuilder();
+
             foreach(var Names in GConfig.RequiredChannelNames)
             {
                 SB.AppendLine(Names);
             }
-            var JoinChannel = (await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel)) as ITextChannel;
-            var LeaveChannel = (await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel)) as ITextChannel;
-            var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;
 
-            //if (JoinChannel == null ||)
             if (string.IsNullOrWhiteSpace(SB.ToString()))
                 SB = SB.AppendLine("No channels found in required channel list.");
-            string Description =
-                                $"**Guild Prefix:** {GConfig.GuildPrefix}\n" +
-                                $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
-                                $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
-                                $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
-                                $"**User Join Logging:** {Joins} ({JoinChannel.Name})\n" +
-                                $"**User Leave Logging:** {Leaves} ({LeaveChannel.Name})\n" +
-                                $"**User Ban Logging:** {Bans} ({BanChannel.Name})\n" +
-                                $"**Chat Karma:** {Karma}\n" +
-                                $"**Chatter Bot:** {Chatterbot}\n" +
-                                $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
-                                $"**AFK Members:** {GConfig.AfkList.Count}\n" +
-                                $"**Total Tags:** {GConfig.TagsList.Count}\n" +
-                                $"**Required Channels for NSFW:** {SB.ToString()}";
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, $"{Context.Guild.Name} || {(await Context.Guild.GetOwnerAsync()).Username}", Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
+
+            SocketGuildChannel JoinChannel;
+            SocketGuildChannel LeaveChannel;
+            SocketGuildChannel BanChannel;
+            SocketGuildChannel ModChannel;
+
+            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.UserBanned.TextChannel != 0 || GConfig.ModChannelID != 0)
+            {
+                JoinChannel = await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel) as SocketGuildChannel;
+                LeaveChannel = await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel) as SocketGuildChannel;
+                BanChannel = await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel) as SocketGuildChannel;
+                ModChannel = await Context.Guild.GetChannelAsync(GConfig.ModChannelID) as SocketGuildChannel;
+            }
+            else
+            {
+                JoinChannel = null;
+                LeaveChannel = null;
+                BanChannel = null;
+                ModChannel = null;
+            }
+
+            string Description = $"**Prefix:** {GConfig.GuildPrefix}\n" +
+                $"**Welcome Message:**\n{GConfig.WelcomeMessage}\n" +
+                $"**Mod Channel:** {ModChannel}\n" +
+                $"**Mute Role:** {GConfig.MuteRoleId}\n" +
+                $"**Kick/Ban Cases:** {GConfig.CaseNumber}\n" +
+                $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
+                $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
+                $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
+                $"**Chatter Bot:** {GConfig.ChatterBot}\n" +
+                $"**Chat Karma:** {Karma}\n" +
+                $"**Karma List:** {KarmaList}\n" +
+                $"**AFK List:** {AFKList}\n" +
+                $"**Tags List** {TagList}\n" +
+                $"**Required Channel:** {SB.ToString()}";
+
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
             await ReplyAsync("", embed: embed);
         }
 
@@ -158,6 +196,44 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
+        [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
+        public async Task ToggleKarmaAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.ChatKarma)
+            {
+                gldConfig.ChatKarma = true;
+                await ReplyAsync(":gear: Users will now be awarded random Karma based on their chat activity!");
+            }
+            else
+            {
+                gldConfig.ChatKarma = false;
+                await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
+        public async Task ToggleChatterBotAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.ChatterBot)
+            {
+                gldConfig.ChatterBot = true;
+                await ReplyAsync(":gear: Chatterbot enabled!");
+            }
+            else
+            {
+                gldConfig.ChatterBot = false;
+                await ReplyAsync(":skull_crossbones: Chatterbot disabled!");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
         [Command("Channel"), Summary("Channel Add #ChannelName/Channel AddId #ChannelName"), Remarks("Adds/Removes channel names/ids from the list")]
         public async Task ChannelAsync(GlobalEnums Prop, ITextChannel channel)
         {
@@ -200,42 +276,6 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
-        public async Task ToggleKarmaAsync()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.ChatKarma)
-            {
-                gldConfig.ChatKarma = true;
-                await ReplyAsync(":gear: Users will now be awarded random Karma based on their chat activity!");
-            }
-            else
-            {
-                gldConfig.ChatKarma = false;
-                await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
 
-        [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
-        public async Task ToggleChatterBotAsync()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.ChatterBot)
-            {
-                gldConfig.ChatterBot = true;
-                await ReplyAsync(":gear: Chatterbot enabled!");
-            }
-            else
-            {
-                gldConfig.ChatterBot = false;
-                await ReplyAsync(":skull_crossbones: Chatterbot disabled!");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
     }
 }
