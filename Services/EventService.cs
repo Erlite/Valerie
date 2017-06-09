@@ -111,7 +111,7 @@ namespace Rick.Services
 
         public static async Task RemoveGuildConfigAsync(SocketGuild Guild)
         {
-            ConsoleService.Log(LogType.Warning, LogSource.Client, $"{Guild.Name} Config's deleted!");
+            Logger.Log(LogType.Warning, LogSource.Client, $"{Guild.Name} Config's deleted!");
             if (GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
             {
                 GuildHandler.GuildConfigs.Remove(Guild.Id);
@@ -136,13 +136,33 @@ namespace Rick.Services
             if (GameCount != 0)
             {
                 await client.SetGameAsync(GetGame);
-                ConsoleService.Log(LogType.Info, LogSource.Client, $"Current Game: {GetGame}");
+                Logger.Log(LogType.Info, LogSource.Client, $"Current Game: {GetGame}");
             }
             else
                 await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
-            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Guilds: {client.Guilds.Count}");
-            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Users: {client.Guilds.Sum(x => x.Users.Count)}");
-            ConsoleService.Log(LogType.Info, LogSource.Client, $"Total Channels: {client.Guilds.Sum(x => x.Channels.Count)}");
+            Logger.Log(LogType.Info, LogSource.Client, $"Total Guilds: {client.Guilds.Count}");
+            Logger.Log(LogType.Info, LogSource.Client, $"Total Users: {client.Guilds.Sum(x => x.Users.Count)}");
+            Logger.Log(LogType.Info, LogSource.Client, $"Total Channels: {client.Guilds.Sum(x => x.Channels.Count)}");
+        }
+
+        public static async Task HandleGuildsTasks(SocketGuildUser User)
+        {
+            var GC = GuildHandler.GuildConfigs[User.Guild.Id];
+
+            if (GC.Karma.ContainsKey(User.Id))
+                GC.Karma.Remove(User.Id);
+
+            foreach (var tag in GC.TagsList)
+            {
+                if (tag.OwnerId == User.Id)
+                {
+                    GC.TagsList.Remove(tag);
+                }
+            }
+
+            Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List");
+
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
 }
