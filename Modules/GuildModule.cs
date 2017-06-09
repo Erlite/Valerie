@@ -72,8 +72,9 @@ namespace Rick.Modules
             }
             var JoinChannel = (await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel)) as ITextChannel;
             var LeaveChannel = (await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel)) as ITextChannel;
-            var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;        
+            var BanChannel = (await Context.Guild.GetChannelAsync(GConfig.UserBanned.TextChannel)) as ITextChannel;
 
+            //if (JoinChannel == null ||)
             if (string.IsNullOrWhiteSpace(SB.ToString()))
                 SB = SB.AppendLine("No channels found in required channel list.");
             string Description =
@@ -81,9 +82,9 @@ namespace Rick.Modules
                                 $"**Server Mod Channel:** {GConfig.ModChannelID}\n" +
                                 $"**Mute Role ID:** {GConfig.MuteRoleId}\n" +
                                 $"**Welcome Message:** {GConfig.WelcomeMessage}\n" +
-                                $"**User Join Logging:** {Joins} ({JoinChannel.Mention})\n" +
-                                $"**User Leave Logging:** {Leaves} ({LeaveChannel.Mention})\n" +
-                                $"**User Ban Logging:** {Bans} ({BanChannel})\n" +
+                                $"**User Join Logging:** {Joins} ({JoinChannel.Name})\n" +
+                                $"**User Leave Logging:** {Leaves} ({LeaveChannel.Name})\n" +
+                                $"**User Ban Logging:** {Bans} ({BanChannel.Name})\n" +
                                 $"**Chat Karma:** {Karma}\n" +
                                 $"**Chatter Bot:** {Chatterbot}\n" +
                                 $"**Total Bans/Kicks Cases:** {GConfig.CaseNumber}\n" +
@@ -172,16 +173,6 @@ namespace Rick.Modules
                 case GlobalEnums.Remove:
                     gldConfig.RequiredChannelNames.Remove(channel.Name);
                     await ReplyAsync($"Channel **{channel.Name}** has been removed from RequiredChannel Attribute.");
-                    break;
-
-                case GlobalEnums.AddId:
-                    gldConfig.RequiredRoleIDs.Add(channel.Id);
-                    await ReplyAsync($"Channel **{channel.Id}** has been added to RequiredChannel Attribute.");
-                    break;
-
-                case GlobalEnums.RemoveId:
-                    gldConfig.RequiredRoleIDs.Remove(channel.Id);
-                    await ReplyAsync($"Channel **{channel.Id}** has been removed from RequiredChannel Attribute.");
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
