@@ -59,22 +59,32 @@ namespace Rick.Services
                 Description = $"**Username: **{user.Username}#{user.Discriminator}\n{getGuild.WelcomeMessage}",
                 Color = new Color(83, 219, 207)
             };
-            var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
-            await LogChannel.SendMessageAsync("", embed: embed);
+            if (getGuild.JoinEvent.TextChannel != 0)
+            {
+                var LogChannel = client.GetChannel(getGuild.JoinEvent.TextChannel) as ITextChannel;
+                await LogChannel.SendMessageAsync("", embed: embed);
+            }
+            else
+                await user.Guild.DefaultChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task UserLeftAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             if (!getGuild.LeaveEvent.IsEnabled) return;
-                var embed = new EmbedBuilder()
-                {
-                    Title = "=== User Left ===",
-                    Description = $"{user.Username}#{user.Discriminator} has left the server! :wave:",
-                    Color = new Color(223, 229, 48)
-                };
-                var LogChannel = client.GetChannel(getGuild.ModChannelID) as ITextChannel;
+            var embed = new EmbedBuilder()
+            {
+                Title = "=== User Left ===",
+                Description = $"{user.Username}#{user.Discriminator} has left the server! :wave:",
+                Color = new Color(223, 229, 48)
+            };
+            if (getGuild.LeaveEvent.TextChannel != 0)
+            {
+                var LogChannel = client.GetChannel(getGuild.LeaveEvent.TextChannel) as ITextChannel;
                 await LogChannel.SendMessageAsync("", embed: embed);
+            }
+            else
+                await user.Guild.DefaultChannel.SendMessageAsync("", embed: embed);
         }
 
         private async Task LatencyUpdateAsync(int older, int newer)
@@ -106,7 +116,7 @@ namespace Rick.Services
             await (await Guild.Owner.CreateDMChannelAsync()).SendMessageAsync(Msg);
             await client.StopAsync();
             await Task.Delay(1000);
-            await client.StartAsync();            
+            await client.StartAsync();
         }
 
         public static async Task RemoveGuildConfigAsync(SocketGuild Guild)
@@ -124,7 +134,7 @@ namespace Rick.Services
         {
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
-            Task.Run(() => MsgsService.AfkAsync(message, gld)); 
+            Task.Run(() => MsgsService.AfkAsync(message, gld));
             Task.Run(() => MsgsService.ChatKarmaAsync(message, gld));
             Task.Run(() => MsgsService.CleverBot(message, gld));
         }
@@ -149,21 +159,19 @@ namespace Rick.Services
         {
             var GC = GuildHandler.GuildConfigs[User.Guild.Id];
 
-            if (!GC.ChatKarma) return;
-
             if (GC.Karma.ContainsKey(User.Id))
+            {
                 GC.Karma.Remove(User.Id);
-
-            Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List");
+                Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
+            }
             foreach (var tag in GC.TagsList)
             {
                 if (tag.OwnerId == User.Id)
                 {
                     GC.TagsList.Remove(tag);
+                    Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed {tag.TagName} by {User.Username}.");
                 }
             }
-
-            Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed all Tags by {User.Username}");
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
