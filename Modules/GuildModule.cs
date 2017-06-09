@@ -86,7 +86,7 @@ namespace Rick.Modules
             var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
             var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
 
-            foreach(var Names in GConfig.RequiredChannelNames)
+            foreach (var Names in GConfig.RequiredChannelNames)
             {
                 SB.AppendLine(Names);
             }
@@ -275,7 +275,6 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
-
 
     }
 }
