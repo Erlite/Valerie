@@ -71,6 +71,13 @@ namespace Rick.Modules
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
             StringBuilder Builder = new StringBuilder();
+
+            if (karmalist.Count <= 0)
+            {
+                await ReplyAsync("Guild's Karma list is empty!");
+                return;
+            }
+
             foreach (var val in filter)
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
