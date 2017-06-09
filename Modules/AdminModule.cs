@@ -11,7 +11,13 @@ using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [ CheckBlacklist, RequireBotPermission(GuildPermission.Administrator)]
+    [ CheckBlacklist, RequireBotPermission(GuildPermission.Administrator |
+        GuildPermission.KickMembers |
+        GuildPermission.BanMembers |
+        GuildPermission.ManageMessages),
+        RequireUserPermission(GuildPermission.KickMembers |
+        GuildPermission.BanMembers |
+        GuildPermission.ManageMessages)]
 
     public class AdminModule : ModuleBase
     {
@@ -22,11 +28,10 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var BanChannel = user.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
             gldConfig.CaseNumber += 1;
-            if (gldConfig.UserBanned.IsEnabled)
+            if (gldConfig.UserBanned.IsEnabled && gldConfig.UserBanned.TextChannel != 0)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
                 var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
-
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await ReplyAsync($"***{ user.Username + '#' + user.Discriminator} GOT KICKED*** :ok_hand: ");
@@ -41,7 +46,7 @@ namespace Rick.Modules
             await user.Guild.AddBanAsync(user);
             gldConfig.CaseNumber += 1;
             var BanChannel = user.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
-            if (gldConfig.UserBanned.IsEnabled)
+            if (gldConfig.UserBanned.IsEnabled && gldConfig.UserBanned.TextChannel != 0)
             {
                 string description = $"**Username: **{user.Username}#{user.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
                 var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
