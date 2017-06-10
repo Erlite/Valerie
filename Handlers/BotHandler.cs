@@ -93,7 +93,7 @@ namespace Rick.Handlers
         }
 
         public static async Task SaveAsync(IClient botConfig)
-            => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)));
+            => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(botConfig, Formatting.Indented)).ConfigureAwait(false));
 
         public static void DirectoryCheck()
         {
