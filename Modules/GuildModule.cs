@@ -14,7 +14,6 @@ namespace Rick.Modules
     [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
-
         [Command("ModChannel"), Summary("ModChannel #ChannelName"), Remarks("Sets the Modchannel to log bans, etc")]
         public async Task SetModLogChannelAsync(ITextChannel channel)
         {
