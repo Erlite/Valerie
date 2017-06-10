@@ -14,14 +14,6 @@ namespace Rick.Modules
     [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
-        private GuildHandler model;
-        private EventService Log;
-
-        public GuildModule(GuildHandler gld, EventService Logger)
-        {
-            model = gld;
-            Log = Logger;
-        }
 
         [Command("ModChannel"), Summary("ModChannel #ChannelName"), Remarks("Sets the Modchannel to log bans, etc")]
         public async Task SetModLogChannelAsync(ITextChannel channel)
@@ -136,19 +128,18 @@ namespace Rick.Modules
         [Command("ToggleJoins"), Summary("ToggleJoins #ChannelName"), Remarks("Toggles Join logging")]
         public async Task ToggleJoinsAsync(ITextChannel Channel = null)
         {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             if (!gldConfig.JoinEvent.IsEnabled)
             {
                 gldConfig.JoinEvent.IsEnabled = true;
                 gldConfig.JoinEvent.TextChannel = Channel.Id;
-                Log.EnableJoinLogging();
+                EventService.EnableJoinLogging();
                 await ReplyAsync(":gear: Joins logging enabled!");
             }
             else
             {
-                Log.DisableJoinLogging();
                 gldConfig.JoinEvent.IsEnabled = false;
+                EventService.DisableJoinLogging();
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
@@ -158,19 +149,18 @@ namespace Rick.Modules
         [Command("ToggleLeaves"), Summary("ToggleLeaves #ChannelName"), Remarks("Toggle Leaves logging")]
         public async Task ToggleLeavesAsync(ITextChannel Channel = null)
         {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             if (!gldConfig.LeaveEvent.IsEnabled)
             {
                 gldConfig.LeaveEvent.IsEnabled = true;
                 gldConfig.LeaveEvent.TextChannel = Channel.Id;
-                Log.EnableLeaveLogging();
+                EventService.EnableLeaveLogging();
                 await ReplyAsync(":gear:   Now logging leaves.");
             }
             else
             {
                 gldConfig.LeaveEvent.IsEnabled = false;
-                Log.DisableLeaveLogging();
+                EventService.DisableLeaveLogging();
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
