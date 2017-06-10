@@ -23,23 +23,26 @@ namespace Rick.Modules
         public async Task CommandsAsync()
         {
             string Description = 
-                "**Admin Commands:** Kick, Ban, Mute Delete\n" + 
+                "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Antiraid, Moneyshot, Clear\n" + 
                 "**Bing Commands:** BImage, BSearch\n" +
-                "**Bot Commands:** [Group Name = Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt\n" + 
+                "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Tweet\n" +
+                "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
                 "**Github Commands:** [Group Name = Github] Userinfo\n" +
-                "**Google Commands:** Google, GImage, Youtube\n" +
-                "**Guild Commands:** [Group Name = Guild] Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleUsername, ToggleNicknames, ToggleBans, Channel, Role, ToggleKarma\n" +
+                "**Google Commands:** Google, GImage, Youtube, Shorten\n" +
+                "**Guild Commands:** Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, Channel, Role\n**Example:** " +
+                "Channel Add #ChannelName, Role Add @RoleName\n" +
                 "**Karma Commands:** Karma, Rank, Top\n" + 
-                "**Nsfw Commands:** Boobs, Bum, E621\n" +
-                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect\n" +
-                "**Search Commands:** Gif, Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie\n" +
-                "**Tag Commands:** [Group Name = Tag] Create, Remove, Execute, Info, Modify, List";
+                "**Nsfw Commands:** Boobs, Ass, E621\n" +
+                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Info, SendMsg\n" +
+                "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar\n" +
+                "**Steam Commands:** SNews, SUser" +
+                "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Help")]
+        [Command("Help"), Summary("Displays information about a specific command.")]
         public async Task HelpAsync(string CommandName)
         {
             var result = _service.Search(Context, CommandName);
