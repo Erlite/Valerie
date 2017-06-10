@@ -90,7 +90,7 @@ namespace Rick.Services
                     break;
             }
 
-            Append($" {message}", Color.DimGray);
+            Append($" {message}", Color.Peru);
         }
     }
 }
