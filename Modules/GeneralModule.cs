@@ -208,36 +208,35 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Ping"), Summary("Normal Command"), Remarks("Measures gateway ping and response time")]
-        public async Task PingAsync()
+        [Command("Ping"), Summary("Measures gateway ping and response time. If a destionation is provided then it pings the destionation."), Remarks("Ping Google.com")]
+        public async Task PingAsync(string Destination = null)
         {
+            string Time = null;
+            if (!string.IsNullOrWhiteSpace(Destination) || Destination != null)
+            {
+                try
+                {
+                    var HttpClient = new HttpClient();
+                    HttpClient.DefaultRequestHeaders.Clear();
+                    HttpClient.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
+                    HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+                    var get = JObject.Parse(await HttpClient.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={Destination}"));
+                    var WebResponse = get["time"].ToString();
+                    Time = WebResponse;
+                }
+                catch { }
+            }
+            if (string.IsNullOrWhiteSpace(Time))
+                Time = "No IP/Web Address was provided to ping.";
+
             var sw = Stopwatch.StartNew();
             var client = Context.Client as DiscordSocketClient;
-            var Gateway = client.Latency;
-            string descrption = $"**Gateway Latency:** { Gateway} ms\n**Response Latency:** {sw.ElapsedMilliseconds} ms\n**Delta:** {sw.ElapsedMilliseconds - Gateway} ms";
+            string descrption = $"**Gateway Latency:** { client.Latency } ms\n" +
+                $"**Response Latency:** {sw.ElapsedMilliseconds} ms\n" +
+                $"**Delta:** {sw.ElapsedMilliseconds - client.Latency} ms\n" +
+                $"**IP/Web Response Time:** {Time}";
             var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
-
-        }
-
-        [Command("Ping"), Summary("Ping Google.com"), Remarks("Pings a website")]
-        public async Task PwnedAsync(string search)
-        {
-            try
-            {
-                using (var http = new HttpClient())
-                {
-                    http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
-                    http.DefaultRequestHeaders.Add("Accept", "application/json");
-                    var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
-                    var time = get["time"].ToString();
-                    var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: $"Ping Result: **{time} ms**");
-                    await ReplyAsync("", embed: embed);
-                }
-            }
-            catch (Exception e)
-            { await ReplyAsync(e.Message); }
         }
 
         [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
