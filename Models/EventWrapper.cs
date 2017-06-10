@@ -1,6 +1,6 @@
 ﻿namespace Rick.Models
 {
-    public class WrapperModel
+    public class EventWrapper
     {
         public bool IsEnabled { get; set; }
         public ulong TextChannel { get; set; }
