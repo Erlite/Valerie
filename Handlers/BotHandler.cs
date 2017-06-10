@@ -43,14 +43,14 @@ namespace Rick.Handlers
             Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();
 
-            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bing API Key: ");
-            result.BingAPIKey = Console.ReadLine();
+            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bing API Key: ");
+            //result.BingAPIKey = Console.ReadLine();
 
-            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Mashape API Key: ");
-            result.MashapeAPIKey = Console.ReadLine();
+            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Mashape API Key: ");
+            //result.MashapeAPIKey = Console.ReadLine();
 
-            Logger.Log(LogType.Info, LogSource.Configuration,"Enter Google API Key: ");
-            result.GoogleAPIKey = Console.ReadLine();
+            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Google API Key: ");
+            //result.GoogleAPIKey = Console.ReadLine();
 
             Logger.Log(LogType.Info, LogSource.Configuration, "Yes = Y || No = N");
 

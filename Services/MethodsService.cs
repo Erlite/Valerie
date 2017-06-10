@@ -142,7 +142,7 @@ namespace Rick.Services
         {
             var Service = new UrlshortenerService(new BaseClientService.Initializer()
             {
-                ApiKey = BotHandler.BotConfig.GoogleAPIKey,
+                ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
             });
             var Refer = new Google.Apis.Urlshortener.v1.Data.Url();
             Refer.LongUrl = URL;

@@ -58,9 +58,9 @@ namespace Rick.Modules
         {
             var Httpclient = new HttpClient();
             string IPlayerService = "http://api.steampowered.com/IPlayerService/";
-            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={BotHandler.BotConfig.SteamAPIKey}&steamids={ID}");
-            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={BotHandler.BotConfig.SteamAPIKey}&steamid={ID}&format=json");
-            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={BotHandler.BotConfig.SteamAPIKey}&steamid={ID}&format=json");
+            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamids={ID}");
+            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
+            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
 
             if (!SummarURL.IsSuccessStatusCode || !GamesOwned.IsSuccessStatusCode || !RecentlyPlayed.IsSuccessStatusCode)
             {

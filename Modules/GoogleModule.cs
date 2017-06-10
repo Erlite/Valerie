@@ -25,10 +25,10 @@ namespace Rick.Modules
             var Str = new StringBuilder();
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
-                ApiKey = BotHandler.BotConfig.GoogleAPIKey
+                ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
             });
             var RequestList = Service.Cse.List(search);
-            RequestList.Cx = BotHandler.BotConfig.SearchEngineID;
+            RequestList.Cx = BotHandler.BotConfig.APIKeys.SearchEngineID;
 
             var items = RequestList.Execute().Items.Take(5);
             foreach (var result in items)
@@ -46,7 +46,7 @@ namespace Rick.Modules
             using (var http = new HttpClient())
             {
                 var rng = new Random();
-                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={BotHandler.BotConfig.GoogleAPIKey}";
+                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={BotHandler.BotConfig.APIKeys.GoogleKey}";
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
@@ -60,7 +60,7 @@ namespace Rick.Modules
         {
             var Service = new YouTubeService(new BaseClientService.Initializer
             {
-                ApiKey = BotHandler.BotConfig.GoogleAPIKey
+                ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
             });
             var SearchRequest = Service.Search.List("snippet");
             SearchRequest.Q = search;

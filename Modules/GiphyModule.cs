@@ -14,7 +14,7 @@ namespace Rick.Modules
     {
         string GifsEndpoint = "https://api.giphy.com/v1/gifs/";
         string StickersEndpoint = "http://api.giphy.com/v1/stickers/";
-        string Key = $"api_key={BotHandler.BotConfig.GiphyAPIKey}";
+        string Key = $"api_key={BotHandler.BotConfig.APIKeys.GiphyKey}";
 
         [Command(""), Summary("Gif Cute kittens"), Remarks("Searches Giphy for your Gifs??"), Alias("Gif"), Priority(0)]
         public async Task GiphyAsync([Remainder] string Terms)

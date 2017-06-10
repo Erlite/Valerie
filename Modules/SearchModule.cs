@@ -129,7 +129,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
                     string Description = get;
@@ -149,7 +149,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "text/plain");
                     var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
                     string Description = $"```{get}```";

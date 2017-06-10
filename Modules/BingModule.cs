@@ -24,7 +24,7 @@ namespace Rick.Modules
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=50&offset=0&mkt=en-us&safeSearch=Off";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {
@@ -54,7 +54,7 @@ namespace Rick.Modules
                 throw new NullReferenceException("Search terms can't be empty!");
             using (var Http = new HttpClient())
             {
-                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.BingAPIKey);
+                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
                 var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={search}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
                 if (!GetRequest.IsSuccessStatusCode)
                 {
