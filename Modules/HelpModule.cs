@@ -6,6 +6,7 @@ using Rick.Attributes;
 using Rick.Enums;
 using Rick.Extensions;
 using System.Text;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
@@ -36,13 +37,13 @@ namespace Rick.Modules
                 "**Nsfw Commands:** Boobs, Ass, E621\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Info, SendMsg\n" +
                 "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar\n" +
-                "**Steam Commands:** SNews, SUser" +
+                "**Steam Commands:** SNews, SUser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Help"), Summary("Displays information about a specific command.")]
+        [Command("Help"), Summary("Displays information about a specific command."), Remarks("Help NameOfTheCommand")]
         public async Task HelpAsync(string CommandName)
         {
             var result = _service.Search(Context, CommandName);
