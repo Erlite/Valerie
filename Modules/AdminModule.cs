@@ -71,16 +71,21 @@ namespace Rick.Modules
             await ReplyAsync("User has been added to Mute Role!");
         }
 
-        [Command("Delete"), Summary("Delete 10"), Remarks("Deletes X amount of messages"), Alias("Del")]
-        public async Task DeleteAsync(int range = 0)
+        [Command("Delete"), Alias("Del"), Summary("Deletes X amount of messages.")]
+        public async Task DeleteAsync(int MessageAmount)
         {
-            if (range <= 0)
-                throw new ArgumentException("The amount cannot be lower than or equal to 0!");
-            var messageList = await Context.Channel.GetMessagesAsync(range).Flatten();
+            if (MessageAmount <= 0)
+            {
+                await ReplyAsync("The amount cannot be lower than or equal to 0!");
+                return;
+            }
+            if (MessageAmount > 100)
+            {
+                await ReplyAsync("Amount can't be higher than 100!");
+                return;
+            }
+            var messageList = await Context.Channel.GetMessagesAsync(MessageAmount).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
-            var msg = await ReplyAsync($"I've deleted {range} messages :ok_hand:");
-            await Task.Delay(3000);
-            await msg.DeleteAsync();
         }
 
         [Command("Addrole"), Summary("Addrole @Username @RoleName"), Remarks("Adds role to a user"), Alias("Arole")]
