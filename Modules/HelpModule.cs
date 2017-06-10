@@ -5,6 +5,7 @@ using System.Linq;
 using Rick.Attributes;
 using Rick.Enums;
 using Rick.Extensions;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -39,15 +40,17 @@ namespace Rick.Modules
         }
 
         [Command("Help")]
-        public async Task HelpAsync(string command)
+        public async Task HelpAsync(string CommandName)
         {
-            var result = _service.Search(Context, command);
+            var result = _service.Search(Context, CommandName);
+            var SB = new StringBuilder();
 
             if (!result.IsSuccess)
             {
-                await ReplyAsync($"**Command Name:** {command}\n**Error:** Not Found!\n**Reason:** Wubbalubbadubdub!");
+                await ReplyAsync($"**Command Name:** {CommandName}\n**Error:** Not Found!\n**Reason:** Wubbalubbadubdub!");
                 return;
             }
+
             var builder = new EmbedBuilder()
             {
                 Color = new Color(179, 56, 216)
@@ -56,9 +59,22 @@ namespace Rick.Modules
             foreach (var match in result.Commands)
             {
                 var cmd = match.Command;
+
+                string Remarks = null;
+                if (cmd.Remarks == null || string.IsNullOrWhiteSpace(cmd.Remarks))
+                    Remarks = "This command doesn't require any parameters.";
+                else
+                    Remarks = cmd.Remarks;
+
+                string Aliases = null;
+                if (cmd.Aliases == null || cmd.Aliases.Count <= 0)
+                    Aliases = "This command has no Aliases.";
+                else
+                    Aliases = string.Join(", ", cmd.Aliases);
+
                 builder.Title = cmd.Name.ToUpper();
-                builder.Description = $"**Aliases:** {string.Join(", ", cmd.Aliases)}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n"+
-                    $"**Remarks:** {cmd.Remarks}\n**Summary:** {cmd.Summary}";
+                builder.Description = $"**Aliases:** {Aliases}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n"+
+                    $"**Remarks:** {Remarks}\n**Summary:** {cmd.Summary}";
             }
             await ReplyAsync("", false, builder.Build());
         }

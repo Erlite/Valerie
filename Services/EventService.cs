@@ -39,12 +39,12 @@ namespace Rick.Services
             client.UserLeft -= UserLeftAsync;
         }
 
-        public void EnableLatencyMonitor()
+        public static void EnableLatencyMonitor()
         {
             client.LatencyUpdated += LatencyUpdateAsync;
         }
 
-        public void DisableLatencyMonitor()
+        public static void DisableLatencyMonitor()
         {
             client.LatencyUpdated -= LatencyUpdateAsync;
         }
@@ -87,7 +87,7 @@ namespace Rick.Services
                 await user.Guild.DefaultChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task LatencyUpdateAsync(int older, int newer)
+        static async Task LatencyUpdateAsync(int older, int newer)
         {
             if (client == null) return;
             var newStatus = (client.ConnectionState == ConnectionState.Disconnected || newer > 100) ? UserStatus.DoNotDisturb
