@@ -66,7 +66,7 @@ namespace Rick.Services
                     //}
                 }
                 GuildHandler.GuildConfigs[gld.Id] = Guilds;
-                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
             }
         }
 
@@ -88,6 +88,20 @@ namespace Rick.Services
             CleverbotResponse Response = null;
             Response = CleverbotLib.Core.Talk(UserMsg, Response);
             await message.Channel.SendMessageAsync(Response.Output);
+        }
+
+        public static async Task AddToMessage(SocketUserMessage Message)
+        {
+            var Config = BotHandler.BotConfig;
+            Config.MessagesReceived += 1;
+            await BotHandler.SaveAsync(Config);
+        }
+
+        public static async Task AddToCommand(SocketUserMessage Message)
+        {
+            var Config = BotHandler.BotConfig;
+            Config.CommandsUsed += 1;
+            await BotHandler.SaveAsync(Config);
         }
     }
 }

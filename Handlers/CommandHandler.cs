@@ -59,6 +59,8 @@ namespace Rick.Handlers
             if (result.IsSuccess)
                 return;
 
+            await MsgsService.AddToCommand(message).ConfigureAwait(false);
+
             string ErrorMsg = null;
             Embed embed = null;
             switch(result)
