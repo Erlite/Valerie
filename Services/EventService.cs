@@ -19,22 +19,22 @@ namespace Rick.Services
             client = c;
         }
 
-        public void EnableJoinLogging()
+        public static void EnableJoinLogging()
         {
             client.UserJoined += UserJoinedAsync;
         }
 
-        public void DisableJoinLogging()
+        public static void DisableJoinLogging()
         {
             client.UserJoined -= UserJoinedAsync;
         }
 
-        public void EnableLeaveLogging()
+        public static void EnableLeaveLogging()
         {
             client.UserLeft += UserLeftAsync;
         }
 
-        public void DisableLeaveLogging()
+        public static void DisableLeaveLogging()
         {
             client.UserLeft -= UserLeftAsync;
         }
@@ -49,7 +49,7 @@ namespace Rick.Services
             client.LatencyUpdated -= LatencyUpdateAsync;
         }
 
-        private async Task UserJoinedAsync(SocketGuildUser user)
+        static async Task UserJoinedAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             if (!getGuild.JoinEvent.IsEnabled) return;
@@ -68,7 +68,7 @@ namespace Rick.Services
                 await user.Guild.DefaultChannel.SendMessageAsync("", embed: embed);
         }
 
-        private async Task UserLeftAsync(SocketGuildUser user)
+        static  async Task UserLeftAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             if (!getGuild.LeaveEvent.IsEnabled) return;
@@ -132,11 +132,13 @@ namespace Rick.Services
 
         public static async Task MessageServicesAsync(SocketMessage msg)
         {
+            
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
-            Task.Run(() => MsgsService.AfkAsync(message, gld));
-            Task.Run(() => MsgsService.ChatKarmaAsync(message, gld));
-            Task.Run(() => MsgsService.CleverBot(message, gld));
+            await MsgsService.AddToMessage(message).ConfigureAwait(false);
+            await Task.Run(() => MsgsService.AfkAsync(message, gld)).ConfigureAwait(false);
+            await Task.Run(() => MsgsService.ChatKarmaAsync(message, gld)).ConfigureAwait(false);
+            await Task.Run(() => MsgsService.CleverBot(message, gld)).ConfigureAwait(false);
         }
 
         public static async Task OnReadyAsync()
