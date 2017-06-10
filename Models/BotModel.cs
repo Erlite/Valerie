@@ -23,27 +23,6 @@ namespace Rick.Models
         [JsonProperty("MessagesReceived")]
         public int MessagesReceived { get; set; }
 
-        [JsonProperty("BingAPIKey")]
-        public string BingAPIKey { get; set; }
-
-        [JsonProperty("MashapeAPIKey")]
-        public string MashapeAPIKey { get; set; }
-
-        [JsonProperty("GoogleAPIKey")]
-        public string GoogleAPIKey { get; set; }
-
-        [JsonProperty("SearchEngineID")]
-        public string SearchEngineID { get; set; }
-
-        [JsonProperty("CleverBotAPIKey")]
-        public string CleverBotAPIKey { get; set; }
-
-        [JsonProperty("SteamAPIKey")]
-        public string SteamAPIKey { get; set; }
-
-        [JsonProperty("GiphyAPIKey")]
-        public string GiphyAPIKey { get; set; } = "dc6zaTOxFJmzC";
-
         [JsonProperty("DebugMode")]
         public bool DebugMode { get; set; }
 
@@ -55,6 +34,12 @@ namespace Rick.Models
 
         [JsonProperty("MentionDefaultPrefix")]
         public bool MentionDefaultPrefix { get; set; }
+
+        [JsonProperty("APIKeys")]
+        public APIKeysWrapper APIKeys { get; set; } = new APIKeysWrapper();
+
+        [JsonProperty("TwitterWrapper")]
+        public TwitterWrapper Twitter { get; set; } = new TwitterWrapper();
 
         [JsonProperty("Blacklist")]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
@@ -71,5 +56,6 @@ namespace Rick.Models
                 return false;
             return m.HasMentionPrefix(c.CurrentUser, ref ap);
         }
+
     }
 }
