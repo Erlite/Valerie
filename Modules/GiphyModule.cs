@@ -47,7 +47,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Sitkcers"), Summary("Giphy Stickers Dank Memes"), Remarks("Animated stickers rather than gifs")]
+        [Command("Stickers"), Summary("Giphy Stickers Dank Memes"), Remarks("Animated stickers rather than gifs")]
         public async Task StickersAsync([Remainder] string Search)
         {
             var GetUrl = StickersEndpoint + $"search?q={Search.Replace(' ', '+')}&" + Key;
