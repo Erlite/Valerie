@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Extensions;
+using Tweetinvi;
 
 namespace Rick.Modules
 {
@@ -227,7 +228,7 @@ namespace Rick.Modules
                 using (var http = new HttpClient())
                 {
                     http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.MashapeAPIKey);
+                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
                     http.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await http.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={search}"));
                     var time = get["time"].ToString();
@@ -533,6 +534,28 @@ namespace Rick.Modules
 
             GuildHandler.GuildConfigs[Context.Guild.Id] = GC;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(10)]
+        public async Task TweetAsync([Remainder] string TweetMessage)
+        {
+            if (TweetMessage.Length >= 120)
+            {
+                await ReplyAsync("Tweet can't be longer than 120 characters!");
+                return;
+            }
+
+            string TweetMsg = $"{TweetMessage} - {Context.User.Username}";
+
+            if (TweetMsg.Length > 140)
+            {
+                await ReplyAsync("Tweet's total length is greater than 140!");
+                return;
+            }
+
+            Tweet.PublishTweet(TweetMsg);
+            var embed = EmbedExtension.Embed(EmbedColors.Green, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"{TweetMessage}\n{Context.User.Username}");
+            await ReplyAsync("", embed: embed);
         }
     }
 }
