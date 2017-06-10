@@ -50,6 +50,8 @@ namespace Rick.Handlers
             string GuildPrefix = GuildHandler.GuildConfigs[gld.Id].GuildPrefix;
             if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionPrefix(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
 
+            await MsgsService.AddToCommand(message).ConfigureAwait(false);
+
             var result = await cmds.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
             var service = cmds.Search(context, argPos);
             CommandInfo Command = null;
@@ -58,8 +60,6 @@ namespace Rick.Handlers
                 Command = service.Commands.FirstOrDefault().Command;
             if (result.IsSuccess)
                 return;
-
-            await MsgsService.AddToCommand(message).ConfigureAwait(false);
 
             string ErrorMsg = null;
             Embed embed = null;
