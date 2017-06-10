@@ -16,14 +16,17 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class BingModule : ModuleBase
     {
-        [Command("BImage"), Summary("Bing Image rick and morty"), Remarks("Searches Bing for your image.")]
-        public async Task ImageAsync([Remainder] string search)
+        [Command("BImage"), Summary("Performs a bing image search for your query and replies back with a random image."), Remarks("BImage Tiny Rick")]
+        public async Task ImageAsync([Remainder] string Query)
         {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("A search term should be provided for me to search!");
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                await ReplyAsync("A search term should be provided for me to search!");
+                return;
+            }
             using (var httpClient = new HttpClient())
             {
-                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={search}&count=50&offset=0&mkt=en-us&safeSearch=Off";
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={Query}&count=50&offset=0&mkt=en-us&safeSearch=Off";
                 httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
@@ -41,21 +44,24 @@ namespace Rick.Modules
                 var Random = new Random();
                 var RandomNum = Random.Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
-                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {search.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {Query.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
 
         }
 
-        [Command("Bing"), Summary("Bing Search Git Gud"), Remarks("Searches Bing for your terms")]
-        public async Task SearchAsync([Remainder]string search)
+        [Command("Bing"), Summary("Performs a bing search for your query and replies back with 5 search results."), Remarks("Bing Tiny Rick")]
+        public async Task SearchAsync([Remainder]string Query)
         {
-            if (string.IsNullOrWhiteSpace(search))
-                throw new NullReferenceException("Search terms can't be empty!");
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                await ReplyAsync("Search terms can't be empty!");
+                return;
+            }
             using (var Http = new HttpClient())
             {
                 Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
-                var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={search}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
+                var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
                 if (!GetRequest.IsSuccessStatusCode)
                 {
                     await ReplyAsync(GetRequest.ReasonPhrase);
@@ -68,7 +74,7 @@ namespace Rick.Modules
                 {
                     str.AppendLine($"**{result.name}**\n{result.snippet}\n{MethodsService.ShortenUrl(result.displayUrl)}\n");
                 }
-                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {Query}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
         }
