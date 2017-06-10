@@ -8,6 +8,8 @@ namespace Rick.Interfaces
         string BotToken { get; set; }
         string BotName { get; set; }
         string DefaultPrefix { get; set; }
+        int CommandsUsed { get; set; }
+        int MessagesReceived { get; set; }
         string BingAPIKey { get; set; }
         string MashapeAPIKey { get; set; }
         string GoogleAPIKey { get; set; }

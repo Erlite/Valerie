@@ -17,6 +17,12 @@ namespace Rick.Models
         [JsonProperty("DefaultPrefix")]
         public string DefaultPrefix { get; set; }
 
+        [JsonProperty("CommandsUsed")]
+        public int CommandsUsed { get; set; }
+
+        [JsonProperty("MessagesReceived")]
+        public int MessagesReceived { get; set; }
+
         [JsonProperty("BingAPIKey")]
         public string BingAPIKey { get; set; }
 
