@@ -62,15 +62,23 @@ namespace Rick.Handlers
                 return;
 
             string ErrorMsg = null;
+            string Remarks = null;
+
+            if (string.IsNullOrWhiteSpace(Command.Remarks) || Command.Remarks == null)
+                Remarks = "This command doesn't require any parameters.";
+            else
+                Remarks = Command.Remarks;
+
             Embed embed = null;
             switch(result)
             {
                 case SearchResult search:
                     break;
                 case ParseResult parse:
-                    ErrorMsg = $"User failed to provide required paramaters for {Command.Name}!\n**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(", ", Command.Parameters.Select(x => x.Name))}\n"+ 
-                        $"You can get more info on how to use {Command.Name} by using:\n{BotHandler.BotConfig.DefaultPrefix}Help {Command.Name}";
-                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "Parsing Failed!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
+                    ErrorMsg = $"**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => x.Name))}\n" +
+                        $"**Example:** {Remarks}\n" +
+                        $"**More Info:** To get more information about a command use: {BotHandler.BotConfig.DefaultPrefix}Help CommandName\n";
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
                     break;
                 case PreconditionResult pre:
                     ErrorMsg = pre.ErrorReason;
