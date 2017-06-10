@@ -28,13 +28,13 @@ namespace Rick.Models
         public bool ChatterBot { get; set; }
 
         [JsonProperty("JoinEvent")]
-        public WrapperModel JoinEvent { get; set; } = new WrapperModel();
+        public EventWrapper JoinEvent { get; set; } = new EventWrapper();
 
         [JsonProperty("LeaveEvent")]
-        public WrapperModel LeaveEvent { get; set; } = new WrapperModel();
+        public EventWrapper LeaveEvent { get; set; } = new EventWrapper();
 
         [JsonProperty("UserBanned")]
-        public WrapperModel UserBanned { get; set; } = new WrapperModel();
+        public EventWrapper UserBanned { get; set; } = new EventWrapper();
 
         [JsonProperty("RequiredRoleID")]
         public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
