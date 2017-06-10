@@ -13,13 +13,7 @@ namespace Rick.Modules
     [Group("Bot"), RequireOwner, RequireContext(ContextType.Guild)]
     public class BotModule : ModuleBase
     {
-        private EventService Events;
-        public BotModule(EventService events)
-        {
-            Events = events;
-        }
-
-        [Command("Username"), Summary("Username OwO"), Remarks("Changes Bot's username")]
+        [Command("Username"), Remarks("Username OwO"), Summary("Changes Bot's username")]
         public async Task UsernameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -32,7 +26,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(botConfig);
         }
 
-        [Command("Nickname"), Summary("Nickname XD"), Remarks("Changes Bot's nickname")]
+        [Command("Nickname"), Remarks("Nickname XD"), Summary("Changes Bot's nickname")]
         public async Task NicknameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -42,7 +36,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Avatar"), Summary("Avatar {Some-Link.Com}"), Remarks("Changes Bot's avatar")]
+        [Command("Avatar"), Remarks("Avatar {Some-Link.Com}"), Summary("Changes Bot's avatar")]
         public async Task AvatarAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -67,7 +61,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Game"), Summary("Game DarkSouls 3"), Remarks("Changes Bot's game")]
+        [Command("Game"), Remarks("Game DarkSouls 3"), Summary("Changes Bot's game")]
         public async Task GameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -80,7 +74,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(botConfig);
         }
 
-        [Command("Status"), Summary("Status 3"), Remarks("Changes Bot's status such as setting status to DND")]
+        [Command("Status"), Remarks("Status 3"), Summary("Changes Bot's status such as setting status to DND")]
         public async Task StatusAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -90,26 +84,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Latency"), Summary("Normal Command"), Remarks("Enables/Disables monitoring your ping")]
-        public async Task LatencyAsync()
-        {
-            var Config = BotHandler.BotConfig;
-            if (!Config.ClientLatency)
-            {
-                Config.ClientLatency = true;
-                Events.EnableLatencyMonitor();
-                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
-            }
-            else
-            {
-                Config.ClientLatency = false;
-                Events.DisableLatencyMonitor();
-                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
-            }
-            await BotHandler.SaveAsync(Config);
-        }
-
-        [Command("Prefix"), Summary("Prefix ?"), Remarks("Sets Bot's default prefix")]
+        [Command("Prefix"), Remarks("Prefix ?"), Summary("Sets Bot's default prefix")]
         public async Task DefaultPrefixAsync([Remainder]string prefix)
         {
             if (string.IsNullOrWhiteSpace(prefix))
@@ -120,7 +95,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(botConfig);
         }
 
-        [Command("Debug"), Summary("Normal Command"), Remarks("Enables/Disables debug mode")]
+        [Command("Debug"), Summary("Enables/Disables debug mode")]
         public async Task DebugAsync()
         {
             var Config = BotHandler.BotConfig;
@@ -137,7 +112,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(Config);
         }
 
-        [Command("Mention"), Summary("Normal Command"), Remarks("Enables/Disables mention prefix")]
+        [Command("Mention"), Summary("Enables/Disables mention prefix")]
         public async Task MentionAsync()
         {
             var Config = BotHandler.BotConfig;
@@ -152,5 +127,23 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(Config);
         }
 
+        [Command("Latency"), Summary("Enables/Disables monitoring your ping")]
+        public async Task LatencyAsync()
+        {
+            var Config = BotHandler.BotConfig;
+            if (!Config.ClientLatency)
+            {
+                Config.ClientLatency = true;
+                EventService.EnableLatencyMonitor();
+                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
+            }
+            else
+            {
+                Config.ClientLatency = false;
+                EventService.DisableLatencyMonitor();
+                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
+            }
+            await BotHandler.SaveAsync(Config);
+        }
     }
 }
