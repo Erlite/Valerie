@@ -12,9 +12,9 @@ namespace Rick.Interfaces
         int CaseNumber { get; set; }
         bool ChatKarma { get; set; }
         bool ChatterBot { get; set; }
-        WrapperModel JoinEvent { get; set; }
-        WrapperModel LeaveEvent { get; set; }
-        WrapperModel UserBanned { get; set; }
+        EventWrapper JoinEvent { get; set; }
+        EventWrapper LeaveEvent { get; set; }
+        EventWrapper UserBanned { get; set; }
         List<ulong> RequiredRoleIDs { get; set;}
         List<string> RequiredChannelNames { get; set; }
         List<TagsModel> TagsList { get; set; }
