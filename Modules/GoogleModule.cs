@@ -19,10 +19,12 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class GoogleModule : ModuleBase
     {
-        [Command("Google"), Summary("Google Very wow"), Remarks("Seaches google for your terms"), Alias("G")]
+        [Command("Google"), Alias("G"), Summary("Searches google for your search terms."), Remarks("Google What is love?")]
         public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
+            string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
                 ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
@@ -30,17 +32,15 @@ namespace Rick.Modules
             var RequestList = Service.Cse.List(search);
             RequestList.Cx = BotHandler.BotConfig.APIKeys.SearchEngineID;
 
-            var items = RequestList.Execute().Items.Take(5);
+            var items = RequestList.Execute().Items.Take(6);
             foreach (var result in items)
             {
-                Str.AppendLine($"**=> {result.Title}**\n{MethodsService.ShortenUrl( result.Link)}");
+                Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{MethodsService.ShortenUrl(result.Link)}\n");
             }
-            string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("GImage"), Summary("GImage doges"), Remarks("Searches google for your image")]
+        [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results."), Remarks("GImage Dank Memes")]
         public async Task GImageAsync([Remainder] string search)
         {
             using (var http = new HttpClient())
@@ -55,7 +55,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Youtube"), Summary("Youtube SomeVideo Name"), Remarks("Searches youtube for your video"), Alias("Yt")]
+        [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube."), Remarks("Youtube SomeVideo Name")]
         public async Task YoutubeAsync([Remainder] string search)
         {
             var Service = new YouTubeService(new BaseClientService.Initializer
@@ -71,7 +71,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Shorten"), Summary("Shorten https://github.com/ExceptionDev"), Remarks("Shortens a url")]
+        [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/ExceptionDev"),]
         public async Task ShortenAsync([Remainder] string URL)
         {
             await ReplyAsync($"This is your shortened URL: {MethodsService.ShortenUrl(URL)}");
