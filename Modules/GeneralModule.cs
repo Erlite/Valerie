@@ -17,6 +17,7 @@ using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Extensions;
 using Tweetinvi;
+using System.IO;
 
 namespace Rick.Modules
 {
@@ -303,7 +304,7 @@ namespace Rick.Modules
         }
 
         [Command("About"), Summary("Normal Command"), Remarks("Shows info about Bot")]
-        public async Task InfoAsync()
+        public async Task AboutAsync()
         {
             var client = Context.Client as DiscordSocketClient;
             var AppInfo = await client.GetApplicationInfoAsync();
@@ -516,13 +517,12 @@ namespace Rick.Modules
                 return;
             }
 
-
             string[] Sides = { "Heads", "Tails"};
             var GetSide = Sides[new Random().Next(0, Sides.Length)];
             
             if(Side.ToLower() == GetSide.ToLower())
             {
-                Karma += Bet;
+                Karma += Bet*2;
                 await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {Karma}.");
             }
             else
@@ -554,6 +554,24 @@ namespace Rick.Modules
 
             Tweet.PublishTweet(TweetMsg);
             var embed = EmbedExtension.Embed(EmbedColors.Green, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"{TweetMessage}\n{Context.User.Username}");
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Stats"), Summary("Shows information about Bot.")]
+        public async Task StatsAsync()
+        {
+            long length = new FileInfo(BotHandler.configPath).Length + new FileInfo(GuildHandler.configPath).Length;
+
+            string Description = $"{Format.Bold("Stats")}\n" +
+                $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
+                $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
+                $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
+                $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
+                $"- Databse Size: {length} Bytes\n" +
+                $"- Total Command Used: {BotHandler.BotConfig.CommandsUsed}\n" +
+                $"- Total Messages Received: {BotHandler.BotConfig.MessagesReceived}";
+
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
     }
