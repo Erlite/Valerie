@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Rick.Interfaces;
-using Rick.Services;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Rick.Enums;
 using Rick.Models;
+using Rick.Interfaces;
+using Rick.Services;
 
 namespace Rick.Handlers
 {
@@ -34,6 +34,9 @@ namespace Rick.Handlers
         {
             BotModel result = new BotModel();
 
+            Logger.Log("Hello and Welcome to Rick Bot's Configuration!\n" +
+                "Don't forget to leave a star on my Github Repo!\n" +
+                "Let's start Rick's Setup!\n");
             Logger.Log(LogType.Info, LogSource.Configuration, "Enter Bot's Token: ");
             result.BotToken = Console.ReadLine();
 
@@ -43,16 +46,38 @@ namespace Rick.Handlers
             Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bot DefaultPrefix: ");
             result.DefaultPrefix = Console.ReadLine();
 
-            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Bing API Key: ");
-            //result.BingAPIKey = Console.ReadLine();
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter BING API Key: ");
+            result.APIKeys.BingKey = Console.ReadLine();
 
-            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Mashape API Key: ");
-            //result.MashapeAPIKey = Console.ReadLine();
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Clever Bot API Key: ");
+            result.APIKeys.CleverBotKey = Console.ReadLine();
 
-            //Logger.Log(LogType.Info, LogSource.Configuration,"Enter Google API Key: ");
-            //result.GoogleAPIKey = Console.ReadLine();
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Google API Key: ");
+            result.APIKeys.GoogleKey = Console.ReadLine();
 
-            Logger.Log(LogType.Info, LogSource.Configuration, "Yes = Y || No = N");
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Mashape API Key: ");
+            result.APIKeys.MashapeKey = Console.ReadLine();
+
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Google Search Engine ID: ");
+            result.APIKeys.SearchEngineID = Console.ReadLine();
+
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Steam API Key: ");
+            result.APIKeys.SteamKey = Console.ReadLine();
+
+            Logger.Log("\n=== Twitter API Keys ===\n");
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Access Token: ");
+            result.Twitter.AccessToken = Console.ReadLine();
+
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Access Token Secret: ");
+            result.Twitter.AccessTokenSecret = Console.ReadLine();
+
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Consumer Key: ");
+            result.Twitter.ConsumerKey = Console.ReadLine();
+
+            Logger.Log(LogType.Info, LogSource.Configuration, "Enter Consumer Secret: ");
+            result.Twitter.ConsumerSecret = Console.ReadLine();
+            
+            Logger.Log("\nFor Yes please type: Y\nFor No please type: N\n\n");
 
             Logger.Log(LogType.Info, LogSource.Configuration,"Enable autoupdate? ");
             char update = Console.ReadLine().ToLower()[0];
