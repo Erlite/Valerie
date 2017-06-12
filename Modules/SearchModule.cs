@@ -1,18 +1,21 @@
 ﻿using System.Threading.Tasks;
-using Discord.Commands;
-using Discord;
 using System;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Linq;
+using Newtonsoft.Json;
+using Discord.Commands;
+using Discord;
 using AngleSharp;
 using AngleSharp.Dom.Html;
-using System.Linq;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Extensions;
-using Newtonsoft.Json;
 using Rick.Enums;
+using Rick.JsonResponse;
+using Rick.Services;
+using System.Text;
 
 namespace Rick.Modules
 {
@@ -189,6 +192,36 @@ namespace Rick.Modules
         {
             string MainUrl = $"https://api.adorable.io/avatars/500/{Name}.png";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("DuckDuckGo"), Alias("DDG"), Summary("Uses Duck Duck Go search engine to get your results."), Remarks("DDG Valley Forge National Park")]
+        public async Task DuckDuckGoAsync([Remainder] string Search)
+        {
+            var SB = new StringBuilder();
+            string APIUrl = $"http://api.duckduckgo.com/?q={Search.Replace(' ', '+')}&format=json&pretty=1";
+            var Response = await new HttpClient().GetAsync(APIUrl);
+            if (!Response.IsSuccessStatusCode)
+            {
+                await ReplyAsync(Response.ReasonPhrase); return;
+            }
+            var Convert = JsonConvert.DeserializeObject<DuckDuckGo>(await Response.Content.ReadAsStringAsync());
+            string Image = null;
+            if (Convert.Image == null || string.IsNullOrWhiteSpace(Convert.Image))
+                Image = "https://preview.ibb.co/e72xna/DDG.jpg";
+            else
+                Image = Convert.Image;
+
+            foreach (var Res in Convert.RelatedTopics.Take(3))
+            {
+                SB.AppendLine($"{Res.Text}\n{MethodsService.ShortenUrl(Res.FirstURL)}");
+            }
+            string Description = $"**{Convert.Heading}**\n" +
+                $"{Convert.Abstract}\n" +
+                $"{MethodsService.ShortenUrl(Convert.AbstractURL)}\n\n" +
+                $"**Related Topics:**\n" +
+                $"{SB.ToString()}";
+            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", Image, Description: Description, ThumbUrl: Image);
             await ReplyAsync("", embed: embed);
         }
     }
