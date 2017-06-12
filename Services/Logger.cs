@@ -92,5 +92,10 @@ namespace Rick.Services
 
             Append($" {message}", Color.Peru);
         }
+
+        public static void Log(string Text)
+        {
+            Append(Text, Color.Crimson);
+        }
     }
 }
