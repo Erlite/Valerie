@@ -251,12 +251,11 @@ namespace Rick.Modules
             await ReplyAsync("Restarted!");
         }
 
-        [Command("Info"), Summary("Normal Command"), Remarks("Shows application info")]
+        [Command("Dump"), Summary("Normal Command"), Remarks("Shows application info")]
         public async Task InfoAsync()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
             var AppInfo = Process.GetCurrentProcess();
-            var S = new StringBuilder();
             var Is64BitStr = Environment.Is64BitProcess ? "Yes" : "No";
             var Is64Bit = IntPtr.Size == 8 ? "Yes" : "No";
             var IsOS64 = Environment.Is64BitOperatingSystem ? "Yes" : "No";
@@ -289,7 +288,7 @@ namespace Rick.Modules
                                 $"- Virtual memory size: {AppInfo.VirtualMemorySize64.ToString()}\n" +
                                 $"- Paged memory size: {AppInfo.PagedMemorySize64.ToString()}\n\n" +
 
-                                $"{Format.Bold("OS and .Net")}" +
+                                $"{Format.Bold("OS and .Net")}\n" +
                                 $"- OS platform: {Environment.OSVersion.Platform.ToString()}\n" +
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
