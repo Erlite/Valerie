@@ -24,7 +24,7 @@ namespace Rick.Modules
         {
             var Str = new StringBuilder();
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
                 ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
@@ -37,7 +37,13 @@ namespace Rick.Modules
             {
                 Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{MethodsService.ShortenUrl(result.Link)}\n");
             }
-            await ReplyAsync("", embed: embed);
+
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+
+            if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
+                await ReplyAsync("No results found!");
+            else
+                await ReplyAsync("", embed: embed);
         }
 
         [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results."), Remarks("GImage Dank Memes")]
