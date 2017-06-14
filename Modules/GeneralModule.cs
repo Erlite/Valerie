@@ -544,7 +544,14 @@ namespace Rick.Modules
                 return;
             }
 
-            string TweetMsg = $"{TweetMessage} - {Context.User.Username}";
+            if (TweetMessage.Length <= 25)
+            {
+                await ReplyAsync("Tweet can't be less than 25 characters!");
+                return;
+            }
+
+            var Filter = MethodsService.Censor(TweetMessage);
+            string TweetMsg = $"{Filter}\nBy: {Context.User.Username}";
 
             if (TweetMsg.Length > 140)
             {
@@ -553,7 +560,9 @@ namespace Rick.Modules
             }
 
             Tweet.PublishTweet(TweetMsg);
-            var embed = EmbedExtension.Embed(EmbedColors.Green, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"{TweetMessage}\n{Context.User.Username}");
+            var embed = EmbedExtension.Embed(EmbedColors.Green, 
+                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description: $"{TweetMessage}\n{Context.User.Username}", FooterText:
+                "Don't forget to follow back: @Vuxey");
             await ReplyAsync("", embed: embed);
         }
 
@@ -573,6 +582,12 @@ namespace Rick.Modules
 
             var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Avatar"), Summary("Shows users avatar in higher resolution."), Remarks("Avatar @ExceptionDev")]
+        public async Task UserAvatarAsync(SocketGuildUser User)
+        {
+            await ReplyAsync(User.GetAvatarUrl(size: 2048));
         }
     }
 }
