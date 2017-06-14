@@ -14,6 +14,7 @@ using Google.Apis.Urlshortener.v1;
 using Google.Apis.Services;
 using Rick.Enums;
 using Rick.JsonResponse;
+using System.Text.RegularExpressions;
 
 namespace Rick.Services
 {
@@ -147,6 +148,13 @@ namespace Rick.Services
             var Refer = new Google.Apis.Urlshortener.v1.Data.Url();
             Refer.LongUrl = URL;
             return Service.Url.Insert(Refer).Execute().Id;
+        }
+
+        public static string Censor(string Text)
+        {
+            string SwearString = "\\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|a+s+s|f+a+g+g+o+t|g+a+y)(w+i+t+|e+r+|i+n+g+)?\\b";
+            Regex Swear = new Regex(SwearString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return Swear.Replace(Text, "***");
         }
 
     }
