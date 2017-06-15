@@ -492,8 +492,10 @@ namespace Rick.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
-            GC.Karma.TryGetValue(Context.User.Id, out int Karma);
-            if(GC.ChatKarma == false)
+            var karmalist = GC.Karma;
+            int Karma = karmalist[Context.User.Id];
+
+            if (GC.ChatKarma == false)
             {
                 await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
                 return;
@@ -530,7 +532,7 @@ namespace Rick.Modules
                 Karma -= Bet;
                 await ReplyAsync($"You lost {Bet}! :frowning: Your current Karma is {Karma}.");
             }
-
+            karmalist[Context.User.Id] = Karma;
             GuildHandler.GuildConfigs[Context.Guild.Id] = GC;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
