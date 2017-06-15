@@ -50,6 +50,9 @@ namespace Rick.Models
         [JsonProperty("Games")]
         public List<string> Games { get; set; } = new List<string>();
 
+        [JsonProperty("CensoredWords")]
+        public string CensoredWords { get; set; }
+
         public bool MentionPrefix(SocketUserMessage m, DiscordSocketClient c, ref int ap)
         {
             if (!MentionDefaultPrefix)

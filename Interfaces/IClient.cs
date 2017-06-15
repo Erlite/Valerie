@@ -20,6 +20,7 @@ namespace Rick.Interfaces
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
         List<string> Games { get; set; }
+        string CensoredWords { get; set; }
         bool MentionPrefix(SocketUserMessage message, DiscordSocketClient client, ref int argPos);
     }
 }
