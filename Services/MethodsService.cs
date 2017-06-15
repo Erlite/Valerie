@@ -152,8 +152,7 @@ namespace Rick.Services
 
         public static string Censor(string Text)
         {
-            string SwearString = "\\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|a+s+s|f+a+g+g+o+t|g+a+y)(w+i+t+|e+r+|i+n+g+)?\\b";
-            Regex Swear = new Regex(SwearString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Regex Swear = new Regex(BotHandler.BotConfig.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return Swear.Replace(Text, "***");
         }
 
