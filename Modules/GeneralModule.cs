@@ -537,37 +537,6 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(10)]
-        public async Task TweetAsync([Remainder] string TweetMessage)
-        {
-            if (TweetMessage.Length >= 120)
-            {
-                await ReplyAsync("Tweet can't be longer than 120 characters!");
-                return;
-            }
-
-            if (TweetMessage.Length <= 25)
-            {
-                await ReplyAsync("Tweet can't be less than 25 characters!");
-                return;
-            }
-
-            var Filter = MethodsService.Censor(TweetMessage);
-            string TweetMsg = $"{Filter}\nBy: {Context.User.Username}";
-
-            if (TweetMsg.Length > 140)
-            {
-                await ReplyAsync("Tweet's total length is greater than 140!");
-                return;
-            }
-
-            Tweet.PublishTweet(TweetMsg);
-            var embed = EmbedExtension.Embed(EmbedColors.Green, 
-                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description: $"{TweetMessage}\n{Context.User.Username}", FooterText:
-                "Don't forget to follow back: @Vuxey");
-            await ReplyAsync("", embed: embed);
-        }
-
         [Command("Stats"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
