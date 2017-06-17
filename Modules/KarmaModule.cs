@@ -63,8 +63,10 @@ namespace Rick.Modules
             }
 
             int Level =  MsgsService.GetLevelFromKarma(karma);
-            string Description = $"{Context.User.Username} has a total Karma of **{karma}** and User level is **{Level}**";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
+            string Description = $"{Context.User.Username} ({Level}) with {karma} karma.";
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ThumbUrl: Context.User.GetAvatarUrl());
+            embed.AddInlineField("Level", Level);
+            embed.AddInlineField("Karma", karma);
             await ReplyAsync("", embed: embed);
         }
 
@@ -86,7 +88,8 @@ namespace Rick.Modules
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
                 var Level = MsgsService.GetLevelFromKarma(val.Value);
-                Builder.AppendLine($"**{user.Username}** with **{val.Value}** karma and current level is **{Level}**");
+                //Builder.AppendLine($"{user.Username} | **Karma:** {val.Value} | **Level:** {Level}");
+                Builder.AppendLine($"{user.Username} - Karma: {val.Value} - Level: {Level}");
             }
             var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl, Description: Builder.ToString());
             await ReplyAsync("", embed: embed);
