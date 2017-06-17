@@ -14,6 +14,7 @@ namespace Rick.Handlers
         public static IClient BotConfig { get; set; }
 
         public static string Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+        public static string CacheFolder = Path.Combine(BotHandler.Data, "Cache");
 
         public const string configPath = "Data/BotConfig.json";
 
@@ -122,9 +123,10 @@ namespace Rick.Handlers
 
         public static void DirectoryCheck()
         {
-            var Data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
             if (!Directory.Exists(Data))
                 Directory.CreateDirectory(Data);
+            if (!Directory.Exists(CacheFolder))
+                Directory.CreateDirectory(CacheFolder);
         }
     }
 }
