@@ -15,6 +15,7 @@ using Google.Apis.Services;
 using Rick.Enums;
 using Rick.JsonResponse;
 using System.Text.RegularExpressions;
+using Tweetinvi;
 
 namespace Rick.Services
 {
@@ -27,7 +28,7 @@ namespace Rick.Services
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {
                     using (
-                        Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
+                        System.IO.Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(),
                                stream = new FileStream
                                    (filename, FileMode.Create, FileAccess.Write, FileShare.None, 3145728, true))
                     {
@@ -86,8 +87,7 @@ namespace Rick.Services
                 Logger.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
                 var Http = new HttpClient();
                 var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
-                int version = 0;
-                Int32.TryParse(GetUrl, out version);
+                Int32.TryParse(GetUrl, out int version);
                 if (BotHandler.BotVersion < version)
                 {
                     Logger.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
@@ -106,7 +106,7 @@ namespace Rick.Services
                         Logger.Log(LogType.Critical, LogSource.Configuration, $"Ignoring Update ...");
                 }
                 else
-                    Logger.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: ");
+                    Logger.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: {BotHandler.BotVersion}");
             }
             else
                 Logger.Log(LogType.Warning, LogSource.Configuration, $"Update is disabled! Continuing..");
@@ -154,6 +154,32 @@ namespace Rick.Services
         {
             Regex Swear = new Regex(BotHandler.BotConfig.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return Swear.Replace(Text, "***");
+        }
+
+        public static void ServicesLogin()
+        {
+            Auth.SetUserCredentials(BotHandler.BotConfig.Twitter.ConsumerKey, BotHandler.BotConfig.Twitter.ConsumerSecret,
+              BotHandler.BotConfig.Twitter.AccessToken, BotHandler.BotConfig.Twitter.AccessTokenSecret);
+            var AuthUser = User.GetAuthenticatedUser();
+            if (AuthUser == null)
+            {
+                Logger.Log(LogType.Critical, LogSource.Configuration, ExceptionHandler.GetLastException().TwitterDescription);
+            }
+            else
+                Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
+
+            try
+            {
+                CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
+                Logger.Log(LogType.Info, LogSource.Configuration, "Logged into CleverBot!");
+            }
+            catch (NullReferenceException Null)
+            {
+                if (BotHandler.BotConfig.APIKeys.CleverBotKey == null)
+                {
+                    Logger.Log(LogType.Critical, LogSource.Configuration, Null.Message);
+                }
+            }
         }
 
     }
