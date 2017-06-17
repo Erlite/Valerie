@@ -25,19 +25,16 @@ namespace Rick.Modules
         {
             string Description = 
                 "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Antiraid, Moneyshot, Clear\n" + 
-                "**Bing Commands:** BImage, BSearch\n" +
                 "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar\n" +
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar" +
+                "Karma, Rank, Top\n" +
                 "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
-                "**Github Commands:** [Group Name = Github] Userinfo\n" +
                 "**Google Commands:** Google, GImage, Youtube, Shorten\n" +
                 "**Guild Commands:** Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, Channel, Role\n**Example:** " +
                 "Channel Add #ChannelName, Role Add @RoleName\n" +
-                "**Karma Commands:** Karma, Rank, Top\n" + 
                 "**Nsfw Commands:** Boobs, Ass, E621\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Info, SendMsg\n" +
-                "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo\n" +
-                "**Steam Commands:** SNews, SUser\n" +
+                "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo, BImage, Bing, GitUser, SNews, Suser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
                 "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");

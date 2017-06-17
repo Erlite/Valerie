@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System;
+using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -15,7 +16,7 @@ using Rick.Extensions;
 using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Services;
-using System.Text;
+using Octokit;
 
 namespace Rick.Modules
 {
@@ -223,6 +224,189 @@ namespace Rick.Modules
                 $"{SB.ToString()}";
             var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", Image, Description: Description, ThumbUrl: Image);
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("BImage"), Summary("Performs a bing image search for your query and replies back with a random image."), Remarks("BImage Tiny Rick")]
+        public async Task ImageAsync([Remainder] string Query)
+        {
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                await ReplyAsync("A search term should be provided for me to search!");
+                return;
+            }
+            using (var httpClient = new HttpClient())
+            {
+                var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={Query}&count=50&offset=0&mkt=en-us&safeSearch=Off";
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
+                var res = await httpClient.GetAsync(link);
+                if (!res.IsSuccessStatusCode)
+                {
+                    await ReplyAsync($"An error occurred: {res.ReasonPhrase}");
+                    return;
+                }
+                JObject result = JObject.Parse(await res.Content.ReadAsStringAsync());
+                JArray arr = (JArray)result["value"];
+                if (arr.Count == 0)
+                {
+                    await ReplyAsync("No results found.");
+                    return;
+                }
+                var Random = new Random();
+                var RandomNum = Random.Next(1, 50);
+                JObject image = (JObject)arr[RandomNum];
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {Query.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
+                await ReplyAsync("", embed: embed);
+            }
+
+        }
+
+        [Command("Bing"), Summary("Performs a bing search for your query and replies back with 5 search results."), Remarks("Bing Tiny Rick")]
+        public async Task SearchAsync([Remainder]string Query)
+        {
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                await ReplyAsync("Search terms can't be empty!");
+                return;
+            }
+            using (var Http = new HttpClient())
+            {
+                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
+                var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
+                if (!GetRequest.IsSuccessStatusCode)
+                {
+                    await ReplyAsync(GetRequest.ReasonPhrase);
+                    return;
+                }
+                var getString = await GetRequest.Content.ReadAsStringAsync();
+                var Convert = JToken.Parse(getString).ToObject<SearchRoot>();
+                var str = new StringBuilder();
+                foreach (var result in Convert.webPages.value)
+                {
+                    str.AppendLine($"**{result.name}**\n{result.snippet}\n{MethodsService.ShortenUrl(result.displayUrl)}\n");
+                }
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {Query}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
+                await ReplyAsync("", embed: embed);
+            }
+        }
+
+        [Command("GitUser"), Summary("Searches Github for the specified user."), Remarks("GitUser ExceptionDev")]
+        public async Task UserInfoAsync(string user)
+        {
+            var github = new GitHubClient(new ProductHeaderValue("Rick"));
+            var usr = await github.User.Get(user);
+            string Description = $"**Bio:** {usr.Bio}\n**Public Repositories:** {usr.PublicRepos}\n**Private Repositories:** {usr.TotalPrivateRepos}\n**Followers:** {usr.Followers}\n**Company:** {usr.Company}";
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, usr.Name, usr.AvatarUrl, Description: Description);
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("SNews"), Summary("SNews 440"), Remarks("Shows news results for the game")]
+        public async Task NewsAsync(int ID)
+        {
+            var Httpclient = new HttpClient();
+            var RequestUrl = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid={ID}&count=5&maxlength=300&format=json");
+            if (!RequestUrl.IsSuccessStatusCode)
+            {
+                await ReplyAsync(RequestUrl.ReasonPhrase);
+                return;
+            }
+            var Content = await RequestUrl.Content.ReadAsStringAsync();
+            var Convert = JToken.Parse(Content).ToObject<SteamAppNews>();
+
+            var Builder = new EmbedBuilder()
+            {
+                Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"APP ID: {ID}",
+                    IconUrl = Context.User.GetAvatarUrl()
+                },
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Total Results: {Convert.appnews.count.ToString()}"
+                },
+                Color = new Color(124, 12, 57)
+            };
+
+            foreach (var Result in Convert.appnews.newsitems)
+            {
+                Builder.AddField(x =>
+                {
+                    x.Name = $"{Result.title} || {Result.feedlabel}";
+                    x.Value = $"{Result.contents}\n{Result.url}";
+                });
+            }
+            await ReplyAsync("", embed: Builder);
+        }
+
+        [Command("SUser"), Summary("Steam User 001100110011"), Remarks("Shows info about a steam user")]
+        public async Task UserAsync(ulong ID)
+        {
+            var Httpclient = new HttpClient();
+            string IPlayerService = "http://api.steampowered.com/IPlayerService/";
+            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamids={ID}");
+            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
+            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
+
+            if (!SummarURL.IsSuccessStatusCode || !GamesOwned.IsSuccessStatusCode || !RecentlyPlayed.IsSuccessStatusCode)
+            {
+                await ReplyAsync(SummarURL.ReasonPhrase);
+                return;
+            }
+
+            var SummaryContent = await SummarURL.Content.ReadAsStringAsync();
+            var SummaryConvert = JToken.Parse(SummaryContent).ToObject<PlayerSummary>();
+
+            var OGames = await GamesOwned.Content.ReadAsStringAsync();
+            var OGamesConvert = JToken.Parse(OGames).ToObject<OwnedGames>();
+
+            var RGames = await RecentlyPlayed.Content.ReadAsStringAsync();
+            var RGamesConvert = JToken.Parse(RGames).ToObject<GetRecent>();
+
+            var Info = SummaryConvert.response.players.FirstOrDefault();
+
+            string State;
+            if (Info.personastate == 0)
+                State = "Offline";
+            else if (Info.personastate == 1)
+                State = "Online";
+            else if (Info.personastate == 2)
+                State = "Busy";
+            else if (Info.personastate == 3)
+                State = "Away";
+            else if (Info.personastate == 4)
+                State = "Snooze";
+            else if (Info.personastate == 5)
+                State = "Looking to trade";
+            else
+                State = "Looking to play";
+
+            var Sb = new StringBuilder();
+
+            var Builder = new EmbedBuilder()
+            {
+                Color = new Color(124, 12, 57),
+                Author = new EmbedAuthorBuilder()
+                {
+                    Name = Info.realname,
+                    IconUrl = Info.avatarfull,
+                    Url = Info.profileurl
+                },
+                ThumbnailUrl = Info.avatarfull
+            };
+            Builder.AddInlineField("Display Name", $"{Info.personaname}");
+            Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");
+            Builder.AddInlineField("Person State", State);
+            Builder.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.timecreated));
+            Builder.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.lastlogoff));
+            Builder.AddInlineField("Primary Clan ID", Info.primaryclanid);
+            Builder.AddInlineField("Owned Games", OGamesConvert.response.game_count);
+            Builder.AddInlineField("Recently Played Games", RGamesConvert.response.total_count);
+            Sb.AppendLine(string.Join(", ", RGamesConvert.response.games.Select(game => game.name)));
+            Builder.Footer = new EmbedFooterBuilder()
+            {
+                Text = Sb.ToString()
+            };
+
+            await ReplyAsync("", embed: Builder);
         }
     }
 }
