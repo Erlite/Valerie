@@ -51,10 +51,7 @@ namespace Rick.Modules
                     x.IsInline = false;
                 });
             }
-            await (await Context.User.CreateDMChannelAsync()).SendMessageAsync("", embed: embed);
-
-
-
+            await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("", embed: embed);
         }
 
         [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]

@@ -113,7 +113,7 @@ namespace Rick.Services
                 $"Github: https://github.com/ExceptionDev/Rick\n" +
                 $"Please help support this Bot's development by leaving a star on the repo! That would be great! " +
                 $"If you come across any issues please feel free to join my guild: `https://discord.me/Noegenesis` or open a new issue on the repo! Thank you for choosing me!";
-            await (await Guild.Owner.CreateDMChannelAsync()).SendMessageAsync(Msg);
+            await (await Guild.Owner.GetOrCreateDMChannelAsync()).SendMessageAsync(Msg);
             await client.StopAsync();
             await Task.Delay(1000);
             await client.StartAsync();
