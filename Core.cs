@@ -9,7 +9,6 @@ using Rick.Services;
 using Rick.Handlers;
 using Rick.Enums;
 using Rick.Models;
-using Tweetinvi;
 
 namespace Rick
 {
@@ -51,12 +50,7 @@ namespace Rick
             Logger.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
             await MethodsService.ProgramUpdater();
 
-            CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
-            Logger.Log(LogType.Info, LogSource.Configuration, "Logged into CleverBot!");
-
-            Auth.SetUserCredentials(BotHandler.BotConfig.Twitter.ConsumerKey, BotHandler.BotConfig.Twitter.ConsumerSecret,
-                BotHandler.BotConfig.Twitter.AccessToken, BotHandler.BotConfig.Twitter.AccessTokenSecret);
-            Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
+            MethodsService.ServicesLogin();
 
             await client.LoginAsync(TokenType.Bot, BotHandler.BotConfig.BotToken);
             await client.StartAsync();
