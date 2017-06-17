@@ -333,6 +333,7 @@
     <Compile Include="Modules\SearchModule.cs" />
     <Compile Include="Modules\SteamModule.cs" />
     <Compile Include="Modules\TagModule.cs" />
+    <Compile Include="Modules\TwitterModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Extensions\EmbedExtension.cs" />
