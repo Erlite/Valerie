@@ -13,14 +13,24 @@ namespace Rick.Services
     {
         static List<ulong> WaitList = new List<ulong>();
 
+        public static int GetLevel(int Karma)
+        {
+            return 1 + (int)Math.Floor(Math.Pow(Karma, 1 / 3.0));
+        }
+
+        public static  int GetKarmaForLastLevel(int Level)
+        {
+            return (Level - 1) * (Level - 1) * (Level - 1);
+        }
+
+        public static int GetKarmaForNextLevel(int Level)
+        {
+            return Level * Level * Level;
+        }
+
         public static double GiveKarma(double karma)
         {
             return (Math.Pow(karma, 2) + 50 * karma) / 5;
-        }
-
-        public static int GetLevelFromKarma(double karma)
-        {
-            return Convert.ToInt32(Math.Sqrt(karma) / 5);
         }
 
         public static async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
@@ -54,10 +64,10 @@ namespace Rick.Services
                 }
                 else
                 {
-          //          if (WaitList.Contains(message.Author.Id))
-           //             return;
-              //      else
-             //       {
+                    //if (WaitList.Contains(message.Author.Id))
+                    //    return;
+                    //else
+                    //{
                         int getKarma = karmalist[message.Author.Id];
                         getKarma += Convert.ToInt32(RandomKarma);
                         karmalist[message.Author.Id] = getKarma;

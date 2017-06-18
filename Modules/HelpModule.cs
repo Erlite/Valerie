@@ -26,7 +26,7 @@ namespace Rick.Modules
             string Description = 
                 "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Antiraid, Moneyshot, Clear\n" + 
                 "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar" +
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar, " +
                 "Karma, Rank, Top\n" +
                 "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
                 "**Google Commands:** Google, GImage, Youtube, Shorten\n" +

@@ -507,7 +507,7 @@ namespace Rick.Modules
                 return;
             }
 
-            if (Karma < Bet || Karma <=0)
+            if (Karma < Bet || Karma <= 0)
             {
                 await ReplyAsync("You don't have enough karma!");
                 return;
@@ -519,12 +519,12 @@ namespace Rick.Modules
                 return;
             }
 
-            string[] Sides = { "Heads", "Tails"};
+            string[] Sides = { "Heads", "Tails" };
             var GetSide = Sides[new Random().Next(0, Sides.Length)];
-            
-            if(Side.ToLower() == GetSide.ToLower())
+
+            if (Side.ToLower() == GetSide.ToLower())
             {
-                Karma += Bet*2;
+                Karma += Bet * 2;
                 await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {Karma}.");
             }
             else
@@ -608,11 +608,14 @@ namespace Rick.Modules
                 return;
             }
 
-            int Level = MsgsService.GetLevelFromKarma(karma);
-            string Description = $"{Context.User.Username} ({Level}) with {karma} karma.";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ThumbUrl: Context.User.GetAvatarUrl());
+            int Level = MsgsService.GetLevel(karma);
+            int KarmaLast = MsgsService.GetKarmaForLastLevel(Level);
+            int KarmaNext = MsgsService.GetKarmaForNextLevel(Level);
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.User.Username} Rankings", Context.User.GetAvatarUrl(), ThumbUrl: Context.User.GetAvatarUrl());
             embed.AddInlineField("Level", Level);
             embed.AddInlineField("Karma", karma);
+            embed.AddInlineField("Karma Required For Last Level", KarmaLast);
+            embed.AddInlineField("Karma Required For Next Level", KarmaNext);
             await ReplyAsync("", embed: embed);
         }
 
@@ -622,8 +625,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
-            StringBuilder Builder = new StringBuilder();
-
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl);
             if (karmalist.Count <= 0)
             {
                 await ReplyAsync("Guild's Karma list is empty!");
@@ -633,13 +635,10 @@ namespace Rick.Modules
             foreach (var val in filter)
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
-                var Level = MsgsService.GetLevelFromKarma(val.Value);
-                //Builder.AppendLine($"{user.Username} | **Karma:** {val.Value} | **Level:** {Level}");
-                Builder.AppendLine($"{user.Username} - Karma: {val.Value} - Level: {Level}");
+                var Level = MsgsService.GetLevel(val.Value);
+                embed.AddInlineField(user.Username, $"**Karma:** {val.Value} | **Level:** {Level}");
             }
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl, Description: Builder.ToString());
             await ReplyAsync("", embed: embed);
         }
-
     }
 }
