@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Threading;
 using Discord.WebSocket;
 using Rick.Handlers;
 using CleverbotLib.Models;
