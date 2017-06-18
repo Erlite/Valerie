@@ -64,6 +64,7 @@ namespace Rick.Modules
             var embed = EmbedExtension.Embed(EmbedColors.Green,
                 $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description: 
                 $"**Tweet:** {TweetMessage}\n" +
+                $"**Tweet ID:** {tweet.Id}\n" +
                 $"[@Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})", ThumbUrl: ThumbImage);
             await ReplyAsync("", embed: embed);
         }
@@ -101,7 +102,7 @@ namespace Rick.Modules
             if (GetTweet.IsTweetPublished)
             {
                 var Success = Tweet.DestroyTweet(GetTweet);
-                await ReplyAsync($"Tweet with {ID} has been deleted!");
+                await ReplyAsync($"Tweet with {ID} ID has been deleted!");
             }
         }
 
