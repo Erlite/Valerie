@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Timer = System.Timers.Timer;
+using System.Threading;
 using Discord.WebSocket;
 using Rick.Handlers;
 using CleverbotLib.Models;
@@ -13,12 +13,30 @@ namespace Rick.Services
     {
         static List<ulong> WaitList = new List<ulong>();
 
+        //public MsgsService()
+        //{
+        //    _timer = new Timer(x =>
+        //    {
+        //        WaitList.Remove()
+        //    },
+        //    null,
+        //    TimeSpan.FromSeconds(1),
+        //    TimeSpan.FromSeconds(1)
+        //    );
+        //}
+
+        #region Karma Related Methods
+        public static int GiveKarma(int karma)
+        {
+            return (Convert.ToInt32(Math.Pow(karma, 3)) + 50 * karma) / 5;
+        }
+
         public static int GetLevel(int Karma)
         {
             return 1 + (int)Math.Floor(Math.Pow(Karma, 1 / 3.0));
         }
 
-        public static  int GetKarmaForLastLevel(int Level)
+        public static int GetKarmaForLastLevel(int Level)
         {
             return (Level - 1) * (Level - 1) * (Level - 1);
         }
@@ -27,11 +45,8 @@ namespace Rick.Services
         {
             return Level * Level * Level;
         }
+        #endregion
 
-        public static double GiveKarma(double karma)
-        {
-            return (Math.Pow(karma, 2) + 50 * karma) / 5;
-        }
 
         public static async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
         {
@@ -45,51 +60,32 @@ namespace Rick.Services
         public static async Task ChatKarmaAsync(SocketUserMessage message, SocketGuild gld)
         {
             var Guilds = GuildHandler.GuildConfigs[gld.Id];
-            if (message.Author.IsBot || !Guilds.ChatKarma) return;
+            if (message.Author.IsBot || !Guilds.IsKarmaEnabled) return;
 
-            //Timer MinuteTimer = new Timer(60000);
-            //MinuteTimer.AutoReset = true;
-            //MinuteTimer.Elapsed += ElapsedTime;
-            //MinuteTimer.Start();
-
-            Random rand = new Random();
-            double RandomKarma = rand.Next(1, 10);
-            RandomKarma = GiveKarma(RandomKarma);
-            if (Guilds.ChatKarma)
+            var GetRandom = new Random().Next(1, 10);
+            var RandomKarma = GiveKarma(GetRandom);
+            var karmalist = Guilds.KarmaList;
+            if (!karmalist.ContainsKey(message.Author.Id))
             {
-                var karmalist = Guilds.Karma;
-                if (!karmalist.ContainsKey(message.Author.Id))
-                {
-                    karmalist.Add(message.Author.Id, Convert.ToInt32(RandomKarma));
-                }
-                else
-                {
-                    //if (WaitList.Contains(message.Author.Id))
-                    //    return;
-                    //else
-                    //{
-                        int getKarma = karmalist[message.Author.Id];
-                        getKarma += Convert.ToInt32(RandomKarma);
-                        karmalist[message.Author.Id] = getKarma;
-                        //WaitList.Add(message.Author.Id);
-                        //ConsoleService.Log(Enums.LogType.Received, Enums.LogSource.Client, $"Added {message.Author.Username} to Waitlist!");
-                    //}
-                }
-                GuildHandler.GuildConfigs[gld.Id] = Guilds;
-                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
+                karmalist.Add(message.Author.Id, RandomKarma);
+                return;
             }
-        }
 
-        //private static void ElapsedTime(object sender, System.Timers.ElapsedEventArgs e)
-        //{
-        //    if (WaitList.Contains(User.Id))
-        //        WaitList.Remove(User.Id);
-        //}
+            //if (WaitList.Contains(message.Author.Id))
+            //    return;
+
+            int getKarma = karmalist[message.Author.Id];
+            getKarma += RandomKarma;
+            karmalist[message.Author.Id] = getKarma;
+
+            GuildHandler.GuildConfigs[gld.Id] = Guilds;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
+        }
 
         public static async Task CleverBot(SocketUserMessage message, SocketGuild gld)
         {
-            var IsEnabled = GuildHandler.GuildConfigs[gld.Id].ChatterBot;
-            if (message.Author.IsBot ||  !IsEnabled || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
+            var IsEnabled = GuildHandler.GuildConfigs[gld.Id].IsChatterBotEnabled;
+            if (message.Author.IsBot || !IsEnabled || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
             string UserMsg = null;
             if (message.Content.Contains(BotHandler.BotConfig.BotName))
             {

@@ -21,11 +21,11 @@ namespace Rick.Models
         [JsonProperty("CaseNumber")]
         public int CaseNumber { get; set; }
 
-        [JsonProperty("ChatKarma")]
-        public bool ChatKarma { get; set; }
+        [JsonProperty("IsKarmaEnabled")]
+        public bool IsKarmaEnabled { get; set; }
 
-        [JsonProperty("ChatterBot")]
-        public bool ChatterBot { get; set; }
+        [JsonProperty("IsChatterBotEnabled")]
+        public bool IsChatterBotEnabled { get; set; }
 
         [JsonProperty("JoinEvent")]
         public EventWrapper JoinEvent { get; set; } = new EventWrapper();
@@ -49,6 +49,6 @@ namespace Rick.Models
         public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
 
         [JsonProperty("KarmaList")]
-        public Dictionary<ulong, int> Karma { get; set; } = new Dictionary<ulong, int>();
+        public Dictionary<ulong, int> KarmaList { get; set; } = new Dictionary<ulong, int>();
     }
 }

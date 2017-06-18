@@ -377,10 +377,10 @@ namespace Rick.Modules
             };
             var Rand = new Random(DateTime.Now.Millisecond);
             var Guilds = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = Guilds.Karma;
+            var karmalist = Guilds.KarmaList;
             int Credits = karmalist[Context.User.Id];
 
-            if (Guilds.ChatKarma == false)
+            if (Guilds.IsKarmaEnabled == false)
             {
                 await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
                 return;
@@ -492,10 +492,10 @@ namespace Rick.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = GC.Karma;
+            var karmalist = GC.KarmaList;
             int Karma = karmalist[Context.User.Id];
 
-            if (GC.ChatKarma == false)
+            if (GC.IsKarmaEnabled == false)
             {
                 await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
                 return;
@@ -566,7 +566,7 @@ namespace Rick.Modules
         {
             if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
             var gldConfig = GuildHandler.GuildConfigs[user.GuildId];
-            var karmalist = gldConfig.Karma;
+            var karmalist = gldConfig.KarmaList;
             int UserKarma = karmalist[Context.User.Id];
 
             if (Karma <= 0)
@@ -609,7 +609,7 @@ namespace Rick.Modules
                 KarmaUser = Context.User as SocketGuildUser;
 
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = gldConfig.Karma;
+            var karmalist = gldConfig.KarmaList;
             karmalist.TryGetValue(KarmaUser.Id, out int karma);
             if (karma <= 0 || !karmalist.ContainsKey(KarmaUser.Id))
             {
@@ -632,7 +632,7 @@ namespace Rick.Modules
         public async Task TopAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = gldConfig.Karma;
+            var karmalist = gldConfig.KarmaList;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
             var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl);
             if (karmalist.Count <= 0)

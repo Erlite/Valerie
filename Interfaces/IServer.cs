@@ -10,8 +10,8 @@ namespace Rick.Interfaces
         ulong ModChannelID { get; set; }
         ulong MuteRoleId { get; set; }
         int CaseNumber { get; set; }
-        bool ChatKarma { get; set; }
-        bool ChatterBot { get; set; }
+        bool IsKarmaEnabled { get; set; }
+        bool IsChatterBotEnabled { get; set; }
         EventWrapper JoinEvent { get; set; }
         EventWrapper LeaveEvent { get; set; }
         EventWrapper UserBanned { get; set; }
@@ -19,6 +19,6 @@ namespace Rick.Interfaces
         List<string> RequiredChannelNames { get; set; }
         List<TagsModel> TagsList { get; set; }
         Dictionary<ulong, string> AfkList { get; set; }
-        Dictionary<ulong, int> Karma { get; set; }
+        Dictionary<ulong, int> KarmaList { get; set; }
     }
 }

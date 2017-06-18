@@ -161,9 +161,9 @@ namespace Rick.Services
         {
             var GC = GuildHandler.GuildConfigs[User.Guild.Id];
 
-            if (GC.Karma.ContainsKey(User.Id))
+            if (GC.KarmaList.ContainsKey(User.Id))
             {
-                GC.Karma.Remove(User.Id);
+                GC.KarmaList.Remove(User.Id);
                 Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
             }
             foreach (var tag in GC.TagsList)

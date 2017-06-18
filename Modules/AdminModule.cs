@@ -143,9 +143,9 @@ namespace Rick.Modules
             var Random = new Random();
             int Karma = Random.Next(100, 500);
             var GldCfg = GuildHandler.GuildConfigs[Context.Guild.Id];
-            foreach(var Key in GldCfg.Karma.Keys.ToList())
+            foreach(var Key in GldCfg.KarmaList.Keys.ToList())
             {
-                GldCfg.Karma[Key] += Karma;
+                GldCfg.KarmaList[Key] += Karma;
             }
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             if (Karma > 300)
@@ -158,7 +158,7 @@ namespace Rick.Modules
         public async Task ClearAsync()
         {
             var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            GuildConfig.Karma.Clear();
+            GuildConfig.KarmaList.Clear();
             GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("Karma Leaderboard has been cleared!");

@@ -66,16 +66,16 @@ namespace Rick.Modules
                 TagList = $"{Context.Guild.Name}'s Tag list contains {GConfig.TagsList.Count} tags.";
 
             string KarmaList = null;
-            if (GConfig.Karma.Count <= 0)
+            if (GConfig.KarmaList.Count <= 0)
                 KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
             else
-                KarmaList = $"{Context.Guild.Name}'s Karma list contains {GConfig.Karma.Count} members.";
+                KarmaList = $"{Context.Guild.Name}'s Karma list contains {GConfig.KarmaList.Count} members.";
 
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
             var Bans = GConfig.UserBanned.IsEnabled ? "Enabled" : "Disabled";
-            var Karma = GConfig.ChatKarma ? "Enabled" : "Disabled";
-            var Chatterbot = GConfig.ChatterBot ? "Enabled" : "Disabled";
+            var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
+            var IsChatterBotEnabled = GConfig.IsChatterBotEnabled ? "Enabled" : "Disabled";
 
             foreach (var Names in GConfig.RequiredChannelNames)
             {
@@ -113,7 +113,7 @@ namespace Rick.Modules
                 $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
                 $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
                 $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
-                $"**Chatter Bot:** {GConfig.ChatterBot}\n" +
+                $"**Chatter Bot:** {GConfig.IsChatterBotEnabled}\n" +
                 $"**Chat Karma:** {Karma}\n" +
                 $"**Karma List:** {KarmaList}\n" +
                 $"**AFK List:** {AFKList}\n" +
@@ -191,34 +191,34 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.ChatKarma)
+            if (!gldConfig.IsKarmaEnabled)
             {
-                gldConfig.ChatKarma = true;
+                gldConfig.IsKarmaEnabled = true;
                 await ReplyAsync(":gear: Users will now be awarded random Karma based on their chat activity!");
             }
             else
             {
-                gldConfig.ChatKarma = false;
+                gldConfig.IsKarmaEnabled = false;
                 await ReplyAsync(":skull_crossbones: Auto Karma disabled!.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
-        public async Task ToggleChatterBotAsync()
+        [Command("ToggleIsChatterBotEnabled"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
+        public async Task ToggleIsChatterBotEnabledAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.ChatterBot)
+            if (!gldConfig.IsChatterBotEnabled)
             {
-                gldConfig.ChatterBot = true;
-                await ReplyAsync(":gear: Chatterbot enabled!");
+                gldConfig.IsChatterBotEnabled = true;
+                await ReplyAsync(":gear: Chatter bot enabled!");
             }
             else
             {
-                gldConfig.ChatterBot = false;
-                await ReplyAsync(":skull_crossbones: Chatterbot disabled!");
+                gldConfig.IsChatterBotEnabled = false;
+                await ReplyAsync(":skull_crossbones: Chatter bot disabled!");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
