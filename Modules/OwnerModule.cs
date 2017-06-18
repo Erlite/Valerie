@@ -299,12 +299,5 @@ namespace Rick.Modules
         {
             var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
         }
-
-        [Command("Stop")]
-        public async Task StopAsync()
-        {
-            await Context.Client.StopAsync();
-        }
-
     }
 }

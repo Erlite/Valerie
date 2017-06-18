@@ -580,6 +580,7 @@ namespace Rick.Modules
                 await ReplyAsync("You don't have enough karma!");
                 return;
             }
+
             if (!karmalist.ContainsKey(user.Id))
             {
                 karmalist.Add(user.Id, 1);
@@ -589,7 +590,9 @@ namespace Rick.Modules
             {
                 int getKarma = karmalist[user.Id];
                 getKarma += Karma;
+                UserKarma -= Karma;
                 karmalist[user.Id] = getKarma;
+                karmalist[Context.User.Id] = UserKarma;
                 await ReplyAsync($"Gave {Karma} Karma to {user.Username}");
             }
             GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
@@ -597,12 +600,18 @@ namespace Rick.Modules
         }
 
         [Command("Rank"), Summary("Normal Command"), Remarks("Shows how much Karma you have")]
-        public async Task GetKarmaAsync()
+        public async Task GetKarmaAsync(SocketGuildUser User = null)
         {
+            SocketGuildUser KarmaUser = null;
+            if (User != null)
+                KarmaUser = User;
+            else
+                KarmaUser = Context.User as SocketGuildUser;
+
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.Karma;
-            karmalist.TryGetValue(Context.User.Id, out int karma);
-            if (karma <= 0 || !karmalist.ContainsKey(Context.User.Id))
+            karmalist.TryGetValue(KarmaUser.Id, out int karma);
+            if (karma <= 0 || !karmalist.ContainsKey(KarmaUser.Id))
             {
                 await ReplyAsync("User doesn't exist or no Karma was found!");
                 return;
@@ -611,7 +620,7 @@ namespace Rick.Modules
             int Level = MsgsService.GetLevel(karma);
             int KarmaLast = MsgsService.GetKarmaForLastLevel(Level);
             int KarmaNext = MsgsService.GetKarmaForNextLevel(Level);
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.User.Username} Rankings", Context.User.GetAvatarUrl(), ThumbUrl: Context.User.GetAvatarUrl());
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{KarmaUser.Username} Rankings", KarmaUser.GetAvatarUrl(), ThumbUrl: KarmaUser.GetAvatarUrl());
             embed.AddInlineField("Level", Level);
             embed.AddInlineField("Karma", karma);
             embed.AddInlineField("Karma Required For Last Level", KarmaLast);
