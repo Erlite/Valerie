@@ -12,18 +12,6 @@ namespace Rick.Services
     {
         static List<ulong> WaitList = new List<ulong>();
 
-        //public MsgsService()
-        //{
-        //    _timer = new Timer(x =>
-        //    {
-        //        WaitList.Remove()
-        //    },
-        //    null,
-        //    TimeSpan.FromSeconds(1),
-        //    TimeSpan.FromSeconds(1)
-        //    );
-        //}
-
         #region Karma Related Methods
         public static int GiveKarma(int karma)
         {
@@ -69,10 +57,7 @@ namespace Rick.Services
                 karmalist.Add(message.Author.Id, RandomKarma);
                 return;
             }
-
-            //if (WaitList.Contains(message.Author.Id))
-            //    return;
-
+            
             int getKarma = karmalist[message.Author.Id];
             getKarma += RandomKarma;
             karmalist[message.Author.Id] = getKarma;
@@ -86,7 +71,7 @@ namespace Rick.Services
             var IsEnabled = GuildHandler.GuildConfigs[gld.Id].IsChatterBotEnabled;
             if (message.Author.IsBot || !IsEnabled || !message.Content.StartsWith(BotHandler.BotConfig.BotName)) return;
             string UserMsg = null;
-            if (message.Content.Contains(BotHandler.BotConfig.BotName))
+            if (message.Content.StartsWith(BotHandler.BotConfig.BotName))
             {
                 UserMsg = message.Content.Replace(BotHandler.BotConfig.BotName, "");
             }
