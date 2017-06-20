@@ -131,6 +131,15 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Nito.AsyncEx.Context, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.AsyncEx.Context.5.0.0-pre-02\lib\netstandard1.3\Nito.AsyncEx.Context.dll</HintPath>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Tasks, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.AsyncEx.Tasks.5.0.0-pre-02\lib\netstandard1.3\Nito.AsyncEx.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Nito.Disposables, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Nito.Disposables.1.1.0\lib\portable45-net45+win8+wp8+wpa81\Nito.Disposables.dll</HintPath>
+    </Reference>
     <Reference Include="Octokit, Version=0.24.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Octokit.0.24.1-alpha0001\lib\net45\Octokit.dll</HintPath>
     </Reference>
@@ -230,6 +239,9 @@
     <Reference Include="System.Reflection.Metadata, Version=1.4.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Reflection.Metadata.1.5.0-preview1-25305-02\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reflection.TypeExtensions, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reflection.TypeExtensions.4.4.0-preview1-25305-02\lib\net461\System.Reflection.TypeExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
     </Reference>
@@ -276,8 +288,32 @@
     <Reference Include="System.Xml.XPath.XDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="Tweetinvi, Version=1.3.0.0, Culture=neutral, PublicKeyToken=7247f14397bf67b9, processorArchitecture=MSIL">
-      <HintPath>packages\TweetinviAPI.1.3.0\lib\net45\Tweetinvi.dll</HintPath>
+    <Reference Include="Tweetinvi, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Controllers, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Controllers.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Credentials, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Credentials.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Factories, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Factories.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Logic, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Logic.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Security, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.Streams, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.Streams.dll</HintPath>
+    </Reference>
+    <Reference Include="Tweetinvi.WebLogic, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TweetinviAPI.2.0.0\lib\net46\Tweetinvi.WebLogic.dll</HintPath>
     </Reference>
     <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
       <HintPath>packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
