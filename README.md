@@ -18,6 +18,8 @@ Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net
 
 If you clone this project or fork it or like it, please do leave a star. It does help a lot! Also, please do credit me in your program/Bot if you use my code.
 
+Command List: https://rickbot.cf/Commands.html
+
 [Add Rick to your server](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)
 
 
