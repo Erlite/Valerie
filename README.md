@@ -12,7 +12,8 @@ Docs -- .Net -- 0
 <br>
 </p>
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cs062nlbc9pbycg3?svg=true)](https://ci.appveyor.com/project/Yivlx/rick)
+[![Build status](https://ci.appveyor.com/api/projects/status/cs062nlbc9pbycg3?svg=true)](https://ci.appveyor.com/project/Vux/rick)
+[![Build Status](https://travis-ci.org/ExceptionDev/Rick.svg?branch=master)](https://travis-ci.org/ExceptionDev/Rick)
 
 Rick is written in C# using Discord.Net library 1.0 Beta latest version and .Net framework 4.6.1. Please don't bully Rick because Rick is old. Rick has over 70+ Commands which include Admin, Owner, Fun, Google, Bing, Other APIs, Karma, Tags, Github, NSFW and many more! You can also use .Net Framework 4.7 and .Net core (Some modules might not work in .Net Core).
 
