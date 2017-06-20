@@ -1,7 +1,8 @@
-configuration: release
+version: 1.4.{build}
 before_build:
-  - nuget restore
-
-build:
-  verbosity: minimal
-  publish_wap: true
+- cmd: >-
+    dotnet restore
+    cd src/Rick/
+build_script:
+- cmd: >-
+    dotnet build
