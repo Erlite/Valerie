@@ -1,6 +1,0 @@
-language: csharp
-solution: Rick.sln
-mono: latest
-install:
-  - sudo apt-get Install-Package Discord.Net -Version 1.0.0-rc2 -Pre
-  - nuget restore Rick.sln

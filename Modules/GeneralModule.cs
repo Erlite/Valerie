@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Extensions;
-using Tweetinvi;
 using System.IO;
 
 namespace Rick.Modules

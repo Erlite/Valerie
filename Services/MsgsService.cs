@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Discord.WebSocket;
 using Rick.Handlers;
-using CleverbotLib.Models;
+using Rick.CleverbotLib.Models;
 
 namespace Rick.Services
 {

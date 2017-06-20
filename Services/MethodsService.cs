@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
-using Rick.Handlers;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Google.Apis.Urlshortener.v1;
 using Google.Apis.Services;
 using Rick.Enums;
 using Rick.JsonResponse;
-using System.Text.RegularExpressions;
+using Rick.Handlers;
 using Tweetinvi;
 
 namespace Rick.Services
@@ -79,39 +79,6 @@ namespace Rick.Services
             yield return typeof(ILookup<string, string>).GetTypeInfo().Assembly;
         }
 
-        public static async Task ProgramUpdater()
-        {
-            var BotConfig = BotHandler.BotConfig;
-            if (BotConfig.AutoUpdate)
-            {
-                Logger.Log(LogType.Info, LogSource.Configuration, "Checking for updates ..");
-                var Http = new HttpClient();
-                var GetUrl = await Http.GetStringAsync("https://exceptiondev.github.io/Downloads/version.txt");
-                Int32.TryParse(GetUrl, out int version);
-                if (BotHandler.BotVersion < version)
-                {
-                    Logger.Log(LogType.Info, LogSource.Configuration, $"New version is available! Version: {version}.\nWould you like to update now? ");
-                    Logger.Log(LogType.Info, LogSource.Configuration, "Type Yes to update!");
-                    var Response = Console.ReadLine().ToLower();
-                    if (Response == "yes")
-                    {
-                        Logger.Log(LogType.Info, LogSource.Configuration, $"Downloading Update .... ");
-                        Uri url = new Uri("https://exceptiondev.github.io/Downloads/Installer.bat");
-                        await Http.DownloadAsync(url, "Installer.bat");
-                        Process.Start("Installer.bat");
-                        await Task.Delay(5000);
-                        Process.GetCurrentProcess().Kill();
-                    }
-                    else
-                        Logger.Log(LogType.Critical, LogSource.Configuration, $"Ignoring Update ...");
-                }
-                else
-                    Logger.Log(LogType.Info, LogSource.Configuration, $"Already using the latest version: {BotHandler.BotVersion}");
-            }
-            else
-                Logger.Log(LogType.Warning, LogSource.Configuration, $"Update is disabled! Continuing..");
-        }
-
         public static async Task<WatsonModel> Translate(string dest, string text)
         {
             string json = null;
@@ -163,24 +130,12 @@ namespace Rick.Services
             var AuthUser = User.GetAuthenticatedUser();
             if (AuthUser == null)
             {
-                Logger.Log(LogType.Critical, LogSource.Configuration, ExceptionHandler.GetLastException().TwitterDescription);
+                Logger.Log(LogType.Error, LogSource.Configuration, ExceptionHandler.GetLastException().TwitterDescription);
             }
             else
                 Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
 
-            try
-            {
-                CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
-                Logger.Log(LogType.Info, LogSource.Configuration, "Logged into CleverBot!");
-            }
-            catch (NullReferenceException Null)
-            {
-                if (BotHandler.BotConfig.APIKeys.CleverBotKey == null)
-                {
-                    Logger.Log(LogType.Critical, LogSource.Configuration, Null.Message);
-                }
-            }
+            CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
         }
-
     }
 }

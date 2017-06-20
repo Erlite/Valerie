@@ -4,9 +4,6 @@
     {
         Info,
         Error,
-        Critical,
-        Execute,
-        Warning,
-        Received,
+        Warning
     }
 }

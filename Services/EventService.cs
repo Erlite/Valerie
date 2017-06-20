@@ -152,9 +152,6 @@ namespace Rick.Services
             }
             else
                 await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
-            Logger.Log(LogType.Info, LogSource.Client, $"Total Guilds: {client.Guilds.Count}");
-            Logger.Log(LogType.Info, LogSource.Client, $"Total Users: {client.Guilds.Sum(x => x.Users.Count)}");
-            Logger.Log(LogType.Info, LogSource.Client, $"Total Channels: {client.Guilds.Sum(x => x.Channels.Count)}");
         }
 
         public static async Task HandleGuildsTasks(SocketGuildUser User)

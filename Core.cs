@@ -4,7 +4,6 @@ using System;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Discord.Net.Providers.WS4Net;
 using Rick.Services;
 using Rick.Handlers;
 using Rick.Enums;
@@ -24,7 +23,6 @@ namespace Rick
 
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
-                WebSocketProvider = WS4NetProvider.Instance,
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 10000,
                 AlwaysDownloadUsers = true,
@@ -48,7 +46,7 @@ namespace Rick
             BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
             Logger.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
-            await MethodsService.ProgramUpdater();
+            RickUpdater.ProgramUpdater();
 
             MethodsService.ServicesLogin();
 

@@ -5,8 +5,6 @@
         Client,
         ParseError,
         PreConditionError,
-        ExecutionError,
         Configuration,
-        CommandExecution
     }
 }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Rick.Enums;
-using System.Drawing;
-using Console = Colorful.Console;
 
 namespace Rick.Services
 {
@@ -30,7 +28,7 @@ namespace Rick.Services
             Console.Write(Environment.NewLine + (string.Join(Environment.NewLine, card)));
         }
 
-        static void Append(string text, Color foreground)
+        static void Append(string text, ConsoleColor foreground)
         {
             Console.ForegroundColor = foreground;
             Console.Write(text);
@@ -42,28 +40,16 @@ namespace Rick.Services
 
             switch (Severity)
             {
-                case LogType.Critical:
-                    Append($"[{Severity}]", Color.Red);
-                    break;
-
                 case LogType.Error:
-                    Append($"[{Severity}]", Color.Maroon);
-                    break;
-
-                case LogType.Execute:
-                    Append($"[{Severity}]", Color.OrangeRed);
+                    Append($"[{Severity}]", ConsoleColor.Red);
                     break;
 
                 case LogType.Info:
-                    Append($"[{Severity}]", Color.Coral);
-                    break;
-
-                case LogType.Received:
-                    Append($"[{Severity}]", Color.ForestGreen);
+                    Append($"[{Severity}]", ConsoleColor.Cyan);
                     break;
 
                 case LogType.Warning:
-                    Append($"[{Severity}]", Color.Yellow);
+                    Append($"[{Severity}]", ConsoleColor.Yellow);
                     break;
 
             }
@@ -71,31 +57,25 @@ namespace Rick.Services
             switch (Source)
             {
                 case LogSource.Client:
-                    Append($"[{Source}]", Color.Firebrick);
-                    break;
-                case LogSource.CommandExecution:
-                    Append($"[{Source}]", Color.MediumOrchid);
+                    Append($"[{Source}]", ConsoleColor.DarkMagenta);
                     break;
                 case LogSource.Configuration:
-                    Append($"[{Source}]", Color.Turquoise);
-                    break;
-                case LogSource.ExecutionError:
-                    Append($"[{Severity}]", Color.HotPink);
+                    Append($"[{Source}]", ConsoleColor.DarkGreen);
                     break;
                 case LogSource.ParseError:
-                    Append($"[{Severity}]", Color.Ivory);
+                    Append($"[{Severity}]", ConsoleColor.DarkRed);
                     break;
                 case LogSource.PreConditionError:
-                    Append($"[{Severity}]", Color.IndianRed);
+                    Append($"[{Severity}]", ConsoleColor.DarkRed);
                     break;
             }
 
-            Append($" {message}", Color.Peru);
+            Append($" {message}", ConsoleColor.Gray);
         }
 
         public static void Log(string Text)
         {
-            Append(Text, Color.Crimson);
+            Append(Text, ConsoleColor.Yellow);
         }
     }
 }
