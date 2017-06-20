@@ -1,13 +1,19 @@
 language: csharp
 solution: Rick.sln
+git:
+  depth: 1
+branches:
+  only:
+  - master
 matrix:
   include:
   - os: linux
     dist: trusty
     sudo: required
-    env: DOTNETCORE=1
-before_install:
-  - sudo apt-get update
+    mono: none
+    dotnet: 2.0.0-preview1-002111-00
+    env: DOTNETCORE=2
+script:
   - sudo apt-get install dotnet-dev-1.0.0-rc4-004771
-install:
-  - nuget restore Rick.sln
+  - dotnet restore --configfile nuget.config
+  - dotnet build
