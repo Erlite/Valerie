@@ -2,7 +2,6 @@ version: 1.4.{build}
 before_build:
 - cmd: >-
     dotnet restore
-    cd src/Rick/
 build_script:
 - cmd: >-
     dotnet build
