@@ -1,0 +1,4 @@
+language: csharp
+solution: Rick.sln
+install:
+  - nuget restore Rick.sln
