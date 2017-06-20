@@ -293,3 +293,4 @@ config.codekit3
 # Custom
 *.vs/
 packages/
+data/
