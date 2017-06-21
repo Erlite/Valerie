@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using System.IO;
-using Rick.Models;
-using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using Rick.Services;
-using Rick.Handlers;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using Rick.Enums;
 using Rick.Extensions;
+using Rick.Services;
+using Rick.Handlers;
+using Rick.Models;
 
 namespace Rick.Modules
 {
@@ -38,7 +38,7 @@ namespace Rick.Modules
 
             var embed = new EmbedBuilder()
             {
-                Color = new Color(123,45,14)
+                Color = new Color(123, 45, 14)
             };
             var Sb = new StringBuilder();
             foreach (SocketGuild guild in client.Guilds)
@@ -78,7 +78,7 @@ namespace Rick.Modules
             await ReplyAsync("Message has been sent and I've left the guild!");
         }
 
-        [Command("Broadcast"),Summary("Broadcast This is a msg"), Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
+        [Command("Broadcast"), Summary("Broadcast This is a msg"), Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
         public async Task Broadcast([Remainder] string broadcast = null)
         {
             if (string.IsNullOrWhiteSpace(broadcast))
@@ -148,66 +148,53 @@ namespace Rick.Modules
         }
 
         [Command("Eval"), Summary("Eval 2+2"), Remarks("Evaluates some sort of expression for you.")]
-        public async Task EvalAsync([Remainder] string value)
+        public async Task EvalAsync([Remainder] string Code)
         {
-            var client = Context.Client as DiscordSocketClient;
+            var Client = Context.Client as DiscordSocketClient;
             var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
-            var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait...");
-            var _globals = new ScriptGlobals { Client = Context.Client as DiscordSocketClient };
-            value = value.Trim('`');
+            var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait ...");
+            var Globals = new ScriptGlobals
+            {
+                Client = Client,
+                Context = Context,
+                SocketGuild = Context.Guild as SocketGuild,
+                SocketGuildChannel = Context.Channel as SocketGuildChannel,
+                SocketGuildUser = Context.User as SocketGuildUser
+            };
+
+            Code = Code.Trim('`');
             try
             {
-                var eval = await CSharpScript.EvaluateAsync(value, options, _globals, typeof(ScriptGlobals));
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = "Evaluated Successfully!";
-                        x.IconUrl = client.CurrentUser.GetAvatarUrl();
-                    })
-                    .AddField(x =>
-                    {
-                        x.Name = "Input";
-                        x.Value = $"```{value}```";
-                    })
-                    .AddField(x =>
-                    {
-                        x.Name = "Output";
-                        x.Value = $"```{eval.ToString()}```";
-                    })
-                    .WithColor(new Color(20, 255, 5))
-                    .WithFooter(x =>
-                    {
-                        x.IconUrl = "https://blog.mariusschulz.com/content/images/dotnet_foundation_logo.png";
-                        x.Text = "Using Microsoft Code Analysis Csharp Scripting";
-                    });
+                var eval = await CSharpScript.EvaluateAsync(Code, options, Globals, typeof(ScriptGlobals));
+                var embed = EmbedExtension.Embed(EmbedColors.Green,
+                    "Expression Evaluated Successfully.", Client.CurrentUser.GetAvatarUrl());
+                embed.AddField(x =>
+                {
+                    x.Name = "Input";
+                    x.Value = $"```{Code}```";
+                })
+                .AddField(x =>
+                {
+                    x.Name = "Output";
+                    x.Value = $"```{eval.ToString()}```";
+                });
 
                 await ReplyAsync("", embed: embed);
             }
             catch (Exception e)
             {
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = "Failed to evaluate code!";
-                        x.IconUrl = client.CurrentUser.GetAvatarUrl();
-                    })
-                    .AddField(x =>
-                    {
-                        x.Name = "Input";
-                        x.Value = $"```{value}```";
-                    })
-                    .AddField(x =>
-                    {
-                        x.Name = "Output";
-                        x.Value = $"```{ e.Message.ToString()}```";
-                    })
-                    .WithColor(new Color(255, 6, 14))
-                    .WithFooter(x =>
-                    {
-                        x.IconUrl = "https://blog.mariusschulz.com/content/images/dotnet_foundation_logo.png";
-                        x.Text = e.StackTrace;
-                    });
-
+                var embed = EmbedExtension.Embed(EmbedColors.Green,
+                    "Failed To Evaluate Expression.", Client.CurrentUser.GetAvatarUrl());
+                embed.AddField(x =>
+                {
+                    x.Name = "Input";
+                    x.Value = $"```{Code}```";
+                })
+                .AddField(x =>
+                {
+                    x.Name = "Output";
+                    x.Value = $"```{e.GetType().ToString()} : {e.Message}\nFrom: {e.Source}```";
+                });
                 await ReplyAsync("", embed: embed);
             }
             finally
@@ -219,6 +206,11 @@ namespace Rick.Modules
         [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
         public async Task ListImportsAsync()
         {
+            if (BotHandler.BotConfig.EvalImports.Count == 0)
+            {
+                await ReplyAsync("Eval Imports list is empty!");
+                return;
+            }
             await ReplyAsync(string.Join(", ", BotHandler.BotConfig.EvalImports.Select(x => x)));
         }
 
