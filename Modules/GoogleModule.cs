@@ -1,10 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Rick.Services;
 using System.Linq;
-using Rick.Attributes;
-using Rick.Handlers;
 using Google.Apis.Customsearch.v1;
 using Google.Apis.Services;
 using System.Net.Http;
@@ -13,6 +9,11 @@ using Newtonsoft.Json.Linq;
 using Google.Apis.YouTube.v3;
 using Rick.Enums;
 using Rick.Extensions;
+using Rick.Attributes;
+using Rick.Handlers;
+using Rick.Services;
+using Discord.WebSocket;
+using Discord.Commands;
 
 namespace Rick.Modules
 {
@@ -81,6 +82,14 @@ namespace Rick.Modules
         public async Task ShortenAsync([Remainder] string URL)
         {
             await ReplyAsync($"This is your shortened URL: {MethodsService.ShortenUrl(URL)}");
+        }
+
+        [Command("Revav"), Summary("Performs a reverse image search for a user avatar.")]
+        public async Task RevavAsync(SocketGuildUser User)
+        {
+            await ReplyAsync(
+                $"Reverse Image Result: " +
+                $"{MethodsService.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
         }
     }
 }
