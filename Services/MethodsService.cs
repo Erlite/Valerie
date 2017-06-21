@@ -137,5 +137,21 @@ namespace Rick.Services
 
             CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
         }
+
+        public static async Task<string> MashapeHeaders(string Headers, string Link)
+        {
+            try
+            {
+                var HTTP = new HttpClient();
+                HTTP.DefaultRequestHeaders.Clear();
+                HTTP.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
+                HTTP.DefaultRequestHeaders.Add("Accept", Headers);
+                return await HTTP.GetStringAsync(Link);
+            }
+            catch (Exception EX)
+            {
+                return EX.Message;
+            }
+        }
     }
 }
