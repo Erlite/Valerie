@@ -648,5 +648,18 @@ namespace Rick.Modules
             }
             await ReplyAsync("", embed: embed);
         }
+        
+        [Command("Yomama"), Summary("Gets a random Yomma Joke")]
+        public async Task YommaAsync()
+        {
+            var Get = await new HttpClient().GetAsync("http://api.yomomma.info/");
+            
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync(Get.ReasonPhrase);
+                return;
+            }
+            await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync())["joke"].ToString());
+        }
     }
 }
