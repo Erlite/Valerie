@@ -125,7 +125,6 @@ namespace Rick.Services
             {
                 GuildHandler.GuildConfigs.Remove(Guild.Id);
             }
-            var path = GuildHandler.configPath;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
