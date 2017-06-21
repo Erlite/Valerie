@@ -1,22 +1,22 @@
-﻿using System.Threading.Tasks;
-using Discord.Commands;
-using Discord;
-using System;
+﻿using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using Discord.WebSocket;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
-using Rick.Handlers;
-using Rick.Attributes;
-using Rick.Services;
 using System.Text;
+using System.IO;
 using Newtonsoft.Json;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Extensions;
-using System.IO;
+using Rick.Handlers;
+using Rick.Attributes;
+using Rick.Services;
 
 namespace Rick.Modules
 {
@@ -272,7 +272,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Afk"), Summary("Adds you to the Guild's AFK list."), Remarks("AFK Add This is a reason. OR AFK Remove OR AFK Modify New Reason")]
+        [Command("AFK"), Summary("Adds you to the Guild's AFK list."), Remarks("AFK Add This is a reason. OR AFK Remove OR AFK Modify New Reason")]
         public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg = "No reason provided!")
         {
             var Guild = Context.Guild as SocketGuild;
@@ -660,6 +660,22 @@ namespace Rick.Modules
                 return;
             }
             await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync())["joke"].ToString());
+        }
+
+        [Command("Probe"), Summary("Probes someone or yourself.")]
+        public async Task ProbeAsync(SocketGuildUser User = null)
+        {
+            SocketGuildUser GetUser = null;
+            if (User != null)
+            {
+                GetUser = User;
+                await ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dirty lilttle slut.");
+            }
+            else
+            {
+                GetUser = Context.User as SocketGuildUser;
+                await ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dumb cunt! Don't know how to use a fucking command?!");
+            }
         }
     }
 }
