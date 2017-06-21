@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RuntimeFrameworkVersion>2.0.0-preview1-002111-00</RuntimeFrameworkVersion>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon></ApplicationIcon>
 </PropertyGroup>
 
 <ItemGroup>
