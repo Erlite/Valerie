@@ -186,7 +186,7 @@ namespace Rick.Modules
             await chn.SendMessageAsync("", false, embed);
         }
 
-        [Command("Userinfo"), Summary("Userinfo @Username"), Remarks("Displays information about a User"), Alias("UI")]
+        [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
         public async Task UserInfoAsync(IUser user)
         {
             var usr = user as IGuildUser ?? Context.Message.Author as IGuildUser;
@@ -239,7 +239,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Embed"), Summary("Embed This is an embeded msg"), Remarks("Embeds a user message")]
+        [Command("Embed"), Summary("Embeds a user message."), Remarks("Embed 123 123 123 This is embed message.")]
         public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Idk how to use Embed Command")
         {
             await Context.Message.DeleteAsync();
@@ -249,7 +249,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("GenID"), Summary("GenID"), Remarks("Generates a UUID")]
+        [Command("GenID"), Summary("Generates a random GUID.")]
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
@@ -257,7 +257,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Coinflip"), Summary("Coinflip"), Remarks("Flips a coin")]
+        [Command("Coinflip"), Summary("Flips a coin like any other coin flip.")]
         public async Task CoinFlipAsync()
         {
             var rand = new Random().Next(2);
@@ -272,7 +272,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Afk"), Summary("Afk Add Reason"), Remarks("Adds you to afk list")]
+        [Command("Afk"), Summary("Adds you to the Guild's AFK list."), Remarks("AFK Add This is a reason. OR AFK Remove OR AFK Modify New Reason")]
         public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg = "No reason provided!")
         {
             var Guild = Context.Guild as SocketGuild;
@@ -302,7 +302,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("About"), Summary("Normal Command"), Remarks("Shows info about Bot")]
+        [Command("About"), Summary("Displays information about the bot.")]
         public async Task AboutAsync()
         {
             var client = Context.Client as DiscordSocketClient;
@@ -321,7 +321,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Encrypt"), Summary("Encrypt Password Some String"), Remarks("Encrypts a string for you")]
+        [Command("Encrypt"), Summary("Encrypts a message?"), Remarks("Encrypts PLS ENCRYPT DIS MSG")]
         public async Task EncryptAsync([Remainder] string Text)
         {
             string Get = EncryptionService.EncryptString(Text);
@@ -333,7 +333,7 @@ namespace Rick.Modules
             await ReplyAsync(Get);
         }
 
-        [Command("Decrypt"), Summary("Decrypt Password Some string"), Remarks("Decrypt a string for you")]
+        [Command("Decrypt"), Summary("Decrypts a message?"), Remarks("Decrypt PLS DECRYPT DIS MSG")]
         public async Task DecryptAsync([Remainder] string Text)
         {
             string Get = EncryptionService.DecryptString(Text);
@@ -345,13 +345,13 @@ namespace Rick.Modules
             await ReplyAsync(Get);
         }
 
-        [Command("Rate"), Summary("Rate Pizza"), Remarks("Rates something out of 10")]
+        [Command("Rate"), Summary("Rates something for you out of 10."), Remarks("Rate Kendrick")]
         public async Task RateAsync([Remainder] string text)
         {
             await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
         }
 
-        [Command("Translate"), Summary("Translate Spanish What the Pizza?"), Remarks("Translates a Given Sentence")]
+        [Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
         public async Task TranslateAsync(string Language, [Remainder] string Text)
         {
             var result = await MethodsService.Translate(Language, Text);
@@ -361,7 +361,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Slotmachine"), Summary("Slotmachine 100"), Remarks("Slot machine!")]
+        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100")]
         public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
@@ -456,7 +456,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Trump"), Summary("Normal Command"), Remarks("Gives random trump quote")]
+        [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
         public async Task TrumpAsync()
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
@@ -465,7 +465,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Docs"), Summary("Docs Attributes"), Remarks("Searches Microsoft docs for terms")]
+        [Command("Docs"), Summary("Searches Microsoft docs for terms"), Remarks("Docs Attributes")]
         public async Task DocsAsync([Remainder] string Search)
         {
             var Builder = new StringBuilder();
@@ -487,7 +487,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Flip"), Summary("Flip Heads 200"), Remarks("Flips a coin! DON'T FORGOT TO BET MONEY!")]
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100")]
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -560,7 +560,7 @@ namespace Rick.Modules
             await ReplyAsync(User.GetAvatarUrl(size: 2048));
         }
 
-        [Command("Karma"), Summary("Karma @Username"), Remarks("Gives another user karma")]
+        [Command("Karma"), Summary("Gives another user karma."), Remarks("Karma @Username 500")]
         public async Task KarmaAsync(IGuildUser user, int Karma)
         {
             if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
@@ -598,7 +598,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("Rank"), Summary("Normal Command"), Remarks("Shows how much Karma you have")]
+        [Command("Rank"), Summary("Shows how much Karma you have")]
         public async Task GetKarmaAsync(SocketGuildUser User = null)
         {
             SocketGuildUser KarmaUser = null;
@@ -627,7 +627,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Top"), Summary("Normal Command"), Remarks("Shows users with top Karma")]
+        [Command("Top"), Summary("Shows users with top Karma")]
         public async Task TopAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
