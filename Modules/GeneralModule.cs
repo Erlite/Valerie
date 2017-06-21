@@ -23,7 +23,7 @@ namespace Rick.Modules
     [CheckBlacklist]
     public class GeneralModule : ModuleBase
     {
-        [Command("GuildInfo"), Summary("Normal Command"), Remarks("Displays information about a guild"), Alias("Gi")]
+        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about a guild."), Remarks("GI 1234567890123 OR GI")]
         public async Task GuildInfoAsync(ulong ID = 0)
         {
             var gld = Context.Guild;
@@ -78,7 +78,7 @@ namespace Rick.Modules
             await ReplyAsync("", false, embed);
         }
 
-        [Command("Roleinfo"), Summary("Roleinfo RoleNameGoesHere"), Remarks("Displays information about given Role"), Alias("RI")]
+        [Command("Roleinfo"), Alias("RI"), Summary("Displays information about a role"), Remarks("Roleinfo @Rolename OR @RI \"RoleName\"")]
         public async Task RoleInfoAsync(IRole role)
         {
             var gld = Context.Guild;

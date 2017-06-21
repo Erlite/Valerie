@@ -10,10 +10,10 @@ using Rick.Handlers;
 
 namespace Rick.Modules
 {
-    [Group("Bot"), RequireOwner, RequireContext(ContextType.Guild)]
+    [Group("Bot"), RequireOwner]
     public class BotModule : ModuleBase
     {
-        [Command("Username"), Remarks("Username OwO"), Summary("Changes Bot's username")]
+        [Command("Username"), Summary("Changes Bot's username"), Remarks("Username OwO")]
         public async Task UsernameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -26,7 +26,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(botConfig);
         }
 
-        [Command("Nickname"), Remarks("Nickname XD"), Summary("Changes Bot's nickname")]
+        [Command("Nickname"), Summary("Changes Bot's nickname"), Remarks("Nickname XD")]
         public async Task NicknameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -36,7 +36,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Avatar"), Remarks("Avatar {Some-Link.Com}"), Summary("Changes Bot's avatar")]
+        [Command("Avatar"), Summary("Changes Bot's avatar"), Remarks("Avatar {Some-Link.Com}")]
         public async Task AvatarAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -61,7 +61,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Game"), Remarks("Game DarkSouls 3"), Summary("Changes Bot's game")]
+        [Command("Game"), Summary("Changes Bot's game"), Remarks("Game DarkSouls 3")]
         public async Task GameAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -74,7 +74,7 @@ namespace Rick.Modules
             await BotHandler.SaveAsync(botConfig);
         }
 
-        [Command("Status"), Remarks("Status 3"), Summary("Changes Bot's status such as setting status to DND")]
+        [Command("Status"), Summary("Changes Bot's status such as setting status to DND"), Remarks("Status 3")]
         public async Task StatusAsync([Remainder] string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -84,7 +84,7 @@ namespace Rick.Modules
             await ReplyAsync(":eyes: Done :eyes:");
         }
 
-        [Command("Prefix"), Remarks("Prefix ?"), Summary("Sets Bot's default prefix")]
+        [Command("Prefix"), Summary("Sets Bot's default prefix"), Remarks("Prefix ?")]
         public async Task DefaultPrefixAsync([Remainder]string prefix)
         {
             if (string.IsNullOrWhiteSpace(prefix))
