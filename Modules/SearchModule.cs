@@ -137,7 +137,7 @@ namespace Rick.Modules
         [Command("Cookie"), Summary("Normal Command"), Remarks("Gets a random Fortune cookie for you")]
         public async Task FortuneCookieAsync()
         {
-            var Get = MethodsService.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
+            var Get = await MethodsService.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
             string Description = $"```{Get}```";
             var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
