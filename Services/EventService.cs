@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using Rick.Enums;
 using Rick.Models;
-using System.Linq;
 
 namespace Rick.Services
 {
