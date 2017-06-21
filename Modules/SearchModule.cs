@@ -128,41 +128,19 @@ namespace Rick.Modules
         [Command("Leet"), Summary("Leet text"), Remarks("Generates text in leet language")]
         public async Task LeetAsync([Remainder] string text)
         {
-            try
-            {
-                using (var http = new HttpClient())
-                {
-                    http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
-                    http.DefaultRequestHeaders.Add("Accept", "text/plain");
-                    var get = await http.GetStringAsync($"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}");
-                    string Description = get;
-                    var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
-                    await ReplyAsync("", embed: embed);
-                }
-            }
-            catch (Exception e)
-            { await ReplyAsync(e.Message); }
+            string Link = $"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}";
+            var get = await MethodsService.MashapeHeaders("text/plain", Link);
+            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: get);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Cookie"), Summary("Normal Command"), Remarks("Gets a random Fortune cookie for you")]
         public async Task FortuneCookieAsync()
         {
-            try
-            {
-                using (var http = new HttpClient())
-                {
-                    http.DefaultRequestHeaders.Clear();
-                    http.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
-                    http.DefaultRequestHeaders.Add("Accept", "text/plain");
-                    var get = await http.GetStringAsync($"https://thibaultcha-fortunecow-v1.p.mashape.com/random");
-                    string Description = $"```{get}```";
-                    var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
-                    await ReplyAsync("", embed: embed);
-                }
-            }
-            catch (Exception e)
-            { await ReplyAsync(e.Message); }
+            var Get = MethodsService.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
+            string Description = $"```{Get}```";
+            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Wiki"), Summary("Wiki Kendrick Lamar"), Remarks("Searches wikipedia for your terms")]
