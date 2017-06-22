@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System.Reflection;
-using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Net;
 using Newtonsoft.Json;
 using Google.Apis.Urlshortener.v1;
 using Google.Apis.Services;
@@ -16,6 +16,7 @@ using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Handlers;
 using Tweetinvi;
+using RedditSharp;
 
 namespace Rick.Services
 {
@@ -125,8 +126,11 @@ namespace Rick.Services
 
         public static void ServicesLogin()
         {
-            Auth.SetUserCredentials(BotHandler.BotConfig.Twitter.ConsumerKey, BotHandler.BotConfig.Twitter.ConsumerSecret,
-              BotHandler.BotConfig.Twitter.AccessToken, BotHandler.BotConfig.Twitter.AccessTokenSecret);
+            var Config = BotHandler.BotConfig;
+            var TwitterConfig = Config.Twitter;
+
+
+            Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
             var AuthUser = User.GetAuthenticatedUser();
             if (AuthUser == null)
             {
@@ -134,8 +138,14 @@ namespace Rick.Services
             }
             else
                 Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
-
-            CleverbotLib.Core.SetAPIKey(BotHandler.BotConfig.APIKeys.CleverBotKey);
+            try
+            {
+                CleverbotLib.Core.SetAPIKey(Config.APIKeys.CleverBotKey);
+            }
+            catch (WebException Ex)
+            {
+                Logger.Log(LogType.Error, LogSource.Configuration, Ex.Message);
+            }
         }
 
         public static async Task<string> MashapeHeaders(string Headers, string Link)
@@ -153,5 +163,15 @@ namespace Rick.Services
                 return EX.Message;
             }
         }
+
+        //public static Reddit RedditLogin()
+        //{
+        //    bool IsAuthenticated = false;
+        //    Reddit Reddit;
+        //    Reddit = new Reddit(BotHandler.BotConfig.Reddit.Username, BotHandler.BotConfig.Reddit.Password);
+        //    Reddit.InitOrUpdateUserAsync();
+        //    IsAuthenticated = Reddit.User != null;
+        //    return Reddit;
+        //}
     }
 }
