@@ -41,9 +41,6 @@ namespace Rick.Models
         [JsonProperty("TwitterWrapper")]
         public TwitterWrapper Twitter { get; set; } = new TwitterWrapper();
 
-        [JsonProperty("RedditWrapper")]
-        public RedditWrapper Reddit { get; set; } = new RedditWrapper();
-
         [JsonProperty("Blacklist")]
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
 
