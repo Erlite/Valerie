@@ -16,7 +16,6 @@ using Rick.Enums;
 using Rick.JsonResponse;
 using Rick.Handlers;
 using Tweetinvi;
-using RedditSharp;
 
 namespace Rick.Services
 {
