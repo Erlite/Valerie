@@ -34,7 +34,6 @@ namespace Rick.Services
         }
         #endregion
 
-
         public static async Task AfkAsync(SocketUserMessage message, SocketGuild gld)
         {
             var AfkList = GuildHandler.GuildConfigs[gld.Id].AfkList;
@@ -84,14 +83,14 @@ namespace Rick.Services
         {
             var Config = BotHandler.BotConfig;
             Config.MessagesReceived += 1;
-            await BotHandler.SaveAsync(Config);
+            await BotHandler.SaveAsync(Config).ConfigureAwait(false);
         }
 
         public static async Task AddToCommand(SocketUserMessage Message)
         {
             var Config = BotHandler.BotConfig;
             Config.CommandsUsed += 1;
-            await BotHandler.SaveAsync(Config);
+            await BotHandler.SaveAsync(Config).ConfigureAwait(false);
         }
     }
 }
