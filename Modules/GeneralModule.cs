@@ -53,7 +53,7 @@ namespace Rick.Modules
                 .WithAuthor(x =>
                 {
                     x.Name = gld.Name;
-                    x.IconUrl = gld.IconUrl;
+                    x.IconUrl = new Uri(gld.IconUrl);
                 })
                 .WithColor(new Color(153, 30, 87))
                 .AddInlineField("Guild ID", GuildID)
@@ -435,7 +435,7 @@ namespace Rick.Modules
                 embed.Author = new EmbedAuthorBuilder()
                 {
                     Name = $"{Context.User.Username} Lost!",
-                    IconUrl = Context.User.GetAvatarUrl()
+                    IconUrl = new Uri(Context.User.GetAvatarUrl())
                 };
                 embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {Credits}";
                 embed.Color = new Color(0xff0000);
@@ -446,7 +446,7 @@ namespace Rick.Modules
                 embed.Author = new EmbedAuthorBuilder()
                 {
                     Name = $"{Context.User.Username} won!",
-                    IconUrl = Context.User.GetAvatarUrl()
+                    IconUrl = new Uri(Context.User.GetAvatarUrl())
                 };
                 embed.Description = $":tada: Your current Karma is {Credits} :tada:";
                 embed.Color = new Color(0x93ff89);

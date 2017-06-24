@@ -70,7 +70,7 @@ namespace Rick.Modules
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = Context.User.Username,
-                IconUrl = Context.User.GetAvatarUrl()
+                IconUrl = new Uri(Context.User.GetAvatarUrl())
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);

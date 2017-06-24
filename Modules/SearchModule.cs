@@ -33,7 +33,7 @@ namespace Rick.Modules
             embed.WithAuthor(x =>
             {
                 x.Name = "Urban Dictionary";
-                x.WithIconUrl("https://lh3.googleusercontent.com/4hpSJ4pAfwRUg-RElZ2QXNh_pV01Z96iJGT2BFuk_RRsNc-AVY7cZhbN2g1zWII9PBQ=w170");
+                x.WithIconUrl(new Uri("https://lh3.googleusercontent.com/4hpSJ4pAfwRUg-RElZ2QXNh_pV01Z96iJGT2BFuk_RRsNc-AVY7cZhbN2g1zWII9PBQ=w170"));
             });
             string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + urban);
             embed.WithColor(new Color(153, 30, 87));
@@ -295,7 +295,7 @@ namespace Rick.Modules
                 Author = new EmbedAuthorBuilder()
                 {
                     Name = $"APP ID: {ID}",
-                    IconUrl = Context.User.GetAvatarUrl()
+                    IconUrl = new Uri(Context.User.GetAvatarUrl())
                 },
                 Footer = new EmbedFooterBuilder()
                 {
@@ -365,10 +365,10 @@ namespace Rick.Modules
                 Author = new EmbedAuthorBuilder()
                 {
                     Name = Info.realname,
-                    IconUrl = Info.avatarfull,
-                    Url = Info.profileurl
+                    IconUrl = new Uri(Info.avatarfull),
+                    Url = new Uri(Info.profileurl)
                 },
-                ThumbnailUrl = Info.avatarfull
+                ThumbnailUrl = new Uri(Info.avatarfull)
             };
             Builder.AddInlineField("Display Name", $"{Info.personaname}");
             Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");

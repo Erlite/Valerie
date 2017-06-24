@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Rick.Enums;
+using System;
 
 namespace Rick.Extensions
 {
@@ -65,22 +66,30 @@ namespace Rick.Extensions
             return embed;
         }
 
-        public static  EmbedBuilder Embed(EmbedColors Color, string AuthorName = null, string AuthorPic = null,  string Title = null, string Description = null, string FooterText = null, string FooterIcon = null, string ImageUrl = null, string ThumbUrl = null)
+        public static  EmbedBuilder Embed(EmbedColors Color, 
+            string AuthorName = null, 
+            string AuthorPic = null,  
+            string Title = null, 
+            string Description = null, 
+            string FooterText = null, 
+            string FooterIcon = null, 
+            string ImageUrl = null, 
+            string ThumbUrl = null)
         {
             return Embed(Color)
                 .WithAuthor(x =>
                 {
                     x.Name = AuthorName;
-                    x.IconUrl = AuthorPic;
+                    x.IconUrl = new Uri(AuthorPic);
                 })
                 .WithTitle(Title)
                 .WithDescription(Description)
-                .WithImageUrl(ImageUrl)
-                .WithThumbnailUrl(ThumbUrl)
+                .WithImageUrl(new Uri(ImageUrl))
+                .WithThumbnailUrl(new Uri(ThumbUrl))
                 .WithFooter(x =>
                 {
                     x.Text = FooterText;
-                    x.IconUrl = FooterIcon;
+                    x.IconUrl = new Uri(FooterIcon);
                 });
         }
     }

@@ -89,7 +89,7 @@ namespace Rick.Modules
                 .WithAuthor(x =>
                 {
                     x.Name = getTag.TagName;
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                    x.IconUrl = new Uri(Context.Client.CurrentUser.GetAvatarUrl());
                 })
                 .AddInlineField("Tag Response", getTag.TagResponse)
                 .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.OwnerId))
