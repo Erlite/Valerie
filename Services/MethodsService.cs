@@ -163,15 +163,5 @@ namespace Rick.Services
                 return EX.Message;
             }
         }
-
-        //public static Reddit RedditLogin()
-        //{
-        //    bool IsAuthenticated = false;
-        //    Reddit Reddit;
-        //    Reddit = new Reddit(BotHandler.BotConfig.Reddit.Username, BotHandler.BotConfig.Reddit.Password);
-        //    Reddit.InitOrUpdateUserAsync();
-        //    IsAuthenticated = Reddit.User != null;
-        //    return Reddit;
-        //}
     }
 }
