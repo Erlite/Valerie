@@ -23,9 +23,7 @@ namespace Rick
 
             client = new DiscordSocketClient(new DiscordSocketConfig()
             {
-                LogLevel = LogSeverity.Verbose,
-                AlwaysDownloadUsers = true,
-                DefaultRetryMode = RetryMode.AlwaysRetry
+                LogLevel = LogSeverity.Verbose
             });
 
             client.Log += (log) => Task.Run(() => Logger.Log(LogType.Info, LogSource.Client, log.Exception?.ToString() ?? log.Message));

@@ -143,13 +143,12 @@ namespace Rick.Services
         {
             var GameCount = BotHandler.BotConfig.Games.Count;
             var GetGame = BotHandler.BotConfig.Games[Random.Next(GameCount)];
-            if (GameCount != 0 || GameCount <= 0)
+            if (GameCount != 0)
             {
                 await client.SetGameAsync(GetGame);
                 Logger.Log(LogType.Info, LogSource.Client, $"Current Game: {GetGame}");
             }
-            else
-                await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
+            await client.SetGameAsync($"{BotHandler.BotConfig.DefaultPrefix}About");
         }
 
         public static async Task HandleGuildsTasks(SocketGuildUser User)
@@ -169,7 +168,7 @@ namespace Rick.Services
                     Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed {tag.TagName} by {User.Username}.");
                 }
             }
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
 }
