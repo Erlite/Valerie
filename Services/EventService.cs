@@ -67,7 +67,7 @@ namespace Rick.Services
                 await user.Guild.DefaultChannel.SendMessageAsync("", embed: embed);
         }
 
-        static  async Task UserLeftAsync(SocketGuildUser user)
+        static async Task UserLeftAsync(SocketGuildUser user)
         {
             var getGuild = GuildHandler.GuildConfigs[user.Guild.Id];
             if (!getGuild.LeaveEvent.IsEnabled) return;
@@ -130,7 +130,7 @@ namespace Rick.Services
 
         public static async Task MessageServicesAsync(SocketMessage msg)
         {
-            
+
             var gld = (msg.Channel as SocketGuildChannel).Guild;
             var message = msg as SocketUserMessage;
             await MsgsService.AddToMessage(message).ConfigureAwait(false);
@@ -143,7 +143,7 @@ namespace Rick.Services
         {
             var GameCount = BotHandler.BotConfig.Games.Count;
             var GetGame = BotHandler.BotConfig.Games[Random.Next(GameCount)];
-            if (GameCount != 0)
+            if (GameCount != 0 || GameCount <= 0)
             {
                 await client.SetGameAsync(GetGame);
                 Logger.Log(LogType.Info, LogSource.Client, $"Current Game: {GetGame}");
@@ -169,7 +169,7 @@ namespace Rick.Services
                     Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed {tag.TagName} by {User.Username}.");
                 }
             }
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
         }
     }
 }
