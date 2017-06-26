@@ -1,24 +1,17 @@
-﻿using Rick.Models;
+﻿using Rick.Wrappers;
 using System.Collections.Generic;
 
 namespace Rick.Interfaces
 {
     public interface IServer
     {
-        string GuildPrefix { get; set; }
-        string WelcomeMessage { get; set; }
-        ulong ModChannelID { get; set; }
-        ulong MuteRoleId { get; set; }
-        int CaseNumber { get; set; }
-        bool IsKarmaEnabled { get; set; }
-        bool IsChatterBotEnabled { get; set; }
-        EventWrapper JoinEvent { get; set; }
-        EventWrapper LeaveEvent { get; set; }
-        EventWrapper UserBanned { get; set; }
-        List<ulong> RequiredRoleIDs { get; set;}
-        List<string> RequiredChannelNames { get; set; }
-        List<TagsModel> TagsList { get; set; }
-        Dictionary<ulong, string> AfkList { get; set; }
-        Dictionary<ulong, int> KarmaList { get; set; }
+        char Prefix { get; set; }
+        List<string> WelcomeMessages { get; set; }
+        ulong MuteRoleID { get; set; }
+        int AdminCases { get; set; }
+        Wrapper JoinEvent { get; set; }
+        Wrapper LeaveEvent { get; set; }
+        Wrapper AdminLog { get; set; }
+        Wrapper Chatterbot { get; set; }
     }
 }

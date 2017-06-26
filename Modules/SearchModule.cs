@@ -14,8 +14,8 @@ using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Extensions;
 using Rick.Enums;
-using Rick.JsonResponse;
-using Rick.Services;
+using Rick.JsonModels;
+using Rick.Functions;
 using Octokit;
 
 namespace Rick.Modules
@@ -98,7 +98,8 @@ namespace Rick.Modules
             if (img?.Source == null)
                 return;
             var source = img.Source.Replace("b.", ".");
-            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched for: {search}", "https://s25.postimg.org/mi3j4sppb/imgur_1.png", source, ImageUrl: source);
+            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched for: {search}", 
+                new Uri("https://s25.postimg.org/mi3j4sppb/imgur_1.png"), source, ImageUrl: new Uri(source));
             await ReplyAsync("", embed: embed);
         }
 
@@ -121,7 +122,8 @@ namespace Rick.Modules
             string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
             var GetRandom = Sets[new Random().Next(0, Sets.Length)];
             string URL = $"https://robohash.org/{name}{GetRandom}";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: URL);
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, 
+                new Uri(Context.User.GetAvatarUrl()), ImageUrl: new Uri(URL));
             await ReplyAsync("", embed: embed);
         }
 
@@ -129,17 +131,19 @@ namespace Rick.Modules
         public async Task LeetAsync([Remainder] string text)
         {
             string Link = $"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}";
-            var get = await MethodsService.MashapeHeaders("text/plain", Link);
-            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: get);
+            var get = await Function.MashapeHeaders("text/plain", Link);
+            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, 
+                new Uri(Context.User.GetAvatarUrl()), Description: get);
             await ReplyAsync("", embed: embed);
         }
 
         [Command("Cookie"), Summary("Normal Command"), Remarks("Gets a random Fortune cookie for you")]
         public async Task FortuneCookieAsync()
         {
-            var Get = await MethodsService.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
+            var Get = await Function.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
             string Description = $"```{Get}```";
-            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, 
+                new Uri(Context.User.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -157,7 +161,8 @@ namespace Rick.Modules
                 string firstParagraph = responseObject[2][0];
 
                 string Description = firstParagraph;
-                var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search.ToUpper()}", Context.User.GetAvatarUrl(), Description: Description, ImageUrl: url);
+                var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search.ToUpper()}", 
+                    new Uri(Context.User.GetAvatarUrl()), Description: Description, ImageUrl: new Uri(url));
                 await ReplyAsync("", false, embed);
             }
             catch(ArgumentException args)
@@ -170,7 +175,8 @@ namespace Rick.Modules
         public async Task AdorableAvatarAsync(string Name)
         {
             string MainUrl = $"https://api.adorable.io/avatars/500/{Name}.png";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, 
+                new Uri(Context.User.GetAvatarUrl()), ImageUrl: new Uri(MainUrl));
             await ReplyAsync("", embed: embed);
         }
 
@@ -193,14 +199,14 @@ namespace Rick.Modules
 
             foreach (var Res in Convert.RelatedTopics.Take(3))
             {
-                SB.AppendLine($"{Res.Text}\n{MethodsService.ShortenUrl(Res.FirstURL)}");
+                SB.AppendLine($"{Res.Text}\n{Function.ShortenUrl(Res.FirstURL)}");
             }
             string Description = $"**{Convert.Heading}**\n" +
                 $"{Convert.Abstract}\n" +
-                $"{MethodsService.ShortenUrl(Convert.AbstractURL)}\n\n" +
+                $"{Function.ShortenUrl(Convert.AbstractURL)}\n\n" +
                 $"**Related Topics:**\n" +
                 $"{SB.ToString()}";
-            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", Image, Description: Description, ThumbUrl: Image);
+            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", new Uri(Image), Description: Description, ThumbUrl: new Uri(Image));
             await ReplyAsync("", embed: embed);
         }
 
@@ -215,7 +221,7 @@ namespace Rick.Modules
             using (var httpClient = new HttpClient())
             {
                 var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={Query}&count=50&offset=0&mkt=en-us&safeSearch=Off";
-                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
+                httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ConfigHandler.IConfig.APIKeys.BingKey);
                 var res = await httpClient.GetAsync(link);
                 if (!res.IsSuccessStatusCode)
                 {
@@ -232,7 +238,8 @@ namespace Rick.Modules
                 var Random = new Random();
                 var RandomNum = Random.Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
-                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {Query.ToUpper()}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {Query.ToUpper()}", 
+                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), ImageUrl: new Uri((string)image["contentUrl"]));
                 await ReplyAsync("", embed: embed);
             }
 
@@ -248,7 +255,7 @@ namespace Rick.Modules
             }
             using (var Http = new HttpClient())
             {
-                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotHandler.BotConfig.APIKeys.BingKey);
+                Http.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ConfigHandler.IConfig.APIKeys.BingKey);
                 var GetRequest = await Http.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
                 if (!GetRequest.IsSuccessStatusCode)
                 {
@@ -258,11 +265,12 @@ namespace Rick.Modules
                 var getString = await GetRequest.Content.ReadAsStringAsync();
                 var Convert = JToken.Parse(getString).ToObject<SearchRoot>();
                 var str = new StringBuilder();
-                foreach (var result in Convert.webPages.value)
+                foreach (var result in Convert.Pages.Value)
                 {
-                    str.AppendLine($"**{result.name}**\n{result.snippet}\n{MethodsService.ShortenUrl(result.displayUrl)}\n");
+                    str.AppendLine($"**{result.Name}**\n{result.Snippet}\n{Function.ShortenUrl(result.URL)}\n");
                 }
-                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {Query}", Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.webPages.totalEstimatedMatches.ToString()}");
+                var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {Query}", 
+                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: str.ToString(), FooterText: $"Total Results: {Convert.Pages.TotalMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
         }
@@ -273,7 +281,8 @@ namespace Rick.Modules
             var github = new GitHubClient(new ProductHeaderValue("Rick"));
             var usr = await github.User.Get(user);
             string Description = $"**Bio:** {usr.Bio}\n**Public Repositories:** {usr.PublicRepos}\n**Private Repositories:** {usr.TotalPrivateRepos}\n**Followers:** {usr.Followers}\n**Company:** {usr.Company}";
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, usr.Name, usr.AvatarUrl, Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, usr.Name, 
+                new Uri(usr.AvatarUrl), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -320,9 +329,9 @@ namespace Rick.Modules
         {
             var Httpclient = new HttpClient();
             string IPlayerService = "http://api.steampowered.com/IPlayerService/";
-            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamids={ID}");
-            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
-            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={BotHandler.BotConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
+            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={ConfigHandler.IConfig.APIKeys.SteamKey}&steamids={ID}");
+            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={ConfigHandler.IConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
+            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={ConfigHandler.IConfig.APIKeys.SteamKey}&steamid={ID}&format=json");
 
             if (!SummarURL.IsSuccessStatusCode || !GamesOwned.IsSuccessStatusCode || !RecentlyPlayed.IsSuccessStatusCode)
             {

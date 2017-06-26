@@ -17,7 +17,7 @@ namespace Rick.Attributes
             timer = new Timer(Timer_Reset, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Command, IServiceProvider Provider)
         {
             if (Cooldown)
                 return Task.FromResult(PreconditionResult.FromError("This command is under Cooldown. Please wait few seconds before using this command again!"));

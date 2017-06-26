@@ -1,64 +1,61 @@
-﻿using System.Threading.Tasks;
-using System.Reflection;
-using System.Linq;
-using System;
+﻿using System;
+using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Discord.WebSocket;
-using Discord.Commands;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Linq;
 using Discord;
-using Rick.Services;
-using Rick.Enums;
 using Rick.Extensions;
+using Rick.Enums;
 
 namespace Rick.Handlers
 {
     public class CommandHandler
     {
-        private IServiceProvider Provider;
-        private DiscordSocketClient client;
-        private CommandService cmds;
-        private BotHandler BotHandler;
-        private GuildHandler GuildHandler;
-        private EventService EventHandler;
+        IServiceProvider Provider;
+        DiscordSocketClient Client;
+        CommandService CommandService;
 
-        public CommandHandler(IServiceProvider prod)
+        public CommandHandler(IServiceProvider IServiceProvider)
         {
-            Provider = prod;
-            client = Provider.GetService<DiscordSocketClient>();
-            BotHandler = Provider.GetService<BotHandler>();
-            GuildHandler = Provider.GetService<GuildHandler>();
-            EventHandler = Provider.GetService<EventService>();
+            Provider = IServiceProvider;
+            Client = Provider.GetService<DiscordSocketClient>();
 
-            client.MessageReceived += HandleCommandsAsync;
-            cmds = Provider.GetService<CommandService>();
+            Client.MessageReceived += HandleMessagesAsync;
+            CommandService = Provider.GetService<CommandService>();
         }
 
-        public async Task ConfigureAsync()
+        public async Task ConfigureCommandsAsync()
         {
-            await cmds.AddModulesAsync(Assembly.GetEntryAssembly());
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
-        private async Task HandleCommandsAsync(SocketMessage msg)
+        async Task HandleMessagesAsync(SocketMessage Message)
         {
-            var gld = (msg.Channel as SocketGuildChannel).Guild;
-            var message = msg as SocketUserMessage;
+            var Guild = (Message.Channel as SocketGuildChannel).Guild;
+            var Msg = Message as SocketUserMessage;
+            var BotConfig = ConfigHandler.IConfig;
+            var GuildConfig = GuildHandler.GuildConfigs[Guild.Id];
 
-            if (message == null || !(message.Channel is IGuildChannel) || message.Author.IsBot || GuildHandler.GuildConfigs[gld.Id].GuildPrefix == null) return;
+            if (Msg == null ||
+                !(Msg.Channel is SocketGuildChannel) ||
+                Msg.Author.IsBot) return;
+
             int argPos = 0;
-            var context = new SocketCommandContext(client, message);
 
-            string GuildPrefix = GuildHandler.GuildConfigs[gld.Id].GuildPrefix;
-            if (!(message.HasStringPrefix(BotHandler.BotConfig.DefaultPrefix, ref argPos) || BotHandler.BotConfig.MentionPrefix(message, client, ref argPos) || message.HasStringPrefix(GuildPrefix, ref argPos))) return;
+            var Context = new SocketCommandContext(Client, Msg);
 
-            await MsgsService.AddToCommand(message).ConfigureAwait(false);
+            if (!(Msg.HasStringPrefix(BotConfig.Prefix, ref argPos) || Msg.HasCharPrefix(GuildConfig.Prefix, ref argPos))) return;
 
-            var result = await cmds.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
-            var service = cmds.Search(context, argPos);
+            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
+
+            var service = CommandService.Search(Context, argPos);
             CommandInfo Command = null;
 
             if (service.IsSuccess)
                 Command = service.Commands.FirstOrDefault().Command;
-            if (result.IsSuccess)
+            if (Result.IsSuccess)
                 return;
 
             string ErrorMsg = null;
@@ -70,38 +67,48 @@ namespace Rick.Handlers
                 Remarks = Command.Remarks;
 
             Embed embed = null;
-            switch(result)
+
+            switch (Result)
             {
-                case SearchResult search:
+                case SearchResult SR:
                     break;
-                case ParseResult parse:
-                    ErrorMsg = $"**Command Usage:** {BotHandler.BotConfig.DefaultPrefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => x.Name))}\n" +
+
+                case ParseResult PR:
+                    ErrorMsg = $"**Command Usage:** {ConfigHandler.IConfig.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => x.Name))}\n" +
                         $"**Example:** {Remarks}\n" +
-                        $"**More Info:** To get more information about a command use: {BotHandler.BotConfig.DefaultPrefix}Help CommandName\n";
-                    embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!", client.CurrentUser.GetAvatarUrl(), null, ErrorMsg);
+                        $"**More Info:** To get more information about a command use: {ConfigHandler.IConfig.Prefix}Help CommandName\n";
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!",
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), null, ErrorMsg);
                     break;
-                case PreconditionResult pre:
-                    ErrorMsg = pre.ErrorReason;
-                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error", client.CurrentUser.GetAvatarUrl(), Description: ErrorMsg);
+
+                case PreconditionResult PCR:
+                    ErrorMsg = PCR.ErrorReason;
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error",
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: ErrorMsg);
                     break;
-                case ExecuteResult exe:
-                    var exeresult = (ExecuteResult)result;
-                    DefaultCommandError(exeresult, service, context);
+
+                case TypeReaderResult TRR:
+                    ErrorMsg = TRR.ErrorReason;
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "TypeReader Error",
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: ErrorMsg);
+                    break;
+
+                case ExecuteResult ER:
+                    var exeresult = (ExecuteResult)Result;
+                    DefaultCommandError(exeresult, service, Context);
                     break;
             }
-
-            if (ErrorMsg != null)
-                await context.Channel.SendMessageAsync("", embed: embed);
         }
 
-        private async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
+        async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
         {
-            if (BotHandler.BotConfig.DebugMode)
+            if (ConfigHandler.IConfig.IsDebugEnabled)
             {
                 string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
                 string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
                 string StackTrace = result.Exception.StackTrace;
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Name, client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: StackTrace);
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Name,
+                    new Uri(Client.CurrentUser.GetAvatarUrl()), Description: Description, FooterText: StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else

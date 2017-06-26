@@ -21,14 +21,14 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
+            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
             if (getTag == null)
             {
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
                 return;
             }
-            await ReplyAsync(getTag.TagResponse);
-            getTag.TagUses++;
+            await ReplyAsync(getTag.Response);
+            getTag.Uses++;
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
@@ -38,7 +38,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var MakeTags = gldConfig.TagsList;
-            var Exists = MakeTags.FirstOrDefault(x => x.TagName == Name);
+            var Exists = MakeTags.FirstOrDefault(x => x.Name == Name);
             if (MakeTags.Contains(Exists))
             {
                 await ReplyAsync("Tag already exists in the dictionary!");
@@ -46,16 +46,17 @@ namespace Rick.Modules
             }
             var tag = new TagsModel
             {
-                TagName = Name,
-                TagResponse = response,
-                OwnerId = Context.User.Id,
+                Name = Name,
+                Response = response,
+                Owner = Context.User.Id,
                 CreationDate = DateTime.Now.ToString()
             };
             MakeTags.Add(tag);
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", Context.User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", 
+                new Uri(Context.User.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -64,7 +65,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x=> x.TagName == Name);
+            var getTag = gldTags.FirstOrDefault(x=> x.Name == Name);
             if(getTag == null)
             {
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
@@ -79,7 +80,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
+            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
             if (getTag == null)
             {
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
@@ -88,12 +89,12 @@ namespace Rick.Modules
             var embed = new EmbedBuilder()
                 .WithAuthor(x =>
                 {
-                    x.Name = getTag.TagName;
+                    x.Name = getTag.Name;
                     x.IconUrl = new Uri(Context.Client.CurrentUser.GetAvatarUrl());
                 })
-                .AddInlineField("Tag Response", getTag.TagResponse)
-                .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.OwnerId))
-                .AddInlineField("Tag Uses", getTag.TagUses)
+                .AddInlineField("Tag Response", getTag.Response)
+                .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.Owner))
+                .AddInlineField("Tag Uses", getTag.Uses)
                 .AddInlineField("Creation Date", getTag.CreationDate)
                 .WithColor(new Color(153, 255, 255));
             await ReplyAsync("", embed: embed);
@@ -104,7 +105,7 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.TagName == Name);
+            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
             if (getTag == null)
             {
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
@@ -113,11 +114,11 @@ namespace Rick.Modules
             switch(prop)
             {
                 case GlobalEnums.TagName:
-                    getTag.TagName = Name;
+                    getTag.Name = Name;
                     break;
 
                 case GlobalEnums.TagResponse:
-                    getTag.TagResponse = Response;
+                    getTag.Response = Response;
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
@@ -135,7 +136,7 @@ namespace Rick.Modules
                 await ReplyAsync($"{Context.Guild.Name} has no tags!");
                 return;
             }
-            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.TagName))}");
+            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.Name))}");
         }
 
         [Command("Find"), Summary("Tag Find Meme"), Remarks("Finds all the tags with a specified Name"), Priority(1)]
@@ -143,15 +144,15 @@ namespace Rick.Modules
         {
             var GldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var GetTags = GldConfig.TagsList;
-            if (!GetTags.Any() || (GetTags.Where(x => !x.TagName.Contains(name)) == null))
+            if (!GetTags.Any() || (GetTags.Where(x => !x.Name.Contains(name)) == null))
             {
                 await ReplyAsync($"No tags were found matching: **{name}** OR **{Context.Guild.Name}** doesn't have any tags!");
                 return;
             }
             var Sb = new StringBuilder();
-            foreach(var Name in GetTags.Where(x => x.TagName.Contains(name)))
+            foreach(var Name in GetTags.Where(x => x.Name.Contains(name)))
             {
-                Sb.Append($"{Name.TagName}, ");
+                Sb.Append($"{Name.Name}, ");
             }
             await ReplyAsync($"Tags matching **{name}**: \n{Sb.ToString()}");
         }

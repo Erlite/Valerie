@@ -15,9 +15,9 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Rick.Enums;
 using Rick.Extensions;
-using Rick.Services;
 using Rick.Handlers;
-using Rick.Models;
+using Rick.Roslyn;
+using Rick.Functions;
 
 namespace Rick.Modules
 {
@@ -28,8 +28,8 @@ namespace Rick.Modules
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
-        public static IEnumerable<Assembly> Assemblies => MethodsService.GetAssemblies();
-        public static IEnumerable<string> Imports => BotHandler.BotConfig.EvalImports;
+        public static IEnumerable<Assembly> Assemblies => Function.GetAssemblies();
+        public static IEnumerable<string> Imports => ConfigHandler.IConfig.EvalImports;
 
         [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
@@ -96,37 +96,37 @@ namespace Rick.Modules
             await ReplyAsync(invite.Url);
         }
 
-        [Command("Archive"), Summary("Archive GuildName ChannelName 10"), Remarks("archives a channel and uploads a JSON")]
-        public async Task ArchiveCommand(string guildName, string channelName, int amount = 9000)
-        {
-            var channelToArchive = (await
-                (await Context.Client.GetGuildsAsync()).FirstOrDefault(x => x.Name == guildName).GetTextChannelsAsync()).FirstOrDefault(x => x.Name == channelName);
-            if (channelToArchive != null)
-            {
-                var listOfMessages = new List<IMessage>(await channelToArchive.GetMessagesAsync(amount).Flatten());
-                List<MessageModel> list = new List<MessageModel>(listOfMessages.Capacity);
-                foreach (var message in listOfMessages)
-                    list.Add(new MessageModel { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
-                var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-                var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
-                await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
-            }
-        }
+        //[Command("Archive"), Summary("Archive GuildName ChannelName 10"), Remarks("archives a channel and uploads a JSON")]
+        //public async Task ArchiveCommand(string guildName, string channelName, int amount = 9000)
+        //{
+        //    var channelToArchive = (await
+        //        (await Context.Client.GetGuildsAsync()).FirstOrDefault(x => x.Name == guildName).GetTextChannelsAsync()).FirstOrDefault(x => x.Name == channelName);
+        //    if (channelToArchive != null)
+        //    {
+        //        var listOfMessages = new List<IMessage>(await channelToArchive.GetMessagesAsync(amount).Flatten());
+        //        List<MessageModel> list = new List<MessageModel>(listOfMessages.Capacity);
+        //        foreach (var message in listOfMessages)
+        //            list.Add(new MessageModel { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
+        //        var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+        //        var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
+        //        await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
+        //    }
+        //}
 
         [Command("Blacklist"), Summary("Blacklist @Username Reason"), Remarks("Forbids a user from using bot commands")]
         public async Task BlacklistAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the owner!")
         {
             if (user.Id == Context.Client.CurrentUser.Id)
                 await ReplyAsync("Wow, You think this is funny?");
-            var botConfig = BotHandler.BotConfig;
+            var botConfig = ConfigHandler.IConfig;
             var Bl = botConfig.Blacklist;
             if (Bl.ContainsKey(user.Id))
                 await ReplyAsync("This user already exist in the blacklist! :skull_crossbones:");
             else
             {
                 Bl.Add(user.Id, reason);
-                BotHandler.BotConfig.Blacklist = Bl;
-                await BotHandler.SaveAsync(botConfig);
+                ConfigHandler.IConfig.Blacklist = Bl;
+                await ConfigHandler.SaveAsync();
                 await ReplyAsync($"{user.Username} has been added to blacklist!");
             }
         }
@@ -134,15 +134,15 @@ namespace Rick.Modules
         [Command("Whitelist"), Summary("Whitelist @username"), Remarks("Removes users from blacklist")]
         public async Task WhitelistAsync(SocketGuildUser user)
         {
-            var botConfig = BotHandler.BotConfig;
+            var botConfig = ConfigHandler.IConfig;
             var Bl = botConfig.Blacklist;
             if (!Bl.ContainsKey(user.Id))
                 await ReplyAsync("This user is not listed in the Blacklist!");
             else
             {
                 Bl.Remove(user.Id);
-                BotHandler.BotConfig.Blacklist = Bl;
-                await BotHandler.SaveAsync(botConfig);
+                ConfigHandler.IConfig.Blacklist = Bl;
+                await ConfigHandler.SaveAsync();
                 await ReplyAsync($"{user.Username} has been removed from the blacklist!");
             }
         }
@@ -153,7 +153,7 @@ namespace Rick.Modules
             var Client = Context.Client as DiscordSocketClient;
             var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
             var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait ...");
-            var Globals = new ScriptGlobals
+            var Globals = new Globals
             {
                 Client = Client,
                 Context = Context,
@@ -165,9 +165,9 @@ namespace Rick.Modules
             Code = Code.Trim('`');
             try
             {
-                var eval = await CSharpScript.EvaluateAsync(Code, options, Globals, typeof(ScriptGlobals));
+                var eval = await CSharpScript.EvaluateAsync(Code, options, Globals, typeof(Globals));
                 var embed = EmbedExtension.Embed(EmbedColors.Green,
-                    "Expression Evaluated Successfully.", Client.CurrentUser.GetAvatarUrl());
+                    "Expression Evaluated Successfully.", new Uri(Client.CurrentUser.GetAvatarUrl()));
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -184,7 +184,7 @@ namespace Rick.Modules
             catch (Exception e)
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Green,
-                    "Failed To Evaluate Expression.", Client.CurrentUser.GetAvatarUrl());
+                    "Failed To Evaluate Expression.", new Uri(Client.CurrentUser.GetAvatarUrl()));
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -206,28 +206,28 @@ namespace Rick.Modules
         [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
         public async Task ListImportsAsync()
         {
-            if (BotHandler.BotConfig.EvalImports.Count == 0)
+            if (ConfigHandler.IConfig.EvalImports.Count == 0)
             {
                 await ReplyAsync("Eval Imports list is empty!");
                 return;
             }
-            await ReplyAsync(string.Join(", ", BotHandler.BotConfig.EvalImports.Select(x => x)));
+            await ReplyAsync(string.Join(", ", ConfigHandler.IConfig.EvalImports.Select(x => x)));
         }
 
         [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
         public async Task RemoveImportAsync(string import)
         {
-            BotHandler.BotConfig.EvalImports.Remove(import);
+            ConfigHandler.IConfig.EvalImports.Remove(import);
             await ReplyAsync($"Removed {import}");
-            await BotHandler.SaveAsync(BotHandler.BotConfig);
+            await ConfigHandler.SaveAsync();
         }
 
         [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
         public async Task AddImportAsync(string import)
         {
-            BotHandler.BotConfig.EvalImports.Add(import);
+            ConfigHandler.IConfig.EvalImports.Add(import);
             await ReplyAsync($"Added {import}");
-            await BotHandler.SaveAsync(BotHandler.BotConfig);
+            await ConfigHandler.SaveAsync();
         }
 
         [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]
@@ -250,7 +250,7 @@ namespace Rick.Modules
             var IsOS64 = Environment.Is64BitOperatingSystem ? "Yes" : "No";
             var isMono = Environment.Is64BitOperatingSystem ? "Yes" : "No";
 
-            long length = new FileInfo(BotHandler.configPath).Length + new FileInfo(GuildHandler.configPath).Length;
+            long length = new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length;
             string Description = $"{Format.Bold("Info")}\n" +
                                 $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n" +
                                 $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
@@ -282,7 +282,8 @@ namespace Rick.Modules
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", application.IconUrl, Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", 
+                new Uri(application.IconUrl), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 

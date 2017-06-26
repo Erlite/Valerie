@@ -7,13 +7,11 @@ namespace Rick.Attributes
 {
     public class CheckBlacklistAttribute : PreconditionAttribute
     {
-        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
+        public override async Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Command, IServiceProvider Provider)
         {
-            var userId = context.User.Id;
-            var Blacklist = BotHandler.BotConfig.Blacklist;
-            var getUser = Blacklist.ContainsKey(userId);
-            string reason;
-            var getReason = Blacklist.TryGetValue(userId, out reason);
+            var Blacklist = ConfigHandler.IConfig.Blacklist;
+            var getUser = Blacklist.ContainsKey(Context.User.Id);
+            Blacklist.TryGetValue(Context.User.Id, out string reason);
             return await Task.FromResult(getUser) ? PreconditionResult.FromError($"You are forbidden from using Bot's commands!\n**Reason:** {reason}") : PreconditionResult.FromSuccess();
         }
     }

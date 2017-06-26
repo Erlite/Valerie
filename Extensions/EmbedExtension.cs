@@ -68,28 +68,28 @@ namespace Rick.Extensions
 
         public static  EmbedBuilder Embed(EmbedColors Color, 
             string AuthorName = null, 
-            string AuthorPic = null,  
+            Uri AuthorPic = null,  
             string Title = null, 
             string Description = null, 
             string FooterText = null, 
-            string FooterIcon = null, 
-            string ImageUrl = null, 
-            string ThumbUrl = null)
+            Uri FooterIcon = null, 
+            Uri ImageUrl = null, 
+            Uri ThumbUrl = null)
         {
             return Embed(Color)
                 .WithAuthor(x =>
                 {
                     x.Name = AuthorName;
-                    x.IconUrl = new Uri(AuthorPic);
+                    x.IconUrl = AuthorPic;
                 })
                 .WithTitle(Title)
                 .WithDescription(Description)
-                .WithImageUrl(new Uri(ImageUrl))
-                .WithThumbnailUrl(new Uri(ThumbUrl))
+                .WithImageUrl(ImageUrl)
+                .WithThumbnailUrl(ThumbUrl)
                 .WithFooter(x =>
                 {
                     x.Text = FooterText;
-                    x.IconUrl = new Uri(FooterIcon);
+                    x.IconUrl = FooterIcon;
                 });
         }
     }

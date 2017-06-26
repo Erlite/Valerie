@@ -27,11 +27,12 @@ namespace Rick.Modules
             await User.KickAsync();            
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var BanChannel = User.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
-            gldConfig.CaseNumber += 1;
-            if (gldConfig.UserBanned.IsEnabled && gldConfig.UserBanned.TextChannel != 0)
+            gldConfig.AdminCases += 1;
+            if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
-                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.CaseNumber}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
+                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.AdminCases}";
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, 
+                    FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif"));
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await ReplyAsync($"***{ User.Username + '#' + User.Discriminator} GOT KICKED*** :ok_hand: ");
@@ -44,12 +45,12 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
             await User.Guild.AddBanAsync(User);
-            gldConfig.CaseNumber += 1;
+            gldConfig.AdminCases += 1;
             var BanChannel = User.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
-            if (gldConfig.UserBanned.IsEnabled && gldConfig.UserBanned.TextChannel != 0)
+            if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
-                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.CaseNumber}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
+                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.AdminCases}";
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://i.redd.it/psv0ndgiqrny.gif"));
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await ReplyAsync($"***{User.Username + '#' + User.Discriminator} GOT BENT*** :hammer: ");
@@ -62,14 +63,14 @@ namespace Rick.Modules
         public async Task MuteAsync(SocketGuildUser User)
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            var GetMuteRole = User.Guild.GetRole(gldConfig.MuteRoleId);
+            var GetMuteRole = User.Guild.GetRole(gldConfig.MuteRoleID);
             if (GetMuteRole == null)
             {
                 await ReplyAsync("Mute Role ID is null! Add Mute Role ID in guild Config!");
                 return;
             }
             await User.AddRoleAsync(GetMuteRole);
-            gldConfig.CaseNumber += 1;
+            gldConfig.AdminCases += 1;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }
@@ -96,7 +97,7 @@ namespace Rick.Modules
         {
             await User.AddRoleAsync(Role);
             string Description = $"{User.Username} has been added to {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, new Uri(User.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -105,7 +106,7 @@ namespace Rick.Modules
         {
             await User.RemoveRoleAsync(Role);
             string Description = $"{User.Username} has been removed from {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, new Uri(User.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -113,13 +114,13 @@ namespace Rick.Modules
         public async Task AntiRadeAsync()
         {
             var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            IRole MuteRole = Context.Guild.GetRole(GuildConfig.MuteRoleId);
+            IRole MuteRole = Context.Guild.GetRole(GuildConfig.MuteRoleID);
             var GetUsers = await Context.Guild.GetUsersAsync();
 
-            if (GuildConfig.MuteRoleId == 0 || Context.Guild.GetRole(GuildConfig.MuteRoleId) == null)
+            if (GuildConfig.MuteRoleID == 0 || Context.Guild.GetRole(GuildConfig.MuteRoleID) == null)
             {
                 var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
-                GuildConfig.MuteRoleId = CreateNew.Id;
+                GuildConfig.MuteRoleID = CreateNew.Id;
                 await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
                 foreach (var user in GetUsers)
                 {
@@ -141,14 +142,21 @@ namespace Rick.Modules
         public async Task MoneyShotAsync()
         {
             var Random = new Random();
-            int Karma = Random.Next(100, 500);
+            int Karma = Random.Next(0, 1000);
             var GldCfg = GuildHandler.GuildConfigs[Context.Guild.Id];
+
+            if (GldCfg.KarmaList.Count <= 0)
+            {
+                await ReplyAsync("Karma List is empty! Please enable Karma first!");
+                return;
+            }
+
             foreach(var Key in GldCfg.KarmaList.Keys.ToList())
             {
                 GldCfg.KarmaList[Key] += Karma;
             }
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            if (Karma > 300)
+            if (Karma > 500)
                 await ReplyAsync("That was a massive money shot boiiii! :money_mouth: ");
             else
                 await ReplyAsync("It was a decent money shot :point_up: ");

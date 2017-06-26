@@ -12,11 +12,11 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Rick.Enums;
-using Rick.JsonResponse;
+using Rick.JsonModels;
 using Rick.Extensions;
 using Rick.Handlers;
 using Rick.Attributes;
-using Rick.Services;
+using Rick.Functions;
 
 namespace Rick.Modules
 {
@@ -187,9 +187,9 @@ namespace Rick.Modules
         }
 
         [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
-        public async Task UserInfoAsync(IUser user)
+        public async Task UserInfoAsync(IGuildUser user = null)
         {
-            var usr = user as IGuildUser ?? Context.Message.Author as IGuildUser;
+            var usr = user as SocketGuildUser ?? Context.Message.Author as SocketGuildUser;
             var userNick = usr.Nickname ?? usr.Nickname;
             var userDisc = usr.DiscriminatorValue;
             var Userid = usr.Id;
@@ -203,8 +203,10 @@ namespace Rick.Modules
             if (string.IsNullOrEmpty(userNick))
                 userNick = "User has no nickname!";
 
-            string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
-            var embed = EmbedExtension.Embed(EmbedColors.White, user.Username, user.GetAvatarUrl(), Description: descrption);
+            string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}" +
+                $"\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
+
+            var embed = EmbedExtension.Embed(EmbedColors.White, user.Username, new Uri(user.GetAvatarUrl()), Description: descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -218,7 +220,7 @@ namespace Rick.Modules
                 {
                     var HttpClient = new HttpClient();
                     HttpClient.DefaultRequestHeaders.Clear();
-                    HttpClient.DefaultRequestHeaders.Add("X-Mashape-Key", BotHandler.BotConfig.APIKeys.MashapeKey);
+                    HttpClient.DefaultRequestHeaders.Add("X-Mashape-Key", ConfigHandler.IConfig.APIKeys.MashapeKey);
                     HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
                     var get = JObject.Parse(await HttpClient.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={Destination}"));
                     var WebResponse = get["time"].ToString();
@@ -235,7 +237,7 @@ namespace Rick.Modules
                 $"**Response Latency:** {sw.ElapsedMilliseconds} ms\n" +
                 $"**Delta:** {sw.ElapsedMilliseconds - client.Latency} ms\n" +
                 $"**IP/Web Response Time:** {Time}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -253,7 +255,7 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, new Uri(Context.User.GetAvatarUrl()), Description: $"Your unique UUID is: {id}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -277,7 +279,7 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            var List = gldConfig.AfkList;
+            var List = gldConfig.AFKList;
 
 
             switch (prop)
@@ -305,44 +307,6 @@ namespace Rick.Modules
         [Command("About"), Summary("Displays information about the bot.")]
         public async Task AboutAsync()
         {
-            var client = Context.Client as DiscordSocketClient;
-            var AppInfo = await client.GetApplicationInfoAsync();
-            string Description = $"Hello! I'm {AppInfo.Name} written by {AppInfo.Owner}! I'm also open source on Github! [https://github.com/ExceptionDev/Rick].\n" +
-                $"If you plan to copy code from my source please do put {AppInfo.Owner} in your credits/help/info/about command/website and if you copy/clone my repo please don't remove this command!\n" +
-                $"Also, leaving a star on my repo won't hurt you!\n" +
-                $"Please user the {BotHandler.BotConfig.DefaultPrefix}Cmds for commands list and {BotHandler.BotConfig.DefaultPrefix}Help CommandName for more info on a command!\n" +
-                $"**Services**\n" +
-                $"I offer wide range of commands for admins and the users! Ranging from Basic commands such as Getting user/guild info to Google/Bing search commands! " +
-                $"Wanna get naughty and keep your hands busy?! I've some NSFW commands as well to keep you entertained! " +
-                $"Want to have some sort of rankings based on how much you talk?! I got Karma! Talk and recieve random karma based on your chat activity! + MANY MORE COMMANDS!\n" +
-                $"**Invite URL:** https://discordapp.com/oauth2/authorize?client_id={AppInfo.Id}&scope=bot&permissions=2146958591\n" +
-                $"**Help Guild:** https://discord.me/Noegenesis";
-            var embed = EmbedExtension.Embed(EmbedColors.White, client.CurrentUser.Username, client.CurrentUser.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Encrypt"), Summary("Encrypts a message?"), Remarks("Encrypts PLS ENCRYPT DIS MSG")]
-        public async Task EncryptAsync([Remainder] string Text)
-        {
-            string Get = EncryptionService.EncryptString(Text);
-            if (string.IsNullOrWhiteSpace(Get))
-            {
-                await ReplyAsync("Null result");
-                return;
-            }
-            await ReplyAsync(Get);
-        }
-
-        [Command("Decrypt"), Summary("Decrypts a message?"), Remarks("Decrypt PLS DECRYPT DIS MSG")]
-        public async Task DecryptAsync([Remainder] string Text)
-        {
-            string Get = EncryptionService.DecryptString(Text);
-            if (string.IsNullOrWhiteSpace(Get))
-            {
-                await ReplyAsync("Null result");
-                return;
-            }
-            await ReplyAsync(Get);
         }
 
         [Command("Rate"), Summary("Rates something for you out of 10."), Remarks("Rate Kendrick")]
@@ -351,15 +315,15 @@ namespace Rick.Modules
             await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
         }
 
-        [Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
-        public async Task TranslateAsync(string Language, [Remainder] string Text)
-        {
-            var result = await MethodsService.Translate(Language, Text);
-            string Description = $"**Input:** {Text}\n" +
-                $"**In {Language}:** {result.Translations[0].Translation}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
-        }
+        //[Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
+        //public async Task TranslateAsync(string Language, [Remainder] string Text)
+        //{
+        //    var result = await MethodsService.Translate(Language, Text);
+        //    string Description = $"**Input:** {Text}\n" +
+        //        $"**In {Language}:** {result.Translations[0].Translation}";
+        //    var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
+        //    await ReplyAsync("", embed: embed);
+        //}
 
         [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100")]
         public async Task SlotMachineAsync(int Bet = 50)
@@ -460,7 +424,9 @@ namespace Rick.Modules
         public async Task TrumpAsync()
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
-            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!", Context.Client.CurrentUser.GetAvatarUrl(), Description: Http.ToString());
+            Uri Pic = new Uri("http://abovethelaw.com/wp-content/uploads/2016/04/cartoon-trump-300x316.jpg");
+            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!", 
+                Pic, Description: Http.ToString());
             await ReplyAsync("", embed: embed);
 
         }
@@ -476,14 +442,15 @@ namespace Rick.Modules
                 return;
             }
             var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
-            foreach (var result in ConvertedJson.results.Take(5).OrderBy(x => x.displayName))
+            foreach (var result in ConvertedJson.Results.Take(5).OrderBy(x => x.Name))
             {
-                Builder.AppendLine($"**{result.displayName}**\n" +
-                    $"**Kind: **{result.itemKind} || **Type: **{result.itemType}\n" +
-                    $"**Summary: **{result.description}\n" +
-                    $"**URL: **{MethodsService.ShortenUrl(result.url)}\n");
+                Builder.AppendLine($"**{result.Name}**\n" +
+                    $"**Kind: **{result.Kind} || **Type: **{result.Type}\n" +
+                    $"**Summary: **{result.Snippet}\n" +
+                    $"**URL: ** {result.URL}\n");
             }
-            var embed = EmbedExtension.Embed(EmbedColors.White, Search, "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.count.ToString()}");
+            var embed = EmbedExtension.Embed(EmbedColors.White, Search, 
+                new Uri("https://exceptiondev.github.io/media/Book.png"), Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -539,7 +506,7 @@ namespace Rick.Modules
         [Command("Stats"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
-            long length = new FileInfo(BotHandler.configPath).Length + new FileInfo(GuildHandler.configPath).Length;
+            long length = new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length;
 
             string Description = $"{Format.Bold("Stats")}\n" +
                 $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
@@ -547,10 +514,10 @@ namespace Rick.Modules
                 $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
                 $"- Databse Size: {length} Bytes\n" +
-                $"- Total Command Used: {BotHandler.BotConfig.CommandsUsed}\n" +
-                $"- Total Messages Received: {BotHandler.BotConfig.MessagesReceived}";
+                $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
+                $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -616,10 +583,11 @@ namespace Rick.Modules
                 return;
             }
 
-            int Level = MsgsService.GetLevel(karma);
-            int KarmaLast = MsgsService.GetKarmaForLastLevel(Level);
-            int KarmaNext = MsgsService.GetKarmaForNextLevel(Level);
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{KarmaUser.Username} Rankings", KarmaUser.GetAvatarUrl(), ThumbUrl: KarmaUser.GetAvatarUrl());
+            int Level = Fomulas.GetLevel(karma);
+            int KarmaLast = Fomulas.GetKarmaForLastLevel(Level);
+            int KarmaNext = Fomulas.GetKarmaForNextLevel(Level);
+            Uri Image = new Uri(KarmaUser.GetAvatarUrl());
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{KarmaUser.Username} Rankings", Image, ThumbUrl: Image);
             embed.AddInlineField("Level", Level);
             embed.AddInlineField("Karma", karma);
             embed.AddInlineField("Karma Required For Last Level", KarmaLast);
@@ -633,7 +601,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.KarmaList;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl);
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", new Uri(Context.Guild.IconUrl));
             if (karmalist.Count <= 0)
             {
                 await ReplyAsync("Guild's Karma list is empty!");
@@ -643,7 +611,7 @@ namespace Rick.Modules
             foreach (var val in filter)
             {
                 var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
-                var Level = MsgsService.GetLevel(val.Value);
+                var Level = Fomulas.GetLevel(val.Value);
                 embed.AddInlineField(user.Username, $"**Karma:** {val.Value} | **Level:** {Level}");
             }
             await ReplyAsync("", embed: embed);

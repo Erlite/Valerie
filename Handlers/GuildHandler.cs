@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 using Rick.Interfaces;
-using System.Threading.Tasks;
-using System.IO;
 using Rick.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Rick.Handlers
 {
@@ -16,14 +18,14 @@ namespace Rick.Handlers
         public static async Task SaveAsync<T>(Dictionary<ulong, T> configs) where T : IServer
             => File.WriteAllText(configPath, await Task.Run(() => JsonConvert.SerializeObject(configs, Formatting.Indented)).ConfigureAwait(false));
 
-        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T> (string path = configPath) where T : IServer, new()
+        public static async Task<Dictionary<ulong, T>> LoadServerConfigsAsync<T>() where T : IServer, new()
         {
-            if (File.Exists(path))
+            if (File.Exists(configPath))
             {
-                return await Task.Run(() => JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(path))).ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(configPath));
             }
             var newConfig = new Dictionary<ulong, T>();
-            await SaveAsync(newConfig);
+            await SaveAsync(newConfig).ConfigureAwait(false);
             return newConfig;
         }
     }

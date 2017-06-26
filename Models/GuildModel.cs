@@ -1,52 +1,44 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using Rick.Wrappers;
 using Rick.Interfaces;
 
 namespace Rick.Models
 {
     public class GuildModel : IServer
     {
-        [JsonProperty("GuildPrefix")]
-        public string GuildPrefix { get; set; } = "?>";
+        [JsonProperty("Prefix")]
+        public char Prefix { get; set; } = '!';
 
-        [JsonProperty("WelcomeMessage")]
-        public string WelcomeMessage { get; set; } = "Welcome to our server! All weapons stay outside!";
-
-        [JsonProperty("ModChannelID")]
-        public ulong ModChannelID { get; set; }
+        [JsonProperty("WelcomeMessages")]
+        public List<string> WelcomeMessages { get; set; } = new List<string>();
 
         [JsonProperty("MuteRoleID")]
-        public ulong MuteRoleId { get; set; }
+        public ulong MuteRoleID { get; set; }
 
-        [JsonProperty("CaseNumber")]
-        public int CaseNumber { get; set; }
+        [JsonProperty("AdminCases")]
+        public int AdminCases { get; set; }
 
         [JsonProperty("IsKarmaEnabled")]
         public bool IsKarmaEnabled { get; set; }
 
-        [JsonProperty("IsChatterBotEnabled")]
-        public bool IsChatterBotEnabled { get; set; }
+        [JsonProperty("JoinLog")]
+        public Wrapper JoinEvent { get; set; } = new Wrapper();
 
-        [JsonProperty("JoinEvent")]
-        public EventWrapper JoinEvent { get; set; } = new EventWrapper();
+        [JsonProperty("LeaveLog")]
+        public Wrapper LeaveEvent { get; set; } = new Wrapper();
 
-        [JsonProperty("LeaveEvent")]
-        public EventWrapper LeaveEvent { get; set; } = new EventWrapper();
+        [JsonProperty("AdminLog")]
+        public Wrapper AdminLog { get; set; } = new Wrapper();
 
-        [JsonProperty("UserBanned")]
-        public EventWrapper UserBanned { get; set; } = new EventWrapper();
-
-        [JsonProperty("RequiredRoleID")]
-        public List<ulong> RequiredRoleIDs { get; set; } = new List<ulong>();
-
-        [JsonProperty("RequiredChannelNames")]
-        public List<string> RequiredChannelNames { get; set; } = new List<string>();
+        [JsonProperty("Chatterbot")]
+        public Wrapper Chatterbot { get; set; } = new Wrapper();
 
         [JsonProperty("Tags")]
         public List<TagsModel> TagsList { get; set; } = new List<TagsModel>();
 
-        [JsonProperty("AfkList")]
-        public Dictionary<ulong, string> AfkList { get; set; } = new Dictionary<ulong, string>();
+        [JsonProperty("AFKList")]
+        public Dictionary<ulong, string> AFKList { get; set; } = new Dictionary<ulong, string>();
 
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> KarmaList { get; set; } = new Dictionary<ulong, int>();

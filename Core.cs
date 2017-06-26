@@ -1,72 +1,70 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
 using Discord.Commands;
-using Rick.Services;
+using Discord.WebSocket;
 using Rick.Handlers;
-using Rick.Enums;
+using Rick.Controllers;
 using Rick.Models;
+using Rick.Functions;
 
 namespace Rick
 {
     public class Core
     {
         static void Main(string[] args) => new Core().StartAsync().GetAwaiter().GetResult();
-        private DiscordSocketClient client;
-        private CommandHandler handler;
 
-        public async Task StartAsync()
+        DiscordSocketClient Client;
+        CommandHandler CommandHandler;
+
+        async Task StartAsync()
         {
-            BotHandler.DirectoryCheck();
-
-            client = new DiscordSocketClient(new DiscordSocketConfig()
+            Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose
             });
 
-            client.Log += (log) => Task.Run(() => Logger.Log(LogType.Info, LogSource.Client, log.Exception?.ToString() ?? log.Message));
+            Client.Log += (Log) => Task.Run(() 
+                => Logger.Log(Enums.LogType.Info, Enums.LogSource.Client, Log.Message));
 
-            var ServiceProdivder = ConfigureServices();
-            handler = new CommandHandler(ServiceProdivder);
-            await handler.ConfigureAsync();
-
-            client.GuildAvailable += EventService.CreateGuildConfigAsync;
-            client.JoinedGuild += EventService.JoinedGuildAsync;
-            client.LeftGuild += EventService.RemoveGuildConfigAsync;
-            client.UserLeft += EventService.HandleGuildsTasks;
-            client.MessageReceived += EventService.MessageServicesAsync;
-            client.Ready += EventService.OnReadyAsync;
-
+            ConfigHandler.DirectoryCheck();
+            ConfigHandler.IConfig = await ConfigHandler.LoadConfigAsync();
             GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildModel>();
-            BotHandler.BotConfig = await BotHandler.LoadConfigAsync();
 
-            Logger.TitleCard($"{BotHandler.BotConfig.BotName} v{BotHandler.BotVersion}");
-            RickUpdater.ProgramUpdater();
+            #region Events
+            Client.UserJoined += Events.UserJoinedAsync;
+            Client.UserLeft += Events.UserLeftAsync;
+            Client.JoinedGuild += Events.JoinedGuildAsync;
+            Client.LeftGuild += Events.DeleteGuildConfig;
+            Client.GuildAvailable += Events.HandleGuildConfigAsync;
+            Client.MessageReceived += Events.HandleGuildMessagesAsync;
+            Client.LatencyUpdated += Events.LatencyAsync;
+            #endregion
 
-            MethodsService.ServicesLogin();
+            var ServiceProvider = Inject();
 
-            await client.LoginAsync(TokenType.Bot, BotHandler.BotConfig.BotToken);
-            await client.StartAsync();
+            CommandHandler = new CommandHandler(ServiceProvider);
+            await CommandHandler.ConfigureCommandsAsync();
+
+            Function.ServicesLogin();
+
+            await Client.LoginAsync(TokenType.Bot, ConfigHandler.IConfig.Token);
+            await Client.StartAsync();
 
             await Task.Delay(-1);
         }
 
-        private IServiceProvider ConfigureServices()
+        IServiceProvider Inject()
         {
             var Services = new ServiceCollection()
-                .AddSingleton(client)
-                .AddSingleton(new GuildHandler())
-                .AddSingleton(new BotHandler())
-                .AddSingleton(new EventService(client))
-                .AddSingleton(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false, LogLevel = LogSeverity.Verbose }));
+                .AddSingleton(Client)
+                .AddSingleton(new CommandService(new CommandServiceConfig
+                {
+                    ThrowOnError = false
+                }));
 
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
-            Provider.GetService<GuildHandler>();
-            Provider.GetService<BotHandler>();
-            Provider.GetService<EventService>();
-            Provider.GetService<MsgsService>();
             return Provider;
         }
     }

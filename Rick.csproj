@@ -4,18 +4,18 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RuntimeFrameworkVersion>2.0.0-preview1-002111-00</RuntimeFrameworkVersion>
-    <ApplicationIcon></ApplicationIcon>
+    <ApplicationIcon>App.ico</ApplicationIcon>
 </PropertyGroup>
 
-<ItemGroup>
-  <PackageReference Include="AngleSharp" Version="0.9.9" />
-  <PackageReference Include="Discord.Net" Version="1.0.0-rc3-00767" />
-  <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.27.1.880" />
-  <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.27.1.138" />
-  <PackageReference Include="Google.Apis.YouTube.v3" Version="1.27.1.760" />
-  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.0-beta2" />
-  <PackageReference Include="Octokit" Version="0.24.1-alpha0001" />
-  <PackageReference Include="TweetinviAPI" Version="2.0.0" />
-</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.9.9" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc3-00767" />
+    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.27.1.880" />
+    <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.27.1.138" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.27.1.760" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.0-beta2" />
+    <PackageReference Include="Octokit" Version="0.24.1-alpha0001" />
+    <PackageReference Include="TweetinviAPI" Version="2.0.0" />
+  </ItemGroup>
 
 </Project>

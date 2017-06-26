@@ -6,7 +6,7 @@ using Rick.Attributes;
 using Rick.Enums;
 using Rick.Extensions;
 using System.Text;
-using Rick.Handlers;
+using System;
 
 namespace Rick.Modules
 {
@@ -37,7 +37,8 @@ namespace Rick.Modules
                 "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo, BImage, Bing, GitUser, SNews, Suser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
                 "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
+            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", 
+                new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
             await ReplyAsync("", embed: embed);
         }
 

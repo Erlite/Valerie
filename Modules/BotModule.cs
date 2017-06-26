@@ -5,8 +5,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Net.Http;
 using System.IO;
-using Rick.Services;
 using Rick.Handlers;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
@@ -18,12 +18,10 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new NullReferenceException("Value cannot be empty");
-            var botConfig = BotHandler.BotConfig;
-            botConfig.BotName = value;
+            var botConfig = ConfigHandler.IConfig;
             var client = Context.Client as DiscordSocketClient;
             await Context.Client.CurrentUser.ModifyAsync(x => x.Username = value);
             await ReplyAsync(":eyes: Done :eyes:");
-            await BotHandler.SaveAsync(botConfig);
         }
 
         [Command("Nickname"), Summary("Changes Bot's nickname"), Remarks("Nickname XD")]
@@ -67,11 +65,11 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(value))
                 throw new NullReferenceException("Value cannot be empty");
             var client = Context.Client as DiscordSocketClient;
-            var botConfig = BotHandler.BotConfig;
+            var botConfig = ConfigHandler.IConfig;
             botConfig.Games.Add(value);
             await client.SetGameAsync(value);
             await ReplyAsync(":eyes: Done :eyes:");
-            await BotHandler.SaveAsync(botConfig);
+            await ConfigHandler.SaveAsync();
         }
 
         [Command("Status"), Summary("Changes Bot's status such as setting status to DND"), Remarks("Status 3")]
@@ -89,34 +87,34 @@ namespace Rick.Modules
         {
             if (string.IsNullOrWhiteSpace(prefix))
                 throw new NullReferenceException("Prefix can't be left empty!");
-            var botConfig = BotHandler.BotConfig;
-            botConfig.DefaultPrefix = prefix;
+            var botConfig = ConfigHandler.IConfig;
+            botConfig.Prefix = prefix;
             await ReplyAsync($":gear: Bot's default prefix has been set to: **{prefix}**");
-            await BotHandler.SaveAsync(botConfig);
+            await ConfigHandler.SaveAsync();
         }
 
         [Command("Debug"), Summary("Enables/Disables debug mode")]
         public async Task DebugAsync()
         {
-            var Config = BotHandler.BotConfig;
-            if (!Config.DebugMode)
+            var Config = ConfigHandler.IConfig;
+            if (!Config.IsDebugEnabled)
             {
-                Config.DebugMode = true;
+                Config.IsDebugEnabled = true;
                 await ReplyAsync(":gear: Debug mode has been enabled!");
             }
             else
             {
-                Config.DebugMode = false;
+                Config.IsDebugEnabled = false;
                 await ReplyAsync(":skull_crossbones: Debug mode has been disbaled!");
             }
-            await BotHandler.SaveAsync(Config);
+            await ConfigHandler.SaveAsync();
         }
 
         [Command("Mention"), Summary("Enables/Disables mention prefix")]
         public async Task MentionAsync()
         {
-            var Config = BotHandler.BotConfig;
-            if (!Config.MentionDefaultPrefix)
+            var Config = ConfigHandler.IConfig;
+            if (!Config.IsMentionEnabled)
             {
                 await ReplyAsync(":gear: Mention Prefix has been enabled!");
             }
@@ -124,26 +122,7 @@ namespace Rick.Modules
             {
                 await ReplyAsync(":skull_crossbones: Mention Prefix has been disbaled!");
             }
-            await BotHandler.SaveAsync(Config);
-        }
-
-        [Command("Latency"), Summary("Enables/Disables monitoring your ping")]
-        public async Task LatencyAsync()
-        {
-            var Config = BotHandler.BotConfig;
-            if (!Config.ClientLatency)
-            {
-                Config.ClientLatency = true;
-                EventService.EnableLatencyMonitor();
-                await ReplyAsync(":gear: Will AutoUpdate my status based on Ping!");
-            }
-            else
-            {
-                Config.ClientLatency = false;
-                EventService.DisableLatencyMonitor();
-                await ReplyAsync(":skull_crossbones: Latency monitor disabled");
-            }
-            await BotHandler.SaveAsync(Config);
+            await ConfigHandler.SaveAsync();
         }
     }
 }

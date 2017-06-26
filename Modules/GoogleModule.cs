@@ -11,7 +11,7 @@ using Rick.Enums;
 using Rick.Extensions;
 using Rick.Attributes;
 using Rick.Handlers;
-using Rick.Services;
+using Rick.Functions;
 using Discord.WebSocket;
 using Discord.Commands;
 
@@ -24,22 +24,23 @@ namespace Rick.Modules
         public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
-            string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
+            Uri URL = new Uri("http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png");
             
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
-                ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
+                ApiKey = ConfigHandler.IConfig.APIKeys.GoogleKey
             });
             var RequestList = Service.Cse.List(search);
-            RequestList.Cx = BotHandler.BotConfig.APIKeys.SearchEngineID;
+            RequestList.Cx = ConfigHandler.IConfig.APIKeys.SearchEngineID;
 
             var items = RequestList.Execute().Items.Take(6);
             foreach (var result in items)
             {
-                Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{MethodsService.ShortenUrl(result.Link)}\n");
+                Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{Function.ShortenUrl(result.Link)}\n");
             }
 
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", 
+                new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Str.ToString(), ThumbUrl: URL);
 
             if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
                 await ReplyAsync("No results found!");
@@ -53,11 +54,12 @@ namespace Rick.Modules
             using (var http = new HttpClient())
             {
                 var rng = new Random();
-                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={BotHandler.BotConfig.APIKeys.GoogleKey}";
+                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={ConfigHandler.IConfig.APIKeys.GoogleKey}";
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
-                var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
+                var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", 
+                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), ImageUrl: new Uri(image));
                 await ReplyAsync("", embed: embed);
             }
         }
@@ -67,7 +69,7 @@ namespace Rick.Modules
         {
             var Service = new YouTubeService(new BaseClientService.Initializer
             {
-                ApiKey = BotHandler.BotConfig.APIKeys.GoogleKey
+                ApiKey = ConfigHandler.IConfig.APIKeys.GoogleKey
             });
             var SearchRequest = Service.Search.List("snippet");
             SearchRequest.Q = search;
@@ -81,7 +83,7 @@ namespace Rick.Modules
         [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/ExceptionDev"),]
         public async Task ShortenAsync([Remainder] string URL)
         {
-            await ReplyAsync($"This is your shortened URL: {MethodsService.ShortenUrl(URL)}");
+            await ReplyAsync($"This is your shortened URL: {Function.ShortenUrl(URL)}");
         }
 
         [Command("Revav"), Summary("Performs a reverse image search for a user avatar.")]
@@ -89,7 +91,7 @@ namespace Rick.Modules
         {
             await ReplyAsync(
                 $"Reverse Image Result: " +
-                $"{MethodsService.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
+                $"{Function.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
         }
     }
 }
