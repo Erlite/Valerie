@@ -5,8 +5,9 @@ using Rick.Models;
 using Rick.Handlers;
 using Discord;
 using Discord.WebSocket;
-using Library.Cleverbot.Models;
 using Rick.Functions;
+using Rick.Enums;
+using Cleverbot.Models;
 
 namespace Rick.Controllers
 {
@@ -46,6 +47,7 @@ namespace Rick.Controllers
         internal static async Task UserLeftAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
+            CleanUpAsync(User);
             if (!Config.LeaveEvent.IsEnabled) return;
             var LeaveChannel = User.Guild.GetChannel(Config.LeaveEvent.TextChannel);
             ITextChannel Channel = null;
@@ -94,6 +96,7 @@ namespace Rick.Controllers
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
             var GuildConfig = GuildHandler.GuildConfigs[Guild.Id];
             var BotConfig = ConfigHandler.IConfig;
+            var User = Message.Author as SocketGuildUser;
 
             BotConfig.MessagesReceived += 1;
 
@@ -102,41 +105,12 @@ namespace Rick.Controllers
 
             if (Message.Author.IsBot || !GuildConfig.Chatterbot.IsEnabled || !GuildConfig.IsKarmaEnabled) return;
 
-            string Msg = null;
-
-            #region Guild AFK Tasks
-            SocketUser usr = Message.MentionedUsers.FirstOrDefault(User => AFKList.TryGetValue(User.Id, out Msg));
-            await Message.Channel.SendMessageAsync($"**Message left from {usr.Username}:** {Msg}");
-            #endregion
-
-            #region Cleverbot Tasks
-            if (Message.Content.StartsWith(ConfigHandler.IConfig.Prefix))
-            {
-                Msg = Message.Content.Replace(ConfigHandler.IConfig.Prefix, "");
-            }
-
-            CleverbotResponse Response = null;
-            Response = Library.Cleverbot.Core.Talk(Msg, Response);
-            await Message.Channel.SendMessageAsync(Response.Output);
-            #endregion
-
-            #region Karma Tasks
-            var GetRandom = new Random().Next(1, 10);
-            var RandomKarma = Fomulas.GiveKarma(GetRandom);
-            var karmalist = GuildConfig.KarmaList;
-            if (!karmalist.ContainsKey(Message.Author.Id))
-            {
-                karmalist.Add(Message.Author.Id, RandomKarma);
-                return;
-            }
-
-            int getKarma = karmalist[Message.Author.Id];
-            getKarma += RandomKarma;
-            karmalist[Message.Author.Id] = getKarma;
-            #endregion
+            KarmaHandlerAsync(User);
+            AFKHandlerAsync(Guild, Message);
+            CleverbotHandlerAsync(Guild, Message);
 
             GuildHandler.GuildConfigs[Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs).ConfigureAwait(false);
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ConfigHandler.SaveAsync();
         }
 
@@ -144,5 +118,75 @@ namespace Rick.Controllers
         {
 
         }
+
+
+        #region Event Methods
+        static async void CleanUpAsync(SocketGuildUser User)
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[User.Guild.Id];
+            if (GuildConfig.KarmaList.ContainsKey(User.Id))
+            {
+                GuildConfig.KarmaList.Remove(User.Id);
+                Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
+            }
+            foreach (var tag in GuildConfig.TagsList)
+            {
+                if (tag.Owner == User.Id)
+                {
+                    GuildConfig.TagsList.Remove(tag);
+                    Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed {tag.Name} by {User.Username}.");
+                }
+            }
+
+            GuildHandler.GuildConfigs[User.Guild.Id] = GuildConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        static async void KarmaHandlerAsync(SocketGuildUser User)
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[User.Guild.Id];
+
+            if (User.IsBot || !GuildConfig.IsKarmaEnabled) return;
+
+            var GetRandom = new Random().Next(1, 10);
+            var RandomKarma = Fomulas.GiveKarma(GetRandom);
+            var karmalist = GuildConfig.KarmaList;
+            if (!karmalist.ContainsKey(User.Id))
+            {
+                karmalist.Add(User.Id, RandomKarma);
+                return;
+            }
+
+            int getKarma = karmalist[User.Id];
+            getKarma += RandomKarma;
+            karmalist[User.Id] = getKarma;
+
+            GuildHandler.GuildConfigs[User.Guild.Id] = GuildConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        static async void AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
+        {
+            var AfkList = GuildHandler.GuildConfigs[Guild.Id].AFKList;
+            string afkReason = null;
+            SocketUser gldUser = Message.MentionedUsers.FirstOrDefault(u => AfkList.TryGetValue(u.Id, out afkReason));
+            if (gldUser != null)
+                await Message.Channel.SendMessageAsync($"**Message left from {gldUser.Username}:** {afkReason}");
+        }
+
+        static async void CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
+        {
+            var IsEnabled = GuildHandler.GuildConfigs[Guild.Id].Chatterbot.IsEnabled;
+            if (Message.Author.IsBot || !IsEnabled || !Message.Content.StartsWith("Rick")) return;
+            string UserMsg = null;
+            if (Message.Content.StartsWith("Rick"))
+            {
+                UserMsg = Message.Content.Replace("Rick", "");
+            }
+            CleverbotResponse Response = null;
+            Response = Cleverbot.Main.Talk(UserMsg, Response);
+            await Message.Channel.SendMessageAsync(Response.Output);
+        }
+        #endregion
     }
 }
