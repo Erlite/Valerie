@@ -3,9 +3,13 @@
     public enum GlobalEnums
     {
         Add,
-        Remove,
         Modify,
+        Remove,
         TagName,
-        TagResponse
+        TagResponse,
+        AdminChannel,
+        JoinChannel,
+        LeaveChannel,
+        ChatterbotChannel
     }
 }
