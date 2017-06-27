@@ -307,6 +307,19 @@ namespace Rick.Modules
         [Command("About"), Summary("Displays information about the bot.")]
         public async Task AboutAsync()
         {
+
+            string Message = $"HENLO! I'm Ricky R-r-r-r-RICK! c: :eggplant:" +
+                $"I'm better than SIRI and you! Yea! You heard that right! :100:" +
+                $"Invite me to your server so I can molest all of your users or if you wanna get laid real quick. " +
+                $"I'm all about them Girls bro.\n" +
+                $"I'm written by ExceptionDev and this is my ??7?? rewrite. Always trying to improve to provide better fucntionality.";
+            string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
+                $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey)";
+
+            var embed = EmbedExtension.Embed(EmbedColors.Gold,
+                "Ricky Rick [@Vuxey](https://twitter.com/Vuxey)", new Uri(Context.Client.CurrentUser.GetAvatarUrl()),
+                Description: $"{Message}\n{Misc}");
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Rate"), Summary("Rates something for you out of 10."), Remarks("Rate Kendrick")]
@@ -321,7 +334,7 @@ namespace Rick.Modules
             var result = await Function.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", 
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!",
                 new Uri(Context.User.GetAvatarUrl()), Description: Description);
             await ReplyAsync("", embed: embed);
         }
@@ -426,7 +439,7 @@ namespace Rick.Modules
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
             Uri Pic = new Uri("http://abovethelaw.com/wp-content/uploads/2016/04/cartoon-trump-300x316.jpg");
-            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!", 
+            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!",
                 Pic, Description: Http.ToString());
             await ReplyAsync("", embed: embed);
 
@@ -450,7 +463,7 @@ namespace Rick.Modules
                     $"**Summary: **{result.Snippet}\n" +
                     $"**URL: ** {result.URL}\n");
             }
-            var embed = EmbedExtension.Embed(EmbedColors.White, Search, 
+            var embed = EmbedExtension.Embed(EmbedColors.White, Search,
                 new Uri("https://exceptiondev.github.io/media/Book.png"), Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
@@ -617,12 +630,12 @@ namespace Rick.Modules
             }
             await ReplyAsync("", embed: embed);
         }
-        
+
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
         {
             var Get = await new HttpClient().GetAsync("http://api.yomomma.info/");
-            
+
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync(Get.ReasonPhrase);
