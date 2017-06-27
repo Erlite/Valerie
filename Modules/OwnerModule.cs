@@ -18,6 +18,7 @@ using Rick.Extensions;
 using Rick.Handlers;
 using Rick.Roslyn;
 using Rick.Functions;
+using Rick.Models;
 
 namespace Rick.Modules
 {
@@ -96,22 +97,28 @@ namespace Rick.Modules
             await ReplyAsync(invite.Url);
         }
 
-        //[Command("Archive"), Summary("Archive GuildName ChannelName 10"), Remarks("archives a channel and uploads a JSON")]
-        //public async Task ArchiveCommand(string guildName, string channelName, int amount = 9000)
-        //{
-        //    var channelToArchive = (await
-        //        (await Context.Client.GetGuildsAsync()).FirstOrDefault(x => x.Name == guildName).GetTextChannelsAsync()).FirstOrDefault(x => x.Name == channelName);
-        //    if (channelToArchive != null)
-        //    {
-        //        var listOfMessages = new List<IMessage>(await channelToArchive.GetMessagesAsync(amount).Flatten());
-        //        List<MessageModel> list = new List<MessageModel>(listOfMessages.Capacity);
-        //        foreach (var message in listOfMessages)
-        //            list.Add(new MessageModel { Author = message.Author.Username, Content = message.Content, Timestamp = message.Timestamp });
-        //        var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-        //        var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
-        //        await Context.Channel.SendFileAsync(GenerateStreamFromString(json), $"{channelName}.json");
-        //    }
-        //}
+        [Command("Archive"), Summary("Archive #ChannelName 10"), Remarks("Archives a channel and uploads a JSON")]
+        public async Task ArchiveCommand(IMessageChannel Channel, int Amount = 9000)
+        {
+            if (Amount >= 10000)
+            {
+                await ReplyAsync("Amount must by less than 9000!");
+                return;
+            }
+
+            var listOfMessages = new List<IMessage>(await Channel.GetMessagesAsync(Amount).Flatten());
+
+            List<ArchiveModel> list = new List<ArchiveModel>(listOfMessages.Capacity);
+            foreach (var message in listOfMessages) list.Add(new ArchiveModel
+            {
+                Author = message.Author.Username,
+                Message = message.Content,
+                Timestamp = message.Timestamp,
+            });
+            var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+            var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
+            await (await Context.User.GetOrCreateDMChannelAsync()).SendFileAsync(GenerateStreamFromString(json), $"{Channel.Name}.json");
+        }
 
         [Command("Blacklist"), Summary("Blacklist @Username Reason"), Remarks("Forbids a user from using bot commands")]
         public async Task BlacklistAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the owner!")
@@ -282,7 +289,7 @@ namespace Rick.Modules
                                 $"- OS version: {Environment.OSVersion.Version} ({Environment.OSVersion.VersionString})\n" +
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.", 
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.",
                 new Uri(application.IconUrl), Description: Description);
             await ReplyAsync("", embed: embed);
         }
