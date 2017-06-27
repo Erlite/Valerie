@@ -291,7 +291,9 @@ namespace Rick.Modules
                                 $"- .NET is Mono: {isMono}\n";
             var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.",
                 new Uri(application.IconUrl), Description: Description);
-            await ReplyAsync("", embed: embed);
+            var Msg = await ReplyAsync("", embed: embed);
+            await Task.Delay(5000);
+            await Msg.DeleteAsync();
         }
 
         [Command("SendMsg"), Summary("SendMsg GuildID Msg"), Remarks("Sends messages to a guild")]
