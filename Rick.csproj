@@ -18,4 +18,8 @@
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Cleverbot\Cleverbot.csproj" />
+  </ItemGroup>
+
 </Project>
