@@ -13,6 +13,8 @@ namespace Rick.Controllers
 {
     public class Events
     {
+        static DiscordSocketClient Client { get; }
+
         internal static async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
@@ -105,9 +107,14 @@ namespace Rick.Controllers
 
         internal static async Task LatencyAsync(int Older, int Newer)
         {
+            if (Client == null) return;
 
+            var Status = (Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
+                : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
+                : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;
+
+            await Client.SetStatusAsync(Status);
         }
-
 
         #region Event Methods
         static async void CleanUpAsync(SocketGuildUser User)
@@ -182,6 +189,24 @@ namespace Rick.Controllers
             var Config = ConfigHandler.IConfig;
             Config.MessagesReceived += 1;
             await ConfigHandler.SaveAsync();
+        }
+
+        public static async Task OnReadyAsync(DiscordSocketClient Client)
+        {
+            var Config = ConfigHandler.IConfig;
+            var GetGame = Config.Games[new Random().Next(Config.Games.Count)];
+
+            Client.LatencyUpdated += LatencyAsync;
+
+            if (Client == null) return;
+
+            if (Config.Games.Count <= 0)
+            {
+                await Client.SetGameAsync(Config.Prefix + "Cmds");
+                return;
+            }
+            else
+                await Client.SetGameAsync(GetGame);
         }
         #endregion
     }
