@@ -42,5 +42,8 @@ namespace Rick.Models
 
         [JsonProperty("KarmaList")]
         public Dictionary<ulong, int> KarmaList { get; set; } = new Dictionary<ulong, int>();
+
+        [JsonPropety("AssignableRoles")]
+        public List<string> AssignableRoles { get; set; } = new List<string>();
     }
 }
