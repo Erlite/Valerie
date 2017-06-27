@@ -11,7 +11,12 @@ namespace Rick.Models
         public char Prefix { get; set; } = '!';
 
         [JsonProperty("WelcomeMessages")]
-        public List<string> WelcomeMessages { get; set; } = new List<string>();
+        public List<string> WelcomeMessages { get; set; } = new List<string>()
+        {
+            "Heyo! Welcome to our server!",
+            "A new being has joined over server!",
+            "Please leave all weapons outside!"
+        };
 
         [JsonProperty("MuteRoleID")]
         public ulong MuteRoleID { get; set; }
