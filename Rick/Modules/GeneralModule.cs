@@ -281,10 +281,14 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             var List = gldConfig.AFKList;
 
-
             switch (prop)
             {
                 case GlobalEnums.Add:
+                    if (List.ContainsKey(Context.User.Id))
+                    {
+                        await ReplyAsync("You are already in the AFK List! :anger:");
+                        return;
+                    }
                     List.Add(Context.User.Id, msg);
                     await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
                     break;
