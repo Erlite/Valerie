@@ -15,7 +15,7 @@ namespace Rick.Modules
     [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
-        [Command("SetPrefix"), Summary("SetPrefix ?"), Remarks("Sets Guild prefix")]
+        [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]
         public async Task SetPrefixAsync(char prefix)
         {
             var Guild = Context.Guild as SocketGuild;
@@ -26,7 +26,8 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
-        [Command("WelcomeMsg"), Summary("WelcomeMsg This is a welcome Msg"), Remarks("Sets welcome message for your server")]
+        [Command("Welcome"), Summary("Sets a welcome message for your server and adds it" +
+            "to the welcome list."), Remarks("Welcome Heyo welcome to our server!")]
         public async Task WelcomeMessageAsync([Remainder]string msg)
         {
             var Guild = Context.Guild as SocketGuild;
@@ -37,8 +38,8 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Welcome Message has been set to:\n```{msg}```");
         }
 
-        [Command("Actions"), Summary("Normal Command"), Remarks("Shows what Actions are being logged")]
-        public async Task ActionsAsync()
+        [Command("Settings"), Summary("Displays all settings for your Guild.")]
+        public async Task SettingsAsync()
         {
             var SB = new StringBuilder();
             var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -111,7 +112,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("ToggleJoins"), Summary("ToggleJoins #ChannelName"), Remarks("Toggles Join logging")]
+        [Command("ToggleJoins"), Summary("Enables/Disables logging joins.")]
         public async Task ToggleJoinsAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -129,7 +130,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleLeaves"), Summary("ToggleLeaves #ChannelName"), Remarks("Toggle Leaves logging")]
+        [Command("ToggleLeaves"), Summary("Enables/Disables logging leaves.")]
         public async Task ToggleLeavesAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -147,7 +148,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
+        [Command("ToggleBans"), Summary("Enables/Disables logging admin actions such as Kick/Ban.")]
         public async Task ToggleBansAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -166,7 +167,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleKarma"), Summary("Normal Command"), Remarks("Toggles Chat Karma")]
+        [Command("ToggleKarma"), Summary("Enables/Disables giving random karma to users.")]
         public async Task ToggleKarmaAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -185,7 +186,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleChatterbot"), Summary("Enables/Disables chatter bot."), Remarks("Toggles Chatter Bot")]
+        [Command("ToggleChatterbot"), Summary("Enables/Disables chatter bot.")]
         public async Task ToggleIsChatterBotEnabledAsync()
         {
             var Guild = Context.Guild as SocketGuild;
