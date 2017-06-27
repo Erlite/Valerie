@@ -8,6 +8,7 @@ using Rick.Attributes;
 using System.Text;
 using Rick.Extensions;
 using System;
+using Rick.Controllers;
 
 namespace Rick.Modules
 {
@@ -118,10 +119,12 @@ namespace Rick.Modules
             {
                 gldConfig.JoinEvent.IsEnabled = true;
                 gldConfig.JoinEvent.TextChannel = Channel.Id;
+                (Context.Client as DiscordSocketClient).UserJoined += Events.UserJoinedAsync;
                 await ReplyAsync(":gear: Joins logging enabled!");
             }
             else
             {
+                (Context.Client as DiscordSocketClient).UserJoined -= Events.UserJoinedAsync;
                 gldConfig.JoinEvent.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
@@ -135,12 +138,14 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             if (!gldConfig.LeaveEvent.IsEnabled)
             {
+                (Context.Client as DiscordSocketClient).UserLeft += Events.UserLeftAsync;
                 gldConfig.LeaveEvent.IsEnabled = true;
                 gldConfig.LeaveEvent.TextChannel = Channel.Id;
                 await ReplyAsync(":gear:   Now logging leaves.");
             }
             else
             {
+                (Context.Client as DiscordSocketClient).UserLeft -= Events.UserLeftAsync;
                 gldConfig.LeaveEvent.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
