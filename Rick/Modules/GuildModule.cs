@@ -25,8 +25,8 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
-        [Command("Welcome"), 
-            Summary("Sets a welcome message for your server and adds it to the welcome list."), 
+        [Command("Welcome"),
+            Summary("Sets a welcome message for your server and adds it to the welcome list."),
             Remarks("Welcome Heyo welcome to our server!")]
         public async Task WelcomeMessageAsync([Remainder]string msg)
         {
@@ -74,7 +74,7 @@ namespace Rick.Modules
             SocketGuildChannel LeaveChannel;
             SocketGuildChannel BanChannel;
 
-            foreach( var Welcome in GConfig.WelcomeMessages)
+            foreach (var Welcome in GConfig.WelcomeMessages)
             {
                 SB = SB.AppendLine(Welcome);
             }
@@ -233,6 +233,32 @@ namespace Rick.Modules
             }
 
             GuildHandler.GuildConfigs[Context.Guild.Id] = Config;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("Roles"), Summary("Adds/removes a role from assignable role list."), Remarks("Roles Add @RoleName")]
+        public async Task RolesAsync(GlobalEnums Action, IRole Role)
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+
+            switch (Action)
+            {
+                case GlobalEnums.Add:
+                    GuildConfig.AssignableRoles.Add(Role.Name);
+                    await ReplyAsync($"{Role.Name} has been added to assignable roles list.");
+                    break;
+
+                case GlobalEnums.Remove:
+                    if (!GuildConfig.AssignableRoles.Contains(Role.Name))
+                    {
+                        await ReplyAsync($"{Role.Name} doesn't exist in Assignable roles list.!");
+                        return;
+                    }
+                    GuildConfig.AssignableRoles.Remove(Role.Name);
+                    await ReplyAsync($"{Role.Name} has been removed from assignable roles list.");
+                    break;
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
