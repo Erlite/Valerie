@@ -112,19 +112,16 @@ namespace Rick.Modules
         }
 
         [Command("ToggleJoins"), Summary("ToggleJoins #ChannelName"), Remarks("Toggles Join logging")]
-        public async Task ToggleJoinsAsync(ITextChannel Channel = null)
+        public async Task ToggleJoinsAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             if (!gldConfig.JoinEvent.IsEnabled)
             {
                 gldConfig.JoinEvent.IsEnabled = true;
-                gldConfig.JoinEvent.TextChannel = Channel.Id;
-                (Context.Client as DiscordSocketClient).UserJoined += Events.UserJoinedAsync;
                 await ReplyAsync(":gear: Joins logging enabled!");
             }
             else
             {
-                (Context.Client as DiscordSocketClient).UserJoined -= Events.UserJoinedAsync;
                 gldConfig.JoinEvent.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:   No longer logging joins.");
             }
@@ -133,19 +130,16 @@ namespace Rick.Modules
         }
 
         [Command("ToggleLeaves"), Summary("ToggleLeaves #ChannelName"), Remarks("Toggle Leaves logging")]
-        public async Task ToggleLeavesAsync(ITextChannel Channel = null)
+        public async Task ToggleLeavesAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             if (!gldConfig.LeaveEvent.IsEnabled)
             {
-                (Context.Client as DiscordSocketClient).UserLeft += Events.UserLeftAsync;
                 gldConfig.LeaveEvent.IsEnabled = true;
-                gldConfig.LeaveEvent.TextChannel = Channel.Id;
                 await ReplyAsync(":gear:   Now logging leaves.");
             }
             else
             {
-                (Context.Client as DiscordSocketClient).UserLeft -= Events.UserLeftAsync;
                 gldConfig.LeaveEvent.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging leaves.");
             }
@@ -154,14 +148,13 @@ namespace Rick.Modules
         }
 
         [Command("ToggleBans"), Summary("Normal Command"), Remarks("Toggles ban logging")]
-        public async Task ToggleBansAsync(ITextChannel Channel = null)
+        public async Task ToggleBansAsync()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             if (!gldConfig.AdminLog.IsEnabled)
             {
                 gldConfig.AdminLog.IsEnabled = true;
-                gldConfig.AdminLog.TextChannel = Channel.Id;
                 await ReplyAsync(":gear:   Now logging bans.");
             }
             else
@@ -192,7 +185,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleChatterbot"), Summary("Normal Command"), Remarks("Toggles Chatter Bot")]
+        [Command("ToggleChatterbot"), Summary("Enables/Disables chatter bot."), Remarks("Toggles Chatter Bot")]
         public async Task ToggleIsChatterBotEnabledAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -208,6 +201,37 @@ namespace Rick.Modules
                 await ReplyAsync(":skull_crossbones: Chatter bot disabled!");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("SetChannel"), Summary("Sets channel for events/logs"), Remarks("SetChannel AdminChannel #Channelname")]
+        public async Task SetChannelAsync(GlobalEnums ConfigChannel, SocketGuildChannel Channel)
+        {
+            var Config = GuildHandler.GuildConfigs[Context.Guild.Id];
+            switch (ConfigChannel)
+            {
+                case GlobalEnums.AdminChannel:
+                    Config.AdminLog.TextChannel = Channel.Id;
+                    await ReplyAsync($"Admin log channel has been set to: **{Channel.Name}**");
+                    break;
+
+                case GlobalEnums.ChatterbotChannel:
+                    Config.Chatterbot.TextChannel = Channel.Id;
+                    await ReplyAsync($"Chatterbot channel has been set to: **{Channel.Name}**");
+                    break;
+
+                case GlobalEnums.JoinChannel:
+                    Config.JoinEvent.TextChannel = Channel.Id;
+                    await ReplyAsync($"Join log channel has been set to: **{Channel.Name}**");
+                    break;
+
+                case GlobalEnums.LeaveChannel:
+                    Config.LeaveEvent.TextChannel = Channel.Id;
+                    await ReplyAsync($"Leave log channel has been set to: **{Channel.Name}**");
+                    break;
+            }
+
+            GuildHandler.GuildConfigs[Context.Guild.Id] = Config;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
