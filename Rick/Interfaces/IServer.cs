@@ -1,4 +1,5 @@
-﻿using Rick.Wrappers;
+﻿using Rick.Models;
+using Rick.Wrappers;
 using System.Collections.Generic;
 
 namespace Rick.Interfaces
