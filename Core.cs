@@ -42,7 +42,7 @@ namespace Rick
             Client.LatencyUpdated += Events.LatencyAsync;
             #endregion
 
-            var ServiceProvider = Inject();
+            var ServiceProvider = InjectServices();
 
             CommandHandler = new CommandHandler(ServiceProvider);
             await CommandHandler.ConfigureCommandsAsync();
@@ -55,7 +55,7 @@ namespace Rick
             await Task.Delay(-1);
         }
 
-        IServiceProvider Inject()
+        IServiceProvider InjectServices()
         {
             var Services = new ServiceCollection()
                 .AddSingleton(Client)
