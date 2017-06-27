@@ -315,15 +315,16 @@ namespace Rick.Modules
             await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
         }
 
-        //[Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
-        //public async Task TranslateAsync(string Language, [Remainder] string Text)
-        //{
-        //    var result = await MethodsService.Translate(Language, Text);
-        //    string Description = $"**Input:** {Text}\n" +
-        //        $"**In {Language}:** {result.Translations[0].Translation}";
-        //    var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", Context.User.GetAvatarUrl(), Description: Description);
-        //    await ReplyAsync("", embed: embed);
-        //}
+        [Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
+        public async Task TranslateAsync(string Language, [Remainder] string Text)
+        {
+            var result = await Function.Translate(Language, Text);
+            string Description = $"**Input:** {Text}\n" +
+                $"**In {Language}:** {result.Translations[0].Translation}";
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!", 
+                new Uri(Context.User.GetAvatarUrl()), Description: Description);
+            await ReplyAsync("", embed: embed);
+        }
 
         [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100")]
         public async Task SlotMachineAsync(int Bet = 50)
