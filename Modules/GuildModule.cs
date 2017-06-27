@@ -8,7 +8,6 @@ using Rick.Attributes;
 using System.Text;
 using Rick.Extensions;
 using System;
-using Rick.Controllers;
 
 namespace Rick.Modules
 {
@@ -26,8 +25,9 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
-        [Command("Welcome"), Summary("Sets a welcome message for your server and adds it" +
-            "to the welcome list."), Remarks("Welcome Heyo welcome to our server!")]
+        [Command("Welcome"), 
+            Summary("Sets a welcome message for your server and adds it to the welcome list."), 
+            Remarks("Welcome Heyo welcome to our server!")]
         public async Task WelcomeMessageAsync([Remainder]string msg)
         {
             var Guild = Context.Guild as SocketGuild;
