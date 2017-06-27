@@ -659,5 +659,51 @@ namespace Rick.Modules
                 await ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dumb cunt! Don't know how to use a fucking command?!");
             }
         }
+
+        [Command("Iam"), Summary("Adds you to one of the roles from assignable roles list."), Remarks("Iam Ultimate-Meme-God")]
+        public async Task IAmAsync(IRole Role)
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+
+            if (!GuildConfig.AssignableRoles.Contains(Role.Name))
+            {
+                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
+                return;
+            }
+
+            var User = Context.User as SocketGuildUser;
+
+            if (User.Roles.Contains(Role))
+            {
+                await ReplyAsync($"You already have **{Role.Name}** role!");
+                return;
+            }
+
+            await User.AddRoleAsync(Role);
+            await ReplyAsync($"You have been added to **{Role.Name}** role!");
+        }
+
+        [Command("IamNot"), Summary("Removes you from the specified role."), Remarks("IAmNot Ultimate-Meme-God")]
+        public async Task IAmNotAsync(IRole Role)
+        {
+            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
+
+            if (!GuildConfig.AssignableRoles.Contains(Role.Name))
+            {
+                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
+                return;
+            }
+
+            var User = Context.User as SocketGuildUser;
+
+            if (!User.Roles.Contains(Role))
+            {
+                await ReplyAsync($"You do not have **{Role.Name}** role!");
+                return;
+            }
+
+            await User.RemoveRoleAsync(Role);
+            await ReplyAsync($"You have been removed from **{Role.Name}** role!");
+        }
     }
 }
