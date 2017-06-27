@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rick", "Rick.csproj", "{D2D50063-4CB0-4110-8E84-69FD8C875E9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rick", "Rick\Rick.csproj", "{D2D50063-4CB0-4110-8E84-69FD8C875E9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleverbot", "..\Cleverbot\Cleverbot.csproj", "{63E2374F-4C20-4636-92AC-3F5AE603F769}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleverbot", "Cleverbot\Cleverbot.csproj", "{63E2374F-4C20-4636-92AC-3F5AE603F769}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

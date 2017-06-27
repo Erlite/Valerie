@@ -94,24 +94,13 @@ namespace Rick.Controllers
         internal static async Task HandleGuildMessagesAsync(SocketMessage Message)
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
-            var GuildConfig = GuildHandler.GuildConfigs[Guild.Id];
-            var BotConfig = ConfigHandler.IConfig;
             var User = Message.Author as SocketGuildUser;
-
-            BotConfig.MessagesReceived += 1;
-
-            var AFKList = GuildConfig.AFKList;
-            var KarmaList = GuildConfig.KarmaList;
-
-            if (Message.Author.IsBot || !GuildConfig.Chatterbot.IsEnabled || !GuildConfig.IsKarmaEnabled) return;
 
             KarmaHandlerAsync(User);
             AFKHandlerAsync(Guild, Message);
             CleverbotHandlerAsync(Guild, Message);
 
-            GuildHandler.GuildConfigs[Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ConfigHandler.SaveAsync();
+            await AddToMessageAsync(Message);
         }
 
         internal static async Task LatencyAsync(int Older, int Newer)
@@ -186,6 +175,13 @@ namespace Rick.Controllers
             CleverbotResponse Response = null;
             Response = Cleverbot.Main.Talk(UserMsg, Response);
             await Message.Channel.SendMessageAsync(Response.Output);
+        }
+
+        static async Task AddToMessageAsync(SocketMessage Message)
+        {
+            var Config = ConfigHandler.IConfig;
+            Config.MessagesReceived += 1;
+            await ConfigHandler.SaveAsync();
         }
         #endregion
     }
