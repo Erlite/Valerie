@@ -13,5 +13,9 @@ namespace Rick.Interfaces
         Wrapper LeaveEvent { get; set; }
         Wrapper AdminLog { get; set; }
         Wrapper Chatterbot { get; set; }
+        List<TagsModel> TagsList { get; set; }
+        Dictionary<ulong, string> AFKList { get; set; }
+        Dictionary<ulong, int> KarmaList { get; set; }
+        List<string> AssignableRoles { get; set; }
     }
 }
