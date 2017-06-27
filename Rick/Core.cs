@@ -39,7 +39,10 @@ namespace Rick
             Client.LeftGuild += Events.DeleteGuildConfig;
             Client.GuildAvailable += Events.HandleGuildConfigAsync;
             Client.MessageReceived += Events.HandleGuildMessagesAsync;
-            Client.LatencyUpdated += Events.LatencyAsync;
+            Client.Ready += async () =>
+            {
+                await Events.OnReadyAsync(Client);
+            };
             #endregion
 
             var ServiceProvider = InjectServices();
