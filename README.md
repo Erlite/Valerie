@@ -29,3 +29,7 @@ This bot uses some methods/ideas from Markus Gordathian and AntiTCB Bot's and al
 
 <p align="center"><img src="http://vvcap.com/img/2Nrq8h0UJ8o.png"/></p>
 <p align="center"><img src="http://vvcap.com/img/tVF34reZRX4.png"/></p>
+
+### Screenshot(s)
+---
+<p align="center"><img src="http://vvcap.com/img/CXGWazZdRSz.png"/></p>
