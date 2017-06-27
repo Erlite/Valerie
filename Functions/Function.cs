@@ -16,6 +16,7 @@ using Rick.JsonModels;
 using Rick.Handlers;
 using Tweetinvi;
 using Rick.Extensions;
+using Cleverbot;
 
 namespace Rick.Functions
 {
@@ -115,7 +116,7 @@ namespace Rick.Functions
                 Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
             try
             {
-                Library.Cleverbot.Core.SetAPIKey(Config.APIKeys.CleverBotKey);
+                Main.SetAPIKey(Config.APIKeys.CleverBotKey);
             }
             catch (WebException Ex)
             {
