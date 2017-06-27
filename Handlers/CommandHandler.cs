@@ -98,6 +98,9 @@ namespace Rick.Handlers
                     DefaultCommandError(exeresult, service, Context);
                     break;
             }
+
+            if (ErrorMsg != null)
+                await Context.Channel.SendMessageAsync("", embed: embed);
         }
 
         async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
