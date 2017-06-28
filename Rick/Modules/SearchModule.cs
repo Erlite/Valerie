@@ -106,13 +106,19 @@ namespace Rick.Modules
         [Command("Catfacts"), Summary("Catfacts"), Remarks("Catfacts for cat lovers")]
         public async Task CatfactsAsync()
         {
-            using (var http = new HttpClient())
+            try
             {
-                var response = await http.GetStringAsync("http://catfacts-api.appspot.com/api/facts");
-                if (response == null)
-                    return;
-                var fact = JObject.Parse(response)["facts"][0].ToString();
-                await ReplyAsync($":feet: {fact}");
+                using (var http = new HttpClient())
+                {
+                    var response = await http.GetStringAsync("http://catfacts-api.appspot.com/api/facts");
+                    if (response == null)
+                        return;
+                    var fact = JObject.Parse(response)["facts"][0].ToString();
+                    await ReplyAsync($":feet: {fact}");
+                }
+            }catch (HttpRequestException EX)
+            {
+                await ReplyAsync(EX.Message);
             }
         }
 
