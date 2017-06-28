@@ -95,7 +95,7 @@ namespace Rick.Controllers
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
 
-            KarmaHandlerAsync(Message.Author);
+            KarmaHandlerAsync(Message.Author as SocketGuildUser);
             AFKHandlerAsync(Guild, Message);
             CleverbotHandlerAsync(Guild, Message);
 
@@ -124,9 +124,11 @@ namespace Rick.Controllers
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        static async void KarmaHandlerAsync(SocketUser User)
+        static async void KarmaHandlerAsync(SocketGuildUser User)
         {
-            var GuildID = (User as SocketGuildUser).Guild.Id;
+            if (User == null) return;
+
+            var GuildID = User.Guild.Id;
             var GuildConfig = GuildHandler.GuildConfigs[GuildID];
 
             if (User.IsBot || !GuildConfig.IsKarmaEnabled) return;
