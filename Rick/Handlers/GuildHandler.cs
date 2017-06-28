@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Rick.Interfaces;
 using Rick.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Rick.Handlers
@@ -25,7 +23,7 @@ namespace Rick.Handlers
                 return JsonConvert.DeserializeObject<Dictionary<ulong, T>>(File.ReadAllText(configPath));
             }
             var newConfig = new Dictionary<ulong, T>();
-            await SaveAsync(newConfig).ConfigureAwait(false);
+            await SaveAsync(newConfig);
             return newConfig;
         }
     }

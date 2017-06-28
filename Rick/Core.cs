@@ -43,6 +43,10 @@ namespace Rick
             {
                 await Events.OnReadyAsync(Client);
             };
+            Client.LatencyUpdated += async (int Older, int Newer) =>
+            {
+                await Events.LatencyHandlerAsync(Client, Older, Newer);
+            };
             #endregion
 
             var ServiceProvider = InjectServices();

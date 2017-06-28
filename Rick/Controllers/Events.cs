@@ -183,8 +183,6 @@ namespace Rick.Controllers
             var Config = ConfigHandler.IConfig;
             var GetGame = Config.Games[new Random().Next(Config.Games.Count)];
 
-            //Client.LatencyUpdated += LatencyAsync;
-
             if (Client == null) return;
 
             if (Config.Games.Count <= 0)
