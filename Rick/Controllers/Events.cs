@@ -16,21 +16,18 @@ namespace Rick.Controllers
         internal static async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
+            if (!Config.JoinEvent.IsEnabled) return;
+
             ITextChannel Channel = null;
             string WelcomeMessage = null;
 
-            if (!Config.JoinEvent.IsEnabled) return;
-
             var JoinChannel = User.Guild.GetChannel(Config.JoinEvent.TextChannel);
 
-            if (Config.WelcomeMessages.Count != 0 || Config.WelcomeMessages.Count <= 0)
-            {
-                WelcomeMessage = Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)];
-            }
-            else
-            {
+            if (Config.WelcomeMessages.Count <= 0)
                 WelcomeMessage = $"Welcome {User.Username} to {User.Guild.Name}!";
-            }
+            else
+                WelcomeMessage = Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)];
+
 
             if (User.Guild.GetChannel(Config.JoinEvent.TextChannel) != null)
             {
@@ -46,11 +43,14 @@ namespace Rick.Controllers
 
         internal static async Task UserLeftAsync(SocketGuildUser User)
         {
-            var Config = GuildHandler.GuildConfigs[User.Guild.Id];
             CleanUpAsync(User);
+
+            var Config = GuildHandler.GuildConfigs[User.Guild.Id];
             if (!Config.LeaveEvent.IsEnabled) return;
+
             var LeaveChannel = User.Guild.GetChannel(Config.LeaveEvent.TextChannel);
             ITextChannel Channel = null;
+
             if (User.Guild.GetChannel(Config.LeaveEvent.TextChannel) != null)
             {
                 Channel = LeaveChannel as ITextChannel;
@@ -94,9 +94,8 @@ namespace Rick.Controllers
         internal static async Task HandleGuildMessagesAsync(SocketMessage Message)
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
-            var User = Message.Author as SocketGuildUser;
 
-            KarmaHandlerAsync(User);
+            KarmaHandlerAsync(Message.Author);
             AFKHandlerAsync(Guild, Message);
             CleverbotHandlerAsync(Guild, Message);
 
@@ -125,9 +124,10 @@ namespace Rick.Controllers
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        static async void KarmaHandlerAsync(SocketGuildUser User)
+        static async void KarmaHandlerAsync(SocketUser User)
         {
-            var GuildConfig = GuildHandler.GuildConfigs[User.Guild.Id];
+            var GuildID = (User as SocketGuildUser).Guild.Id;
+            var GuildConfig = GuildHandler.GuildConfigs[GuildID];
 
             if (User.IsBot || !GuildConfig.IsKarmaEnabled) return;
 
@@ -144,7 +144,7 @@ namespace Rick.Controllers
             getKarma += RandomKarma;
             karmalist[User.Id] = getKarma;
 
-            GuildHandler.GuildConfigs[User.Guild.Id] = GuildConfig;
+            GuildHandler.GuildConfigs[GuildID] = GuildConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
