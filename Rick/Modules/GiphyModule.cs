@@ -9,7 +9,7 @@ using Rick.JsonModels;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, Group("Giphy"), ]
+    [CheckBlacklist, Group("Giphy"), APICheck ]
     public class GiphyModule : ModuleBase
     {
         string GifsEndpoint = "https://api.giphy.com/v1/gifs/";

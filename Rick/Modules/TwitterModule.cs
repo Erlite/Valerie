@@ -14,7 +14,7 @@ using Tweetinvi.Models;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist]
+    [CheckBlacklist, APICheck]
     public class TwitterModule : ModuleBase
     {
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(30)]
