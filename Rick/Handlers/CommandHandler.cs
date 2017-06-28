@@ -78,19 +78,19 @@ namespace Rick.Handlers
                         $"**Example:** {Remarks}\n" +
                         $"**More Info:** To get more information about a command use: {ConfigHandler.IConfig.Prefix}Help CommandName\n";
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), null, ErrorMsg);
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case PreconditionResult PCR:
                     ErrorMsg = PCR.ErrorReason;
-                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: ErrorMsg);
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error was thrown",
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case TypeReaderResult TRR:
                     ErrorMsg = TRR.ErrorReason;
-                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "TypeReader Error",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: ErrorMsg);
+                    embed = EmbedExtension.Embed(EmbedColors.Maroon, "TypeReader Error was thrown",
+                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case ExecuteResult ER:
