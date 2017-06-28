@@ -8,7 +8,6 @@ using Discord.WebSocket;
 using Rick.Functions;
 using Rick.Enums;
 using Cleverbot.Models;
-using Database;
 
 namespace Rick.Controllers
 {
