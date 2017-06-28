@@ -13,8 +13,6 @@ namespace Rick.Controllers
 {
     public class Events
     {
-        static DiscordSocketClient Client { get; }
-
         internal static async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
@@ -103,17 +101,6 @@ namespace Rick.Controllers
             CleverbotHandlerAsync(Guild, Message);
 
             await AddToMessageAsync(Message);
-        }
-
-        internal static async Task LatencyAsync(int Older, int Newer)
-        {
-            if (Client == null) return;
-
-            var Status = (Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
-                : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
-                : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;
-
-            await Client.SetStatusAsync(Status);
         }
 
         #region Event Methods
@@ -207,6 +194,17 @@ namespace Rick.Controllers
             }
             else
                 await Client.SetGameAsync(GetGame);
+        }
+        
+        public static async Task LatencyHandlerAsync(DiscordSocketClient Client, int Older, int Newer)
+        {
+            if (Client == null) return;
+            
+            var Status = (Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
+                : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
+                : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;
+
+            await Client.SetStatusAsync(Status);
         }
         #endregion
     }
