@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Rick.Functions;
 using Rick.Enums;
 using Cleverbot.Models;
+using Database;
 
 namespace Rick.Controllers
 {
@@ -193,11 +194,11 @@ namespace Rick.Controllers
             else
                 await Client.SetGameAsync(GetGame);
         }
-        
+
         public static async Task LatencyHandlerAsync(DiscordSocketClient Client, int Older, int Newer)
         {
             if (Client == null) return;
-            
+
             var Status = (Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;

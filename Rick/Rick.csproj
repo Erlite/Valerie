@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cleverbot\Cleverbot.csproj" />
+    <ProjectReference Include="..\Database\Database.csproj" />
   </ItemGroup>
 
 </Project>
