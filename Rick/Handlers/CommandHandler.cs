@@ -78,19 +78,19 @@ namespace Rick.Handlers
                         $"**Example:** {Remarks}\n" +
                         $"**More Info:** To get more information about a command use: {ConfigHandler.IConfig.Prefix}Help CommandName\n";
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
+                        Client.CurrentUser.GetAvatarUrl(), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case PreconditionResult PCR:
                     ErrorMsg = PCR.ErrorReason;
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error was thrown",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
+                        Client.CurrentUser.GetAvatarUrl(), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case TypeReaderResult TRR:
                     ErrorMsg = TRR.ErrorReason;
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, "TypeReader Error was thrown",
-                        new Uri(Client.CurrentUser.GetAvatarUrl()), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
+                        Client.CurrentUser.GetAvatarUrl(), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
                     break;
 
                 case ExecuteResult ER:
@@ -111,7 +111,7 @@ namespace Rick.Handlers
                 string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
                 string StackTrace = result.Exception.StackTrace;
                 var embed = EmbedExtension.Embed(EmbedColors.Red, Name,
-                    new Uri(Client.CurrentUser.GetAvatarUrl()), Description: Description, FooterText: StackTrace);
+                    Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
