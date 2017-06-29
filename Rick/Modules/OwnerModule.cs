@@ -32,7 +32,7 @@ namespace Rick.Modules
         public static IEnumerable<Assembly> Assemblies => Function.GetAssemblies();
         public static IEnumerable<string> Imports => ConfigHandler.IConfig.EvalImports;
 
-        [Command("ServerList"), Summary("Normal Command"), Remarks("Get's a list of all guilds the bot is in."), Alias("Sl")]
+        [Command("ServerList"), Summary("Get's a list of all guilds the bot is in."), Alias("Sl")]
         public async Task ServerListAsync()
         {
             var client = Context.Client as DiscordSocketClient;
@@ -55,7 +55,7 @@ namespace Rick.Modules
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("", embed: embed);
         }
 
-        [Command("Leave"), Summary("Leave 123897481723 This is a message"), Remarks("Tells the bot to leave a certain guild")]
+        [Command("Leave"), Summary("Tells the bot to leave a certain guild"), Remarks("Leave 123897481723 This is a message")]
         public async Task LeaveAsync(ulong ID, [Remainder] string msg = "No reason provided by the owner.")
         {
             if (string.IsNullOrWhiteSpace(msg))
@@ -79,7 +79,7 @@ namespace Rick.Modules
             await ReplyAsync("Message has been sent and I've left the guild!");
         }
 
-        [Command("Broadcast"), Summary("Broadcast This is a msg"), Remarks("Broadcasts a message to the default channel of all servers the bot is connected to.")]
+        [Command("Broadcast"), Summary("Broadcasts a message to the default channel of all servers the bot is connected to."), Remarks("Broadcast This is a msg")]
         public async Task Broadcast([Remainder] string broadcast = null)
         {
             if (string.IsNullOrWhiteSpace(broadcast))
@@ -97,7 +97,7 @@ namespace Rick.Modules
             await ReplyAsync(invite.Url);
         }
 
-        [Command("Archive"), Summary("Archive #ChannelName 10"), Remarks("Archives a channel and uploads a JSON")]
+        [Command("Archive"), Summary("Archives a channel and uploads a JSON"), Remarks("Archive #ChannelName 50")]
         public async Task ArchiveCommand(IMessageChannel Channel, int Amount = 9000)
         {
             if (Amount >= 10000)
@@ -120,7 +120,7 @@ namespace Rick.Modules
             await (await Context.User.GetOrCreateDMChannelAsync()).SendFileAsync(GenerateStreamFromString(json), $"{Channel.Name}.json");
         }
 
-        [Command("Blacklist"), Summary("Blacklist @Username Reason"), Remarks("Forbids a user from using bot commands")]
+        [Command("Blacklist"), Summary("Forbids a user from using bot commands"), Remarks("Blacklist @Username Reason")]
         public async Task BlacklistAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided by the owner!")
         {
             if (user.Id == Context.Client.CurrentUser.Id)
@@ -138,7 +138,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Whitelist"), Summary("Whitelist @username"), Remarks("Removes users from blacklist")]
+        [Command("Whitelist"), Summary("Removes users from blacklist"), Remarks("Whitelist @username")]
         public async Task WhitelistAsync(SocketGuildUser user)
         {
             var botConfig = ConfigHandler.IConfig;
@@ -154,7 +154,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Eval"), Summary("Eval 2+2"), Remarks("Evaluates some sort of expression for you.")]
+        [Command("Eval"), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
         public async Task EvalAsync([Remainder] string Code)
         {
             var Client = Context.Client as DiscordSocketClient;
@@ -210,7 +210,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("EvalList"), Summary("Evallist"), Remarks("Shows all of the current namespaces in eval imports")]
+        [Command("EvalList"), Summary("Shows all of the current namespaces in eval imports")]
         public async Task ListImportsAsync()
         {
             if (ConfigHandler.IConfig.EvalImports.Count == 0)
@@ -221,7 +221,7 @@ namespace Rick.Modules
             await ReplyAsync(string.Join(", ", ConfigHandler.IConfig.EvalImports.Select(x => x)));
         }
 
-        [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
+        [Command("EvalRemove"), Summary("Removes a namespace from the current eval namespace list"), Remarks("EvalRemove Discord")]
         public async Task RemoveImportAsync(string Namespace)
         {
             if (!ConfigHandler.IConfig.EvalImports.Contains(Namespace))
@@ -234,7 +234,7 @@ namespace Rick.Modules
             await ConfigHandler.SaveAsync();
         }
 
-        [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
+        [Command("EvalAdd"), Summary("Adds a namespace to the current eval namespace list"), Remarks("EvalAdd Discord.Net"),]
         public async Task AddImportAsync(string Namespace)
         {
             if (ConfigHandler.IConfig.EvalImports.Contains(Namespace))
@@ -247,7 +247,7 @@ namespace Rick.Modules
             await ConfigHandler.SaveAsync();
         }
 
-        [Command("Reconnect"), Summary("Normal Command"), Remarks("As Foxbot said: It doesn't get a chance to send a graceful close")]
+        [Command("Reconnect"), Summary("As Foxbot said: It doesn't get a chance to send a graceful close.")]
         public async Task ReconnectAsync()
         {
             var client = Context.Client as DiscordSocketClient;
@@ -257,7 +257,7 @@ namespace Rick.Modules
             await ReplyAsync("Restarted!");
         }
 
-        [Command("Dump"), Summary("Normal Command"), Remarks("Shows application info")]
+        [Command("Dump"), Summary("Dumps all diagonastic information about Rick's process.")]
         public async Task InfoAsync()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
@@ -306,7 +306,7 @@ namespace Rick.Modules
             await Msg.DeleteAsync();
         }
 
-        [Command("SendMsg"), Summary("SendMsg GuildID Msg"), Remarks("Sends messages to a guild")]
+        [Command("SendMsg"), Summary("Sends messages to a guild"), Remarks("SendMsg GuildID Msg")]
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
         {
             var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
