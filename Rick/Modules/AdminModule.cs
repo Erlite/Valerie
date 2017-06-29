@@ -46,7 +46,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
             await User.Guild.AddBanAsync(User);
             gldConfig.AdminCases += 1;
-            var BanChannel = User.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
+            var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
                 string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.AdminCases}";
@@ -63,13 +63,16 @@ namespace Rick.Modules
         public async Task MuteAsync(SocketGuildUser User)
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            var GetMuteRole = User.Guild.GetRole(gldConfig.MuteRoleID);
-            if (GetMuteRole == null)
+            IRole MuteRole = User.Guild.GetRole(gldConfig.MuteRoleID);
+            if (gldConfig.MuteRoleID == 0 || Context.Guild.GetRole(gldConfig.MuteRoleID) == null)
             {
-                await ReplyAsync("Mute Role ID is null! Add Mute Role ID in guild Config!");
+                var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
+                gldConfig.MuteRoleID = CreateNew.Id;
+                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+                await User.AddRoleAsync(MuteRole);
                 return;
             }
-            await User.AddRoleAsync(GetMuteRole);
+            await User.AddRoleAsync(MuteRole);
             gldConfig.AdminCases += 1;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
