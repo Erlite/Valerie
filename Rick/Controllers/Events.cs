@@ -73,6 +73,13 @@ namespace Rick.Controllers
                 $"**Support Server:** https://discord.gg/S5CnhVY \n" +
                 $"**Twitter:** https://twitter.com/Vuxey";
             await Guild.DefaultChannel.SendMessageAsync(Message);
+
+            var CreateConfig = new GuildModel();
+            if (!GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
+            {
+                GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
+            }
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
         internal static async Task DeleteGuildConfig(SocketGuild Guild)
@@ -87,7 +94,10 @@ namespace Rick.Controllers
         internal static async Task HandleGuildConfigAsync(SocketGuild Guild)
         {
             var CreateConfig = new GuildModel();
-            GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
+            if (!GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
+            {
+                GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
+            }
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
