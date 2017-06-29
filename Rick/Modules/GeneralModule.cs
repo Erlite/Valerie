@@ -187,13 +187,18 @@ namespace Rick.Modules
         }
 
         [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
-        public async Task UserInfoAsync(IGuildUser user = null)
+        public async Task UserInfoAsync(IGuildUser User = null)
         {
-            var usr = user as SocketGuildUser ?? Context.Message.Author as SocketGuildUser;
+            SocketGuildUser usr = null;
+            if (User != null)
+                usr = User as SocketGuildUser;
+            else
+                usr = Context.User as SocketGuildUser;
+
             var userNick = usr.Nickname ?? usr.Nickname;
             var userDisc = usr.DiscriminatorValue;
             var Userid = usr.Id;
-            var isbot = usr.IsBot;
+            var isbot = usr.IsBot ? "YEAAAA!" : "Nopeee";
             var UserStatus = usr.Status;
             var UserGame = usr.Game.Value.Name;
             var UserCreated = usr.CreatedAt;
@@ -206,7 +211,7 @@ namespace Rick.Modules
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}" +
                 $"\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.White, user.Username, new Uri(user.GetAvatarUrl()), Description: descrption);
+            var embed = EmbedExtension.Embed(EmbedColors.White, $"{usr.Username} Information", new Uri(usr.GetAvatarUrl()), Description: descrption, ImageUrl: new Uri(usr.GetAvatarUrl()));
             await ReplyAsync("", embed: embed);
         }
 
