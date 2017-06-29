@@ -6,7 +6,7 @@
 
 Rick is written in C# using Discord.Net library 1.0 Beta. Rick can be ran on .Net Framework 4.0+ and .Net Core 1.0+. Rick has over 70+ Commands to keep you busy and happy!
 
-If you clone this project or fork it or like it, please do leave a star. It does help a lot!
+Leave a 🌟 if you :heart: it. Best way to show support 💪.
 
 | Documentation | Command List | Invite | Appveyor | Travis-CI |
 |--------------:|:------------:|:------:|:--------:|----------:|
