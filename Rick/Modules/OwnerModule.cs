@@ -159,7 +159,7 @@ namespace Rick.Modules
         {
             var Client = Context.Client as DiscordSocketClient;
             var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
-            var working = await Context.Channel.SendMessageAsync("**Evaluating**, please wait ...");
+            var working = await Context.Channel.SendMessageAsync("**Evaluating Expression ...**");
             var Globals = new Globals
             {
                 Client = Client,
@@ -190,8 +190,8 @@ namespace Rick.Modules
             }
             catch (Exception e)
             {
-                var embed = EmbedExtension.Embed(EmbedColors.Green,
-                    "Failed To Evaluate Expression.", new Uri(Client.CurrentUser.GetAvatarUrl()));
+                var embed = EmbedExtension.Embed(EmbedColors.Maroon,
+                    "Failed To Evaluate Expression.", new Uri(Client.CurrentUser.GetAvatarUrl()), FooterText: $"From: {e.Source}");
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -200,7 +200,7 @@ namespace Rick.Modules
                 .AddField(x =>
                 {
                     x.Name = "Output";
-                    x.Value = $"```{e.GetType().ToString()} : {e.Message}\nFrom: {e.Source}```";
+                    x.Value = $"```{e.GetType().ToString()} : {e.Message}```";
                 });
                 await ReplyAsync("", embed: embed);
             }
