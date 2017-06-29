@@ -9,10 +9,8 @@ namespace Rick.Handlers
     public class ConfigHandler
     {
         public static IConfig IConfig { get; set; }
-
         static string DataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
         public static string CacheFolder = Path.Combine("Data", "Cache");
-
         public static string ConfigFile = "Data/Config.json";
 
         public static async Task<ConfigModel> LoadConfigAsync()
@@ -43,7 +41,6 @@ namespace Rick.Handlers
         public static async Task SaveAsync()
                         => await File.WriteAllTextAsync(ConfigFile, JsonConvert.SerializeObject(IConfig, Formatting.Indented));
 
-        //File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(botConfig, Formatting.Indented));
         public static void DirectoryCheck()
         {
             if (!(Directory.Exists(DataFolder) || Directory.Exists(CacheFolder)))
