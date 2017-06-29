@@ -97,7 +97,7 @@ namespace Rick.Functions
         public static string Censor(string Text)
         {
             Regex Swear = new Regex(ConfigHandler.IConfig.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return Swear.Replace(Text, "***");
+            return Swear.Replace(Text, "BEEP");
         }
 
         public static void ServicesLogin()
