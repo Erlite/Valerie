@@ -68,13 +68,13 @@ namespace Rick.Extensions
 
         public static  EmbedBuilder Embed(EmbedColors Color, 
             string AuthorName = null, 
-            Uri AuthorPic = null,  
+            string AuthorPic = null,  
             string Title = null, 
             string Description = null, 
             string FooterText = null, 
-            Uri FooterIcon = null, 
-            Uri ImageUrl = null, 
-            Uri ThumbUrl = null)
+            string FooterIcon = null, 
+            string ImageUrl = null, 
+            string ThumbUrl = null)
         {
             return Embed(Color)
                 .WithAuthor(x =>
