@@ -26,7 +26,7 @@ namespace Rick.Modules
         {
             await User.KickAsync();            
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var BanChannel = User.Guild.GetChannel(gldConfig.JoinEvent.TextChannel) as ITextChannel;
+            var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
             gldConfig.AdminCases += 1;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
