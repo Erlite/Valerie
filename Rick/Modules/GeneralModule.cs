@@ -53,7 +53,7 @@ namespace Rick.Modules
                 .WithAuthor(x =>
                 {
                     x.Name = gld.Name;
-                    x.IconUrl = new Uri(gld.IconUrl);
+                    x.IconUrl = gld.IconUrl;
                 })
                 .WithColor(new Color(153, 30, 87))
                 .AddInlineField("Guild ID", GuildID)
@@ -211,7 +211,7 @@ namespace Rick.Modules
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}" +
                 $"\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.White, $"{usr.Username} Information", new Uri(usr.GetAvatarUrl()), Description: descrption, ImageUrl: new Uri(usr.GetAvatarUrl()));
+            var embed = EmbedExtension.Embed(EmbedColors.White, $"{usr.Username} Information", usr.GetAvatarUrl(), Description: descrption, ImageUrl: usr.GetAvatarUrl());
             await ReplyAsync("", embed: embed);
         }
 
@@ -242,7 +242,7 @@ namespace Rick.Modules
                 $"**Response Latency:** {sw.ElapsedMilliseconds} ms\n" +
                 $"**Delta:** {sw.ElapsedMilliseconds - client.Latency} ms\n" +
                 $"**IP/Web Response Time:** {Time}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: descrption);
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
             await ReplyAsync("", embed: embed);
         }
 
@@ -260,7 +260,7 @@ namespace Rick.Modules
         public async Task CreateUuidAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, new Uri(Context.User.GetAvatarUrl()), Description: $"Your unique UUID is: {id}");
+            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -326,7 +326,7 @@ namespace Rick.Modules
                 $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey)";
 
             var embed = EmbedExtension.Embed(EmbedColors.Gold,
-                "Ricky Rick [@Vuxey](https://twitter.com/Vuxey)", new Uri(Context.Client.CurrentUser.GetAvatarUrl()),
+                "Ricky Rick [@Vuxey](https://twitter.com/Vuxey)", Context.Client.CurrentUser.GetAvatarUrl(),
                 Description: $"{Message}\n{Misc}");
             await ReplyAsync("", embed: embed);
         }
@@ -344,7 +344,7 @@ namespace Rick.Modules
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
             var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!",
-                new Uri(Context.User.GetAvatarUrl()), Description: Description);
+                Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -422,7 +422,7 @@ namespace Rick.Modules
                 embed.Author = new EmbedAuthorBuilder()
                 {
                     Name = $"{Context.User.Username} Lost!",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl = Context.User.GetAvatarUrl()
                 };
                 embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {Credits}";
                 embed.Color = new Color(0xff0000);
@@ -433,7 +433,7 @@ namespace Rick.Modules
                 embed.Author = new EmbedAuthorBuilder()
                 {
                     Name = $"{Context.User.Username} won!",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl = Context.User.GetAvatarUrl()
                 };
                 embed.Description = $":tada: Your current Karma is {Credits} :tada:";
                 embed.Color = new Color(0x93ff89);
@@ -447,7 +447,7 @@ namespace Rick.Modules
         public async Task TrumpAsync()
         {
             var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
-            Uri Pic = new Uri("http://abovethelaw.com/wp-content/uploads/2016/04/cartoon-trump-300x316.jpg");
+            var Pic = "http://abovethelaw.com/wp-content/uploads/2016/04/cartoon-trump-300x316.jpg";
             var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!",
                 Pic, Description: Http.ToString());
             await ReplyAsync("", embed: embed);
@@ -473,7 +473,7 @@ namespace Rick.Modules
                     $"**URL: ** {result.URL}\n");
             }
             var embed = EmbedExtension.Embed(EmbedColors.White, Search,
-                new Uri("https://exceptiondev.github.io/media/Book.png"), Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
+                "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
             await ReplyAsync("", embed: embed);
         }
 
@@ -540,7 +540,7 @@ namespace Rick.Modules
                 $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
                 $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -609,7 +609,7 @@ namespace Rick.Modules
             int Level = Fomulas.GetLevel(karma);
             int KarmaLast = Fomulas.GetKarmaForLastLevel(Level);
             int KarmaNext = Fomulas.GetKarmaForNextLevel(Level);
-            Uri Image = new Uri(KarmaUser.GetAvatarUrl());
+            string Image = KarmaUser.GetAvatarUrl();
             var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{KarmaUser.Username} Rankings", Image, ThumbUrl: Image);
             embed.AddInlineField("Level", Level);
             embed.AddInlineField("Karma", karma);
@@ -624,7 +624,7 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var karmalist = gldConfig.KarmaList;
             var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", new Uri(Context.Guild.IconUrl));
+            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl);
             if (karmalist.Count <= 0)
             {
                 await ReplyAsync("Guild's Karma list is empty!");

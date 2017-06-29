@@ -30,10 +30,10 @@ namespace Rick.Modules
                 ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
             var embed = EmbedExtension.Embed(EmbedColors.Green,
-                $"{Context.User.Username} posted a tweet!", new Uri(Context.User.GetAvatarUrl()), Description: 
+                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description: 
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
-                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: new Uri(ThumbImage));
+                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: ThumbImage);
             await ReplyAsync("", embed: embed);
         }
 
@@ -62,10 +62,10 @@ namespace Rick.Modules
             });
 
             var embed = EmbedExtension.Embed(EmbedColors.Green,
-                $"{Context.User.Username} posted a tweet!", new Uri(Context.User.GetAvatarUrl()), Description:
+                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {tweet.Id}\n" +
-                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})", ThumbUrl: new Uri(ThumbImage));
+                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})", ThumbUrl: ThumbImage);
             await ReplyAsync("", embed: embed);
         }
 
@@ -86,11 +86,11 @@ namespace Rick.Modules
                     ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
                 var embed = EmbedExtension.Embed(EmbedColors.Green, 
-                    $"{Context.User.Username} replied to a tweet!", new Uri(Context.User.GetAvatarUrl()), Description:
+                    $"{Context.User.Username} replied to a tweet!", Context.User.GetAvatarUrl(), Description:
                     $"**Original Tweet:** {ReplyTo.FullText}\n" +
                     $"**Reply:** {TweetMessage}\n" +
                     $"Tweet ID: {UserTweet.Id}\n" +
-                    $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: new Uri(ThumbImage));
+                    $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: ThumbImage);
                 await ReplyAsync("", embed: embed);
             }
         }

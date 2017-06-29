@@ -55,8 +55,8 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", 
-                new Uri(Context.User.GetAvatarUrl()), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!",
+                Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -65,8 +65,8 @@ namespace Rick.Modules
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x=> x.Name == Name);
-            if(getTag == null)
+            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
+            if (getTag == null)
             {
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
                 return;
@@ -90,7 +90,7 @@ namespace Rick.Modules
                 .WithAuthor(x =>
                 {
                     x.Name = getTag.Name;
-                    x.IconUrl = new Uri(Context.Client.CurrentUser.GetAvatarUrl());
+                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
                 })
                 .AddInlineField("Tag Response", getTag.Response)
                 .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.Owner))
@@ -111,7 +111,7 @@ namespace Rick.Modules
                 await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
                 return;
             }
-            switch(prop)
+            switch (prop)
             {
                 case GlobalEnums.TagName:
                     getTag.Name = Name;
@@ -150,7 +150,7 @@ namespace Rick.Modules
                 return;
             }
             var Sb = new StringBuilder();
-            foreach(var Name in GetTags.Where(x => x.Name.Contains(name)))
+            foreach (var Name in GetTags.Where(x => x.Name.Contains(name)))
             {
                 Sb.Append($"{Name.Name}, ");
             }

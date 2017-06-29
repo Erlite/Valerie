@@ -7,7 +7,6 @@ using Rick.Enums;
 using Rick.Attributes;
 using System.Text;
 using Rick.Extensions;
-using System;
 
 namespace Rick.Modules
 {
@@ -108,7 +107,7 @@ namespace Rick.Modules
                 $"**AFK List:** {AFKList}\n" +
                 $"**Tags List** {TagList}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, new Uri(Context.Guild.IconUrl), Description: Description, ThumbUrl: new Uri(Context.Guild.IconUrl));
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
             await ReplyAsync("", embed: embed);
         }
 

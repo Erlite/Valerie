@@ -57,7 +57,7 @@ namespace Rick.Modules
                 return;
             }
             search = search?.Trim() ?? "";
-            Uri url = new Uri(await Function.GetE621ImageLink(search));
+            string url = await Function.GetE621ImageLink(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else

@@ -33,7 +33,7 @@ namespace Rick.Modules
             embed.WithAuthor(x =>
             {
                 x.Name = "Urban Dictionary";
-                x.WithIconUrl(new Uri("https://lh3.googleusercontent.com/4hpSJ4pAfwRUg-RElZ2QXNh_pV01Z96iJGT2BFuk_RRsNc-AVY7cZhbN2g1zWII9PBQ=w170"));
+                x.WithIconUrl("https://lh3.googleusercontent.com/4hpSJ4pAfwRUg-RElZ2QXNh_pV01Z96iJGT2BFuk_RRsNc-AVY7cZhbN2g1zWII9PBQ=w170");
             });
             string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + urban);
             embed.WithColor(new Color(153, 30, 87));
@@ -99,7 +99,7 @@ namespace Rick.Modules
                 return;
             var source = img.Source.Replace("b.", ".");
             var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched for: {search}", 
-                new Uri("https://s25.postimg.org/mi3j4sppb/imgur_1.png"), source, ImageUrl: new Uri(source));
+                "https://s25.postimg.org/mi3j4sppb/imgur_1.png", source, ImageUrl: source);
             await ReplyAsync("", embed: embed);
         }
 
@@ -129,7 +129,7 @@ namespace Rick.Modules
             var GetRandom = Sets[new Random().Next(0, Sets.Length)];
             string URL = $"https://robohash.org/{name}{GetRandom}";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, 
-                new Uri(Context.User.GetAvatarUrl()), ImageUrl: new Uri(URL));
+                Context.User.GetAvatarUrl(), ImageUrl: URL);
             await ReplyAsync("", embed: embed);
         }
 
@@ -139,7 +139,7 @@ namespace Rick.Modules
             string Link = $"https://montanaflynn-l33t-sp34k.p.mashape.com/encode?text={Uri.EscapeUriString(text)}";
             var get = await Function.MashapeHeaders("text/plain", Link);
             var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, 
-                new Uri(Context.User.GetAvatarUrl()), Description: get);
+                Context.User.GetAvatarUrl(), Description: get);
             await ReplyAsync("", embed: embed);
         }
 
@@ -149,7 +149,7 @@ namespace Rick.Modules
             var Get = await Function.MashapeHeaders("text/plain", "https://thibaultcha-fortunecow-v1.p.mashape.com/random");
             string Description = $"```{Get}```";
             var embed = EmbedExtension.Embed(EmbedColors.Yellow, Context.User.Username, 
-                new Uri(Context.User.GetAvatarUrl()), Description: Description);
+                Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -168,7 +168,7 @@ namespace Rick.Modules
 
                 string Description = firstParagraph;
                 var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search.ToUpper()}", 
-                    new Uri(Context.User.GetAvatarUrl()), Description: Description, ImageUrl: new Uri(url));
+                    Context.User.GetAvatarUrl(), Description: Description, ImageUrl: url);
                 await ReplyAsync("", false, embed);
             }
             catch(ArgumentException args)
@@ -182,7 +182,7 @@ namespace Rick.Modules
         {
             string MainUrl = $"https://api.adorable.io/avatars/500/{Name}.png";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, Context.User.Username, 
-                new Uri(Context.User.GetAvatarUrl()), ImageUrl: new Uri(MainUrl));
+                Context.User.GetAvatarUrl(), ImageUrl: MainUrl);
             await ReplyAsync("", embed: embed);
         }
 
@@ -212,7 +212,7 @@ namespace Rick.Modules
                 $"{Function.ShortenUrl(Convert.AbstractURL)}\n\n" +
                 $"**Related Topics:**\n" +
                 $"{SB.ToString()}";
-            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", new Uri(Image), Description: Description, ThumbUrl: new Uri(Image));
+            var embed = EmbedExtension.Embed(EmbedColors.Orange, $"Searched For: {Search}", Image, Description: Description, ThumbUrl: Image);
             await ReplyAsync("", embed: embed);
         }
 
@@ -245,7 +245,7 @@ namespace Rick.Modules
                 var RandomNum = Random.Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
                 var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Search Term:   {Query.ToUpper()}", 
-                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), ImageUrl: new Uri((string)image["contentUrl"]));
+                    Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
             }
 
@@ -276,7 +276,7 @@ namespace Rick.Modules
                     str.AppendLine($"**{result.Name}**\n{result.Snippet}\n{Function.ShortenUrl(result.URL)}\n");
                 }
                 var embed = EmbedExtension.Embed(EmbedColors.Cyan, $"Searched For: {Query}", 
-                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: str.ToString(), FooterText: $"Total Results: {Convert.Pages.TotalMatches.ToString()}");
+                    Context.Client.CurrentUser.GetAvatarUrl(), Description: str.ToString(), FooterText: $"Total Results: {Convert.Pages.TotalMatches.ToString()}");
                 await ReplyAsync("", embed: embed);
             }
         }
@@ -288,7 +288,7 @@ namespace Rick.Modules
             var usr = await github.User.Get(user);
             string Description = $"**Bio:** {usr.Bio}\n**Public Repositories:** {usr.PublicRepos}\n**Private Repositories:** {usr.TotalPrivateRepos}\n**Followers:** {usr.Followers}\n**Company:** {usr.Company}";
             var embed = EmbedExtension.Embed(EmbedColors.Pastle, usr.Name, 
-                new Uri(usr.AvatarUrl), Description: Description);
+                usr.AvatarUrl, Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -310,7 +310,7 @@ namespace Rick.Modules
                 Author = new EmbedAuthorBuilder()
                 {
                     Name = $"APP ID: {ID}",
-                    IconUrl = new Uri(Context.User.GetAvatarUrl())
+                    IconUrl = Context.User.GetAvatarUrl()
                 },
                 Footer = new EmbedFooterBuilder()
                 {
@@ -380,10 +380,10 @@ namespace Rick.Modules
                 Author = new EmbedAuthorBuilder()
                 {
                     Name = Info.realname,
-                    IconUrl = new Uri(Info.avatarfull),
-                    Url = new Uri(Info.profileurl)
+                    IconUrl = Info.avatarfull,
+                    Url = Info.profileurl
                 },
-                ThumbnailUrl = new Uri(Info.avatarfull)
+                ThumbnailUrl = Info.avatarfull
             };
             Builder.AddInlineField("Display Name", $"{Info.personaname}");
             Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");
