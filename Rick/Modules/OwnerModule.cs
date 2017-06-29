@@ -222,18 +222,28 @@ namespace Rick.Modules
         }
 
         [Command("EvalRemove"), Summary("EvalRemove Discord"), Remarks("Removes a namespace from the current eval namespace list")]
-        public async Task RemoveImportAsync(string import)
+        public async Task RemoveImportAsync(string Namespace)
         {
-            ConfigHandler.IConfig.EvalImports.Remove(import);
-            await ReplyAsync($"Removed {import}");
+            if (!ConfigHandler.IConfig.EvalImports.Contains(Namespace))
+            {
+                await ReplyAsync($"**{Namespace}** doesn't exists in Evan Imports!");
+                return;
+            }
+            ConfigHandler.IConfig.EvalImports.Remove(Namespace);
+            await ReplyAsync($"Removed **{Namespace}** from Eval Imports.");
             await ConfigHandler.SaveAsync();
         }
 
         [Command("EvalAdd"), Summary("EvalAdd Discord.Net"), Remarks("Adds a namespace to the current eval namespace list")]
-        public async Task AddImportAsync(string import)
+        public async Task AddImportAsync(string Namespace)
         {
-            ConfigHandler.IConfig.EvalImports.Add(import);
-            await ReplyAsync($"Added {import}");
+            if (ConfigHandler.IConfig.EvalImports.Contains(Namespace))
+            {
+                await ReplyAsync($"**{Namespace}** already exists in Evan Imports!");
+                return;
+            }
+            ConfigHandler.IConfig.EvalImports.Add(Namespace);
+            await ReplyAsync($"Added **{Namespace}** to Eval Imports.");
             await ConfigHandler.SaveAsync();
         }
 
