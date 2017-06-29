@@ -31,8 +31,8 @@ namespace Rick.Modules
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
                 string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.AdminCases}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, 
-                    FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif"));
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, 
+                    FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await ReplyAsync($"***{ User.Username + '#' + User.Discriminator} GOT KICKED*** :ok_hand: ");
@@ -50,7 +50,8 @@ namespace Rick.Modules
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
                 string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.AdminCases}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://i.redd.it/psv0ndgiqrny.gif"));
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, 
+                    FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await ReplyAsync($"***{User.Username + '#' + User.Discriminator} GOT BENT*** :hammer: ");
@@ -100,7 +101,7 @@ namespace Rick.Modules
         {
             await User.AddRoleAsync(Role);
             string Description = $"{User.Username} has been added to {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, new Uri(User.GetAvatarUrl()), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -109,7 +110,7 @@ namespace Rick.Modules
         {
             await User.RemoveRoleAsync(Role);
             string Description = $"{User.Username} has been removed from {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, new Uri(User.GetAvatarUrl()), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
