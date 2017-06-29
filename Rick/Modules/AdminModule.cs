@@ -110,7 +110,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Antiraid"), Summary("In case of a raid, this command adds everyone to a mute role!"), Remarks("Kick @Username User was spamming!")]
+        [Command("Antiraid"), Summary("In case of a raid, this command adds everyone to a mute role!")]
         public async Task AntiRadeAsync()
         {
             var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
