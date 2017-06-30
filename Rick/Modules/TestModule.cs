@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
-using Rick.Functions;
+using Rick.Controllers;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
     public class TestModule : ModuleBase
     {
         [Command("Test")]
-        public async Task TestAsync(string Msg)
+        public async Task TestAsync()
         {
-            string Filter = Function.Censor(Msg);
-            await ReplyAsync(Filter);
+            await ReplyAsync("Test");
         }
     }
 }
