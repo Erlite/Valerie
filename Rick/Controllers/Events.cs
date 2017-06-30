@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Rick.Functions;
 using Rick.Enums;
 using Cleverbot.Models;
+using Rick.Extensions;
 
 namespace Rick.Controllers
 {
@@ -24,9 +25,12 @@ namespace Rick.Controllers
             var JoinChannel = User.Guild.GetChannel(Config.JoinEvent.TextChannel);
 
             if (Config.WelcomeMessages.Count <= 0)
-                WelcomeMessage = $"Welcome {User.Username} to {User.Guild.Name}!";
+                WelcomeMessage = $"{User.Mention} just joined {User.Guild.Name}! WELCOME!";
             else
-                WelcomeMessage = Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)];
+            {
+                var ConfigMsg = Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)];
+                WelcomeMessage = StringExtension.ReplaceWith(ConfigMsg, User.Mention, User.Guild.Name);
+            }
 
 
             if (User.Guild.GetChannel(Config.JoinEvent.TextChannel) != null)
@@ -54,12 +58,12 @@ namespace Rick.Controllers
             if (User.Guild.GetChannel(Config.LeaveEvent.TextChannel) != null)
             {
                 Channel = LeaveChannel as ITextChannel;
-                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}");
+                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}. :wave:");
             }
             else
             {
                 Channel = User.Guild.DefaultChannel as ITextChannel;
-                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}");
+                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}. :wave:");
             }
         }
 
@@ -120,6 +124,11 @@ namespace Rick.Controllers
             {
                 GuildConfig.KarmaList.Remove(User.Id);
                 Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
+            }
+            if (GuildConfig.AFKList.ContainsKey(User.Id))
+            {
+                GuildConfig.AFKList.Remove(User.Id);
+                Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s AFK List.");
             }
             foreach (var tag in GuildConfig.TagsList)
             {
@@ -215,7 +224,7 @@ namespace Rick.Controllers
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;
 
             await Client.SetStatusAsync(Status);
-        }
+        }        
         #endregion
     }
 }
