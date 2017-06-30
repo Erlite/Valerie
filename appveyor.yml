@@ -1,0 +1,7 @@
+version: 1.4.{build}
+before_build:
+- cmd: >-
+    dotnet restore
+build_script:
+- cmd: >-
+    dotnet build
