@@ -8,7 +8,7 @@ namespace Rick.Models
     public class ConfigModel : IConfig
     {
         [JsonProperty("Prefix")]
-        public string Prefix { get; set; } = "--";
+        public string Prefix { get; set; } = "<>";
 
         [JsonProperty("Token")]
         public string Token { get; set; }
@@ -21,7 +21,7 @@ namespace Rick.Models
 
         [JsonProperty("CensoredWords")]
         public string CensoredWords { get; set; } =
-            "\\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|a+s+s+|n+i+g+g+e+r+|d+i+c+k+|p+u+s+s+y+|f+a+g+g+o+t+)(w+i+t+|e+r+|i+n+g+)?\\b";
+            "\\\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|a+s+s+|n+i+g+g+e+r+|d+i+c+k+|p+u+s+s+y+|f+a+g+g+o+t+)(w+i+t+|e+r+|i+n+g+)?\\\b";
 
         [JsonProperty("IsDebugEnabled")]
         public bool IsDebugEnabled { get; set; }
