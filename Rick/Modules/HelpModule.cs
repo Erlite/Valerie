@@ -14,8 +14,7 @@ namespace Rick.Modules
     public class HelpModule : ModuleBase
     {
         private CommandService _service;
-
-        public HelpModule(CommandService service)
+        HelpModule(CommandService service)
         {
             _service = service;
         }
@@ -26,14 +25,14 @@ namespace Rick.Modules
             string Description = 
                 "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Antiraid, Moneyshot, Clear\n" + 
                 "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Encrypt, Decrypt, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar, " +
-                "Karma, Rank, Top\n" +
+                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar, " +
+                "Karma, Rank, Top, Yomama, Probe, Iam, IAmNot\n" +
                 "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
-                "**Google Commands:** Google, GImage, Youtube, Shorten\n" +
-                "**Guild Commands:** Modchannel, SetPrefix, WelcomeMsg, Actions, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, Channel, Role\n**Example:** " +
-                "Channel Add #ChannelName, Role Add @RoleName\n" +
+                "**Google Commands:** Google, GImage, Youtube, Shorten, Revav\n" +
+                "**Guild Commands:** Prefix, Welcome, Settings, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, SetChannel, Roles\n**Example:** " +
+                "SetChannel JoinChannel #ChannelName, Roles Add @RoleName\n" +
                 "**Nsfw Commands:** Boobs, Ass, E621\n" +
-                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Info, SendMsg\n" +
+                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Dump, SendMsg\n" +
                 "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo, BImage, Bing, GitUser, SNews, Suser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
                 "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
