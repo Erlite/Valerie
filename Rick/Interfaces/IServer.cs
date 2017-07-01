@@ -6,7 +6,7 @@ namespace Rick.Interfaces
 {
     public interface IServer
     {
-        char Prefix { get; set; }
+        string Prefix { get; set; }
         List<string> WelcomeMessages { get; set; }
         ulong MuteRoleID { get; set; }
         int AdminCases { get; set; }

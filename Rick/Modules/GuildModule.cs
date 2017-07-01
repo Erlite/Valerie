@@ -15,7 +15,7 @@ namespace Rick.Modules
     public class GuildModule : ModuleBase
     {
         [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]
-        public async Task SetPrefixAsync(char prefix)
+        public async Task SetPrefixAsync(string prefix)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -35,7 +35,7 @@ namespace Rick.Modules
             gldConfig.WelcomeMessages.Add(msg);
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync($"Guild Welcome Message has been set to:\n```{msg}```");
+            await ReplyAsync($"Welcome messages has been added to Guild's welcome messages list.");
         }
 
         [Command("Settings"), Summary("Displays all settings for your Guild.")]
@@ -80,7 +80,7 @@ namespace Rick.Modules
             }
 
             if (string.IsNullOrWhiteSpace(SB.ToString()))
-                SB = SB.AppendLine("Guild has no welcome message/s!");
+                SB = SB.Append("Guild has no welcome message/s!");
 
             if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.AdminLog.TextChannel != 0)
             {

@@ -46,7 +46,7 @@ namespace Rick.Handlers
 
             var Context = new SocketCommandContext(Client, Msg);
 
-            if (!(Msg.HasStringPrefix(BotConfig.Prefix, ref argPos) || Msg.HasCharPrefix(GuildConfig.Prefix, ref argPos))) return;
+            if (!(Msg.HasStringPrefix(BotConfig.Prefix, ref argPos) || Msg.HasStringPrefix(GuildConfig.Prefix, ref argPos))) return;
 
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
 

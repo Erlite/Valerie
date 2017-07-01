@@ -8,7 +8,7 @@ namespace Rick.Models
     public class GuildModel : IServer
     {
         [JsonProperty("Prefix")]
-        public char Prefix { get; set; } = '!';
+        public string Prefix { get; set; } = "<>";
 
         [JsonProperty("WelcomeMessages")]
         public List<string> WelcomeMessages { get; set; } = new List<string>();
