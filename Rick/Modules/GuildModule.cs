@@ -11,7 +11,7 @@ using System;
 
 namespace Rick.Modules
 {
-    [RequireUserPermission(GuildPermission.Administrator), CheckBlacklist]
+    [RequireUserPermission(GuildPermission.ManageGuild), RequireBotPermission(GuildPermission.ManageGuild), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
         [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]
@@ -26,16 +26,17 @@ namespace Rick.Modules
         }
 
         [Command("Welcome"),
-            Summary("Sets a welcome message for your server and adds it to the welcome list."),
-            Remarks("Welcome Heyo welcome to our server!")]
-        public async Task WelcomeMessageAsync([Remainder]string msg)
+            Summary("Sets a welcome message for your server and adds it to the welcome list. You can also remove a welcome message " +
+            "from the list by using list index."),
+            Remarks("Welcome Add Heyo welcome to our server! OR Welcome Remove 2")]
+        public async Task WelcomeMessageAsync([Remainder]string msg = null)
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.WelcomeMessages.Add(msg);
+            await ReplyAsync("Welcome message has been added to Guild's welcome messages list.");
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync($"Welcome messages has been added to Guild's welcome messages list.");
         }
 
         [Command("Settings"), Summary("Displays all settings for your Guild.")]
@@ -62,21 +63,26 @@ namespace Rick.Modules
             else
                 KarmaList = $"{Context.Guild.Name}'s Karma list contains {GConfig.KarmaList.Count} members.";
 
+            string Roles = null;
+            if (GConfig.AssignableRoles.Count <= 0)
+                Roles = $"There are no assignable roles for {Context.Guild.Name}.";
+            else
+                Roles = $"{Context.Guild.Name}'s has {GConfig.AssignableRoles.Count} assignable roles!";
+
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
             var Bans = GConfig.AdminLog.IsEnabled ? "Enabled" : "Disabled";
             var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
             var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
 
-
-
             SocketGuildChannel JoinChannel;
             SocketGuildChannel LeaveChannel;
             SocketGuildChannel BanChannel;
+            SocketGuildChannel ChatterBotChannel;
 
             foreach (var Welcome in GConfig.WelcomeMessages)
             {
-                SB = SB.AppendLine(Welcome);
+                SB = SB.AppendLine($":fleur_de_lis: {Welcome}");
             }
 
             if (string.IsNullOrWhiteSpace(SB.ToString()))
@@ -87,13 +93,16 @@ namespace Rick.Modules
                 JoinChannel = await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel) as SocketGuildChannel;
                 LeaveChannel = await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel) as SocketGuildChannel;
                 BanChannel = await Context.Guild.GetChannelAsync(GConfig.AdminLog.TextChannel) as SocketGuildChannel;
+                ChatterBotChannel = await Context.Guild.GetChannelAsync(GConfig.Chatterbot.TextChannel) as SocketGuildChannel;
             }
             else
             {
                 JoinChannel = null;
                 LeaveChannel = null;
                 BanChannel = null;
+                ChatterBotChannel = null;
             }
+
 
             string Description = $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message:**\n{SB.ToString()}\n" +
@@ -102,11 +111,12 @@ namespace Rick.Modules
                 $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
                 $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
                 $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
-                $"**Chatter Bot:** {IsChatterBotEnabled}\n" +
+                $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
                 $"**Chat Karma:** {Karma}\n" +
                 $"**Karma List:** {KarmaList}\n" +
                 $"**AFK List:** {AFKList}\n" +
-                $"**Tags List** {TagList}";
+                $"**Tags List** {TagList}\n" +
+                $"**Assignable Roles:** {Roles}";
 
             var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, new Uri(Context.Guild.IconUrl), Description: Description, ThumbUrl: new Uri(Context.Guild.IconUrl));
             await ReplyAsync("", embed: embed);
