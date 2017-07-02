@@ -11,30 +11,26 @@ using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [ CheckBlacklist, RequireBotPermission(GuildPermission.Administrator |
+    [CheckBlacklist, RequireBotPermission(GuildPermission.Administrator |
         GuildPermission.KickMembers |
         GuildPermission.BanMembers |
-        GuildPermission.ManageMessages),
-        RequireUserPermission(GuildPermission.KickMembers |
-        GuildPermission.BanMembers |
-        GuildPermission.ManageMessages)]
-
+        GuildPermission.ManageMessages), Permission]
     public class AdminModule : ModuleBase
     {
         [Command("Kick"), Summary("Kicks user from the guild with a reason."), Remarks("Kick @Username User was spamming!")]
         public async Task KickAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
         {
-            await User.KickAsync();            
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
             gldConfig.AdminCases += 1;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
                 string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.AdminCases}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, 
+                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description,
                     FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif"));
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
+            await User.KickAsync();
             await ReplyAsync($"***{ User.Username + '#' + User.Discriminator} GOT KICKED*** :ok_hand: ");
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
@@ -44,7 +40,6 @@ namespace Rick.Modules
         public async Task BanAsync(SocketGuildUser User, [Remainder] string reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            await User.Guild.AddBanAsync(User);
             gldConfig.AdminCases += 1;
             var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
@@ -53,8 +48,8 @@ namespace Rick.Modules
                 var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: description, FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: new Uri("https://i.redd.it/psv0ndgiqrny.gif"));
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
+            await User.Guild.AddBanAsync(User);
             await ReplyAsync($"***{User.Username + '#' + User.Discriminator} GOT BENT*** :hammer: ");
-
             GuildHandler.GuildConfigs[User.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
@@ -154,7 +149,7 @@ namespace Rick.Modules
                 return;
             }
 
-            foreach(var Key in GldCfg.KarmaList.Keys.ToList())
+            foreach (var Key in GldCfg.KarmaList.Keys.ToList())
             {
                 GldCfg.KarmaList[Key] += Karma;
             }
