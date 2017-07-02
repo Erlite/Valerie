@@ -180,8 +180,10 @@ namespace Rick.Controllers
 
         static async void CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
         {
-            var IsEnabled = GuildHandler.GuildConfigs[Guild.Id].Chatterbot.IsEnabled;
-            if (Message.Author.IsBot || !IsEnabled || !Message.Content.StartsWith("Rick")) return;
+            var GC = GuildHandler.GuildConfigs[Guild.Id];
+            var IsEnabled = GC.Chatterbot.IsEnabled;
+            var Channel = Guild.GetChannel(GC.Chatterbot.TextChannel) as IMessageChannel;
+            if (Message.Author.IsBot || !IsEnabled || !Message.Content.StartsWith("Rick") || Message.Channel != Channel) return;
             string UserMsg = null;
             if (Message.Content.StartsWith("Rick"))
             {
@@ -189,7 +191,10 @@ namespace Rick.Controllers
             }
             CleverbotResponse Response = null;
             Response = Cleverbot.Main.Talk(UserMsg, Response);
-            await Message.Channel.SendMessageAsync(Response.Output);
+            if (Channel != null)
+                await Channel.SendMessageAsync(Response.Output);
+            else
+                await Message.Channel.SendMessageAsync(Response.Output);
         }
 
         static async Task AddToMessageAsync(SocketMessage Message)
