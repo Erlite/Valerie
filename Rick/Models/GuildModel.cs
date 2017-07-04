@@ -19,6 +19,9 @@ namespace Rick.Models
         [JsonProperty("AdminCases")]
         public int AdminCases { get; set; }
 
+        [JsonProperty("NoInvites")]
+        public bool NoInvites { get; set; }
+
         [JsonProperty("IsKarmaEnabled")]
         public bool IsKarmaEnabled { get; set; }
 

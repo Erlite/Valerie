@@ -10,6 +10,7 @@ namespace Rick.Interfaces
         List<string> WelcomeMessages { get; set; }
         ulong MuteRoleID { get; set; }
         int AdminCases { get; set; }
+        bool NoInvites { get; set; }
         Wrapper JoinEvent { get; set; }
         Wrapper LeaveEvent { get; set; }
         Wrapper AdminLog { get; set; }
