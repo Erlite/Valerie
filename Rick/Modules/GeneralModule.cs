@@ -714,5 +714,24 @@ namespace Rick.Modules
             await User.RemoveRoleAsync(Role);
             await ReplyAsync($"You have been removed from **{Role.Name}** role!");
         }
+
+        [Command("Discrim"), Summary("Gets all users who match a certain discrim"), Remarks("Discrim 0001")]
+        public async Task DiscrimAsync(string DiscrimValue)
+        {
+            var Guilds = (Context.Client as DiscordSocketClient).Guilds;
+            var sb = new StringBuilder();
+            foreach (var gld in Guilds)
+            {
+                var dis = gld.Users.Where(x => x.Discriminator == DiscrimValue && x.Username != Context.User.Username);
+                foreach (var d in dis)
+                {
+                    sb.AppendLine(d.Username);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(sb.ToString()))
+                await ReplyAsync($"Users matching **{DiscrimValue}** Discriminator:\n{sb.ToString()}");
+            else
+                await ReplyAsync($"No usernames found matching **{DiscrimValue}** discriminator.");
+        }
     }
 }

@@ -6,19 +6,27 @@ using Discord.Commands;
 using Rick.Controllers;
 using Rick.Handlers;
 using Rick.Functions;
+using Discord.WebSocket;
+using System.Linq;
+
 namespace Rick.Modules
 {
     public class TestModule : ModuleBase
     {
         [Command("Test")]
-        public async Task TestAsync([Remainder]string Message)
+        public async Task TestAsync(string Discrim)
         {
-            if (Function.Advertisement(Message))
+            var Guilds = (Context.Client as DiscordSocketClient).Guilds;
+            var sb = new StringBuilder();
+            foreach (var gld in Guilds)
             {
-                await ReplyAsync("OK");
+                var dis = gld.Users.Where(x => x.Discriminator == Discrim && x.Username != Context.User.Username);
+                foreach (var d in dis)
+                {
+                    sb.AppendLine(d.Username);
+                }
             }
-            else
-                await ReplyAsync("None");
+            await ReplyAsync(sb.ToString());
         }
     }
 }
