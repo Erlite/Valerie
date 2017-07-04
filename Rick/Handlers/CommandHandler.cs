@@ -40,7 +40,8 @@ namespace Rick.Handlers
 
             if (Msg == null ||
                 !(Msg.Channel is SocketGuildChannel) ||
-                Msg.Author.IsBot) return;
+                Msg.Author.IsBot ||
+                BotConfig.Blacklist.ContainsKey(Msg.Author.Id)) return;
 
             int argPos = 0;
 
