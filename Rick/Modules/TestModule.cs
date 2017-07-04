@@ -5,15 +5,20 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Rick.Controllers;
 using Rick.Handlers;
-
+using Rick.Functions;
 namespace Rick.Modules
 {
     public class TestModule : ModuleBase
     {
         [Command("Test")]
-        public async Task TestAsync()
+        public async Task TestAsync([Remainder]string Message)
         {
-            await ReplyAsync("Test");
+            if (Function.Advertisement(Message))
+            {
+                await ReplyAsync("OK");
+            }
+            else
+                await ReplyAsync("None");
         }
     }
 }
