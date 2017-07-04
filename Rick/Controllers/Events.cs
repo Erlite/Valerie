@@ -112,7 +112,7 @@ namespace Rick.Controllers
             KarmaHandlerAsync(Message.Author as SocketGuildUser);
             AFKHandlerAsync(Guild, Message);
             CleverbotHandlerAsync(Guild, Message);
-
+            await AntiAdvertisementAsync(Guild, Message);
             await AddToMessageAsync(Message);
         }
 
@@ -204,6 +204,17 @@ namespace Rick.Controllers
             await ConfigHandler.SaveAsync();
         }
 
+        static async Task AntiAdvertisementAsync(SocketGuild Guild, SocketMessage Message)
+        {
+            var Config = GuildHandler.GuildConfigs[Guild.Id];
+            if (!Config.NoInvites || Guild == null) return;
+            if (Function.Advertisement(Message.Content))
+            {
+                await Message.DeleteAsync();
+                await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
+            }
+        }
+
         public static async Task OnReadyAsync(DiscordSocketClient Client)
         {
             var Config = ConfigHandler.IConfig;
@@ -229,7 +240,14 @@ namespace Rick.Controllers
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK;
 
             await Client.SetStatusAsync(Status);
-        }        
+        }
+
+        public static async Task AddToCommand(SocketMessage Message)
+        {
+            var Config = ConfigHandler.IConfig;
+            Config.CommandsUsed += 1;
+            await ConfigHandler.SaveAsync();
+        }
         #endregion
     }
 }
