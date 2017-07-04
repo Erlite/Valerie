@@ -94,10 +94,20 @@ namespace Rick.Functions
             return Service.Url.Insert(Refer).Execute().Id;
         }
 
-        public static string Censor(string Text)
+        public static async Task<string> MashapeHeaders(string Headers, string Link)
         {
-            Regex Swear = new Regex(ConfigHandler.IConfig.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return Swear.Replace(Text, "BEEP");
+            try
+            {
+                var HTTP = new HttpClient();
+                HTTP.DefaultRequestHeaders.Clear();
+                HTTP.DefaultRequestHeaders.Add("X-Mashape-Key", ConfigHandler.IConfig.APIKeys.MashapeKey);
+                HTTP.DefaultRequestHeaders.Add("Accept", Headers);
+                return await HTTP.GetStringAsync(Link);
+            }
+            catch (Exception EX)
+            {
+                return EX.Message;
+            }
         }
 
         public static void ServicesLogin()
@@ -124,20 +134,30 @@ namespace Rick.Functions
             }
         }
 
-        public static async Task<string> MashapeHeaders(string Headers, string Link)
+        public static string Censor(string Text)
         {
-            try
+            Regex Swear = new Regex(ConfigHandler.IConfig.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return Swear.Replace(Text, "BEEP");
+        }
+
+        public static bool Advertisement(string Message)
+        {
+            List<string> URLS = new List<string>
             {
-                var HTTP = new HttpClient();
-                HTTP.DefaultRequestHeaders.Clear();
-                HTTP.DefaultRequestHeaders.Add("X-Mashape-Key", ConfigHandler.IConfig.APIKeys.MashapeKey);
-                HTTP.DefaultRequestHeaders.Add("Accept", Headers);
-                return await HTTP.GetStringAsync(Link);
-            }
-            catch (Exception EX)
-            {
-                return EX.Message;
-            }
+                "https://discordapp.com/invite/",
+                "https://discord.com/invite/",
+                "https://discord.me/invite/",
+                "https://discordapp.gg/invite/",
+                "https://discord.gg/invite/",
+                "https://discord.me/",
+                "https://www.discordapp.com/invite/",
+                "https://www.discord.com/invite/",
+                "https://www.discord.me/invite/",
+                "https://www.discordapp.gg/invite/",
+                "https://www.discord.gg/invite/",
+                "https://www.discord.me/",
+            };
+            return (URLS.Any(x => Message.Contains(x) | Message.StartsWith(x)));
         }
     }
 }
