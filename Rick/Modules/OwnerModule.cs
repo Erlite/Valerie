@@ -128,14 +128,15 @@ namespace Rick.Modules
             var botConfig = ConfigHandler.IConfig;
             var Bl = botConfig.Blacklist;
             if (Bl.ContainsKey(user.Id))
-                await ReplyAsync("This user already exist in the blacklist! :skull_crossbones:");
-            else
             {
-                Bl.Add(user.Id, reason);
-                ConfigHandler.IConfig.Blacklist = Bl;
-                await ConfigHandler.SaveAsync();
-                await ReplyAsync($"{user.Username} has been added to blacklist!");
+                await ReplyAsync("This user already exist in the blacklist! :skull_crossbones:"); return;
             }
+            Bl.Add(user.Id, reason);
+            ConfigHandler.IConfig.Blacklist = Bl;
+            await ConfigHandler.SaveAsync();
+            await ReplyAsync($"{user.Username} has been added to blacklist!");
+            await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: {reason}\n\n" +
+                $"If you would like to appeal please send a DM to: Yucked#8070.");
         }
 
         [Command("Whitelist"), Summary("Removes users from blacklist"), Remarks("Whitelist @username")]
@@ -144,14 +145,15 @@ namespace Rick.Modules
             var botConfig = ConfigHandler.IConfig;
             var Bl = botConfig.Blacklist;
             if (!Bl.ContainsKey(user.Id))
-                await ReplyAsync("This user is not listed in the Blacklist!");
-            else
             {
-                Bl.Remove(user.Id);
-                ConfigHandler.IConfig.Blacklist = Bl;
-                await ConfigHandler.SaveAsync();
-                await ReplyAsync($"{user.Username} has been removed from the blacklist!");
+                await ReplyAsync("This user is not listed in the Blacklist!");
+                return;
             }
+            Bl.Remove(user.Id);
+            ConfigHandler.IConfig.Blacklist = Bl;
+            await ConfigHandler.SaveAsync();
+            await ReplyAsync($"{user.Username} has been removed from the blacklist!");
+            await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync("You have been removed from my Blacklist! You may use my commands again.");
         }
 
         [Command("Eval"), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
