@@ -6,7 +6,6 @@ using Google.Apis.Services;
 using System.Net.Http;
 using System;
 using Newtonsoft.Json.Linq;
-using Google.Apis.YouTube.v3;
 using Rick.Enums;
 using Rick.Extensions;
 using Rick.Attributes;
@@ -67,17 +66,8 @@ namespace Rick.Modules
         [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube."), Remarks("Youtube SomeVideo Name")]
         public async Task YoutubeAsync([Remainder] string search)
         {
-            var Service = new YouTubeService(new BaseClientService.Initializer
-            {
-                ApiKey = ConfigHandler.IConfig.APIKeys.GoogleKey
-            });
-            var SearchRequest = Service.Search.List("snippet");
-            SearchRequest.Q = search;
-            SearchRequest.MaxResults = 1;
-            SearchRequest.Type = "video";
-            var SearchResponse = (await SearchRequest.ExecuteAsync()).Items.Select(x => "http://www.youtube.com/watch?v=" + x.Id.VideoId).FirstOrDefault();
-            await ReplyAsync(SearchResponse);
-
+            var Link = "http://www.youtube.com/watch?v=" + Function.Youtube(search);
+            await ReplyAsync(Link);
         }
 
         [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/Yucked"),]
