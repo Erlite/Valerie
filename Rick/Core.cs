@@ -35,10 +35,13 @@ namespace Rick
             #region Events
             Client.UserJoined += Events.UserJoinedAsync;
             Client.UserLeft += Events.UserLeftAsync;
-            Client.JoinedGuild += Events.JoinedGuildAsync;
             Client.LeftGuild += Events.DeleteGuildConfig;
             Client.GuildAvailable += Events.HandleGuildConfigAsync;
             Client.MessageReceived += Events.HandleGuildMessagesAsync;
+            Client.JoinedGuild += async (Guild) =>
+            {
+                await Events.JoinedGuildAsync(Guild, Client);
+            };
             Client.Ready += async () =>
             {
                 await Events.OnReadyAsync(Client);

@@ -67,25 +67,6 @@ namespace Rick.Controllers
             }
         }
 
-        internal static async Task JoinedGuildAsync(SocketGuild Guild)
-        {
-            var Prefix = ConfigHandler.IConfig.Prefix;
-            string Message = $"HELLO! I'm Rick! Thank you for inviting me to your server :eggplant:\n" +
-                $"Default Prefix: {Prefix}" +
-                $"**Website:** https://Rickbot.cf \n" +
-                $"**Command List:** https://Rickbot.cf/Pages/Commands.html \n" +
-                $"**Support Server:** https://discord.gg/S5CnhVY \n" +
-                $"**Twitter:** https://twitter.com/Vuxey";
-            await Guild.DefaultChannel.SendMessageAsync(Message);
-
-            var CreateConfig = new GuildModel();
-            if (!GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
-            {
-                GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
-            }
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
         internal static async Task DeleteGuildConfig(SocketGuild Guild)
         {
             if (GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
@@ -145,7 +126,7 @@ namespace Rick.Controllers
 
         static async void KarmaHandlerAsync(SocketGuildUser User)
         {
-            if (User == null) return;
+            if (User == null || ConfigHandler.IConfig.Blacklist.ContainsKey(User.Id)) return;
 
             var GuildID = User.Guild.Id;
             var GuildConfig = GuildHandler.GuildConfigs[GuildID];
@@ -247,6 +228,21 @@ namespace Rick.Controllers
             var Config = ConfigHandler.IConfig;
             Config.CommandsUsed += 1;
             await ConfigHandler.SaveAsync();
+        }
+
+        public static async Task JoinedGuildAsync(SocketGuild Guild, DiscordSocketClient Client)
+        {
+            var Prefix = ConfigHandler.IConfig.Prefix;
+            string Message = $"HELLO! I'm Rick! Thank you for inviting me to your server :eggplant:\n" +
+                $"Default Prefix: {Prefix}" +
+                $"**Website:** https://Rickbot.cf \n" +
+                $"**Command List:** https://Rickbot.cf/Pages/Commands.html \n" +
+                $"**Support Server:** https://discord.gg/S5CnhVY \n" +
+                $"**Twitter:** https://twitter.com/Vuxey";
+            await Guild.DefaultChannel.SendMessageAsync(Message);
+            await Client.StopAsync();
+            await Task.Delay(2000);
+            await Client.StartAsync();
         }
         #endregion
     }
