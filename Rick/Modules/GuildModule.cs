@@ -271,5 +271,24 @@ namespace Rick.Modules
             GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
+
+        [Command("ToggleAntInv"), Summary("Enables/Disables NoInvites. If user posts an invite link it will be removed")]
+        public async Task ToggleAntInv()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.NoInvites)
+            {
+                gldConfig.NoInvites = true;
+                await ReplyAsync(":gear: Anti Invites has now been enabled!");
+            }
+            else
+            {
+                gldConfig.NoInvites = false;
+                await ReplyAsync(":skull_crossbones: Anti Invites has been disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
     }
 }
