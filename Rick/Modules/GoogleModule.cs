@@ -80,7 +80,7 @@ namespace Rick.Modules
 
         }
 
-        [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/ExceptionDev"),]
+        [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/Yucked"),]
         public async Task ShortenAsync([Remainder] string URL)
         {
             await ReplyAsync($"This is your shortened URL: {Function.ShortenUrl(URL)}");
