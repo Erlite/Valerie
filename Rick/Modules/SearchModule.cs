@@ -122,7 +122,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Robohash"), Summary("Bot ExceptionDev"), Remarks("Generates a bot image for your username/name")]
+        [Command("Robohash"), Summary("Robohash Yucked"), Remarks("Generates a bot image for your username/name")]
         public async Task RobohashAsync(string name)
         {
             string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
@@ -281,7 +281,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("GitUser"), Summary("Searches Github for the specified user."), Remarks("GitUser ExceptionDev")]
+        [Command("GitUser"), Summary("Searches Github for the specified user."), Remarks("GitUser Yucked")]
         public async Task UserInfoAsync(string user)
         {
             var github = new GitHubClient(new ProductHeaderValue("Rick"));
