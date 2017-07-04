@@ -321,7 +321,7 @@ namespace Rick.Modules
                 $"I'm better than SIRI and you! Yea! You heard that right! :100:" +
                 $"Invite me to your server so I can molest all of your users or if you wanna get laid real quick. " +
                 $"I'm all about them Girls bro.\n" +
-                $"I'm written by ExceptionDev and this is my ??7?? rewrite. Always trying to improve to provide better fucntionality.";
+                $"I'm written by Yucked and this is my ??9?? rewrite. Always trying to improve to provide better fucntionality.";
             string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
                 $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey)";
 
@@ -544,7 +544,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Avatar"), Summary("Shows users avatar in higher resolution."), Remarks("Avatar @ExceptionDev")]
+        [Command("Avatar"), Summary("Shows users avatar in higher resolution."), Remarks("Avatar @Yucked")]
         public async Task UserAvatarAsync(SocketGuildUser User)
         {
             await ReplyAsync(User.GetAvatarUrl(size: 2048));
