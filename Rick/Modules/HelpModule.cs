@@ -19,7 +19,7 @@ namespace Rick.Modules
             _service = service;
         }
 
-        [Command("Commands"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
+        [Command("Help"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
         public async Task CommandsAsync()
         {
             string Description = 
@@ -29,7 +29,7 @@ namespace Rick.Modules
                 "Karma, Rank, Top, Yomama, Probe, Iam, IAmNot\n" +
                 "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
                 "**Google Commands:** Google, GImage, Youtube, Shorten, Revav\n" +
-                "**Guild Commands:** Prefix, Welcome, Settings, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, SetChannel, Roles\n**Example:** " +
+                "**Guild Commands:** Prefix, Welcome, Settings, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, SetChannel, Roles, ToggleAntInv\n**Example:** " +
                 "SetChannel JoinChannel #ChannelName, Roles Add @RoleName\n" +
                 "**Nsfw Commands:** Boobs, Ass, E621\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Dump, SendMsg\n" +
