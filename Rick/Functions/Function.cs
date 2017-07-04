@@ -17,6 +17,7 @@ using Rick.Handlers;
 using Tweetinvi;
 using Rick.Extensions;
 using Cleverbot;
+using Google.Apis.YouTube.v3;
 
 namespace Rick.Functions
 {
@@ -158,6 +159,19 @@ namespace Rick.Functions
                 "https://www.discord.me/",
             };
             return (URLS.Any(x => Message.Contains(x) | Message.StartsWith(x)));
+        }
+
+        public static string Youtube(string Search)
+        {
+            var Service = new YouTubeService(new BaseClientService.Initializer
+            {
+                ApiKey = ConfigHandler.IConfig.APIKeys.GoogleKey
+            });
+            var SearchRequest = Service.Search.List("snippet");
+            SearchRequest.Q = Search;
+            SearchRequest.MaxResults = 1;
+            SearchRequest.Type = "video";
+            return (SearchRequest.Execute()).Items.Select(x => x.Id.VideoId).FirstOrDefault();
         }
     }
 }
