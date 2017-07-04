@@ -58,6 +58,8 @@ namespace Rick.Handlers
             if (Result.IsSuccess)
                 return;
 
+            await Controllers.Events.AddToCommand(Message).ConfigureAwait(false);
+
             string ErrorMsg = null;
             string Remarks = null;
 
