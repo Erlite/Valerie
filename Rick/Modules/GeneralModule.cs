@@ -264,7 +264,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Coinflip"), Summary("Flips a coin like any other coin flip.")]
+        [Command("Coinflip"), Summary("Flips a coin like any other coin flip."), Cooldown(60)]
         public async Task CoinFlipAsync()
         {
             var rand = new Random().Next(2);
@@ -348,7 +348,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100")]
+        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(60)]
         public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
@@ -477,7 +477,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100")]
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(120)]
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
