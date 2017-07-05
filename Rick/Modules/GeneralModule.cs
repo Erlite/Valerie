@@ -265,7 +265,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Coinflip"), Summary("Flips a coin like any other coin flip."), Cooldown(15)]
+        [Command("Coinflip"), Summary("Flips a coin like any other coin flip.")]
         public async Task CoinFlipAsync()
         {
             var rand = new Random().Next(2);
@@ -349,7 +349,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(15)]
+        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(5)]
         public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
@@ -381,6 +381,12 @@ namespace Rick.Modules
             if (Bet <= 0)
             {
                 await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
+                return;
+            }
+
+            if (Bet > 5000)
+            {
+                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
                 return;
             }
 
@@ -478,7 +484,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(15)]
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(5)]
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -506,6 +512,12 @@ namespace Rick.Modules
             if (Bet <= 0)
             {
                 await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
+                return;
+            }
+
+            if (Bet > 5000)
+            {
+                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
                 return;
             }
 
