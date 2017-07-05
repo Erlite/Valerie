@@ -3,16 +3,19 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Net.Http;
 using Rick.Attributes;
 using Rick.Functions;
+using Rick.JsonModels;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [RequireNsfw ,CheckBlacklist]
+    [RequireNsfw, CheckBlacklist]
     public class NSFWModule : ModuleBase
     {
-        [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Remarks("I can't believe you need help with this command.."), Alias("Tits")]
+        [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
             try
@@ -30,7 +33,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Ass"), Summary("Oh my, you naughty lilttle boiii!"), Remarks("I can't believe you need help with this command.."), Alias("Butt")]
+        [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
             try
@@ -48,7 +51,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("E621"), Summary("E621 Kawaii"), Remarks("Never used this command. Don't ask me")]
+        [Command("E621"), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
         public async Task E621Async(string search)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -71,6 +74,28 @@ namespace Rick.Modules
                     .WithImageUrl(url);
                 await ReplyAsync("", embed: embed);
             }
+        }
+
+        [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
+        public async Task PornAsync([Remainder] string Search)
+        {
+            var Response = await new HttpClient().GetAsync($"http://api.porn.com/videos/find.json?search={Uri.EscapeDataString(Search)}");
+            if (!Response.IsSuccessStatusCode)
+            {
+                await ReplyAsync(Response.ReasonPhrase);
+                return;
+            }
+            var ConvertJson = JsonConvert.DeserializeObject<Porn>(await Response.Content.ReadAsStringAsync());
+            if (!ConvertJson.IsSuccess)
+            {
+                await ReplyAsync("No results found!");
+                return;
+            }
+            var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
+            var embed = EmbedExtension.Embed(Enums.EmbedColors.White, Getvid.VideoTitle, new Uri(Getvid.VideoThumb), Description: Getvid.VideoUrl, ThumbUrl: new Uri(Getvid.VideoThumb), FooterText: $"Total Results: {ConvertJson.Count}");
+            embed.AddInlineField("Video Length", Getvid.duration);
+            embed.AddInlineField("Total Views", Getvid.views);
+            await ReplyAsync("", embed: embed);
         }
     }
 }
