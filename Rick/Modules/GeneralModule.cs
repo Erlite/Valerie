@@ -17,6 +17,7 @@ using Rick.Extensions;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Functions;
+using NineGag;
 
 namespace Rick.Modules
 {
@@ -264,7 +265,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Coinflip"), Summary("Flips a coin like any other coin flip."), Cooldown(60)]
+        [Command("Coinflip"), Summary("Flips a coin like any other coin flip."), Cooldown(15)]
         public async Task CoinFlipAsync()
         {
             var rand = new Random().Next(2);
@@ -348,7 +349,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(60)]
+        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(15)]
         public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
@@ -477,7 +478,7 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(120)]
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(15)]
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -732,6 +733,17 @@ namespace Rick.Modules
                 await ReplyAsync($"Users matching **{DiscrimValue}** Discriminator:\n{sb.ToString()}");
             else
                 await ReplyAsync($"No usernames found matching **{DiscrimValue}** discriminator.");
+        }
+
+        [Command("9Gag"), Summary("Gets hotest posts from 9Gag")]
+        public async Task NineGagAsync()
+        {
+            using (NineGagClient Client = new NineGagClient())
+            {
+                var Posts = await Client.GetPostsAsync(PostActuality.Hot);
+                var p = Posts.Posts.FirstOrDefault().Content.FirstOrDefault().Uri;
+                await ReplyAsync(p.ToString());
+            }
         }
     }
 }
