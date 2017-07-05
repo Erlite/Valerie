@@ -133,7 +133,7 @@ namespace Rick.Controllers
 
             if (User.IsBot || !GuildConfig.IsKarmaEnabled) return;
 
-            var GetRandom = new Random().Next(1, 10);
+            var GetRandom = new Random().Next(1, 5);
             var RandomKarma = Fomulas.GiveKarma(GetRandom);
             var karmalist = GuildConfig.KarmaList;
             if (!karmalist.ContainsKey(User.Id))

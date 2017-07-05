@@ -6,7 +6,7 @@ namespace Rick.Functions
     {
         public static int GiveKarma(int karma)
         {
-            return (Convert.ToInt32(Math.Pow(karma, 3)) + 50 * karma) / 5;
+            return (Convert.ToInt32(Math.Pow(karma, 2)) + 25 * karma) / 5;
         }
 
         public static int GetLevel(int Karma)
