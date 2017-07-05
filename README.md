@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://rickbot.cf/media/Rick.png">
+<img src="https://imghost.io/images/2017/07/05/rsz_1rick_and_morty_logo.png">
 </p>
 
 ---
