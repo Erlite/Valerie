@@ -118,7 +118,7 @@ namespace Rick.Modules
                 $"**Tags List** {TagList}\n" +
                 $"**Assignable Roles:** {Roles}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, new Uri(Context.Guild.IconUrl), Description: Description, ThumbUrl: new Uri(Context.Guild.IconUrl));
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Context.Guild.Name, Context.Guild.IconUrl, Description: Description, ThumbUrl: Context.Guild.IconUrl);
             await ReplyAsync("", embed: embed);
         }
 

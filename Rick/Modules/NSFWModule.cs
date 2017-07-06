@@ -60,7 +60,7 @@ namespace Rick.Modules
                 return;
             }
             search = search?.Trim() ?? "";
-            Uri url = new Uri(await Function.GetE621ImageLink(search));
+            string url = await Function.GetE621ImageLink(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
@@ -92,7 +92,8 @@ namespace Rick.Modules
                 return;
             }
             var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
-            var embed = EmbedExtension.Embed(Enums.EmbedColors.White, Getvid.VideoTitle, new Uri(Getvid.VideoThumb), Description: Getvid.VideoUrl, ThumbUrl: new Uri(Getvid.VideoThumb), FooterText: $"Total Results: {ConvertJson.Count}");
+            var embed = EmbedExtension.Embed(Enums.EmbedColors.White, Getvid.VideoTitle, Getvid.VideoThumb, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
+                FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddInlineField("Video Length", Getvid.duration);
             embed.AddInlineField("Total Views", Getvid.views);
             await ReplyAsync("", embed: embed);

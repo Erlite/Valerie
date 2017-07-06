@@ -56,7 +56,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
             var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", 
-                new Uri(Context.User.GetAvatarUrl()), Description: Description);
+                Context.User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
@@ -90,7 +90,7 @@ namespace Rick.Modules
                 .WithAuthor(x =>
                 {
                     x.Name = getTag.Name;
-                    x.IconUrl = new Uri(Context.Client.CurrentUser.GetAvatarUrl());
+                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
                 })
                 .AddInlineField("Tag Response", getTag.Response)
                 .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.Owner))

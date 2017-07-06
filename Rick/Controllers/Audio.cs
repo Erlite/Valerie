@@ -55,7 +55,7 @@ namespace Rick.Controllers
 
             if (ConnectedChannels.TryGetValue(Guild.Id, out IAudioClient Audio))
             {
-                var Embed = EmbedExtension.Embed(Enums.EmbedColors.Pastle, $"Now Playing {Name}", ThumbUrl: new Uri(VidInfo.ImageStandardResUrl));
+                var Embed = EmbedExtension.Embed(Enums.EmbedColors.Pastle, $"Now Playing {Name}", ThumbUrl: VidInfo.ImageStandardResUrl);
                 Embed.AddInlineField("Author", VidInfo.Author);
                 Embed.AddInlineField("Duartion", VidInfo.Duration);
                 await Channel.SendMessageAsync("", embed: Embed);

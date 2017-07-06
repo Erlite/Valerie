@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc3-00771" />
+    <PackageReference Include="Discord.Net" Version="1.0.1" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.27.1.880" />
     <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.27.1.138" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.27.1.760" />

@@ -37,7 +37,7 @@ namespace Rick.Modules
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
                 "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
             var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", 
-                new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
+                Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
             await ReplyAsync("", embed: embed);
         }
 

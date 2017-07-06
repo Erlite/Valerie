@@ -71,7 +71,7 @@ namespace Rick.Modules
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = Context.User.Username,
-                IconUrl = new Uri(Context.User.GetAvatarUrl())
+                IconUrl = Context.User.GetAvatarUrl()
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);
@@ -176,7 +176,7 @@ namespace Rick.Modules
             {
                 var eval = await CSharpScript.EvaluateAsync(Code, options, Globals, typeof(Globals));
                 var embed = EmbedExtension.Embed(EmbedColors.Green,
-                    "Expression Evaluated Successfully.", new Uri(Client.CurrentUser.GetAvatarUrl()));
+                    "Expression Evaluated Successfully.", Client.CurrentUser.GetAvatarUrl());
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -193,7 +193,7 @@ namespace Rick.Modules
             catch (Exception e)
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Maroon,
-                    "Failed To Evaluate Expression.", new Uri(Client.CurrentUser.GetAvatarUrl()), FooterText: $"From: {e.Source}");
+                    "Failed To Evaluate Expression.", Client.CurrentUser.GetAvatarUrl(), FooterText: $"From: {e.Source}");
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -302,7 +302,7 @@ namespace Rick.Modules
                                 $"- OS is 64-bit: {IsOS64}\n" +
                                 $"- .NET is Mono: {isMono}\n";
             var embed = EmbedExtension.Embed(EmbedColors.Teal, "Full dump of all diagnostic information about this instance.",
-                new Uri(application.IconUrl), Description: Description);
+                application.IconUrl, Description: Description);
             var Msg = await ReplyAsync("", embed: embed);
             await Task.Delay(5000);
             await Msg.DeleteAsync();

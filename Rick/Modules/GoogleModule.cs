@@ -23,7 +23,7 @@ namespace Rick.Modules
         public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
-            Uri URL = new Uri("http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png");
+            string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
             
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
@@ -39,7 +39,7 @@ namespace Rick.Modules
             }
 
             var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", 
-                new Uri(Context.Client.CurrentUser.GetAvatarUrl()), Description: Str.ToString(), ThumbUrl: URL);
+                Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
 
             if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
                 await ReplyAsync("No results found!");
@@ -58,7 +58,7 @@ namespace Rick.Modules
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
                 var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", 
-                    new Uri(Context.Client.CurrentUser.GetAvatarUrl()), ImageUrl: new Uri(image));
+                    Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
                 await ReplyAsync("", embed: embed);
             }
         }
