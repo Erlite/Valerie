@@ -11,10 +11,11 @@ using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, RequireBotPermission(GuildPermission.Administrator |
+    [CheckBlacklist, Permission,
+        RequireBotPermission(GuildPermission.Administrator |
         GuildPermission.KickMembers |
         GuildPermission.BanMembers |
-        GuildPermission.ManageMessages), Permission]
+        GuildPermission.ManageMessages)]
     public class AdminModule : ModuleBase
     {
         [Command("Kick"), Summary("Kicks user from the guild with a reason."), Remarks("Kick @Username User was spamming!")]
@@ -25,9 +26,13 @@ namespace Rick.Modules
             gldConfig.AdminCases += 1;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
-                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{Reason}\n**Case Number:** {gldConfig.AdminCases}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description,
-                    FooterText: $"Kick Date: { DateTime.Now.ToString()}", ImageUrl: "https://media.tenor.co/images/6c5fc36400b6adcf3d2bcc7bb68677eb/tenor.gif");
+                var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
+                    FooterText: $"Kick Date: { DateTime.Now.ToString()}");
+                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
+                embed.AddInlineField("Responsible Mod", Context.User.Username);
+                embed.AddInlineField("Case Number", gldConfig.AdminCases);
+                embed.AddInlineField("Case Type", "Kick");
+                embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await User.KickAsync();
@@ -37,16 +42,20 @@ namespace Rick.Modules
         }
 
         [Command("Ban"), Summary("Bans a user from the guild with a reason."), Remarks("Ban @Username User was spamming!")]
-        public async Task BanAsync(SocketGuildUser User, [Remainder] string reason = "No reason provided by the moderator!")
+        public async Task BanAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
             gldConfig.AdminCases += 1;
             var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
             if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
             {
-                string description = $"**Username: **{User.Username}#{User.Discriminator}\n**Responsilble Mod: **{Context.User.Username}\n**Reason: **{reason}\n**Case Number:** {gldConfig.AdminCases}";
-                var embed = EmbedExtension.Embed(EmbedColors.Red, Context.Client.CurrentUser.Username, Context.Client.CurrentUser.GetAvatarUrl(), Description: description, 
-                    FooterText: $"Ban Date: { DateTime.Now.ToString()}", ImageUrl: "https://i.redd.it/psv0ndgiqrny.gif");
+                var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
+                    FooterText: $"Kick Date: { DateTime.Now.ToString()}");
+                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
+                embed.AddInlineField("Responsible Mod", Context.User.Username + "#" + Context.User.Discriminator);
+                embed.AddInlineField("Case Number", gldConfig.AdminCases);
+                embed.AddInlineField("Case Type", "Ban");
+                embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
             await User.Guild.AddBanAsync(User);
@@ -107,34 +116,6 @@ namespace Rick.Modules
             string Description = $"{User.Username} has been removed from {Role.Name}!";
             var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
             await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Antiraid"), Summary("In case of a raid, this command adds everyone to a mute role!")]
-        public async Task AntiRadeAsync()
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            IRole MuteRole = Context.Guild.GetRole(GuildConfig.MuteRoleID);
-            var GetUsers = await Context.Guild.GetUsersAsync();
-
-            if (GuildConfig.MuteRoleID == 0 || Context.Guild.GetRole(GuildConfig.MuteRoleID) == null)
-            {
-                var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
-                GuildConfig.MuteRoleID = CreateNew.Id;
-                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-                foreach (var user in GetUsers)
-                {
-                    await user.AddRoleAsync(MuteRole);
-                }
-                await ReplyAsync("Created mute role and muted everyone!");
-            }
-            else
-            {
-                foreach (var user in GetUsers)
-                {
-                    await user.AddRoleAsync(MuteRole);
-                }
-                await ReplyAsync("Muted everyone. This guild is protected from raid!");
-            }
         }
 
         [Command("MoneyShot"), Summary("Gives random Karma to everyone in the Guild's Karma list.")]
