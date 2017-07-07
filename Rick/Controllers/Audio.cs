@@ -44,7 +44,7 @@ namespace Rick.Controllers
             var VidInfo = await Client.GetVideoInfoAsync(Input);
             var AudioBit = VidInfo.AudioStreams.OrderBy(x => x.Bitrate).Last();
             var Name = new Regex("[^a-zA-Z0-9 -]").Replace(VidInfo.Title, "");
-            var VideoPath = $"{ConfigHandler.ConfigFile}/{Name}.{AudioBit.Container.GetFileExtension()}";
+            var VideoPath = $"{ConfigHandler.CacheFolder}/{Name}.{AudioBit.Container.GetFileExtension()}";
             if (!File.Exists(VideoPath))
             {
                 await Channel.SendMessageAsync($"Downloading **{Name}** ...");
@@ -56,8 +56,10 @@ namespace Rick.Controllers
             if (ConnectedChannels.TryGetValue(Guild.Id, out IAudioClient Audio))
             {
                 var Embed = EmbedExtension.Embed(Enums.EmbedColors.Pastle, $"Now Playing {Name}", ThumbUrl: VidInfo.ImageStandardResUrl);
-                Embed.AddInlineField("Author", VidInfo.Author);
+                Embed.AddInlineField("Author", VidInfo.Author.Name);
                 Embed.AddInlineField("Duartion", VidInfo.Duration);
+                Embed.AddInlineField("Views", VidInfo.ViewCount);
+                Embed.AddInlineField("Likes", VidInfo.LikeCount);
                 await Channel.SendMessageAsync("", embed: Embed);
                 var Stream = Audio.CreatePCMStream(AudioApplication.Music);
                 await CreateStream(VideoPath).StandardOutput.BaseStream.CopyToAsync(Stream);
