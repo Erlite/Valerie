@@ -10,7 +10,7 @@ using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [Group("Bot"), RequireOwner]
+    [Group("Bot"), RequireOwner, RequireBotPermission(GuildPermission.SendMessages)]
     public class BotModule : ModuleBase
     {
         [Command("Username"), Summary("Changes Bot's username"), Remarks("Username OwO")]

@@ -20,7 +20,7 @@ using Octokit;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, APICheck]
+    [CheckBlacklist, APICheck, RequireBotPermission(GuildPermission.SendMessages)]
     public class SearchModule : ModuleBase
     {
         [Command("Urban"), Summary("Urban IE"), Remarks("Searches urban dictionary for your word")]

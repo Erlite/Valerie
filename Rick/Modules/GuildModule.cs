@@ -11,7 +11,7 @@ using System;
 
 namespace Rick.Modules
 {
-    [RequireUserPermission(GuildPermission.ManageGuild), RequireBotPermission(GuildPermission.ManageGuild), CheckBlacklist]
+    [RequireUserPermission(GuildPermission.ManageGuild), RequireBotPermission(GuildPermission.ManageGuild | GuildPermission.SendMessages), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
         [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]

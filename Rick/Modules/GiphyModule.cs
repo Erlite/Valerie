@@ -6,10 +6,11 @@ using System.Net.Http;
 using Rick.Handlers;
 using Newtonsoft.Json;
 using Rick.JsonModels;
+using Discord;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, Group("Giphy"), APICheck ]
+    [CheckBlacklist, Group("Giphy"), APICheck, RequireBotPermission(GuildPermission.SendMessages)]
     public class GiphyModule : ModuleBase
     {
         string GifsEndpoint = "https://api.giphy.com/v1/gifs/";

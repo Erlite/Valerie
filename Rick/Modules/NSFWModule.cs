@@ -12,7 +12,7 @@ using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [RequireNsfw, CheckBlacklist]
+    [RequireNsfw, CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class NSFWModule : ModuleBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]

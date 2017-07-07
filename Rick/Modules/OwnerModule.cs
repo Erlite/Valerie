@@ -22,7 +22,7 @@ using Rick.Models;
 
 namespace Rick.Modules
 {
-    [RequireOwner]
+    [RequireOwner, RequireBotPermission(GuildPermission.SendMessages)]
     public class OwnerModule : ModuleBase
     {
         private static MemoryStream GenerateStreamFromString(string value)
@@ -53,6 +53,7 @@ namespace Rick.Modules
                 });
             }
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("", embed: embed);
+            await ReplyAsync("Serverlist has been sent :point_up: ");
         }
 
         [Command("Leave"), Summary("Tells the bot to leave a certain guild"), Remarks("Leave 123897481723 This is a message")]

@@ -6,11 +6,10 @@ using Rick.Attributes;
 using Rick.Enums;
 using Rick.Extensions;
 using System.Text;
-using System;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist]
+    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class HelpModule : ModuleBase
     {
         private CommandService _service;

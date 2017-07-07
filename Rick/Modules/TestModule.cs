@@ -10,22 +10,24 @@ using Discord.WebSocket;
 using System.Linq;
 using Discord.Audio;
 using Discord;
+using System.Threading;
 
 namespace Rick.Modules
 {
-    public class TestModule : ModuleBase
+    public class TestModule
     {
-        private readonly Audio _service;
+        private readonly Timer _timer;
 
-        public TestModule(Audio audio)
+        public TestModule( DiscordSocketClient Client)
         {
-            _service = audio;
-        }
-        [Command("Test", RunMode = RunMode.Async)]
-        public async Task TestAsync(string Discrim)
-        {
-            await _service.JoinAudioChannelAsync(Context.Guild, (Context.User as IVoiceState).VoiceChannel);
-            
+            _timer = new Timer(async _ =>
+            {
+                var chn = Client.GetChannel(232558894554152960) as IMessageChannel;
+                await chn.SendMessageAsync("test");
+            },
+            null,
+            TimeSpan.FromSeconds(20),
+            TimeSpan.FromSeconds(5));
         }
     }
 }

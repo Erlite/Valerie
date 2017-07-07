@@ -13,10 +13,11 @@ using Rick.Handlers;
 using Rick.Functions;
 using Discord.WebSocket;
 using Discord.Commands;
+using Discord;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, APICheck]
+    [CheckBlacklist, APICheck, RequireBotPermission(GuildPermission.SendMessages)]
     public class GoogleModule : ModuleBase
     {
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms."), Remarks("Google What is love?")]

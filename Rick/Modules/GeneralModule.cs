@@ -21,7 +21,7 @@ using NineGag;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist]
+    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class GeneralModule : ModuleBase
     {
         [Command("GuildInfo"), Alias("GI"), Summary("Displays information about a guild."), Remarks("GI 1234567890123 OR GI")]

@@ -13,7 +13,7 @@ using Rick.Enums;
 
 namespace Rick.Modules
 {
-    [Group("Tag"), CheckBlacklist]
+    [Group("Tag"), CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class TagModule : ModuleBase
     {
         [Command, Summary("Executes a tag."), Remarks("Tag TagName"), Priority(0)]

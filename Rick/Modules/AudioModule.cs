@@ -4,10 +4,11 @@ using Discord.Commands;
 using Rick.Controllers;
 using Discord;
 using System.Linq;
-//Taken from PassiveBot
+using Rick.Attributes;
 
 namespace Rick.Modules
 {
+    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class AudioModule : ModuleBase
     {
         public static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();

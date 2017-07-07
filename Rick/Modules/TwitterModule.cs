@@ -11,10 +11,11 @@ using Rick.Enums;
 using Rick.Handlers;
 using Tweetinvi.Parameters;
 using Tweetinvi.Models;
+using Discord;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, APICheck]
+    [CheckBlacklist, APICheck, RequireBotPermission(GuildPermission.SendMessages)]
     public class TwitterModule : ModuleBase
     {
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(30)]
