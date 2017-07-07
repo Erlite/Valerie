@@ -233,13 +233,16 @@ namespace Rick.Controllers
         public static async Task JoinedGuildAsync(SocketGuild Guild)
         {
             var Prefix = ConfigHandler.IConfig.Prefix;
-            string Message = $"HELLO! I'm Rick! Thank you for inviting me to your server :eggplant:\n" +
-                $"Default Prefix: {Prefix}" +
-                $"**Website:** https://Rickbot.cf \n" +
-                $"**Command List:** https://Rickbot.cf/Pages/Commands.html \n" +
-                $"**Support Server:** https://discord.gg/S5CnhVY \n" +
-                $"**Twitter:** https://twitter.com/Vuxey";
-            await Guild.DefaultChannel.SendMessageAsync(Message);
+            var gld = GuildHandler.GuildConfigs[Guild.Id];
+            string Message = $"HENLO! I'm Ricky R-r-r-r-RICK! c: :eggplant:" +
+                $"I'm better than SIRI and you! Yea! You heard that right! :100:\n" +
+                $"Default Prefix is: {Prefix}\n" +
+                $"Your Guild Prefix is: {gld.Prefix}\n" +
+                $"To setup your guild read the `Guild Commands` section on command list. Use `{Prefix}Settings` to preview your guild settings.";
+            string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
+                $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey) | " +
+                $"[Invite Me](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)";
+            await Guild.DefaultChannel.SendMessageAsync($"{Message}\n{Misc}");
 
             var CreateConfig = new GuildModel();
             if (!GuildHandler.GuildConfigs.ContainsKey(Guild.Id))

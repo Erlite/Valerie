@@ -324,7 +324,7 @@ namespace Rick.Modules
                 $"I'm written by Yucked and this is my ??9?? rewrite. Always trying to improve to provide better fucntionality.";
             string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
                 $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey) | " +
-                $"[Invite Me]https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175()";
+                $"[Invite Me](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)";
 
             var embed = EmbedExtension.Embed(EmbedColors.Gold,
                 "Ricky Rick", Context.Client.CurrentUser.GetAvatarUrl(),
