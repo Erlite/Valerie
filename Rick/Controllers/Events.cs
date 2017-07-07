@@ -230,7 +230,7 @@ namespace Rick.Controllers
             await ConfigHandler.SaveAsync();
         }
 
-        public static async Task JoinedGuildAsync(SocketGuild Guild, DiscordSocketClient Client)
+        public static async Task JoinedGuildAsync(SocketGuild Guild)
         {
             var Prefix = ConfigHandler.IConfig.Prefix;
             string Message = $"HELLO! I'm Rick! Thank you for inviting me to your server :eggplant:\n" +
@@ -240,9 +240,13 @@ namespace Rick.Controllers
                 $"**Support Server:** https://discord.gg/S5CnhVY \n" +
                 $"**Twitter:** https://twitter.com/Vuxey";
             await Guild.DefaultChannel.SendMessageAsync(Message);
-            await Client.StopAsync();
-            await Task.Delay(2000);
-            await Client.StartAsync();
+
+            var CreateConfig = new GuildModel();
+            if (!GuildHandler.GuildConfigs.ContainsKey(Guild.Id))
+            {
+                GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
+            }
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
         #endregion
     }
