@@ -119,6 +119,7 @@ namespace Rick.Modules
             var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, jsonSettings);
             await (await Context.User.GetOrCreateDMChannelAsync()).SendFileAsync(GenerateStreamFromString(json), $"{Channel.Name}.json");
+            await ReplyAsync($"{Channel.Name}]s Archive has been sent to your DM.");
         }
 
         [Command("Blacklist"), Summary("Forbids a user from using bot commands"), Remarks("Blacklist @Username Reason")]
