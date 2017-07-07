@@ -8,25 +8,24 @@ using Rick.Handlers;
 using Rick.Functions;
 using Discord.WebSocket;
 using System.Linq;
+using Discord.Audio;
+using Discord;
 
 namespace Rick.Modules
 {
     public class TestModule : ModuleBase
     {
-        [Command("Test")]
+        private readonly Audio _service;
+
+        public TestModule(Audio audio)
+        {
+            _service = audio;
+        }
+        [Command("Test", RunMode = RunMode.Async)]
         public async Task TestAsync(string Discrim)
         {
-            var Guilds = (Context.Client as DiscordSocketClient).Guilds;
-            var sb = new StringBuilder();
-            foreach (var gld in Guilds)
-            {
-                var dis = gld.Users.Where(x => x.Discriminator == Discrim && x.Username != Context.User.Username);
-                foreach (var d in dis)
-                {
-                    sb.AppendLine(d.Username);
-                }
-            }
-            await ReplyAsync(sb.ToString());
+            await _service.JoinAudioChannelAsync(Context.Guild, (Context.User as IVoiceState).VoiceChannel);
+            
         }
     }
 }
