@@ -317,17 +317,17 @@ namespace Rick.Modules
         [Command("About"), Summary("Displays information about the bot.")]
         public async Task AboutAsync()
         {
-
             string Message = $"HENLO! I'm Ricky R-r-r-r-RICK! c: :eggplant:" +
                 $"I'm better than SIRI and you! Yea! You heard that right! :100:" +
                 $"Invite me to your server so I can molest all of your users or if you wanna get laid real quick. " +
                 $"I'm all about them Girls bro.\n" +
                 $"I'm written by Yucked and this is my ??9?? rewrite. Always trying to improve to provide better fucntionality.";
             string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
-                $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey)";
+                $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey) | " +
+                $"[Invite Me]https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175()";
 
             var embed = EmbedExtension.Embed(EmbedColors.Gold,
-                "Ricky Rick [@Vuxey](https://twitter.com/Vuxey)", Context.Client.CurrentUser.GetAvatarUrl(),
+                "Ricky Rick", Context.Client.CurrentUser.GetAvatarUrl(),
                 Description: $"{Message}\n{Misc}");
             await ReplyAsync("", embed: embed);
         }
