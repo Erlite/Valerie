@@ -40,7 +40,7 @@ namespace Rick
             Client.MessageReceived += Events.HandleGuildMessagesAsync;
             Client.JoinedGuild += async (Guild) =>
             {
-                await Events.JoinedGuildAsync(Guild, Client);
+                await Events.JoinedGuildAsync(Guild);
             };
             Client.Ready += async () =>
             {
@@ -69,6 +69,7 @@ namespace Rick
         {
             var Services = new ServiceCollection()
                 .AddSingleton(Client)
+                .AddSingleton(new Audio())
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false
