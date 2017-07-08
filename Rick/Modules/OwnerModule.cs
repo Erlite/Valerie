@@ -36,23 +36,12 @@ namespace Rick.Modules
         public async Task ServerListAsync()
         {
             var client = Context.Client as DiscordSocketClient;
-
-            var embed = new EmbedBuilder()
-            {
-                Color = new Color(123, 45, 14)
-            };
             var Sb = new StringBuilder();
             foreach (SocketGuild guild in client.Guilds)
             {
-                embed.AddField(x =>
-                {
-                    x.Name = $"{guild.Name} ({guild.Id})";
-                    x.Value = $"Owner: {guild.Owner.Username} ({guild.Owner.Id})\n" +
-                    $"Total Users: {guild.MemberCount}";
-                    x.IsInline = false;
-                });
+                Sb.AppendLine($"{guild.Name} ({guild.Id})\n");
             }
-            await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("", embed: embed);
+            await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync(Sb.ToString());
             await ReplyAsync("Serverlist has been sent :point_up: ");
         }
 
