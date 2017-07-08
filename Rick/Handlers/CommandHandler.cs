@@ -106,19 +106,19 @@ namespace Rick.Handlers
                 await Context.Channel.SendMessageAsync("", embed: embed);
         }
 
-        async void DefaultCommandError(ExecuteResult result, SearchResult res, SocketCommandContext context)
+        async Task DefaultCommandError(ExecuteResult Result, SearchResult res, SocketCommandContext context)
         {
             if (ConfigHandler.IConfig.IsDebugEnabled)
             {
                 string Name = $"Error Executing Command || Command Name: {res.Commands.FirstOrDefault().Command.Name}";
-                string Description = $"**Error Reason:**\n{result.ErrorReason}\n\n**Target Site:**\n{result.Exception.TargetSite}\n\n**Stack Trace:**";
-                string StackTrace = result.Exception.StackTrace;
+                string Description = $"**Error Reason:**\n{Result.ErrorReason}\n\n**Stack Trace:**";
+                string StackTrace = Result.Exception.StackTrace;
                 var embed = EmbedExtension.Embed(EmbedColors.Red, Name,
                     Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: StackTrace);
                 await context.Channel.SendMessageAsync("", embed: embed);
             }
             else
-                await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), result.ErrorReason)}");
+                await context.Channel.SendMessageAsync($"{string.Concat(Format.Bold("ERROR: "), Result.ErrorReason)}");
         }
     }
 }

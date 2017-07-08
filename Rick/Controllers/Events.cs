@@ -90,15 +90,15 @@ namespace Rick.Controllers
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
 
-            KarmaHandlerAsync(Message.Author as SocketGuildUser);
-            AFKHandlerAsync(Guild, Message);
-            CleverbotHandlerAsync(Guild, Message);
+            await KarmaHandlerAsync(Message.Author as SocketGuildUser);
+            await AFKHandlerAsync(Guild, Message);
+            await CleverbotHandlerAsync(Guild, Message);
             await AntiAdvertisementAsync(Guild, Message);
             await AddToMessageAsync(Message);
         }
 
         #region Event Methods
-        static async void CleanUpAsync(SocketGuildUser User)
+        static async Task CleanUpAsync(SocketGuildUser User)
         {
             var GuildConfig = GuildHandler.GuildConfigs[User.Guild.Id];
             if (GuildConfig.KarmaList.ContainsKey(User.Id))
@@ -124,7 +124,7 @@ namespace Rick.Controllers
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        static async void KarmaHandlerAsync(SocketGuildUser User)
+        static async Task KarmaHandlerAsync(SocketGuildUser User)
         {
             if (User == null || ConfigHandler.IConfig.Blacklist.ContainsKey(User.Id)) return;
 
@@ -150,7 +150,7 @@ namespace Rick.Controllers
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        static async void AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
+        static async Task AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
         {
             var AfkList = GuildHandler.GuildConfigs[Guild.Id].AFKList;
             string afkReason = null;
@@ -159,7 +159,7 @@ namespace Rick.Controllers
                 await Message.Channel.SendMessageAsync($"**Message left from {gldUser.Username}:** {afkReason}");
         }
 
-        static async void CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
+        static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
         {
             var GC = GuildHandler.GuildConfigs[Guild.Id];
             var IsEnabled = GC.Chatterbot.IsEnabled;

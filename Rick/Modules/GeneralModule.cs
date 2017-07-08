@@ -542,15 +542,15 @@ namespace Rick.Modules
         [Command("Stats"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
-            var length = ByteSize.FromBytes(new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length);
-            var cache = ByteSize.FromBytes(Function.DirSize(new DirectoryInfo(ConfigHandler.CacheFolder)));
+            var length = new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length;
+            var cache = Function.DirSize(new DirectoryInfo(ConfigHandler.CacheFolder));
             string Description =
                 $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
                 $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
                 $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
-                $"- Databse Size: {Convert.ToInt32(length.KiloBytes)} MB\n" +
-                $"- Cache Size: {Convert.ToInt32(cache.MegaBytes)} MB\n" +
+                $"- Databse Size: {Convert.ToInt32(length)} Bytes\n" +
+                $"- Cache Size: {Convert.ToInt32(cache)} Bytes\n" +
                 $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
                 $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
 
