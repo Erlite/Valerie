@@ -18,6 +18,7 @@ using Tweetinvi;
 using Rick.Extensions;
 using Cleverbot;
 using Google.Apis.YouTube.v3;
+using System.IO;
 
 namespace Rick.Functions
 {
@@ -172,6 +173,22 @@ namespace Rick.Functions
             SearchRequest.MaxResults = 1;
             SearchRequest.Type = "video";
             return (SearchRequest.Execute()).Items.Select(x => x.Id.VideoId).FirstOrDefault();
+        }
+
+        public static long DirSize(DirectoryInfo d)
+        {
+            long size = 0;
+            FileInfo[] fis = d.GetFiles();
+            foreach (FileInfo fi in fis)
+            {
+                size += fi.Length;
+            }
+            DirectoryInfo[] dis = d.GetDirectories();
+            foreach (DirectoryInfo di in dis)
+            {
+                size += DirSize(di);
+            }
+            return size;
         }
     }
 }
