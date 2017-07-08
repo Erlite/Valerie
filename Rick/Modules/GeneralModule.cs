@@ -542,18 +542,20 @@ namespace Rick.Modules
         [Command("Stats"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
-            long length = new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length;
-
-            string Description = $"{Format.Bold("Stats")}\n" +
+            var length = ByteSize.FromBytes(new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length);
+            var cache = ByteSize.FromBytes(Function.DirSize(new DirectoryInfo(ConfigHandler.CacheFolder)));
+            string Description =
                 $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
                 $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
                 $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
-                $"- Databse Size: {length} Bytes\n" +
+                $"- Databse Size: {Convert.ToInt32(length.KiloBytes)} MB\n" +
+                $"- Cache Size: {Convert.ToInt32(cache.MegaBytes)} MB\n" +
                 $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
                 $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, "Rick Stats.", Context.Client.CurrentUser.GetAvatarUrl(), Description: Description);
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: "Rick Stats", Description: Description, ThumbUrl: 
+                Context.Client.CurrentUser.GetAvatarUrl());
             await ReplyAsync("", embed: embed);
         }
 
