@@ -33,7 +33,7 @@ namespace Rick.Modules
             var RequestList = Service.Cse.List(search);
             RequestList.Cx = ConfigHandler.IConfig.APIKeys.SearchEngineID;
 
-            var items = RequestList.Execute().Items.Take(6);
+            var items = RequestList.Execute().Items.Take(5);
             foreach (var result in items)
             {
                 Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{Function.ShortenUrl(result.Link)}\n");
@@ -60,7 +60,10 @@ namespace Rick.Modules
                 var image = items[0]["link"].ToString();
                 var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", 
                     Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
-                await ReplyAsync("", embed: embed);
+                if (!string.IsNullOrWhiteSpace(image))
+                    await ReplyAsync("", embed: embed);
+                else
+                    await ReplyAsync("No results found!");
             }
         }
 
