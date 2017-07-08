@@ -47,7 +47,7 @@ namespace Rick.Controllers
 
         internal static async Task UserLeftAsync(SocketGuildUser User)
         {
-            CleanUpAsync(User);
+            await CleanUpAsync(User);
 
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
             if (!Config.LeaveEvent.IsEnabled) return;

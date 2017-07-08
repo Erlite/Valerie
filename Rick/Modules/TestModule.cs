@@ -30,9 +30,9 @@ namespace Rick.Modules
         //    TimeSpan.FromSeconds(20),
         //    TimeSpan.FromSeconds(5));
         //}
-        [Command("test")]
-        public async Task test()
-        {
-        }
+        //[Command("test")]
+        //public async Task test()
+        //{
+        //}
     }
 }

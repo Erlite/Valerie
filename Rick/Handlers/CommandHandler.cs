@@ -98,7 +98,7 @@ namespace Rick.Handlers
 
                 case ExecuteResult ER:
                     var exeresult = (ExecuteResult)Result;
-                    DefaultCommandError(exeresult, service, Context);
+                    await DefaultCommandError(exeresult, service, Context);
                     break;
             }
 
