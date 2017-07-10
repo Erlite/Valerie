@@ -17,7 +17,6 @@ using Rick.Extensions;
 using Rick.Handlers;
 using Rick.Attributes;
 using Rick.Functions;
-using NineGag;
 
 namespace Rick.Modules
 {
@@ -32,50 +31,17 @@ namespace Rick.Modules
             if (ID != 0)
                 gld = client.GetGuild(ID);
 
-            var GuildID = gld.Id;
-            var GuildOwner = gld.GetOwnerAsync().GetAwaiter().GetResult().Mention;
-            var GuildDefault = gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Mention.ToUpper();
-            var GuildVoice = gld.VoiceRegionId;
-            var GuildCreated = gld.CreatedAt;
-            var GuildAvailable = gld.Available;
-            var GuildNotification = gld.DefaultMessageNotifications;
-            var GuildEmbed = gld.IsEmbeddable;
-            var GuildMfa = gld.MfaLevel;
-            var GuildRoles = gld.Roles;
-            var GuildAfak = gld.AFKTimeout;
-            var GuildVeri = gld.VerificationLevel;
-            var users = await gld.GetUsersAsync();
-            var OnlineUsers = users.Count(x => x.Status == UserStatus.Online);
-            var OfflineUsers = users.Count(x => x.Status == UserStatus.Offline);
-            var InvisibleUsers = users.Count(x => x.Status == UserStatus.Invisible);
-            var DndUsers = users.Count(x => x.Status == UserStatus.DoNotDisturb);
-            var IdleUsers = users.Count(x => x.Status == UserStatus.Idle);
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = gld.Name;
-                    x.IconUrl = gld.IconUrl;
-                })
-                .WithColor(new Color(153, 30, 87))
-                .AddInlineField("Guild ID", GuildID)
-                .AddInlineField("Guild Owner", GuildOwner)
-                .AddInlineField("Default Channel", GuildDefault)
-                .AddInlineField("Voice Region", GuildVoice)
-                .AddInlineField("Created At", GuildCreated)
-                .AddInlineField("Guild Available?", GuildAvailable)
-                .AddInlineField("Default Notifcations", GuildNotification)
-                .AddInlineField("Is Embedable?", GuildEmbed)
-                .AddInlineField("MFA Level", GuildMfa)
-                .AddInlineField("AFK Timeout", GuildAfak)
-                .AddInlineField("Roles Count", GuildRoles.Count)
-                .AddInlineField("Verification Level", GuildVeri)
-                .AddInlineField("Total Guild Users", users.Count)
-                .AddInlineField(":green_heart: Onlines Users", OnlineUsers)
-                .AddInlineField(":black_circle: Offline Users", OfflineUsers)
-                .AddInlineField(":black_circle: Invisble Users", InvisibleUsers)
-                .AddInlineField(":red_circle: DND Users", DndUsers)
-                .AddInlineField(":yellow_heart: Idle Users", IdleUsers)
-                .AddInlineField(":robot: Bot Users", users.Where(u => u.IsBot).Count());
+            string Desc =
+                $"**ID:** {gld.Id}\n" +
+                $"**Owner:** {gld.GetOwnerAsync().GetAwaiter().GetResult().Username}\n" +
+                $"**Default Channel:** {gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Name}\n" +
+                $"**Voice Region:** {gld.VoiceRegionId}\n" +
+                $"**Created At:** {gld.CreatedAt}\n" +
+                $"**Roles:** {gld.Roles.Count}\n" +
+                $"**Users:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
+                $"**Bots:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
+                $"**AFK Timeout:** {gld.AFKTimeout}\n";
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: $"{gld.Name} Information", Description: Desc, ThumbUrl: gld.IconUrl);
             await ReplyAsync("", false, embed);
         }
 
@@ -747,17 +713,6 @@ namespace Rick.Modules
                 await ReplyAsync($"Users matching **{DiscrimValue}** Discriminator:\n{sb.ToString()}");
             else
                 await ReplyAsync($"No usernames found matching **{DiscrimValue}** discriminator.");
-        }
-
-        [Command("9Gag"), Summary("Gets hotest posts from 9Gag")]
-        public async Task NineGagAsync()
-        {
-            using (NineGagClient Client = new NineGagClient())
-            {
-                var Posts = await Client.GetPostsAsync(PostActuality.Hot);
-                var p = Posts.Posts.FirstOrDefault().Content.FirstOrDefault().Uri;
-                await ReplyAsync(p.ToString());
-            }
         }
     }
 }
