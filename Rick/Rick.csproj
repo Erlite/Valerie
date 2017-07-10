@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cleverbot\Cleverbot.csproj" />
-    <ProjectReference Include="..\NineGag\NineGag.csproj" />
   </ItemGroup>
 
 </Project>
