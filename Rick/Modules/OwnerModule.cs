@@ -126,8 +126,9 @@ namespace Rick.Modules
             ConfigHandler.IConfig.Blacklist = Bl;
             await ConfigHandler.SaveAsync();
             await ReplyAsync($"{user.Username} has been added to blacklist!");
+            var GetOwner = await (Context.Client as DiscordSocketClient).GetApplicationInfoAsync();
             await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: {reason}\n\n" +
-                $"If you would like to appeal please send a DM to: Yucked#8070.");
+                $"If you would like to appeal please send a DM to: {GetOwner.Owner.Username}#{GetOwner.Owner.Discriminator}.");
         }
 
         [Command("Whitelist"), Summary("Removes users from blacklist"), Remarks("Whitelist @username")]
