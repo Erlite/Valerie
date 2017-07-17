@@ -21,8 +21,21 @@ namespace Rick.Modules
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(30)]
         public async Task TweetAsync([Remainder] string TweetMessage)
         {
-            var TweetMsg = PublishTweet(TweetMessage, Context.User.Username);
-            var UserTweet = Tweet.PublishTweet(TweetMsg);
+            if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
+            {
+                await ReplyAsync("Tweet can't be longer than 120 characters and can't be shorter than 25 characters!");
+                return;
+            }
+
+            var Filter = Functions.Function.Censor(TweetMessage);
+            var Publish = $"{Filter} - {Context.User.Username}";
+            if (Publish.Length > 140)
+            {
+                await ReplyAsync("Tweet's total length is greater than 140!");
+                return;
+            }
+
+            var UserTweet = Tweet.PublishTweet(Filter);
             string ThumbImage = null;
 
             if (!string.IsNullOrWhiteSpace(User.GetAuthenticatedUser().ProfileImageUrlFullSize))
@@ -31,7 +44,7 @@ namespace Rick.Modules
                 ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
             var embed = EmbedExtension.Embed(EmbedColors.Green,
-                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description: 
+                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
                 $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: ThumbImage);
@@ -45,7 +58,19 @@ namespace Rick.Modules
             string FileName = ConfigHandler.CacheFolder + "/" + Context.User.Username + $"{new Random().Next(1, 9999)}.png";
             await new HttpClient().DownloadAsync(new Uri(URL), FileName);
 
-            var Filter = PublishTweet(TweetMessage, Context.User.Username);
+            if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
+            {
+                await ReplyAsync("Tweet can't be longer than 120 characters and can't be shorter than 25 characters!");
+                return;
+            }
+
+            var Filter = Functions.Function.Censor(TweetMessage);
+            var Publish = $"{Filter} - {Context.User.Username}";
+            if (Publish.Length > 140)
+            {
+                await ReplyAsync("Tweet's total length is greater than 140!");
+                return;
+            }
 
             string ThumbImage = null;
 
@@ -77,8 +102,21 @@ namespace Rick.Modules
 
             if (ReplyTo.IsTweetPublished)
             {
-                var TweetMsg = PublishTweet(TweetMessage, Context.User.Username);
-                var UserTweet = Tweet.PublishTweetInReplyTo(TweetMsg, ReplyTo);
+                if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
+                {
+                    await ReplyAsync("Tweet can't be longer than 120 characters and can't be shorter than 25 characters!");
+                    return;
+                }
+
+                var Filter = Functions.Function.Censor(TweetMessage);
+                var Publish = $"{Filter} - {Context.User.Username}";
+                if (Publish.Length > 140)
+                {
+                    await ReplyAsync("Tweet's total length is greater than 140!");
+                    return;
+                }
+
+                var UserTweet = Tweet.PublishTweetInReplyTo(Publish, ReplyTo);
                 string ThumbImage = null;
 
                 if (!string.IsNullOrWhiteSpace(User.GetAuthenticatedUser().ProfileImageUrlFullSize))
@@ -86,7 +124,7 @@ namespace Rick.Modules
                 else
                     ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-                var embed = EmbedExtension.Embed(EmbedColors.Green, 
+                var embed = EmbedExtension.Embed(EmbedColors.Green,
                     $"{Context.User.Username} replied to a tweet!", Context.User.GetAvatarUrl(), Description:
                     $"**Original Tweet:** {ReplyTo.FullText}\n" +
                     $"**Reply:** {TweetMessage}\n" +
@@ -105,27 +143,6 @@ namespace Rick.Modules
                 var Success = Tweet.DestroyTweet(GetTweet);
                 await ReplyAsync($"Tweet with {ID} ID has been deleted!");
             }
-        }
-
-        string PublishTweet(string TweetMessage, string Username)
-        {
-            if (TweetMessage.Length >= 120)
-            {
-                return "Tweet can't be longer than 120 characters!";
-            }
-
-            if (TweetMessage.Length <= 25)
-            {
-                return "Tweet can't be less than 25 characters!";
-            }
-
-            var Filter = Functions.Function.Censor(TweetMessage);
-            var Publish = $"{Filter} - {Username}";
-            if (Publish.Length > 140)
-            {
-                return "Tweet's total length is greater than 140!";
-            }
-            return Publish;
         }
     }
 }
