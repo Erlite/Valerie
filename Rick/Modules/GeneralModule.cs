@@ -154,11 +154,11 @@ namespace Rick.Modules
         }
 
         [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
-        public async Task UserInfoAsync(IGuildUser User = null)
+        public async Task UserInfoAsync(SocketGuildUser User = null)
         {
             SocketGuildUser usr = null;
             if (User != null)
-                usr = User as SocketGuildUser;
+                usr = User;
             else
                 usr = Context.User as SocketGuildUser;
 
