@@ -17,6 +17,5 @@ namespace Rick.Interfaces
         Dictionary<ulong, string> Blacklist { get; set; }
         List<string> EvalImports { get; set; }
         List<string> Games { get; set; }
-        List<ulong> UpdateList { get; set; }
     }
 }

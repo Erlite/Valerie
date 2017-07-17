@@ -43,8 +43,5 @@ namespace Rick.Models
 
         [JsonProperty("Games")]
         public List<string> Games { get; set; } = new List<string>();
-
-        [JsonProperty("UpdateList")]
-        public List<ulong> UpdateList { get; set; } = new List<ulong>();
     }
 }
