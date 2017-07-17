@@ -37,6 +37,9 @@ namespace Rick.Models
         [JsonProperty("Chatterbot")]
         public Wrapper Chatterbot { get; set; } = new Wrapper();
 
+        [JsonProperty("Starboard")]
+        public Wrapper Starboard { get; set; } = new Wrapper();
+
         [JsonProperty("Tags")]
         public List<TagsModel> TagsList { get; set; } = new List<TagsModel>();
 
