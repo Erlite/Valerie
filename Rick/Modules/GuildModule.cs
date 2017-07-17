@@ -71,7 +71,7 @@ namespace Rick.Modules
 
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Bans = GConfig.AdminLog.IsEnabled ? "Enabled" : "Disabled";
+            var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
             var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
             var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
 
@@ -88,11 +88,11 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(SB.ToString()))
                 SB = SB.Append("Guild has no welcome message/s!");
 
-            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.AdminLog.TextChannel != 0)
+            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.ModLog.TextChannel != 0)
             {
                 JoinChannel = await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel) as SocketGuildChannel;
                 LeaveChannel = await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel) as SocketGuildChannel;
-                BanChannel = await Context.Guild.GetChannelAsync(GConfig.AdminLog.TextChannel) as SocketGuildChannel;
+                BanChannel = await Context.Guild.GetChannelAsync(GConfig.ModLog.TextChannel) as SocketGuildChannel;
                 ChatterBotChannel = await Context.Guild.GetChannelAsync(GConfig.Chatterbot.TextChannel) as SocketGuildChannel;
             }
             else
@@ -107,7 +107,7 @@ namespace Rick.Modules
             string Description = $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message:**\n{SB.ToString()}\n" +
                 $"**Mute Role:** {GConfig.MuteRoleID}\n" +
-                $"**Kick/Ban Cases:** {GConfig.AdminCases}\n" +
+                $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
                 $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
                 $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
                 $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
@@ -163,14 +163,14 @@ namespace Rick.Modules
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.AdminLog.IsEnabled)
+            if (!gldConfig.ModLog.IsEnabled)
             {
-                gldConfig.AdminLog.IsEnabled = true;
+                gldConfig.ModLog.IsEnabled = true;
                 await ReplyAsync(":gear:   Now logging bans.");
             }
             else
             {
-                gldConfig.AdminLog.IsEnabled = false;
+                gldConfig.ModLog.IsEnabled = false;
                 await ReplyAsync(":skull_crossbones:  No longer logging bans.");
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
@@ -215,30 +215,35 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("SetChannel"), Summary("Sets channel for events/logs"), Remarks("SetChannel AdminChannel #Channelname")]
+        [Command("SetChannel"), Summary("Sets channel for events/logs. ConfigChannel Types: Mod, Join, Leave, CB, Starboard"), Remarks("SetChannel AdminChannel #Channelname")]
         public async Task SetChannelAsync(GlobalEnums ConfigChannel, SocketGuildChannel Channel)
         {
             var Config = GuildHandler.GuildConfigs[Context.Guild.Id];
             switch (ConfigChannel)
             {
-                case GlobalEnums.AdminChannel:
-                    Config.AdminLog.TextChannel = Channel.Id;
-                    await ReplyAsync($"Admin log channel has been set to: **{Channel.Name}**");
+                case GlobalEnums.Mod:
+                    Config.ModLog.TextChannel = Channel.Id;
+                    await ReplyAsync($"Mod log channel has been set to: **{Channel.Name}**");
                     break;
 
-                case GlobalEnums.ChatterbotChannel:
+                case GlobalEnums.CB:
                     Config.Chatterbot.TextChannel = Channel.Id;
                     await ReplyAsync($"Chatterbot channel has been set to: **{Channel.Name}**");
                     break;
 
-                case GlobalEnums.JoinChannel:
+                case GlobalEnums.Join:
                     Config.JoinEvent.TextChannel = Channel.Id;
                     await ReplyAsync($"Join log channel has been set to: **{Channel.Name}**");
                     break;
 
-                case GlobalEnums.LeaveChannel:
+                case GlobalEnums.Leave:
                     Config.LeaveEvent.TextChannel = Channel.Id;
                     await ReplyAsync($"Leave log channel has been set to: **{Channel.Name}**");
+                    break;
+
+                case GlobalEnums.Starboard:
+                    Config.Starboard.TextChannel = Channel.Id;
+                    await ReplyAsync($"Starboard channel has been set to: **{Channel.Name}**");
                     break;
             }
 

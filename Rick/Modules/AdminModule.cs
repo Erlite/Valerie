@@ -22,15 +22,15 @@ namespace Rick.Modules
         public async Task KickAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
-            gldConfig.AdminCases += 1;
-            if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
+            var BanChannel = User.Guild.GetChannel(gldConfig.ModLog.TextChannel) as ITextChannel;
+            gldConfig.ModCases += 1;
+            if (gldConfig.ModLog.IsEnabled && gldConfig.ModLog.TextChannel != 0)
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
                     FooterText: $"Kick Date: { DateTime.Now.ToString()}");
                 embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
                 embed.AddInlineField("Responsible Mod", Context.User.Username);
-                embed.AddInlineField("Case Number", gldConfig.AdminCases);
+                embed.AddInlineField("Case Number", gldConfig.ModCases);
                 embed.AddInlineField("Case Type", "Kick");
                 embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
@@ -45,15 +45,15 @@ namespace Rick.Modules
         public async Task BanAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
         {
             var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            gldConfig.AdminCases += 1;
-            var BanChannel = User.Guild.GetChannel(gldConfig.AdminLog.TextChannel) as ITextChannel;
-            if (gldConfig.AdminLog.IsEnabled && gldConfig.AdminLog.TextChannel != 0)
+            gldConfig.ModCases += 1;
+            var BanChannel = User.Guild.GetChannel(gldConfig.ModLog.TextChannel) as ITextChannel;
+            if (gldConfig.ModLog.IsEnabled && gldConfig.ModLog.TextChannel != 0)
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
                     FooterText: $"Kick Date: { DateTime.Now.ToString()}");
                 embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
                 embed.AddInlineField("Responsible Mod", Context.User.Username + "#" + Context.User.Discriminator);
-                embed.AddInlineField("Case Number", gldConfig.AdminCases);
+                embed.AddInlineField("Case Number", gldConfig.ModCases);
                 embed.AddInlineField("Case Type", "Ban");
                 embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
@@ -78,7 +78,7 @@ namespace Rick.Modules
                 return;
             }
             await User.AddRoleAsync(MuteRole);
-            gldConfig.AdminCases += 1;
+            gldConfig.ModCases += 1;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("User has been added to Mute Role!");
         }

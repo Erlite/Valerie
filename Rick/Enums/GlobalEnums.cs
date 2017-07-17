@@ -7,9 +7,10 @@
         Remove,
         TagName,
         TagResponse,
-        AdminChannel,
-        JoinChannel,
-        LeaveChannel,
-        ChatterbotChannel
+        Mod,
+        Join,
+        Leave,
+        CB,
+        Starboard
     }
 }

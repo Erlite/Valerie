@@ -16,8 +16,8 @@ namespace Rick.Models
         [JsonProperty("MuteRoleID")]
         public ulong MuteRoleID { get; set; }
 
-        [JsonProperty("AdminCases")]
-        public int AdminCases { get; set; }
+        [JsonProperty("ModCases")]
+        public int ModCases { get; set; }
 
         [JsonProperty("NoInvites")]
         public bool NoInvites { get; set; }
@@ -31,8 +31,8 @@ namespace Rick.Models
         [JsonProperty("LeaveLog")]
         public Wrapper LeaveEvent { get; set; } = new Wrapper();
 
-        [JsonProperty("AdminLog")]
-        public Wrapper AdminLog { get; set; } = new Wrapper();
+        [JsonProperty("ModLog")]
+        public Wrapper ModLog { get; set; } = new Wrapper();
 
         [JsonProperty("Chatterbot")]
         public Wrapper Chatterbot { get; set; } = new Wrapper();
