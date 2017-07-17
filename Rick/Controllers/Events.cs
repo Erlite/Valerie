@@ -97,6 +97,16 @@ namespace Rick.Controllers
             await AddToMessageAsync(Message);
         }
 
+        internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> CacheMsgs, ISocketMessageChannel Channel, SocketReaction Reaction)
+        {
+
+        }
+
+        internal static async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> CacheMsgs, ISocketMessageChannel Channel, SocketReaction Reaction)
+        {
+
+        }
+
         #region Event Methods
         static async Task CleanUpAsync(SocketGuildUser User)
         {

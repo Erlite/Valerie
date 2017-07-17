@@ -22,7 +22,8 @@ namespace Rick
         {
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Verbose
+                LogLevel = LogSeverity.Verbose,
+                MessageCacheSize = 10000
             });
 
             Client.Log += (Log) => Task.Run(() 
@@ -50,6 +51,8 @@ namespace Rick
             {
                 await Events.LatencyHandlerAsync(Client, Older, Newer);
             };
+            Client.ReactionAdded += Events.ReactionAddedAsync;
+            Client.ReactionRemoved += Events.ReactionRemovedAsync;
             #endregion
 
             var ServiceProvider = InjectServices();
