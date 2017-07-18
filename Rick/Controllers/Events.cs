@@ -99,12 +99,46 @@ namespace Rick.Controllers
 
         internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> CacheMsgs, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
-
+            var GuildConfig = GuildHandler.GuildConfigs[(Channel as SocketGuildChannel).Guild.Id];
+            if (!GuildConfig.Starboard.IsEnabled && Reaction.Emote.Name != "⭐") return;
+            await CacheMsgs.GetOrDownloadAsync();
+            if (Reaction.Message.IsSpecified && CacheMsgs.Value.Id == Reaction.Message.Value.Id)
+            {
+                var embed = EmbedExtension.Embed(EmbedColors.Gold,
+                    Description: $":star:{Reaction.Message.Value.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention}\n{Reaction.Message.Value.Content}");
+                await CacheMsgs.Value.ModifyAsync(x =>
+                {
+                    x.Embed = new Optional<Embed>(embed);
+                });
+            }
+            else
+            {
+                var SbChannel = (Channel as SocketGuildChannel).Guild.GetChannel(GuildConfig.Starboard.TextChannel) as IMessageChannel;
+                var embed = EmbedExtension.Embed(EmbedColors.Gold,
+                    Description: $":star:{Reaction.Message.Value.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention}\n{Reaction.Message.Value.Content}");
+                await SbChannel.SendMessageAsync("", embed: embed);
+            }
         }
 
         internal static async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> CacheMsgs, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
-
+            var Guild = (Channel as SocketGuildChannel).Guild;
+            var GuildConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!GuildConfig.Starboard.IsEnabled && Reaction.Emote.Name != "⭐") return;
+            await CacheMsgs.GetOrDownloadAsync();
+            if (Reaction.Message.IsSpecified && CacheMsgs.Value.Id == Reaction.Message.Value.Id)
+            {
+                var embed = EmbedExtension.Embed(EmbedColors.Gold,
+                    Description: $":star:{Reaction.Message.Value.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention}\n{Reaction.Message.Value.Content}");
+                await CacheMsgs.Value.ModifyAsync(x =>
+                {
+                    x.Embed = new Optional<Embed>(embed);
+                });
+            }
+            else if (Reaction.Message.Value.Reactions.Count <= 0)
+            {
+                await Reaction.Message.Value.DeleteAsync();
+            }
         }
 
         #region Event Methods
