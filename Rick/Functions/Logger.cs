@@ -20,15 +20,15 @@ namespace Rick.Functions
 
             switch (Severity)
             {
-                case LogType.Error:
+                case LogType.ERR:
                     Append($"[{Severity}]", ConsoleColor.Red);
                     break;
 
-                case LogType.Info:
-                    Append($"[{Severity}]", ConsoleColor.Cyan);
+                case LogType.OK:
+                    Append($"[{Severity}]", ConsoleColor.Green);
                     break;
 
-                case LogType.Warning:
+                case LogType.WARN:
                     Append($"[{Severity}]", ConsoleColor.Yellow);
                     break;
 
@@ -40,7 +40,7 @@ namespace Rick.Functions
                     Append($"[{Source}]", ConsoleColor.DarkMagenta);
                     break;
                 case LogSource.Config:
-                    Append($"[{Source}]", ConsoleColor.DarkGreen);
+                    Append($"[{Source}]", ConsoleColor.Cyan);
                     break;
             }
 
