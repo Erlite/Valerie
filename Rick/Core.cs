@@ -22,12 +22,12 @@ namespace Rick
         {
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Verbose,
+                LogLevel = LogSeverity.Info,
                 MessageCacheSize = 10000
             });
 
             Client.Log += (Log) => Task.Run(() 
-                => Logger.Log(Enums.LogType.Info, Enums.LogSource.Client, Log.Message));
+                => Logger.Log(Enums.LogType.OK, Enums.LogSource.Client, Log.Message));
 
             ConfigHandler.DirectoryCheck();
             ConfigHandler.IConfig = await ConfigHandler.LoadConfigAsync();
