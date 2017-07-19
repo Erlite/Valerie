@@ -17,7 +17,7 @@ namespace Rick.Modules
     public class TagModule : ModuleBase
     {
         [Command, Summary("Executes a tag."), Remarks("Tag TagName"), Priority(0)]
-        public async Task TagAsync(string Name)
+        public async Task ExecuteTagAsync(string Name)
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
             var gldTags = gldConfig.TagsList;

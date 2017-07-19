@@ -54,7 +54,7 @@ namespace Rick.Modules
             using (var http = new HttpClient())
             {
                 var rng = new Random();
-                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 50) }&fields=items%2Flink&key={ConfigHandler.IConfig.APIKeys.GoogleKey}";
+                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 10) }&fields=items%2Flink&key={ConfigHandler.IConfig.APIKeys.GoogleKey}";
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
                 var image = items[0]["link"].ToString();
@@ -64,6 +64,7 @@ namespace Rick.Modules
                     await ReplyAsync("", embed: embed);
                 else
                     await ReplyAsync("No results found!");
+                http.Dispose();
             }
         }
 
