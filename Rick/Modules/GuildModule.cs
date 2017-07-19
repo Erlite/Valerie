@@ -7,38 +7,12 @@ using Rick.Enums;
 using Rick.Attributes;
 using System.Text;
 using Rick.Extensions;
-using System;
 
 namespace Rick.Modules
 {
     [RequireUserPermission(GuildPermission.ManageGuild), RequireBotPermission(GuildPermission.ManageGuild | GuildPermission.SendMessages), CheckBlacklist]
     public class GuildModule : ModuleBase
     {
-        [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]
-        public async Task SetPrefixAsync(string prefix)
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            gldConfig.Prefix = prefix;
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
-        }
-
-        [Command("Welcome"),
-            Summary("Sets a welcome message for your server and adds it to the welcome list. You can also remove a welcome message " +
-            "from the list by using list index."),
-            Remarks("Welcome Add Heyo welcome to our server! OR Welcome Remove 2")]
-        public async Task WelcomeMessageAsync([Remainder]string msg = null)
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            gldConfig.WelcomeMessages.Add(msg);
-            await ReplyAsync("Welcome message has been added to Guild's welcome messages list.");
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
         [Command("Settings"), Summary("Displays all settings for your Guild.")]
         public async Task SettingsAsync()
         {
@@ -74,11 +48,13 @@ namespace Rick.Modules
             var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
             var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
             var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
+            var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
 
             SocketGuildChannel JoinChannel;
             SocketGuildChannel LeaveChannel;
             SocketGuildChannel BanChannel;
             SocketGuildChannel ChatterBotChannel;
+            SocketGuildChannel SBChannel;
 
             foreach (var Welcome in GConfig.WelcomeMessages)
             {
@@ -88,12 +64,13 @@ namespace Rick.Modules
             if (string.IsNullOrWhiteSpace(SB.ToString()))
                 SB = SB.Append("Guild has no welcome message/s!");
 
-            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.ModLog.TextChannel != 0)
+            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.ModLog.TextChannel != 0 || GConfig.Starboard.TextChannel != 0)
             {
                 JoinChannel = await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel) as SocketGuildChannel;
                 LeaveChannel = await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel) as SocketGuildChannel;
                 BanChannel = await Context.Guild.GetChannelAsync(GConfig.ModLog.TextChannel) as SocketGuildChannel;
                 ChatterBotChannel = await Context.Guild.GetChannelAsync(GConfig.Chatterbot.TextChannel) as SocketGuildChannel;
+                SBChannel = await Context.Guild.GetChannelAsync(GConfig.Starboard.TextChannel) as SocketGuildChannel;
             }
             else
             {
@@ -101,6 +78,7 @@ namespace Rick.Modules
                 LeaveChannel = null;
                 BanChannel = null;
                 ChatterBotChannel = null;
+                SBChannel = null;
             }
 
 
@@ -112,6 +90,8 @@ namespace Rick.Modules
                 $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
                 $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
                 $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
+                $"**Starboard:** {SBEnabled} [{SBChannel}]\n" +
+                $"**AntiAdvertisement:** {GConfig.NoInvites}\n" +
                 $"**Chat Karma:** {Karma}\n" +
                 $"**Karma List:** {KarmaList}\n" +
                 $"**AFK List:** {AFKList}\n" +
@@ -122,7 +102,32 @@ namespace Rick.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("ToggleJoins"), Summary("Enables/Disables logging joins.")]
+        [Command("Prefix"), Summary("Sets guild prefix. Prefix can only be a character."), Remarks("Prefix .")]
+        public async Task SetPrefixAsync(string prefix)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            gldConfig.Prefix = prefix;
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
+        }
+
+        [Command("Welcome"),
+            Summary("Sets a welcome message for your server and adds it to the welcome list. You can also remove a welcome message " +
+            "from the list by using list index."),
+            Remarks("Welcome Add Heyo welcome to our server! OR Welcome Remove 2")]
+        public async Task WelcomeMessageAsync([Remainder]string msg = null)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            gldConfig.WelcomeMessages.Add(msg);
+            await ReplyAsync("Welcome message has been added to Guild's welcome messages list.");
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("ToggleJoins"), Alias("TJ"), Summary("Enables/Disables logging joins.")]
         public async Task ToggleJoinsAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -140,7 +145,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleLeaves"), Summary("Enables/Disables logging leaves.")]
+        [Command("ToggleLeaves"), Alias("TL"), Summary("Enables/Disables logging leaves.")]
         public async Task ToggleLeavesAsync()
         {
             var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -158,7 +163,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleBans"), Summary("Enables/Disables logging admin actions such as Kick/Ban.")]
+        [Command("ToggleBans"), Alias("TB"), Summary("Enables/Disables logging admin actions such as Kick/Ban.")]
         public async Task ToggleBansAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -177,7 +182,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleKarma"), Summary("Enables/Disables giving random karma to users.")]
+        [Command("ToggleKarma"), Alias("TK"), Summary("Enables/Disables giving random karma to users.")]
         public async Task ToggleKarmaAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -196,7 +201,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleChatterbot"), Summary("Enables/Disables chatter bot.")]
+        [Command("ToggleChatterbot"), Alias("TCB"), Summary("Enables/Disables chatter bot.")]
         public async Task ToggleIsChatterBotEnabledAsync()
         {
             var Guild = Context.Guild as SocketGuild;
@@ -215,7 +220,45 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("SetChannel"), Summary("Sets channel for events/logs. ConfigChannel Types: Mod, Join, Leave, CB, Starboard"), Remarks("SetChannel AdminChannel #Channelname")]
+        [Command("ToggleAntInv"), Alias("TA"), Summary("Enables/Disables NoInvites. If user posts an invite link it will be removed")]
+        public async Task ToggleAntInv()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.NoInvites)
+            {
+                gldConfig.NoInvites = true;
+                await ReplyAsync(":gear: Anti Invites has now been enabled!");
+            }
+            else
+            {
+                gldConfig.NoInvites = false;
+                await ReplyAsync(":skull_crossbones: Anti Invites has been disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("ToggleStarboard"), Alias("TS"), Summary("Enables/Disables starboard")]
+        public async Task ToggleStarboardAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            if (!gldConfig.Starboard.IsEnabled)
+            {
+                gldConfig.Starboard.IsEnabled = true;
+                await ReplyAsync(":gear: Starboard has now been enabled!");
+            }
+            else
+            {
+                gldConfig.Starboard.IsEnabled = false;
+                await ReplyAsync(":skull_crossbones: Starboard has been disabled!.");
+            }
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("SetChannel"),  Summary("Sets channel for events/logs. ConfigChannel Types: Mod, Join, Leave, CB, Starboard"), Remarks("SetChannel AdminChannel #Channelname")]
         public async Task SetChannelAsync(GlobalEnums ConfigChannel, SocketGuildChannel Channel)
         {
             var Config = GuildHandler.GuildConfigs[Context.Guild.Id];
@@ -274,25 +317,6 @@ namespace Rick.Modules
                     break;
             }
             GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("ToggleAntInv"), Summary("Enables/Disables NoInvites. If user posts an invite link it will be removed")]
-        public async Task ToggleAntInv()
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            if (!gldConfig.NoInvites)
-            {
-                gldConfig.NoInvites = true;
-                await ReplyAsync(":gear: Anti Invites has now been enabled!");
-            }
-            else
-            {
-                gldConfig.NoInvites = false;
-                await ReplyAsync(":skull_crossbones: Anti Invites has been disabled!.");
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
     }
