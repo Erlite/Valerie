@@ -1,5 +1,6 @@
 ﻿using System;
 using Rick.Enums;
+using System.Globalization;
 
 namespace Rick.Functions
 {
@@ -14,6 +15,8 @@ namespace Rick.Functions
         public static void Log(LogType Severity, LogSource Source, string message)
         {
             Console.Write(Environment.NewLine);
+
+            Append($"[{DateTime.Now.ToString("hh:mm:ss.fff tt", DateTimeFormatInfo.InvariantInfo)}]", ConsoleColor.DarkGray);
 
             switch (Severity)
             {
@@ -36,18 +39,12 @@ namespace Rick.Functions
                 case LogSource.Client:
                     Append($"[{Source}]", ConsoleColor.DarkMagenta);
                     break;
-                case LogSource.Configuration:
+                case LogSource.Config:
                     Append($"[{Source}]", ConsoleColor.DarkGreen);
-                    break;
-                case LogSource.ParseError:
-                    Append($"[{Severity}]", ConsoleColor.DarkRed);
-                    break;
-                case LogSource.PreConditionError:
-                    Append($"[{Severity}]", ConsoleColor.DarkRed);
                     break;
             }
 
-            Append($" {message}", ConsoleColor.Gray);
+            Append($" {message}", ConsoleColor.White);
         }
 
         public static void Log(string Text)

@@ -3,8 +3,6 @@
     public enum LogSource
     {
         Client,
-        ParseError,
-        PreConditionError,
-        Configuration,
+        Config
     }
 }
