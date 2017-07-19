@@ -148,19 +148,19 @@ namespace Rick.Controllers
             if (GuildConfig.KarmaList.ContainsKey(User.Id))
             {
                 GuildConfig.KarmaList.Remove(User.Id);
-                Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
+                Logger.Log(LogType.WARN, LogSource.Config, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
             }
             if (GuildConfig.AFKList.ContainsKey(User.Id))
             {
                 GuildConfig.AFKList.Remove(User.Id);
-                Logger.Log(LogType.Warning, LogSource.Configuration, $"{User.Username} removed from {User.Guild.Name}'s AFK List.");
+                Logger.Log(LogType.WARN, LogSource.Config, $"{User.Username} removed from {User.Guild.Name}'s AFK List.");
             }
             foreach (var tag in GuildConfig.TagsList)
             {
                 if (tag.Owner == User.Id)
                 {
                     GuildConfig.TagsList.Remove(tag);
-                    Logger.Log(LogType.Warning, LogSource.Configuration, $"Removed {tag.Name} by {User.Username}.");
+                    Logger.Log(LogType.WARN, LogSource.Config, $"Removed {tag.Name} by {User.Username}.");
                 }
             }
 

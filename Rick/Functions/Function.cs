@@ -122,17 +122,17 @@ namespace Rick.Functions
             var AuthUser = User.GetAuthenticatedUser();
             if (AuthUser == null)
             {
-                Logger.Log(LogType.Error, LogSource.Configuration, ExceptionHandler.GetLastException().TwitterDescription);
+                Logger.Log(LogType.ERR, LogSource.Config, ExceptionHandler.GetLastException().TwitterDescription);
             }
             else
-                Logger.Log(LogType.Info, LogSource.Configuration, "Logged into Twitter!");
+                Logger.Log(LogType.OK, LogSource.Config, "Logged into Twitter!");
             try
             {
                 Main.SetAPIKey(Config.APIKeys.CleverBotKey);
             }
             catch (WebException Ex)
             {
-                Logger.Log(LogType.Error, LogSource.Configuration, Ex.Message);
+                Logger.Log(LogType.ERR, LogSource.Config, Ex.Message);
             }
         }
 
