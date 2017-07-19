@@ -40,7 +40,6 @@ namespace Rick.Handlers
             var GuildConfig = GuildHandler.GuildConfigs[Guild.Id];
 
             if (Msg == null ||
-                !(Msg.Channel is SocketGuildChannel) ||
                 Msg.Author.IsBot ||
                 BotConfig.Blacklist.ContainsKey(Msg.Author.Id)) return;
 
@@ -83,14 +82,14 @@ namespace Rick.Handlers
                         $"**More Info:** To get more information about a command use: {ConfigHandler.IConfig.Prefix}Help CommandName\n";
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, $"{Command.Name} Parameters not provided!",
                         Client.CurrentUser.GetAvatarUrl(), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
-                    Logger.Log(LogType.ERR, LogSource.Client, $"{Guild.Name} || {Context.User.Username}");
+                    Logger.Log(LogType.ERR, LogSource.Client, $"{Guild.Name} || {Context.User.Username} ({Context.User.Id})");
                     break;
 
                 case PreconditionResult PCR:
                     ErrorMsg = PCR.ErrorReason;
                     embed = EmbedExtension.Embed(EmbedColors.Maroon, "Unmet Precondition Error was thrown",
                         Client.CurrentUser.GetAvatarUrl(), Description: $"{Format.Bold("ERROR:")} {ErrorMsg}");
-                    Logger.Log(LogType.ERR, LogSource.Client, $"{Guild.Name} || {Context.User.Username}");
+                    Logger.Log(LogType.ERR, LogSource.Client, $"{Guild.Name} || {Context.User.Username} ({Context.User.Id})");
                     break;
 
                 case ExecuteResult ER:
