@@ -16,7 +16,8 @@ namespace Rick.Modules
         [Command("Settings"), Summary("Displays all settings for your Guild.")]
         public async Task SettingsAsync()
         {
-            var SB = new StringBuilder();
+            var WM = new StringBuilder();
+            var LM = new StringBuilder();
             var GConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
 
             string AFKList = null;
@@ -58,11 +59,15 @@ namespace Rick.Modules
 
             foreach (var Welcome in GConfig.WelcomeMessages)
             {
-                SB = SB.AppendLine($":fleur_de_lis: {Welcome}");
+                WM = WM.AppendLine($":fleur_de_lis: {Welcome}");
             }
+            foreach (var Leave in GConfig.LeaveMessages)
+                LM = LM.AppendLine($":fleur_de_lis: {Leave}");
 
-            if (string.IsNullOrWhiteSpace(SB.ToString()))
-                SB = SB.Append("Guild has no welcome message/s!");
+            if (string.IsNullOrWhiteSpace(WM.ToString()))
+                WM = WM.Append("Guild has no custom welcome message(s)!");
+            if (string.IsNullOrWhiteSpace(LM.ToString()))
+                LM = LM.Append("Guild has no custom leave message(s)");
 
             if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.ModLog.TextChannel != 0 || GConfig.Starboard.TextChannel != 0)
             {
@@ -83,7 +88,8 @@ namespace Rick.Modules
 
 
             string Description = $"**Prefix:** {GConfig.Prefix}\n" +
-                $"**Welcome Message:**\n{SB.ToString()}\n" +
+                $"**Welcome Message(s):**\n{WM.ToString()}\n" +
+                $"**Leave Message(s):**\n{LM.ToString()}\n" +
                 $"**Mute Role:** {GConfig.MuteRoleID}\n" +
                 $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
                 $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
@@ -113,7 +119,7 @@ namespace Rick.Modules
             await ReplyAsync($"Guild Prefix has been set to: **{prefix}**");
         }
 
-        [Command("Welcome"),
+        [Command("WelcomeMsg"),
             Summary("Sets a welcome message for your server and adds it to the welcome list. You can also remove a welcome message " +
             "from the list by using list index."),
             Remarks("Welcome Add Heyo welcome to our server! OR Welcome Remove 2")]
@@ -123,6 +129,19 @@ namespace Rick.Modules
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
             gldConfig.WelcomeMessages.Add(msg);
             await ReplyAsync("Welcome message has been added to Guild's welcome messages list.");
+            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        [Command("LeaveMsg"),
+            Summary("Sets a welcome message for your server and adds it to the welcome list. You can also remove a welcome message from the list by using list index."),
+            Remarks("Welcome Add Heyo welcome to our server! OR Welcome Remove 2")]
+        public async Task LeaveMessageAsync([Remainder]string msg = null)
+        {
+            var Guild = Context.Guild as SocketGuild;
+            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
+            gldConfig.LeaveMessages.Add(msg);
+            await ReplyAsync("Leave message has been added to Guild's leave messages list.");
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
@@ -220,8 +239,8 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("ToggleAntInv"), Alias("TA"), Summary("Enables/Disables NoInvites. If user posts an invite link it will be removed")]
-        public async Task ToggleAntInv()
+        [Command("ToggleAntiad"), Alias("TA"), Summary("Enables/Disables NoInvites. If user posts an invite link it will be removed")]
+        public async Task ToggleAntiad()
         {
             var Guild = Context.Guild as SocketGuild;
             var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
@@ -258,7 +277,7 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
         }
 
-        [Command("SetChannel"),  Summary("Sets channel for events/logs. ConfigChannel Types: Mod, Join, Leave, CB, Starboard"), Remarks("SetChannel AdminChannel #Channelname")]
+        [Command("SetChannel"), Summary("Sets channel for events/logs. ConfigChannel Types: Mod, Join, Leave, CB, Starboard"), Remarks("SetChannel AdminChannel #Channelname")]
         public async Task SetChannelAsync(GlobalEnums ConfigChannel, SocketGuildChannel Channel)
         {
             var Config = GuildHandler.GuildConfigs[Context.Guild.Id];
