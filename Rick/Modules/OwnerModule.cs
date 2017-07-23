@@ -45,7 +45,7 @@ namespace Rick.Modules
             await ReplyAsync("Serverlist has been sent :point_up: ");
         }
 
-        [Command("Leave"), Summary("Tells the bot to leave a certain guild"), Remarks("Leave 123897481723 This is a message")]
+        [Command("LeaveGuild"), Summary("Tells the bot to leave a certain guild"), Remarks("Leave 123897481723 This is a message")]
         public async Task LeaveAsync(ulong ID, [Remainder] string msg = "No reason provided by the owner.")
         {
             if (string.IsNullOrWhiteSpace(msg))
