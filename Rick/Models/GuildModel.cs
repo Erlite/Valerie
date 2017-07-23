@@ -13,6 +13,9 @@ namespace Rick.Models
         [JsonProperty("WelcomeMessages")]
         public List<string> WelcomeMessages { get; set; } = new List<string>();
 
+        [JsonProperty("LeaveMessages")]
+        public List<string> LeaveMessages { get; set; } = new List<string>();
+
         [JsonProperty("MuteRoleID")]
         public ulong MuteRoleID { get; set; }
 

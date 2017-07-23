@@ -8,9 +8,11 @@ namespace Rick.Interfaces
     {
         string Prefix { get; set; }
         List<string> WelcomeMessages { get; set; }
+        List<string> LeaveMessages { get; set; }
         ulong MuteRoleID { get; set; }
         int ModCases { get; set; }
         bool NoInvites { get; set; }
+        bool IsKarmaEnabled { get; set; }
         Wrapper JoinEvent { get; set; }
         Wrapper LeaveEvent { get; set; }
         Wrapper ModLog { get; set; }
