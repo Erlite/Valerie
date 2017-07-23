@@ -386,7 +386,7 @@ namespace Rick.Modules
                 ThumbnailUrl = Info.avatarfull
             };
             Builder.AddInlineField("Display Name", $"{Info.personaname}");
-            Builder.AddInlineField("Location", $"{Info.locstatecode}, {Info.loccountrycode}");
+            Builder.AddInlineField("Location", $"{Info.locstatecode ?? "No State"}, {Info.loccountrycode ?? "No Country"}");
             Builder.AddInlineField("Person State", State);
             Builder.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.timecreated));
             Builder.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.lastlogoff));
