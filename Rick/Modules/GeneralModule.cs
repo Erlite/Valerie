@@ -162,12 +162,12 @@ namespace Rick.Modules
             else
                 usr = Context.User as SocketGuildUser;
 
-            var userNick = usr.Nickname ?? usr.Nickname;
+            var userNick = usr.Nickname ?? "User has no Nickname";
             var userDisc = usr.DiscriminatorValue;
             var Userid = usr.Id;
             var isbot = usr.IsBot ? "YEAAAA!" : "Nopeee";
             var UserStatus = usr.Status;
-            var UserGame = usr.Game.Value.Name;
+            var UserGame = usr.Game.Value.Name ?? "No Game";
             var UserCreated = usr.CreatedAt;
             var UserJoined = usr.JoinedAt;
             var UserPerms = usr.GuildPermissions;
@@ -266,11 +266,21 @@ namespace Rick.Modules
                     break;
 
                 case GlobalEnums.Remove:
+                    if (!List.ContainsKey(Context.User.Id))
+                    {
+                        await ReplyAsync("You are not in the AFK list.");
+                        return;
+                    }
                     List.Remove(Context.User.Id);
                     await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
                     break;
 
                 case GlobalEnums.Modify:
+                    if (!List.ContainsKey(Context.User.Id))
+                    {
+                        await ReplyAsync("You are not in the AFK list.");
+                        return;
+                    }
                     List[Context.User.Id] = msg;
                     await ReplyAsync("Your message has been modified!");
                     break;
@@ -516,11 +526,11 @@ namespace Rick.Modules
                 $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
                 $"- Databse Size: {Convert.ToInt32(length)} Bytes\n" +
-                $"- Cache Size: {Convert.ToInt32(cache)} Bytes\n" +
+                $"- Cache Size: {Convert.ToInt32((cache / 1024) / 1024.0)} MB\n" +
                 $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
                 $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
 
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: "Rick Stats", Description: Description, ThumbUrl: 
+            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: "Rick Stats", Description: Description, ThumbUrl:
                 Context.Client.CurrentUser.GetAvatarUrl());
             await ReplyAsync("", embed: embed);
         }
