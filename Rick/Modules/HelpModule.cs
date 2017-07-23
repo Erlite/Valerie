@@ -22,15 +22,16 @@ namespace Rick.Modules
         public async Task CommandsAsync()
         {
             string Description = 
-                "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Antiraid, Moneyshot, Clear\n" + 
+                "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Moneyshot, Clear\n" +
+                "**Audio Commands:** Join, Leave, Play, Skip, Queue, Qadd, QClear\n" + 
                 "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
                 "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar, " +
-                "Karma, Rank, Top, Yomama, Probe, Iam, IAmNot\n" +
+                "Karma, Rank, Top, Yomama, Probe, Iam, IAmNot, Discrim\n" +
                 "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
                 "**Google Commands:** Google, GImage, Youtube, Shorten, Revav\n" +
-                "**Guild Commands:** Prefix, Welcome, Settings, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, SetChannel, Roles, ToggleAntInv\n**Example:** " +
-                "SetChannel JoinChannel #ChannelName, Roles Add @RoleName\n" +
-                "**Nsfw Commands:** Boobs, Ass, E621\n" +
+                "**Guild Commands:** Settings, Prefix, WelcomeMsg, LeaveMsg, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, ToggleAntiad, ToggleStarboard," +
+                " SetChannel, Roles\n**Example:** SetChannel Join #ChannelName, Roles Add @RoleName\n" +
+                "**Nsfw Commands:** Boobs, Ass, E621, Porn\n" +
                 "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Dump, SendMsg\n" +
                 "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo, BImage, Bing, GitUser, SNews, Suser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
