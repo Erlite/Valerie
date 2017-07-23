@@ -32,7 +32,6 @@ namespace Rick.Controllers
                 WelcomeMessage = StringExtension.ReplaceWith(ConfigMsg, User.Mention, User.Guild.Name);
             }
 
-
             if (User.Guild.GetChannel(Config.JoinEvent.TextChannel) != null)
             {
                 Channel = JoinChannel as ITextChannel;
@@ -52,18 +51,28 @@ namespace Rick.Controllers
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
             if (!Config.LeaveEvent.IsEnabled) return;
 
-            var LeaveChannel = User.Guild.GetChannel(Config.LeaveEvent.TextChannel);
             ITextChannel Channel = null;
+            string LeaveMessage = null;
+
+            var LeaveChannel = User.Guild.GetChannel(Config.LeaveEvent.TextChannel);
+
+            if (Config.LeaveMessages.Count <= 0)
+                LeaveMessage = $"{User.Mention} has left {User.Guild.Name} :wave:";
+            else
+            {
+                var configMsg = Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)];
+                LeaveMessage = StringExtension.ReplaceWith(configMsg, User.Mention, User.Guild.Name);
+            }
 
             if (User.Guild.GetChannel(Config.LeaveEvent.TextChannel) != null)
             {
                 Channel = LeaveChannel as ITextChannel;
-                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}. :wave:");
+                await Channel.SendMessageAsync(LeaveMessage);
             }
             else
             {
                 Channel = User.Guild.DefaultChannel as ITextChannel;
-                await Channel.SendMessageAsync($"{User.Username} has left {User.Guild.Name}. :wave:");
+                await Channel.SendMessageAsync(LeaveMessage);
             }
         }
 
