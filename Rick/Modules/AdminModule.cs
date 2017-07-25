@@ -28,14 +28,14 @@ namespace Rick.Modules
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
                     FooterText: $"Kick Date: { DateTime.Now.ToString()}");
-                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
+                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $"\n({User.Id})");
                 embed.AddInlineField("Responsible Mod", Context.User.Username);
                 embed.AddInlineField("Case Number", gldConfig.ModCases);
                 embed.AddInlineField("Case Type", "Kick");
                 embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
-            await User.KickAsync();
+            await User.KickAsync(Reason);
             await ReplyAsync($"***{ User.Username + '#' + User.Discriminator} GOT KICKED*** :ok_hand: ");
             GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
@@ -51,14 +51,14 @@ namespace Rick.Modules
             {
                 var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
                     FooterText: $"Kick Date: { DateTime.Now.ToString()}");
-                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $" ({User.Id})");
+                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $"\n({User.Id})");
                 embed.AddInlineField("Responsible Mod", Context.User.Username + "#" + Context.User.Discriminator);
                 embed.AddInlineField("Case Number", gldConfig.ModCases);
                 embed.AddInlineField("Case Type", "Ban");
                 embed.AddInlineField("Reason", Reason);
                 await BanChannel.SendMessageAsync("", embed: embed);
             }
-            await User.Guild.AddBanAsync(User);
+            await User.Guild.AddBanAsync(User, 30, Reason);
             await ReplyAsync($"***{User.Username + '#' + User.Discriminator} GOT BENT*** :hammer: ");
             GuildHandler.GuildConfigs[User.Guild.Id] = gldConfig;
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
