@@ -184,7 +184,7 @@ namespace Rick.Controllers
             RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
             var GuildConfig = GuildHandler.GuildConfigs[GuildID];
-            if (User == null ||                 
+            if (User == null ||
                 User.IsBot ||
                 ConfigHandler.IConfig.Blacklist.ContainsKey(User.Id) ||
                 !GuildConfig.IsKarmaEnabled ||
@@ -198,13 +198,13 @@ namespace Rick.Controllers
                 karmalist.Add(User.Id, RandomKarma);
                 return;
             }
-                int getKarma = karmalist[User.Id];
-                getKarma += RandomKarma;
-                karmalist[User.Id] = getKarma;
+            int getKarma = karmalist[User.Id];
+            getKarma += RandomKarma;
+            karmalist[User.Id] = getKarma;
 
-                GuildHandler.GuildConfigs[GuildID] = GuildConfig;
-                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-                Waitlist.Add(User.Id);
+            GuildHandler.GuildConfigs[GuildID] = GuildConfig;
+            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            Waitlist.Add(User.Id);
         }
 
         static async Task AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
