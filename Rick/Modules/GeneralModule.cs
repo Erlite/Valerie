@@ -156,12 +156,7 @@ namespace Rick.Modules
         [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
         public async Task UserInfoAsync(SocketGuildUser User = null)
         {
-            SocketGuildUser usr = null;
-            if (User != null)
-                usr = User;
-            else
-                usr = Context.User as SocketGuildUser;
-
+            var usr = User ?? Context.User as SocketGuildUser;
             var userNick = usr.Nickname ?? "User has no Nickname";
             var userDisc = usr.DiscriminatorValue;
             var Userid = usr.Id;
@@ -171,9 +166,6 @@ namespace Rick.Modules
             var UserCreated = usr.CreatedAt;
             var UserJoined = usr.JoinedAt;
             var UserPerms = usr.GuildPermissions;
-
-            if (string.IsNullOrEmpty(userNick))
-                userNick = "User has no nickname!";
 
             string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}" +
                 $"\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
@@ -706,23 +698,23 @@ namespace Rick.Modules
             await ReplyAsync($"You have been removed from **{Role.Name}** role!");
         }
 
-        [Command("Discrim"), Summary("Gets all users who match a certain discrim"), Remarks("Discrim 0001")]
-        public async Task DiscrimAsync(string DiscrimValue)
+        [Command("Discrim"), Summary("Gets all users who match a certain discrim"), Remarks("Discrim @Username")]
+        public async Task DiscrimAsync(IGuildUser User)
         {
             var Guilds = (Context.Client as DiscordSocketClient).Guilds;
             var sb = new StringBuilder();
             foreach (var gld in Guilds)
             {
-                var dis = gld.Users.Where(x => x.Discriminator == DiscrimValue && x.Username != Context.User.Username);
+                var dis = gld.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
                 foreach (var d in dis)
                 {
                     sb.AppendLine(d.Username);
                 }
             }
             if (!string.IsNullOrWhiteSpace(sb.ToString()))
-                await ReplyAsync($"Users matching **{DiscrimValue}** Discriminator:\n{sb.ToString()}");
+                await ReplyAsync($"Users matching **{User.Discriminator}** Discriminator:\n{sb.ToString()}");
             else
-                await ReplyAsync($"No usernames found matching **{DiscrimValue}** discriminator.");
+                await ReplyAsync($"No usernames found matching **{User.Discriminator}** discriminator.");
         }
     }
 }
