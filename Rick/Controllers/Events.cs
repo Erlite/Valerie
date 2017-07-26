@@ -9,11 +9,16 @@ using Rick.Functions;
 using Rick.Enums;
 using Cleverbot.Models;
 using Rick.Extensions;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace Rick.Controllers
 {
     public class Events
     {
+        static List<ulong> Waitlist = new List<ulong>();
+        static Timer timer;
+
         internal static async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GuildConfigs[User.Guild.Id];
@@ -61,7 +66,7 @@ namespace Rick.Controllers
             else
             {
                 var configMsg = Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)];
-                LeaveMessage = StringExtension.ReplaceWith(configMsg, User.Mention, User.Guild.Name);
+                LeaveMessage = StringExtension.ReplaceWith(configMsg, User.Username, User.Guild.Name);
             }
 
             if (User.Guild.GetChannel(Config.LeaveEvent.TextChannel) != null)
@@ -157,19 +162,16 @@ namespace Rick.Controllers
             if (GuildConfig.KarmaList.ContainsKey(User.Id))
             {
                 GuildConfig.KarmaList.Remove(User.Id);
-                Logger.Log(LogType.WARN, LogSource.Config, $"{User.Username} removed from {User.Guild.Name}'s Karma List.");
             }
             if (GuildConfig.AFKList.ContainsKey(User.Id))
             {
                 GuildConfig.AFKList.Remove(User.Id);
-                Logger.Log(LogType.WARN, LogSource.Config, $"{User.Username} removed from {User.Guild.Name}'s AFK List.");
             }
             foreach (var tag in GuildConfig.TagsList)
             {
                 if (tag.Owner == User.Id)
                 {
                     GuildConfig.TagsList.Remove(tag);
-                    Logger.Log(LogType.WARN, LogSource.Config, $"Removed {tag.Name} by {User.Username}.");
                 }
             }
 
@@ -179,12 +181,14 @@ namespace Rick.Controllers
 
         static async Task KarmaHandlerAsync(SocketGuildUser User)
         {
-            if (User == null || ConfigHandler.IConfig.Blacklist.ContainsKey(User.Id)) return;
-
+            RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
             var GuildConfig = GuildHandler.GuildConfigs[GuildID];
-
-            if (User.IsBot || !GuildConfig.IsKarmaEnabled) return;
+            if (User == null ||                 
+                User.IsBot ||
+                ConfigHandler.IConfig.Blacklist.ContainsKey(User.Id) ||
+                !GuildConfig.IsKarmaEnabled ||
+                Waitlist.Contains(User.Id)) return;
 
             var GetRandom = new Random().Next(1, 5);
             var RandomKarma = Fomulas.GiveKarma(GetRandom);
@@ -194,13 +198,13 @@ namespace Rick.Controllers
                 karmalist.Add(User.Id, RandomKarma);
                 return;
             }
+                int getKarma = karmalist[User.Id];
+                getKarma += RandomKarma;
+                karmalist[User.Id] = getKarma;
 
-            int getKarma = karmalist[User.Id];
-            getKarma += RandomKarma;
-            karmalist[User.Id] = getKarma;
-
-            GuildHandler.GuildConfigs[GuildID] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+                GuildHandler.GuildConfigs[GuildID] = GuildConfig;
+                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+                Waitlist.Add(User.Id);
         }
 
         static async Task AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
@@ -303,6 +307,17 @@ namespace Rick.Controllers
                 GuildHandler.GuildConfigs.Add(Guild.Id, CreateConfig);
             }
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+        }
+
+        static void RemoveUser(ulong Id)
+        {
+            timer = new Timer(_ =>
+            {
+                Waitlist.Remove(Id);
+            },
+            null,
+            TimeSpan.FromSeconds(60),
+            TimeSpan.FromSeconds(60));
         }
         #endregion
     }
