@@ -152,5 +152,32 @@ namespace Rick.Modules
             await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
             await ReplyAsync("Karma Leaderboard and AFK list has been cleared!");
         }
+
+        [Command("PurgeUser"), Summary("Purges 500 messages by the specified user."), Remarks("PurgeUser @Username"), Alias("PUser", "PurgeU")]
+        public async Task PurgeUserAsync(IGuildUser User)
+        {
+            try
+            {
+                var Guild = Context.Guild as SocketGuild;
+                foreach (var Channel in Guild.TextChannels)
+                {
+                    var Chn = Channel as ITextChannel;
+                    var Messages = (await Chn.GetMessagesAsync(200).Flatten()).Where(x => x.Author.Id == User.Id);
+                    await Chn.DeleteMessagesAsync(Messages);
+                }
+                await ReplyAsync($"Cleaned up {User.Username} messages.");
+            }
+            catch (NullReferenceException Ex)
+            {
+                await ReplyAsync(Ex.StackTrace);
+            }
+        }
+
+        [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Remarks("PurgeChannel #ChannelName"), Alias("PChannel", "PurgeC")]
+        public async Task PurgeChannelAsync(ITextChannel Channel)
+        {
+            var Messages = await Channel.GetMessagesAsync(500).Flatten();
+            await Channel.DeleteMessagesAsync(Messages);
+        }
     }
 }
