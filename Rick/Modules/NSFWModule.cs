@@ -5,14 +5,12 @@ using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Net.Http;
-using Rick.Attributes;
-using Rick.Functions;
-using Rick.JsonModels;
+using Rick.Models;
 using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [RequireNsfw, CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireNsfw, RequireBotPermission(GuildPermission.SendMessages)]
     public class NSFWModule : ModuleBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
@@ -60,18 +58,12 @@ namespace Rick.Modules
                 return;
             }
             search = search?.Trim() ?? "";
-            string url = await Function.GetE621ImageLink(search);
+            string url = await StringExtension.GetE621ImageLinkAsync(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
             {
-                var embed = new EmbedBuilder()
-                    .WithAuthor(x =>
-                    {
-                        x.Name = $"{Context.User.Username} searched for {search}";
-                        x.IconUrl = url;
-                    })
-                    .WithImageUrl(url);
+                var embed = Vmbed.Embed(VmbedColors.Pastel, url, $"{Context.User.Username} searched for {search}", ImageUrl: url);
                 await ReplyAsync("", embed: embed);
             }
         }
@@ -92,7 +84,7 @@ namespace Rick.Modules
                 return;
             }
             var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
-            var embed = EmbedExtension.Embed(Enums.EmbedColors.White, Getvid.VideoTitle, Getvid.VideoThumb, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
+            var embed = Vmbed.Embed(VmbedColors.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
                 FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddInlineField("Video Length", Getvid.duration);
             embed.AddInlineField("Total Views", Getvid.views);

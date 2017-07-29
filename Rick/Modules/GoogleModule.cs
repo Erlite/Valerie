@@ -1,46 +1,43 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
-using Google.Apis.Customsearch.v1;
-using Google.Apis.Services;
 using System.Net.Http;
 using System;
 using Newtonsoft.Json.Linq;
-using Rick.Enums;
-using Rick.Extensions;
-using Rick.Attributes;
-using Rick.Handlers;
-using Rick.Functions;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
+using Rick.Handlers.ConfigHandler;
+using Rick.Attributes;
+using Google.Apis.Customsearch.v1;
+using Google.Apis.Services;
+using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, APICheck, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
     public class GoogleModule : ModuleBase
     {
-        [Command("Google"), Alias("G"), Summary("Searches google for your search terms."), Remarks("Google What is love?")]
+        [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();
             string URL = "http://diylogodesigns.com/blog/wp-content/uploads/2016/04/google-logo-icon-PNG-Transparent-Background.png";
-            
+
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
-                ApiKey = ConfigHandler.IConfig.APIKeys.GoogleKey
+                ApiKey = BotDB.Config.APIKeys.GoogleKey
             });
             var RequestList = Service.Cse.List(search);
-            RequestList.Cx = ConfigHandler.IConfig.APIKeys.SearchEngineID;
+            RequestList.Cx = BotDB.Config.APIKeys.SearchEngineID;
 
-            var items = RequestList.Execute().Items.Take(5);
+            var items = RequestList.Execute().Items.Take(3);
             foreach (var result in items)
             {
-                Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{Function.ShortenUrl(result.Link)}\n");
+                Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{StringExtension.ShortenUrl(result.Link)}\n");
             }
 
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Searched for: {search}", 
-                Context.Client.CurrentUser.GetAvatarUrl(), Description: Str.ToString(), ThumbUrl: URL);
+            var embed = Vmbed.Embed(VmbedColors.Pastel, Description: Str.ToString(), ThumbUrl: URL);
 
             if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
                 await ReplyAsync("No results found!");
@@ -48,37 +45,37 @@ namespace Rick.Modules
                 await ReplyAsync("", embed: embed);
         }
 
-        [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results."), Remarks("GImage Dank Memes")]
+        [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results.")]
         public async Task GImageAsync([Remainder] string search)
         {
             using (var http = new HttpClient())
             {
                 var rng = new Random();
-                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start={ rng.Next(1, 10) }&fields=items%2Flink&key={ConfigHandler.IConfig.APIKeys.GoogleKey}";
+                var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start=" +
+                    $"{ rng.Next(1, 10) }&fields=items%2Flink&key={BotDB.Config.APIKeys.GoogleKey}";
                 var obj = JObject.Parse(await http.GetStringAsync(reqString));
                 var items = obj["items"] as JArray;
-                var image = items[0]["link"].ToString();
-                var embed = EmbedExtension.Embed(EmbedColors.Yellow, $"Searched for: {search}", 
-                    Context.Client.CurrentUser.GetAvatarUrl(), ImageUrl: image);
+                string image = items[0]["link"].ToString();
+
                 if (!string.IsNullOrWhiteSpace(image))
-                    await ReplyAsync("", embed: embed);
+                    await ReplyAsync(image);
                 else
                     await ReplyAsync("No results found!");
                 http.Dispose();
             }
         }
 
-        [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube."), Remarks("Youtube SomeVideo Name")]
+        [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube.")]
         public async Task YoutubeAsync([Remainder] string search)
         {
-            var Link = "http://www.youtube.com/watch?v=" + Function.Youtube(search);
+            var Link = "http://www.youtube.com/watch?v=" + StringExtension.Youtube(search);
             await ReplyAsync(Link);
         }
 
-        [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner."), Remarks("Shorten https://github.com/Yucked"),]
+        [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner.")]
         public async Task ShortenAsync([Remainder] string URL)
         {
-            await ReplyAsync($"This is your shortened URL: {Function.ShortenUrl(URL)}");
+            await ReplyAsync($"This is your shortened URL: {StringExtension.ShortenUrl(URL)}");
         }
 
         [Command("Revav"), Summary("Performs a reverse image search for a user avatar.")]
@@ -86,7 +83,7 @@ namespace Rick.Modules
         {
             await ReplyAsync(
                 $"Reverse Image Result: " +
-                $"{Function.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
+                $"{StringExtension.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
         }
     }
 }

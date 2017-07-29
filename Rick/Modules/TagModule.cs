@@ -1,169 +1,105 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
-using Discord;
 using Discord.Commands;
-using Rick.Handlers;
-using Rick.Attributes;
-using Rick.Models;
+using Rick.Handlers.GuildHandler;
+using Rick.Handlers.GuildHandler.Enum;
 using Rick.Extensions;
-using Rick.Enums;
 
 namespace Rick.Modules
 {
-    [Group("Tag"), CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
+    [Group("Tag"), RequireBotPermission(Discord.GuildPermission.SendMessages)]
     public class TagModule : ModuleBase
     {
-        [Command, Summary("Executes a tag."), Remarks("Tag TagName"), Priority(0)]
-        public async Task ExecuteTagAsync(string Name)
+        [Command, Summary("Executes a tag."), Priority(0)]
+        public async Task TagAsync(string TagName)
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
-            if (getTag == null)
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            var Tag = Config.TagsList.FirstOrDefault(x => x.Name == TagName);
+            if (Tag == null)
             {
-                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                await ReplyAsync($"Tag with name **{TagName}** doesn't exist.");
                 return;
             }
-            await ReplyAsync(getTag.Response);
-            getTag.Uses++;
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            await ReplyAsync(Tag.Response);
+            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagUpdate, TagName);
         }
 
-        [Command("Create"), Summary("Creates a tag with tag response."), Remarks("Tag Create TagName This is Tag response."), Priority(1)]
-        public async Task CreateAsync(string Name, [Remainder] string response)
+        [Command("Create"), Summary("Creates a tag."), Priority(1)]
+        public async Task CreateAsync(string Name, [Remainder]string Response)
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var MakeTags = gldConfig.TagsList;
-            var Exists = MakeTags.FirstOrDefault(x => x.Name == Name);
-            if (MakeTags.Contains(Exists))
+            var Exists = ServerDB.GuildConfig(Context.Guild.Id).TagsList.FirstOrDefault(x => x.Name == Name);
+            if (ServerDB.GuildConfig(Context.Guild.Id).TagsList.Contains(Exists))
             {
-                await ReplyAsync("Tag already exists in the dictionary!");
+                await ReplyAsync($"**{Name}** tag already exists.");
                 return;
             }
-            var tag = new TagsModel
-            {
-                Name = Name,
-                Response = response,
-                Owner = Context.User.Id,
-                CreationDate = DateTime.Now.ToString()
-            };
-            MakeTags.Add(tag);
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            string Description = $"**Tag Name:** {Name}\n**Tag Response:**```{response}```";
-            var embed = EmbedExtension.Embed(EmbedColors.Green, $"{Context.User.Username} added new Tag!", 
-                Context.User.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
+            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagAdd, Name, Response, Context.User.Id, DateTime.Now.ToString());
+            await ReplyAsync($"**{Name}** tag has been created.");
         }
 
-        [Command("Remove"), Summary("Deletes a tag from the tag list."), Remarks("Tag Delete TagName"), Priority(1)]
+        [Command("Remove"), Alias("Delete"), Summary("Deletes a tag."), Priority(1)]
         public async Task RemoveAsync(string Name)
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x=> x.Name == Name);
-            if(getTag == null)
+            var Exists = ServerDB.GuildConfig(Context.Guild.Id).TagsList.FirstOrDefault(x => x.Name == Name);
+            if (Exists == null)
             {
-                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                await ReplyAsync($"**{Name}** tag doesn't exists.");
                 return;
             }
-            await RemoveTag(getTag);
-            await ReplyAsync("Tag Removed :put_litter_in_its_place: ");
+            if (Exists.Owner != Context.User.Id)
+            {
+                await ReplyAsync($"You are not the owner of **{Name}**.");
+                return;
+            }
+            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagRemove, Name);
+            await ReplyAsync($"**{Name}** tag has been removed.");
         }
 
-        [Command("Info"), Summary("Shows information about a tag."), Remarks("Tag Info TagName"), Priority(1)]
-        public async Task TagInfoAsync(string Name)
+        [Command("Modify"), Summary("Changes Tag's response"), Priority(1)]
+        public async Task ModifyAsync(string Name, [Remainder]string Response)
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
-            if (getTag == null)
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            var Tag = Config.TagsList.FirstOrDefault(x => x.Name == Name);
+            if (Tag == null)
             {
-                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
+                await ReplyAsync($"**{Name}** doesn't exist.");
                 return;
             }
-            var embed = new EmbedBuilder()
-                .WithAuthor(x =>
-                {
-                    x.Name = getTag.Name;
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                })
-                .AddInlineField("Tag Response", getTag.Response)
-                .AddInlineField("Tag Owner", await Context.Guild.GetUserAsync(getTag.Owner))
-                .AddInlineField("Tag Uses", getTag.Uses)
-                .AddInlineField("Creation Date", getTag.CreationDate)
-                .WithColor(new Color(153, 255, 255));
+            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagModify, Name, Response);
+            await ReplyAsync($"**{Name}** has been updated.");
+        }
+
+        [Command("Info"), Summary("Shows information about a tag."), Priority(1)]
+        public async Task InfoAsync(string Name)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            var GetTag = Config.TagsList.FirstOrDefault(x => x.Name == Name);
+            if (GetTag == null)
+            {
+                await ReplyAsync($"**{Name}** doesn't exist.");
+                return;
+            }
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}",
+                ThumbUrl: (await Context.Guild.GetUserAsync(GetTag.Owner)).GetAvatarUrl());
+            embed.AddInlineField("Name", GetTag.Name);
+            embed.AddInlineField("Owner", await Context.Guild.GetUserAsync(GetTag.Owner));
+            embed.AddInlineField("Uses", GetTag.Uses);
+            embed.AddInlineField("Creation Date", GetTag.CreationDate);
+            embed.AddInlineField("Response", GetTag.Response);
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Modify"), Summary("Modifies a tag"), Remarks("Tag Modify TagName TagResponse"), Priority(1)]
-        public async Task ModifyTagAsync(GlobalEnums prop, string Name, string Response)
-        {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            var getTag = gldTags.FirstOrDefault(x => x.Name == Name);
-            if (getTag == null)
-            {
-                await ReplyAsync($"Tag with name **{Name}** doesn't exist or couldn't be found!");
-                return;
-            }
-            switch(prop)
-            {
-                case GlobalEnums.TagName:
-                    getTag.Name = Name;
-                    break;
-
-                case GlobalEnums.TagResponse:
-                    getTag.Response = Response;
-                    break;
-            }
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync(":gears: Done");
-        }
-
-        [Command("List"), Summary("Shows a list of all tags in the guild"), Remarks("Tag List"), Priority(1)]
+        [Command("List"), Summary("Shows a list of all tags."), Priority(1)]
         public async Task ListAsync()
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            if (!gldTags.Any())
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.TagsList.Any())
             {
-                await ReplyAsync($"{Context.Guild.Name} has no tags!");
+                await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
                 return;
             }
-            await ReplyAsync($"**Tags List:** {string.Join(", ", gldTags.Select(x => x.Name))}");
-        }
-
-        [Command("Find"), Summary("Finds tag with a specific word or letter"), Remarks("Tag Find Meme"), Priority(1)]
-        public async Task FindAsync(string name)
-        {
-            var GldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var GetTags = GldConfig.TagsList;
-            if (!GetTags.Any() || (GetTags.Where(x => !x.Name.Contains(name)) == null))
-            {
-                await ReplyAsync($"No tags were found matching: **{name}** OR **{Context.Guild.Name}** doesn't have any tags!");
-                return;
-            }
-            var Sb = new StringBuilder();
-            foreach(var Name in GetTags.Where(x => x.Name.Contains(name)))
-            {
-                Sb.Append($"{Name.Name}, ");
-            }
-            await ReplyAsync($"Tags matching **{name}**: \n{Sb.ToString()}");
-        }
-
-        private async Task RemoveTag(TagsModel tag)
-        {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var gldTags = gldConfig.TagsList;
-            gldTags.Remove(tag);
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            await ReplyAsync(string.Join(",", Config.TagsList.Select(x => x.Name)));
         }
     }
 }

@@ -1,29 +1,285 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.Diagnostics;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Rick.Enums;
-using Rick.JsonModels;
+using Rick.Handlers.GuildHandler;
+using Rick.Handlers.GuildHandler.Enum;
 using Rick.Extensions;
-using Rick.Handlers;
 using Rick.Attributes;
-using Rick.Functions;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Text;
+using Rick.Services;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class GeneralModule : ModuleBase
     {
-        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about a guild."), Remarks("GI 1234567890123 OR GI")]
+        [Command("Rank"), Summary("Shows your current rank and how much Karma is needed for next level.")]
+        public async Task RankAsync(IGuildUser User = null)
+        {
+            User = User ?? Context.User as IGuildUser;
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.KarmaList.ContainsKey(User.Id))
+            {
+                await ReplyAsync($"{User.Username} doesn't exist in Karma list.");
+                return;
+            }
+            var UserKarma = Config.KarmaList.TryGetValue(User.Id, out int Karma);
+            var embed = Vmbed.Embed(VmbedColors.Pastel, ThumbUrl: User.GetAvatarUrl());
+            embed.AddInlineField("Karma", Karma);
+            embed.AddInlineField("Level", IntExtension.GetLevel(Karma));
+            embed.AddInlineField("Previous Level", IntExtension.GetKarmaForLastLevel(IntExtension.GetLevel(Karma)));
+            embed.AddInlineField("Next Level", IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma)));
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Top"), Summary("Shows top 10 users in the Karma list.")]
+        public async Task KarmaAsync()
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (Config.KarmaList.Count == 0)
+            {
+                await ReplyAsync("There are no top users for this guild.");
+                return;
+            }
+            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name} | Top 10 Users");
+            var Karmalist = Config.KarmaList.OrderByDescending(x => x.Value).Take(10);
+            foreach(var Value in Karmalist)
+            {
+                var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
+                if (User == null)
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaDelete, $"{User.Id}");
+                embed.AddInlineField(User.Username, $"Rank: {Value.Value} | Level: {IntExtension.GetLevel(Value.Value)}");
+            }
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("AFK"), Summary("Adds Or Removes you from AFK list.")]
+        public async Task AFKAsync(CommandEnums Action, [Remainder] string AFKMessage = "I'm busy.")
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            switch (Action)
+            {
+                case CommandEnums.Add:
+                    if (Config.AFKList.ContainsKey(Context.User.Id))
+                    {
+                        await ReplyAsync("You are already in the AFK list.");
+                        return;
+                    }
+                    await ServerDB.AFKHandlerAsync(Context.Guild.Id, ModelEnum.AFKAdd, Context.User.Id, AFKMessage);
+                    await ReplyAsync("You have been added to the AFK list.");
+                    break;
+                case CommandEnums.Remove:
+                    if (!Config.AFKList.ContainsKey(Context.User.Id))
+                    {
+                        await ReplyAsync("You are not in the AFK list.");
+                        return;
+                    }
+                    await ServerDB.AFKHandlerAsync(Context.Guild.Id, ModelEnum.AFKRemove, Context.User.Id);
+                    await ReplyAsync("You have been removed from the AFK list.");
+                    break;
+                case CommandEnums.Modify:
+                    await ServerDB.AFKHandlerAsync(Context.Guild.Id, ModelEnum.AFKModify, Context.User.Id, AFKMessage);
+                    await ReplyAsync("Your AFK message have been modified.");
+                    break;
+            }
+        }
+
+        [Command("Iam"), Summary("Adds you to one of the roles from assignable roles list.")]
+        public async Task IAmAsync(IRole Role)
+        {
+            var GuildConfig = ServerDB.GuildConfig(Context.Guild.Id);
+            var User = Context.User as SocketGuildUser;
+            if (!GuildConfig.AssignableRoles.Contains(Role.Id))
+            {
+                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
+                return;
+            }
+
+            if (User.Roles.Contains(Role))
+            {
+                await ReplyAsync($"You already have **{Role.Name}** role!");
+                return;
+            }
+            await User.AddRoleAsync(Role);
+            await ReplyAsync($"You have been added to **{Role.Name}** role!");
+        }
+
+        [Command("IamNot"), Summary("Removes you from the specified role.")]
+        public async Task IAmNotAsync(IRole Role)
+        {
+            var GuildConfig = ServerDB.GuildConfig(Context.Guild.Id);
+            var User = Context.User as SocketGuildUser;
+
+            if (!GuildConfig.AssignableRoles.Contains(Role.Id))
+            {
+                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
+                return;
+            }
+
+            if (!User.Roles.Contains(Role))
+            {
+                await ReplyAsync($"You do not have **{Role.Name}** role!");
+                return;
+            }
+
+            await User.RemoveRoleAsync(Role);
+            await ReplyAsync($"You have been removed from **{Role.Name}** role!");
+        }
+
+        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Cooldown(5)]
+        public async Task SlotMachineAsync(int Bet = 50)
+        {
+            string[] Slots = new string[]
+            {
+                ":heart:",
+                ":eggplant:",
+                ":poo:",
+                ":eyes:",
+                ":star2:",
+                ":peach:",
+                ":pizza:"
+            };
+            var Rand = new Random(DateTime.Now.Millisecond);
+            var Guild = ServerDB.GuildConfig(Context.Guild.Id);
+            var UserKarma = Guild.KarmaList[Context.User.Id];
+            if (Guild.IsKarmaEnabled == false)
+            {
+                await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
+                return;
+            }
+
+            if (UserKarma <= 0 || UserKarma < Bet)
+            {
+                await ReplyAsync("You don't have enough karma for slot machine!");
+                return;
+            }
+
+            if (Bet <= 0)
+            {
+                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
+                return;
+            }
+
+            if (Bet > 5000)
+            {
+                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
+                return;
+            }
+
+            var embed = new EmbedBuilder();
+
+            int[] s = new int[]
+            {
+                Rand.Next(0, Slots.Length),
+                Rand.Next(0, Slots.Length),
+                Rand.Next(0, Slots.Length)
+            };
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 1";
+                x.Value = Slots[s[0]];
+                x.IsInline = true;
+            });
+
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 2";
+                x.Value = Slots[s[1]];
+                x.IsInline = true;
+            });
+
+            embed.AddField(x =>
+            {
+                x.Name = "Slot 3";
+                x.Value = Slots[s[2]];
+                x.IsInline = true;
+            });
+
+            int win = 0;
+            if (s[0] == s[1] & s[0] == s[2]) win = 10;
+            else if (s[0] == s[1] || s[0] == s[2] || s[1] == s[2]) win = 2;
+
+            if (win == 0)
+            {
+                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
+                embed.Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"{Context.User.Username} Lost!",
+                    IconUrl = Context.User.GetAvatarUrl()
+                };
+                embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {UserKarma}";
+                embed.Color = new Color(0xff0000);
+            }
+            else
+            {
+                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet);
+                embed.Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"{Context.User.Username} won!",
+                    IconUrl = Context.User.GetAvatarUrl()
+                };
+                embed.Description = $":tada: Your current Karma is {UserKarma} :tada:";
+                embed.Color = new Color(0x93ff89);
+            }
+            await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Cooldown(5)]
+        public async Task FlipAsync(string Side, int Bet = 50)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            int UserKarma = Config.KarmaList[Context.User.Id];
+            if (Config.IsKarmaEnabled == false)
+            {
+                await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
+                return;
+            }
+
+            if (int.TryParse(Side, out int res))
+            {
+                await ReplyAsync("Side can't be a number. Use help command for more information!");
+                return;
+            }
+
+            if (UserKarma < Bet || UserKarma <= 0)
+            {
+                await ReplyAsync("You don't have enough karma!");
+                return;
+            }
+
+            if (Bet <= 0)
+            {
+                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
+                return;
+            }
+
+            if (Bet > 5000)
+            {
+                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
+                return;
+            }
+
+            string[] Sides = { "Heads", "Tails" };
+            var GetSide = Sides[new Random().Next(0, Sides.Length)];
+
+            if (Side.ToLower() == GetSide.ToLower())
+            {
+                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet*2);
+                await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {UserKarma}.");
+            }
+            else
+            {
+                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
+                await ReplyAsync($"You lost {Bet}! :frowning: Your current Karma is {UserKarma}.");
+            }
+        }
+
+        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about a guild.")]
         public async Task GuildInfoAsync(ulong ID = 0)
         {
             var gld = Context.Guild;
@@ -41,11 +297,11 @@ namespace Rick.Modules
                 $"**Users:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
                 $"**Bots:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
                 $"**AFK Timeout:** {gld.AFKTimeout}\n";
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: $"{gld.Name} Information", Description: Desc, ThumbUrl: gld.IconUrl);
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"{gld.Name} Information", Description: Desc, ThumbUrl: gld.IconUrl);
             await ReplyAsync("", false, embed);
         }
 
-        [Command("Roleinfo"), Alias("RI"), Summary("Displays information about a role"), Remarks("Roleinfo @Rolename OR @RI \"RoleName\"")]
+        [Command("Roleinfo"), Alias("RI"), Summary("Displays information about a role")]
         public async Task RoleInfoAsync(IRole role)
         {
             var gld = Context.Guild;
@@ -153,474 +409,34 @@ namespace Rick.Modules
             await chn.SendMessageAsync("", false, embed);
         }
 
-        [Command("Userinfo"), Alias("UI"), Summary("Displays information about a username."), Remarks("Userinfo OR Userinfo @Username")]
-        public async Task UserInfoAsync(SocketGuildUser User = null)
+        [Command("Rate"), Summary("Rates something for you out of 10.")]
+        public async Task RateAsync([Remainder] string ThingToRate)
         {
-            var usr = User ?? Context.User as SocketGuildUser;
-            var userNick = usr.Nickname ?? "User has no Nickname";
-            var userDisc = usr.DiscriminatorValue;
-            var Userid = usr.Id;
-            var isbot = usr.IsBot ? "YEAAAA!" : "Nopeee";
-            var UserStatus = usr.Status;
-            var UserGame = usr.Game.Value.Name ?? "No Game";
-            var UserCreated = usr.CreatedAt;
-            var UserJoined = usr.JoinedAt;
-            var UserPerms = usr.GuildPermissions;
-
-            string descrption = $"**Nickname: **{userNick}\n**Discriminator: **{userDisc}\n**ID: **{Userid}\n**Is Bot: **{isbot}\n**Status: **{UserStatus}" +
-                $"\n**Game: **{UserGame}\n**Created At: **{UserCreated}\n**Joined At: **{UserJoined}\n**Guild Permissions: **{UserPerms}";
-
-            var embed = EmbedExtension.Embed(EmbedColors.White, $"{usr.Username} Information", usr.GetAvatarUrl(), Description: descrption, ImageUrl: usr.GetAvatarUrl());
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync($":thinking: I would rate '{ThingToRate}' a {new Random().Next(11)}/10");
         }
 
-        [Command("Ping"), Summary("Measures gateway ping and response time. If a destionation is provided then it pings the destionation."), Remarks("Ping Google.com")]
-        public async Task PingAsync(string Destination = null)
-        {
-            string Time = null;
-            if (!string.IsNullOrWhiteSpace(Destination) || Destination != null)
-            {
-                try
-                {
-                    var HttpClient = new HttpClient();
-                    HttpClient.DefaultRequestHeaders.Clear();
-                    HttpClient.DefaultRequestHeaders.Add("X-Mashape-Key", ConfigHandler.IConfig.APIKeys.MashapeKey);
-                    HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-                    var get = JObject.Parse(await HttpClient.GetStringAsync($"https://igor-zachetly-ping-uin.p.mashape.com/pinguin.php?address={Destination}"));
-                    var WebResponse = get["time"].ToString();
-                    Time = WebResponse;
-                }
-                catch { }
-            }
-            if (string.IsNullOrWhiteSpace(Time))
-                Time = "No IP/Web Address was provided to ping.";
-
-            var sw = Stopwatch.StartNew();
-            var client = Context.Client as DiscordSocketClient;
-            string descrption = $"**Gateway Latency:** { client.Latency } ms\n" +
-                $"**Response Latency:** {sw.ElapsedMilliseconds} ms\n" +
-                $"**Delta:** {sw.ElapsedMilliseconds - client.Latency} ms\n" +
-                $"**IP/Web Response Time:** {Time}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Ping Results", Context.Client.CurrentUser.GetAvatarUrl(), Description: descrption);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Embed"), Summary("Embeds a user message."), Remarks("Embed 123 123 123 This is embed message.")]
-        public async Task EmbedAsync(int Color1 = 255, int Color2 = 255, int Color3 = 255, [Remainder] string msg = "Idk how to use Embed Command")
-        {
-            await Context.Message.DeleteAsync();
-            var embed = new EmbedBuilder()
-                .WithColor(new Color(Color1, Color2, Color3))
-                .WithDescription($"{Format.Italics(msg)}");
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("GenID"), Summary("Generates a random GUID.")]
-        public async Task CreateUuidAsync()
-        {
-            var id = Guid.NewGuid().ToString();
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, Context.User.Username, Context.User.GetAvatarUrl(), Description: $"Your unique UUID is: {id}");
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Coinflip"), Summary("Flips a coin like any other coin flip.")]
-        public async Task CoinFlipAsync()
-        {
-            var rand = new Random().Next(2);
-            switch (rand)
-            {
-                case 0:
-                    await ReplyAsync("HEAAADS");
-                    break;
-                case 1:
-                    await ReplyAsync("TAAAILS");
-                    break;
-            }
-        }
-
-        [Command("AFK"), Summary("Adds you to the Guild's AFK list."), Remarks("AFK Add This is a reason. OR AFK Remove OR AFK Modify New Reason")]
-        public async Task SetAfkAsync(GlobalEnums prop, [Remainder] string msg = "No reason provided!")
-        {
-            var Guild = Context.Guild as SocketGuild;
-            var gldConfig = GuildHandler.GuildConfigs[Guild.Id];
-            var List = gldConfig.AFKList;
-
-            switch (prop)
-            {
-                case GlobalEnums.Add:
-                    if (List.ContainsKey(Context.User.Id))
-                    {
-                        await ReplyAsync("You are already in the AFK List! :anger:");
-                        return;
-                    }
-                    List.Add(Context.User.Id, msg);
-                    await ReplyAsync($"Added {Context.User.Username} to Guild's AFK list with message: **{msg}**");
-                    break;
-
-                case GlobalEnums.Remove:
-                    if (!List.ContainsKey(Context.User.Id))
-                    {
-                        await ReplyAsync("You are not in the AFK list.");
-                        return;
-                    }
-                    List.Remove(Context.User.Id);
-                    await ReplyAsync($"Removed {Context.User.Username} from the Guild's AFK list!");
-                    break;
-
-                case GlobalEnums.Modify:
-                    if (!List.ContainsKey(Context.User.Id))
-                    {
-                        await ReplyAsync("You are not in the AFK list.");
-                        return;
-                    }
-                    List[Context.User.Id] = msg;
-                    await ReplyAsync("Your message has been modified!");
-                    break;
-            }
-
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("About"), Summary("Displays information about the bot.")]
-        public async Task AboutAsync()
-        {
-            string Message = $"HENLO! I'm Ricky R-r-r-r-RICK! c: :eggplant:" +
-                $"I'm better than SIRI and you! Yea! You heard that right! :100:" +
-                $"Invite me to your server so I can molest all of your users or if you wanna get laid real quick. " +
-                $"I'm all about them Girls bro.\n" +
-                $"I'm written by Yucked and this is my ??9?? rewrite. Always trying to improve to provide better fucntionality.";
-            string Misc = $"[My Website](https://Rickbot.cf) | [Command List](https://Rickbot.cf/Pages/Commands.html) | " +
-                $"[My Support Server](https://discord.gg/S5CnhVY) | [Follow Me](https://twitter.com/Vuxey) | " +
-                $"[Invite Me](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175)";
-
-            var embed = EmbedExtension.Embed(EmbedColors.Gold,
-                "Ricky Rick", Context.Client.CurrentUser.GetAvatarUrl(),
-                Description: $"{Message}\n{Misc}");
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Rate"), Summary("Rates something for you out of 10."), Remarks("Rate Kendrick")]
-        public async Task RateAsync([Remainder] string text)
-        {
-            await ReplyAsync($":thinking: I would rate '{text}' a {new Random().Next(11)}/10");
-        }
-
-        [Command("Translate"), Summary("Translates a sentence into the specified language."), Remarks("Translate Spanish What the Pizza?")]
+        [Command("Translate"), Summary("Translates a sentence into the specified language.")]
         public async Task TranslateAsync(string Language, [Remainder] string Text)
         {
-            var result = await Function.Translate(Language, Text);
+            var result = await Misc.Translate(Language, Text);
             string Description = $"**Input:** {Text}\n" +
                 $"**In {Language}:** {result.Translations[0].Translation}";
-            var embed = EmbedExtension.Embed(EmbedColors.Blurple, "Translation Service!",
-                Context.User.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Remarks("Slotmachine 100"), Cooldown(5)]
-        public async Task SlotMachineAsync(int Bet = 50)
-        {
-            string[] Slots = new string[]
-            {
-                ":heart:",
-                ":eggplant:",
-                ":poo:",
-                ":eyes:",
-                ":star2:",
-                ":peach:",
-                ":pizza:"
-            };
-            var Rand = new Random(DateTime.Now.Millisecond);
-            var Guilds = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = Guilds.KarmaList;
-            int Credits = karmalist[Context.User.Id];
-
-            if (Guilds.IsKarmaEnabled == false)
-            {
-                await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
-                return;
-            }
-
-            if (Credits <= 0 || Credits < Bet)
-            {
-                await ReplyAsync("You don't have enough karma for slot machine!");
-                return;
-            }
-            if (Bet <= 0)
-            {
-                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
-                return;
-            }
-
-            if (Bet > 5000)
-            {
-                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
-                return;
-            }
-
-            var embed = new EmbedBuilder();
-
-            int[] s = new int[]
-            {
-                Rand.Next(0, Slots.Length),
-                Rand.Next(0, Slots.Length),
-                Rand.Next(0, Slots.Length)
-            };
-            embed.AddField(x =>
-            {
-                x.Name = "Slot 1";
-                x.Value = Slots[s[0]];
-                x.IsInline = true;
-            });
-
-            embed.AddField(x =>
-            {
-                x.Name = "Slot 2";
-                x.Value = Slots[s[1]];
-                x.IsInline = true;
-            });
-
-            embed.AddField(x =>
-            {
-                x.Name = "Slot 3";
-                x.Value = Slots[s[2]];
-                x.IsInline = true;
-            });
-
-            int win = 0;
-            if (s[0] == s[1] & s[0] == s[2]) win = 10;
-            else if (s[0] == s[1] || s[0] == s[2] || s[1] == s[2]) win = 2;
-
-            if (win == 0)
-            {
-                Credits -= Bet;
-                embed.Author = new EmbedAuthorBuilder()
-                {
-                    Name = $"{Context.User.Username} Lost!",
-                    IconUrl = Context.User.GetAvatarUrl()
-                };
-                embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {Credits}";
-                embed.Color = new Color(0xff0000);
-            }
-            else
-            {
-                Credits += Bet;
-                embed.Author = new EmbedAuthorBuilder()
-                {
-                    Name = $"{Context.User.Username} won!",
-                    IconUrl = Context.User.GetAvatarUrl()
-                };
-                embed.Description = $":tada: Your current Karma is {Credits} :tada:";
-                embed.Color = new Color(0x93ff89);
-            }
-            karmalist[Context.User.Id] = Credits;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync(Description);
         }
 
         [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
         public async Task TrumpAsync()
         {
-            var Http = (JObject.Parse((await (await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote")).Content.ReadAsStringAsync())))["value"];
-            string Pic = "http://abovethelaw.com/wp-content/uploads/2016/04/cartoon-trump-300x316.jpg";
-            var embed = EmbedExtension.Embed(EmbedColors.Maroon, "TRUMMMP!",
-                Pic, Description: Http.ToString());
-            await ReplyAsync("", embed: embed);
-
+            await ReplyAsync((JObject.Parse((
+                await (await new HttpClient()
+                .GetAsync("https://api.tronalddump.io/random/quote"))
+                .Content.ReadAsStringAsync())))["value"].ToString());
         }
 
-        [Command("Docs"), Summary("Searches Microsoft docs for terms"), Remarks("Docs Attributes")]
-        public async Task DocsAsync([Remainder] string Search)
-        {
-            var Builder = new StringBuilder();
-            var Response = await new HttpClient().GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
-            if (!Response.IsSuccessStatusCode)
-            {
-                await ReplyAsync(Response.ReasonPhrase);
-                return;
-            }
-            var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
-            foreach (var result in ConvertedJson.Results.Take(5).OrderBy(x => x.Name))
-            {
-                Builder.AppendLine($"**{result.Name}**\n" +
-                    $"**Kind: **{result.Kind} || **Type: **{result.Type}\n" +
-                    $"**Summary: **{result.Snippet}\n" +
-                    $"**URL: ** {result.URL}\n");
-            }
-            var embed = EmbedExtension.Embed(EmbedColors.White, Search,
-                "https://exceptiondev.github.io/media/Book.png", Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Remarks("Flip Heads 100"), Cooldown(5)]
-        public async Task FlipAsync(string Side, int Bet = 50)
-        {
-            var GC = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = GC.KarmaList;
-            int Karma = karmalist[Context.User.Id];
-
-            if (GC.IsKarmaEnabled == false)
-            {
-                await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
-                return;
-            }
-
-            if (int.TryParse(Side, out int res))
-            {
-                await ReplyAsync("Side can't be a number. Use help command for more information!");
-                return;
-            }
-
-            if (Karma < Bet || Karma <= 0)
-            {
-                await ReplyAsync("You don't have enough karma!");
-                return;
-            }
-
-            if (Bet <= 0)
-            {
-                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
-                return;
-            }
-
-            if (Bet > 5000)
-            {
-                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
-                return;
-            }
-
-            string[] Sides = { "Heads", "Tails" };
-            var GetSide = Sides[new Random().Next(0, Sides.Length)];
-
-            if (Side.ToLower() == GetSide.ToLower())
-            {
-                Karma += Bet * 2;
-                await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {Karma}.");
-            }
-            else
-            {
-                Karma -= Bet;
-                await ReplyAsync($"You lost {Bet}! :frowning: Your current Karma is {Karma}.");
-            }
-            karmalist[Context.User.Id] = Karma;
-            GuildHandler.GuildConfigs[Context.Guild.Id] = GC;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("Stats"), Summary("Shows information about Bot.")]
-        public async Task StatsAsync()
-        {
-            var length = new FileInfo(ConfigHandler.ConfigFile).Length + new FileInfo(GuildHandler.configPath).Length;
-            var cache = Function.DirSize(new DirectoryInfo(ConfigHandler.CacheFolder));
-            string Description =
-                $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
-                $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
-                $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
-                $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
-                $"- Databse Size: {Convert.ToInt32(length)} Bytes\n" +
-                $"- Cache Size: {Convert.ToInt32((cache / 1024) / 1024.0)} MB\n" +
-                $"- Total Command Used: {ConfigHandler.IConfig.CommandsUsed}\n" +
-                $"- Total Messages Received: {ConfigHandler.IConfig.MessagesReceived}";
-
-            var embed = EmbedExtension.Embed(EmbedColors.Teal, Title: "Rick Stats", Description: Description, ThumbUrl:
-                Context.Client.CurrentUser.GetAvatarUrl());
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Avatar"), Summary("Shows users avatar in higher resolution."), Remarks("Avatar @Yucked")]
+        [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public async Task UserAvatarAsync(SocketGuildUser User)
         {
             await ReplyAsync(User.GetAvatarUrl(size: 2048));
-        }
-
-        [Command("Karma"), Summary("Gives another user karma."), Remarks("Karma @Username 500")]
-        public async Task KarmaAsync(IGuildUser user, int Karma)
-        {
-            if (user.Id == Context.Client.CurrentUser.Id || user.Id == Context.User.Id) return;
-            var gldConfig = GuildHandler.GuildConfigs[user.GuildId];
-            var karmalist = gldConfig.KarmaList;
-            int UserKarma = karmalist[Context.User.Id];
-
-            if (Karma <= 0)
-            {
-                await ReplyAsync("Karma can't be <= 0!");
-                return;
-            }
-
-            if (UserKarma < Karma || UserKarma <= 0)
-            {
-                await ReplyAsync("You don't have enough karma!");
-                return;
-            }
-
-            if (!karmalist.ContainsKey(user.Id))
-            {
-                karmalist.Add(user.Id, 1);
-                await ReplyAsync($"Added {user.Username} to Karma List and gave 1 Karma to {user.Username}");
-            }
-            else
-            {
-                int getKarma = karmalist[user.Id];
-                getKarma += Karma;
-                UserKarma -= Karma;
-                karmalist[user.Id] = getKarma;
-                karmalist[Context.User.Id] = UserKarma;
-                await ReplyAsync($"Gave {Karma} Karma to {user.Username}");
-            }
-            GuildHandler.GuildConfigs[user.GuildId] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("Rank"), Summary("Shows how much Karma you have")]
-        public async Task GetKarmaAsync(SocketGuildUser User = null)
-        {
-            SocketGuildUser KarmaUser = null;
-            if (User != null)
-                KarmaUser = User;
-            else
-                KarmaUser = Context.User as SocketGuildUser;
-
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = gldConfig.KarmaList;
-            karmalist.TryGetValue(KarmaUser.Id, out int karma);
-            if (karma <= 0 || !karmalist.ContainsKey(KarmaUser.Id))
-            {
-                await ReplyAsync("User doesn't exist or no Karma was found!");
-                return;
-            }
-
-            int Level = Fomulas.GetLevel(karma);
-            int KarmaLast = Fomulas.GetKarmaForLastLevel(Level);
-            int KarmaNext = Fomulas.GetKarmaForNextLevel(Level);
-            string Image = KarmaUser.GetAvatarUrl();
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{KarmaUser.Username} Rankings", Image, ThumbUrl: Image);
-            embed.AddInlineField("Level", Level);
-            embed.AddInlineField("Karma", karma);
-            embed.AddInlineField("Karma Required For Last Level", KarmaLast);
-            embed.AddInlineField("Karma Required For Next Level", KarmaNext);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Top"), Summary("Shows users with top Karma")]
-        public async Task TopAsync()
-        {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var karmalist = gldConfig.KarmaList;
-            var filter = karmalist.OrderByDescending(x => x.Value).Take(10);
-            var embed = EmbedExtension.Embed(EmbedColors.Pastle, $"Top 10 Users", Context.Guild.IconUrl);
-            if (karmalist.Count <= 0)
-            {
-                await ReplyAsync("Guild's Karma list is empty!");
-                return;
-            }
-
-            foreach (var val in filter)
-            {
-                var user = (await Context.Guild.GetUserAsync(val.Key)) as SocketGuildUser;
-                var Level = Fomulas.GetLevel(val.Value);
-                embed.AddInlineField(user.Username, $"**Karma:** {val.Value} | **Level:** {Level}");
-            }
-            await ReplyAsync("", embed: embed);
         }
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
@@ -630,7 +446,7 @@ namespace Rick.Modules
 
             if (!Get.IsSuccessStatusCode)
             {
-                await ReplyAsync(Get.ReasonPhrase);
+                await ReplyAsync("Yomomma so fat that she crashed yomomma API.");
                 return;
             }
             await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync())["joke"].ToString());
@@ -652,53 +468,7 @@ namespace Rick.Modules
             }
         }
 
-        [Command("Iam"), Summary("Adds you to one of the roles from assignable roles list."), Remarks("Iam Ultimate-Meme-God")]
-        public async Task IAmAsync(IRole Role)
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-
-            if (!GuildConfig.AssignableRoles.Contains(Role.Name))
-            {
-                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
-                return;
-            }
-
-            var User = Context.User as SocketGuildUser;
-
-            if (User.Roles.Contains(Role))
-            {
-                await ReplyAsync($"You already have **{Role.Name}** role!");
-                return;
-            }
-
-            await User.AddRoleAsync(Role);
-            await ReplyAsync($"You have been added to **{Role.Name}** role!");
-        }
-
-        [Command("IamNot"), Summary("Removes you from the specified role."), Remarks("IAmNot Ultimate-Meme-God")]
-        public async Task IAmNotAsync(IRole Role)
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-
-            if (!GuildConfig.AssignableRoles.Contains(Role.Name))
-            {
-                await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
-                return;
-            }
-
-            var User = Context.User as SocketGuildUser;
-
-            if (!User.Roles.Contains(Role))
-            {
-                await ReplyAsync($"You do not have **{Role.Name}** role!");
-                return;
-            }
-
-            await User.RemoveRoleAsync(Role);
-            await ReplyAsync($"You have been removed from **{Role.Name}** role!");
-        }
-
-        [Command("Discrim"), Summary("Gets all users who match a certain discrim"), Remarks("Discrim @Username")]
+        [Command("Discrim"), Summary("Gets all users who match a certain discrim")]
         public async Task DiscrimAsync(IGuildUser User)
         {
             var Guilds = (Context.Client as DiscordSocketClient).Guilds;

@@ -1,89 +1,260 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Linq;
-using Discord.Commands;
+using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
-using Rick.Handlers;
-using Rick.Attributes;
-using Rick.Enums;
+using Rick.Handlers.GuildHandler;
+using Rick.Handlers.GuildHandler.Enum;
 using Rick.Extensions;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, Permission,
-        RequireBotPermission(GuildPermission.Administrator |
-        GuildPermission.KickMembers |
-        GuildPermission.BanMembers |
-        GuildPermission.ManageMessages)]
+    [RequireBotPermission(GuildPermission.KickMembers | GuildPermission.BanMembers | GuildPermission.SendMessages),
+        RequireUserPermission(GuildPermission.Administrator)]
     public class AdminModule : ModuleBase
     {
-        [Command("Kick"), Summary("Kicks user from the guild with a reason."), Remarks("Kick @Username User was spamming!")]
-        public async Task KickAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
+        [Command("Prefix"), Summary("Changes guild's prefix.")]
+        public async Task PrefixAsync(string NewPrefix)
         {
-            var gldConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            var BanChannel = User.Guild.GetChannel(gldConfig.ModLog.TextChannel) as ITextChannel;
-            gldConfig.ModCases += 1;
-            if (gldConfig.ModLog.IsEnabled && gldConfig.ModLog.TextChannel != 0)
-            {
-                var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
-                    FooterText: $"Kick Date: { DateTime.Now.ToString()}");
-                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $"\n({User.Id})");
-                embed.AddInlineField("Responsible Mod", Context.User.Username);
-                embed.AddInlineField("Case Number", gldConfig.ModCases);
-                embed.AddInlineField("Case Type", "Kick");
-                embed.AddInlineField("Reason", Reason);
-                await BanChannel.SendMessageAsync("", embed: embed);
-            }
-            await User.KickAsync(Reason);
-            await ReplyAsync($"***{ User.Username + '#' + User.Discriminator} GOT KICKED*** :ok_hand: ");
-            GuildHandler.GuildConfigs[Context.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.Prefix, NewPrefix);
+            await ReplyAsync($"Guild's prefix has been set to: {NewPrefix}");
         }
 
-        [Command("Ban"), Summary("Bans a user from the guild with a reason."), Remarks("Ban @Username User was spamming!")]
-        public async Task BanAsync(SocketGuildUser User, [Remainder] string Reason = "No reason provided by the moderator!")
+        [Command("RoleAdd"), Alias("RA"), Summary("Adds a role to assignable role list.")]
+        public async Task RoleAddAsync(IRole Role)
         {
-            var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            gldConfig.ModCases += 1;
-            var BanChannel = User.Guild.GetChannel(gldConfig.ModLog.TextChannel) as ITextChannel;
-            if (gldConfig.ModLog.IsEnabled && gldConfig.ModLog.TextChannel != 0)
+            if (ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id))
             {
-                var embed = EmbedExtension.Embed(EmbedColors.Red, ThumbUrl: User.GetAvatarUrl(),
-                    FooterText: $"Kick Date: { DateTime.Now.ToString()}");
-                embed.AddInlineField("Username", User.Username + "#" + User.Discriminator + $"\n({User.Id})");
-                embed.AddInlineField("Responsible Mod", Context.User.Username + "#" + Context.User.Discriminator);
-                embed.AddInlineField("Case Number", gldConfig.ModCases);
-                embed.AddInlineField("Case Type", "Ban");
-                embed.AddInlineField("Reason", Reason);
-                await BanChannel.SendMessageAsync("", embed: embed);
-            }
-            await User.Guild.AddBanAsync(User, 30, Reason);
-            await ReplyAsync($"***{User.Username + '#' + User.Discriminator} GOT BENT*** :hammer: ");
-            GuildHandler.GuildConfigs[User.Guild.Id] = gldConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-        }
-
-        [Command("Mute"), Summary("Adds user to mute role specified in Guild's Config."), Remarks("Mute @Username")]
-        public async Task MuteAsync(SocketGuildUser User)
-        {
-            var gldConfig = GuildHandler.GuildConfigs[User.Guild.Id];
-            IRole MuteRole = User.Guild.GetRole(gldConfig.MuteRoleID);
-            if (gldConfig.MuteRoleID == 0 || Context.Guild.GetRole(gldConfig.MuteRoleID) == null)
-            {
-                var CreateNew = await Context.Guild.CreateRoleAsync("Mute Role", GuildPermissions.None, Color.Default);
-                gldConfig.MuteRoleID = CreateNew.Id;
-                await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-                await User.AddRoleAsync(MuteRole);
+                await ReplyAsync($"{Role.Name} already exists in assignable roles list.");
                 return;
             }
-            await User.AddRoleAsync(MuteRole);
-            gldConfig.ModCases += 1;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync("User has been added to Mute Role!");
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.RolesAdd, $"{Role.Id}");
+            await ReplyAsync($"**{Role.Name}** has been added to assignable roles list.");
         }
 
-        [Command("Delete"), Alias("Del"), Summary("Deletes X amount of messages. Messages can't be old than 2 weeks."), Remarks("Delete 10")]
+        [Command("RoleRemove"), Alias("RR"), Summary("Removes a role from assignable role list.")]
+        public async Task RoleRemoveAsync(IRole Role)
+        {
+            if (!ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id))
+            {
+                await ReplyAsync($"{Role.Name} doesn't exist in assignable roles list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.RolesRemove, $"{Role.Id}");
+            await ReplyAsync($"**{Role.Name}** has been removed from assignable role list.");
+        }
+
+        [Command("WelcomeAdd"), Alias("WA"), Summary("Adds a welcome message to welcome messages list.")]
+        public async Task WelcomeAddAsync([Remainder] string WelcomeMessage)
+        {
+            if (ServerDB.GuildConfig(Context.Guild.Id).WelcomeMessages.Contains(WelcomeMessage))
+            {
+                await ReplyAsync("Welcome message already exist in the Welcome Messages list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.WelcomeAdd, WelcomeMessage);
+            await ReplyAsync("Welcome message has been added to Welcome Messages list.");
+        }
+
+        [Command("WelcomeRemove"), Alias("WR"), Summary("Removes a welcome message from welcome messages list.")]
+        public async Task WelcomeRemoveAsync([Remainder] string WelcomeMessage)
+        {
+            if (!ServerDB.GuildConfig(Context.Guild.Id).WelcomeMessages.Contains(WelcomeMessage))
+            {
+                await ReplyAsync("Welcome message doesn't exist in the Welcome Messages list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.WelcomeRemove, WelcomeMessage);
+            await ReplyAsync("Welcome message has been removed from Welcome Messages list.");
+        }
+
+        [Command("LeaveAdd"), Alias("LA"), Summary("Adds a leave message to leave messages list.")]
+        public async Task LeaveAddAsync([Remainder] string LeaveMessage)
+        {
+            if (ServerDB.GuildConfig(Context.Guild.Id).LeaveMessages.Contains(LeaveMessage))
+            {
+                await ReplyAsync("Leave message already exists in the Leave Messages list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveAdd, LeaveMessage);
+            await ReplyAsync("Leave message has been added to leave messages list.");
+        }
+
+        [Command("LeaveRemove"), Alias("LR"), Summary("Removes a leave message from leaves message list.")]
+        public async Task LeaveRemoveAsync([Remainder] string LeaveMessage)
+        {
+            if (!ServerDB.GuildConfig(Context.Guild.Id).LeaveMessages.Contains(LeaveMessage))
+            {
+                await ReplyAsync("Leave message doesn't exists in the Leave Messages list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveRemove, LeaveMessage);
+            await ReplyAsync("Leave message has been removed");
+        }
+
+        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType include: CB, Join, Karma, Leave, Starboard, Mod, NoAds.")]
+        public async Task ToggleAsync(CommandEnums ValueType)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            switch (ValueType)
+            {
+                case CommandEnums.CB:
+                    if (!Config.Chatterbot.IsEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.CBEnabled, "true");
+                        await ReplyAsync("Chatterbot has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.CBEnabled, "false");
+                        await ReplyAsync("Chatterbot has been disabled.");
+                    }
+                    break;
+                case CommandEnums.Join:
+                    if (!Config.JoinEvent.IsEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinEnabled, "true");
+                        await ReplyAsync("Join event has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinEnabled, "true");
+                        await ReplyAsync("Join event has been disabled.");
+                    }
+                    break;
+                case CommandEnums.Karma:
+                    if (!Config.IsKarmaEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaEnabled, "true");
+                        await ReplyAsync("Karma has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaEnabled, "false");
+                        await ReplyAsync("Karma has been disabled.");
+                    }
+                    break;
+                case CommandEnums.Leave:
+                    if (!Config.LeaveEvent.IsEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveEnabled, "true");
+                        await ReplyAsync("Leave logging has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveEnabled, "false");
+                        await ReplyAsync("Leave logging has been disabled.");
+                    }
+                    break;
+                case CommandEnums.Starboard:
+                    if (!Config.Starboard.IsEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.StarEnabled, "true");
+                        await ReplyAsync("Starboard has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.StarEnabled, "false");
+                        await ReplyAsync("Starboard has been disabled.");
+                    }
+                    break;
+                case CommandEnums.Mod:
+                    if (!Config.ModLog.IsEnabled)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModEnabled, "true");
+                        await ReplyAsync("Mod log has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModEnabled, "false");
+                        await ReplyAsync("Mod log has been disabled.");
+                    }
+                    break;
+                case CommandEnums.NoAds:
+                    if (!Config.AntiAdvertisement)
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.AntiAdvertisement, "true");
+                        await ReplyAsync("AntiAdvertisement has been enabled.");
+                    }
+                    else
+                    {
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.AntiAdvertisement, "false");
+                        await ReplyAsync("AntiAdvertisement has been disabled.");
+                    }
+                    break;
+            }
+        }
+
+        [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Karma, Leave, Starboard, Mod.")]
+        public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
+        {
+            switch (ValueType)
+            {
+                case CommandEnums.CB:
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.CBChannel, $"{Channel.Id}");
+                    await ReplyAsync($"Chatterbot channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Join:
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinChannel, $"{Channel.Id}");
+                    await ReplyAsync($"Join log channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Leave:
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveChannel, $"{Channel.Id}");
+                    await ReplyAsync($"Leave log channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Starboard:
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.StarChannel, $"{Channel.Id}");
+                    await ReplyAsync($"Starboard channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Mod:
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModChannel, $"{Channel.Id}");
+                    await ReplyAsync($"Mod log channel has been set to: {Channel.Mention}");
+                    break;
+            }
+        }
+
+        [Command("Kick"), Summary("Kicks user from the guild.")]
+        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = "No reason provided by moderator.")
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            await User.KickAsync(Reason);
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModCases);
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != 0)
+            {
+                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
+                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
+                embed.AddInlineField("Responsible Moderator", Context.User.Username);
+                embed.AddInlineField("Case No.", Config.ModCases);
+                embed.AddInlineField("Case Type", "Kick");
+                embed.AddInlineField("Reason", Reason);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Config.ModLog.TextChannel)).SendMessageAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+        }
+
+        [Command("Ban"), Summary("Bans user from the guild.")]
+        public async Task BanAsync(IGuildUser User, [Remainder] string Reason = "No reason provided by moderator.")
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            await Context.Guild.AddBanAsync(User, 7, Reason);
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModCases);
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != 0)
+            {
+                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
+                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
+                embed.AddInlineField("Responsible Moderator", Context.User.Username);
+                embed.AddInlineField("Case No.", Config.ModCases);
+                embed.AddInlineField("Case Type", "Ban");
+                embed.AddInlineField("Reason", Reason);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Config.ModLog.TextChannel)).SendMessageAsync("", embed: embed);
+            }
+            else
+                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+        }
+
+        [Command("Delete"), Alias("Del"), Summary("Deletes X amount of messages. Messages can't be old than 2 weeks.")]
         public async Task DeleteAsync(int MessageAmount)
         {
             if (MessageAmount <= 0)
@@ -98,59 +269,6 @@ namespace Rick.Modules
             }
             var messageList = await Context.Channel.GetMessagesAsync(MessageAmount).Flatten();
             await Context.Channel.DeleteMessagesAsync(messageList);
-        }
-
-        [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role."), Remarks("Addrole @Username @RoleName OR Addrole \"Username\" \"RoleName\"")]
-        public async Task AroleAsync(SocketGuildUser User, SocketRole Role)
-        {
-            await User.AddRoleAsync(Role);
-            string Description = $"{User.Username} has been added to {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Removerole"), Alias("Rrole"), Summary("Removes user from the specified role."), Remarks("RemoveRole @Username @RoleName OR Addrole \"Username\" \"RoleName\"")]
-        public async Task RemoveRoleAsync(SocketGuildUser User, SocketRole Role)
-        {
-            await User.RemoveRoleAsync(Role);
-            string Description = $"{User.Username} has been removed from {Role.Name}!";
-            var embed = EmbedExtension.Embed(EmbedColors.Dark, User.Username, User.GetAvatarUrl(), Description: Description);
-            await ReplyAsync("", embed: embed);
-        }
-
-        [Command("MoneyShot"), Summary("Gives random Karma to everyone in the Guild's Karma list.")]
-        public async Task MoneyShotAsync()
-        {
-            var Random = new Random();
-            int Karma = Random.Next(0, 1000);
-            var GldCfg = GuildHandler.GuildConfigs[Context.Guild.Id];
-
-            if (GldCfg.KarmaList.Count <= 0)
-            {
-                await ReplyAsync("Karma List is empty! Please enable Karma first!");
-                return;
-            }
-
-            foreach (var Key in GldCfg.KarmaList.Keys.ToList())
-            {
-                GldCfg.KarmaList[Key] += Karma;
-            }
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            if (Karma > 500)
-                await ReplyAsync("That was a massive money shot boiiii! :money_mouth: ");
-            else
-                await ReplyAsync("It was a decent money shot :point_up: ");
-        }
-
-        [Command("Clear"), Summary("Clears current Karma and AFK list.")]
-        public async Task ClearAsync()
-        {
-            var GuildConfig = GuildHandler.GuildConfigs[Context.Guild.Id];
-            GuildConfig.KarmaList.Clear();
-            GuildConfig.AFKList.Clear();
-            GuildHandler.GuildConfigs[Context.Guild.Id] = GuildConfig;
-            await GuildHandler.SaveAsync(GuildHandler.GuildConfigs);
-            await ReplyAsync("Karma Leaderboard and AFK list has been cleared!");
         }
 
         [Command("PurgeUser"), Summary("Purges 500 messages by the specified user."), Remarks("PurgeUser @Username"), Alias("PUser", "PurgeU")]
@@ -178,6 +296,20 @@ namespace Rick.Modules
         {
             var Messages = await Channel.GetMessagesAsync(500).Flatten();
             await Channel.DeleteMessagesAsync(Messages);
+        }
+
+        [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role.")]
+        public async Task AaddroleAsync(IGuildUser User, IRole Role)
+        {
+            await User.AddRoleAsync(Role);
+            await ReplyAsync($"{User} has been added to {Role.Name}");
+        }
+
+        [Command("Removerole"), Alias("Rrole"), Summary("Removes user from the specified role.")]
+        public async Task RemoveRoleAsync(IGuildUser User, IRole Role)
+        {
+            await User.RemoveRoleAsync(Role);
+            await ReplyAsync($"{User} has been removed from {Role.Name}");
         }
     }
 }

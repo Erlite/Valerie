@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Rick.Controllers;
 using Discord;
-using System.Linq;
-using Rick.Attributes;
+using Discord.Commands;
+using Rick.Services;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireBotPermission(GuildPermission.SendMessages)]
     public class AudioModule : ModuleBase
     {
         public static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();

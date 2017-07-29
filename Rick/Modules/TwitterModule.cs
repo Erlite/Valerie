@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Tweetinvi;
-using Rick.Extensions;
-using Rick.Attributes;
-using Rick.Enums;
-using Rick.Handlers;
 using Tweetinvi.Parameters;
 using Tweetinvi.Models;
-using Discord;
+using Rick.Attributes;
+using Rick.Extensions;
+using Rick.Handlers;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, APICheck, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
     public class TwitterModule : ModuleBase
     {
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(30)]
@@ -27,7 +26,7 @@ namespace Rick.Modules
                 return;
             }
 
-            var Filter = Functions.Function.Censor(TweetMessage);
+            var Filter = StringExtension.Censor(TweetMessage);
             var Publish = $"{Filter} - {Context.User.Username}";
             if (Publish.Length > 140)
             {
@@ -43,11 +42,10 @@ namespace Rick.Modules
             else
                 ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-            var embed = EmbedExtension.Embed(EmbedColors.Green,
-                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description:
+            var embed = Vmbed.Embed(VmbedColors.Green, Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
-                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: ThumbImage);
+                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
             await ReplyAsync("", embed: embed);
         }
 
@@ -55,7 +53,7 @@ namespace Rick.Modules
             Remarks("TweetMedia \"https://Foo.com/Foo.png\"\"Tweet Message much wow\""), Cooldown(30)]
         public async Task MediaAsync(string URL, [Remainder] string TweetMessage)
         {
-            string FileName = ConfigHandler.CacheFolder + "/" + Context.User.Username + $"{new Random().Next(1, 9999)}.png";
+            string FileName = MainHandler.CacheFolder + "/" + Context.User.Username + $"{new Random().Next(1, 9999)}.png";
             await new HttpClient().DownloadAsync(new Uri(URL), FileName);
 
             if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
@@ -64,7 +62,7 @@ namespace Rick.Modules
                 return;
             }
 
-            var Filter = Functions.Function.Censor(TweetMessage);
+            var Filter = StringExtension.Censor(TweetMessage);
             var Publish = $"{Filter} - {Context.User.Username}";
             if (Publish.Length > 140)
             {
@@ -87,11 +85,10 @@ namespace Rick.Modules
                 Medias = new List<IMedia> { TweetMedia }
             });
 
-            var embed = EmbedExtension.Embed(EmbedColors.Green,
-                $"{Context.User.Username} posted a tweet!", Context.User.GetAvatarUrl(), Description:
+            var embed = Vmbed.Embed(VmbedColors.Green, Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {tweet.Id}\n" +
-                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})", ThumbUrl: ThumbImage);
+                $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})");
             await ReplyAsync("", embed: embed);
         }
 
@@ -108,7 +105,7 @@ namespace Rick.Modules
                     return;
                 }
 
-                var Filter = Functions.Function.Censor(TweetMessage);
+                var Filter = StringExtension.Censor(TweetMessage);
                 var Publish = $"{Filter} - {Context.User.Username}";
                 if (Publish.Length > 140)
                 {
@@ -124,12 +121,10 @@ namespace Rick.Modules
                 else
                     ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-                var embed = EmbedExtension.Embed(EmbedColors.Green,
-                    $"{Context.User.Username} replied to a tweet!", Context.User.GetAvatarUrl(), Description:
-                    $"**Original Tweet:** {ReplyTo.FullText}\n" +
-                    $"**Reply:** {TweetMessage}\n" +
-                    $"Tweet ID: {UserTweet.Id}\n" +
-                    $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})", ThumbUrl: ThumbImage);
+                var embed = Vmbed.Embed(VmbedColors.Green, Description:
+                    $"**Tweet:** {TweetMessage}\n" +
+                    $"**Tweet ID:** {UserTweet.Id}\n" +
+                    $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
                 await ReplyAsync("", embed: embed);
             }
         }

@@ -1,15 +1,12 @@
 ﻿using System.Threading.Tasks;
+using System.Linq;
+using System.Text;
 using Discord.Commands;
 using Discord;
-using System.Linq;
-using Rick.Attributes;
-using Rick.Enums;
 using Rick.Extensions;
-using System.Text;
 
 namespace Rick.Modules
 {
-    [CheckBlacklist, RequireBotPermission(GuildPermission.SendMessages)]
     public class HelpModule : ModuleBase
     {
         private CommandService _service;
@@ -18,30 +15,26 @@ namespace Rick.Modules
             _service = service;
         }
 
-        [Command("Help"), Summary("Normal Command"), Remarks("Shows all the commands!"), Alias("Cmds")]
+        [Command("Help"), Summary("Shows a list of all commands."), Alias("Cmds")]
         public async Task CommandsAsync()
         {
-            string Description = 
-                "**Admin Commands:** Kick, Ban, Mute Delete, Addrole, Removerole, Moneyshot, Clear\n" +
-                "**Audio Commands:** Join, Leave, Play, Skip, Queue, Qadd, QClear\n" + 
-                "**Bot Commands:** [Group: Bot] Username, Nickname, Avatar, Game, Status, Latency, Prefix, Debug, Mention\n**Example:** Bot Username NewUsername\n" +
-                "**General Commands:** GuildInfo, RoleInfo, UserInfo, Ping, Embed, GenId, Coinflip, Afk, About, Rate, Translate, Slotmachine, Trump, Docs, Flip, Stats, Avatar, " +
-                "Karma, Rank, Top, Yomama, Probe, Iam, IAmNot, Discrim\n" +
-                "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n " + 
+            string Description =
+                "**Admin Commands:** Prefix, AddRole, RemoveRole, WelcomeAdd, WelcomeRemove, LeaveAdd, LeaveRemove, Toggle, Channel, Kick, Ban, Delete, PurgeUser, PurgeChanel, AddRole, RemoveRole" +
+                "**Audio Commands:** Join, Leave, Play, Skip, Queue, Qadd, QClear\n" +
+                "**Bot Commands:** [Group: Bot] Prefix, Avatar, Game, Username, Nickname\n" +
+                "**General Commands:** Rank, Top, AFK, Iam, IamNot, Slotmachine, Flip, GuildInfo, RoleInfo, Rate, Translate, Trump, Avatar, Yomama, Probe, Discrim\n" +
+                "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n" +
                 "**Google Commands:** Google, GImage, Youtube, Shorten, Revav\n" +
-                "**Guild Commands:** Settings, Prefix, WelcomeMsg, LeaveMsg, ToggleJoins, ToggleLeaves, ToggleBans, ToggleKarma, ToggleChatterBot, ToggleAntiad, ToggleStarboard," +
-                " SetChannel, Roles\n**Example:** SetChannel Join #ChannelName, Roles Add @RoleName\n" +
                 "**Nsfw Commands:** Boobs, Ass, E621, Porn\n" +
-                "**Owner Commands:** Serverlist, Leave, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, Reconnect, Dump, SendMsg\n" +
-                "**Search Commands:** Urban, Lmgtfy, Imgur, Catfacts, Robohash, Leet, Cookie, Wiki, AdorableAvatar, DuckDuckGo, BImage, Bing, GitUser, SNews, Suser\n" +
+                "**Owner Commands:** Serverlist, LeaveGuild, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, SendMsg\n" +
+                "**Search Commands:** Urban, Lmgtfy, Imgur, Robohash, Wiki, AdorableAvatar, DuckDuckGo, Docs, BImage, Bing, SNews, Suser\n" +
                 "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
                 "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
-            var embed = EmbedExtension.Embed(EmbedColors.Gold, $"{Context.Client.CurrentUser.Username} Commands List", 
-                Context.Client.CurrentUser.GetAvatarUrl(), Description: Description, FooterText: "For more info on command use: ?>Help CommandName");
+            var embed = Vmbed.Embed(VmbedColors.Gold, Context.Client.CurrentUser.GetAvatarUrl(), $"Commands List.", Description: Description);
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Help"), Summary("Displays information about a specific command."), Remarks("Help NameOfTheCommand")]
+        [Command("Help"), Summary("Displays information about a specific command.")]
         public async Task HelpAsync(string CommandName)
         {
             var result = _service.Search(Context, CommandName);
@@ -62,12 +55,6 @@ namespace Rick.Modules
             {
                 var cmd = match.Command;
 
-                string Remarks = null;
-                if (cmd.Remarks == null || string.IsNullOrWhiteSpace(cmd.Remarks))
-                    Remarks = "This command doesn't require any parameters.";
-                else
-                    Remarks = cmd.Remarks;
-
                 string Aliases = null;
                 if (cmd.Aliases == null || cmd.Aliases.Count <= 0)
                     Aliases = "This command has no Aliases.";
@@ -75,8 +62,8 @@ namespace Rick.Modules
                     Aliases = string.Join(", ", cmd.Aliases);
 
                 builder.Title = cmd.Name.ToUpper();
-                builder.Description = $"**Aliases:** {Aliases}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n"+
-                    $"**Remarks:** {Remarks}\n**Summary:** {cmd.Summary}";
+                builder.Description = $"**Aliases:** {Aliases}\n**Parameters:** {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n" +
+                    $"**Summary:** {cmd.Summary}";
             }
             await ReplyAsync("", false, builder.Build());
         }

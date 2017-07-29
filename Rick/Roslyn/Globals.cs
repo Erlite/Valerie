@@ -1,5 +1,5 @@
-﻿using Discord.WebSocket;
-using Discord.Commands;
+﻿using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Rick.Roslyn
 {

@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Discord.WebSocket;
+using Discord.Commands;
 using Rick.Handlers;
-using Rick.Controllers;
-using Rick.Models;
-using Rick.Functions;
+using Rick.Services;
+using Rick.Services.Logger.Enums;
+using Rick.Services.Logger;
+using Rick.Handlers.ConfigHandler;
 
 namespace Rick
 {
@@ -20,51 +20,37 @@ namespace Rick
 
         async Task StartAsync()
         {
+            await BotDB.LoadConfigAsync();
+            MainHandler.DirectoryCheck();
+            MainHandler.ServicesLogin();
+
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Info,
-                MessageCacheSize = 10000
+                LogLevel = Discord.LogSeverity.Info
             });
 
-            Client.Log += (Log) => Task.Run(() 
-                => Logger.Log(Enums.LogType.OK, Enums.LogSource.Client, Log.Message));
-
-            ConfigHandler.DirectoryCheck();
-            ConfigHandler.IConfig = await ConfigHandler.LoadConfigAsync();
-            GuildHandler.GuildConfigs = await GuildHandler.LoadServerConfigsAsync<GuildModel>();
-
-            #region Events
-            Client.UserJoined += Events.UserJoinedAsync;
-            Client.UserLeft += Events.UserLeftAsync;
-            Client.LeftGuild += Events.DeleteGuildConfig;
-            Client.GuildAvailable += Events.HandleGuildConfigAsync;
-            Client.MessageReceived += Events.HandleGuildMessagesAsync;
-            Client.JoinedGuild += async (Guild) =>
-            {
-                await Events.JoinedGuildAsync(Guild);
-            };
-            Client.Ready += async () =>
-            {
-                await Events.OnReadyAsync(Client);
-            };
-            Client.LatencyUpdated += async (int Older, int Newer) =>
-            {
-                await Events.LatencyHandlerAsync(Client, Older, Newer);
-            };
-            Client.ReactionAdded += Events.ReactionAddedAsync;
-            Client.ReactionRemoved += Events.ReactionRemovedAsync;
-            #endregion
-
             var ServiceProvider = InjectServices();
-
             CommandHandler = new CommandHandler(ServiceProvider);
             await CommandHandler.ConfigureCommandsAsync();
 
-            Function.ServicesLogin();
+            Client.Log += (log) => Task.Run(() => Log.Write(Status.KAY, Source.Client, log.Message));
+            Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
+            Client.JoinedGuild += EventsHandler.JoinedGuildAsync;
+            Client.LeftGuild += EventsHandler.LeftGuildAsync;
+            Client.MessageReceived += EventsHandler.MessageReceivedAsync;
+            Client.UserJoined += EventsHandler.UserJoinedAsync;
+            Client.UserLeft += EventsHandler.UserLeftAsync;
+            Client.Ready += async () =>
+            {
+                await EventsHandler.ReadyAsync(Client);
+            };
+            Client.LatencyUpdated += async (int Older, int Newer) =>
+            {
+                await EventsHandler.LatencyUpdatedAsync(Client, Older, Newer);
+            };
 
-            await Client.LoginAsync(TokenType.Bot, ConfigHandler.IConfig.Token);
+            await Client.LoginAsync(Discord.TokenType.Bot, BotDB.Config.Token);
             await Client.StartAsync();
-
             await Task.Delay(-1);
         }
 
