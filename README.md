@@ -20,9 +20,7 @@ Leave a 🌟 if you :heart: it. Best way to show support 💪.
 ### Credits
 ---
 
-Thanks to everyone at Discord API and C# server for helping me out.
-This bot uses some methods/ideas from Markus Gordathian and AntiTCB Bot's and also other bot's I saw on Discord.
-
+Thanks to everyone at Discord API and C# server for helping me out. A special thanks to LupineDream and Dataccountz for suggesting and helping out with the development of Valerie.
 
 ### Testimonials
 ---
