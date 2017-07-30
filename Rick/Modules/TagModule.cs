@@ -34,7 +34,7 @@ namespace Rick.Modules
                 await ReplyAsync($"**{Name}** tag already exists.");
                 return;
             }
-            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagAdd, Name, Response, Context.User.Id, DateTime.Now.ToString());
+            await ServerDB.TagsHandlerAsync(Context.Guild.Id, ModelEnum.TagAdd, Name, Response, Context.User.Id.ToString(), DateTime.Now.ToString());
             await ReplyAsync($"**{Name}** tag has been created.");
         }
 
@@ -47,7 +47,7 @@ namespace Rick.Modules
                 await ReplyAsync($"**{Name}** tag doesn't exists.");
                 return;
             }
-            if (Exists.Owner != Context.User.Id)
+            if (Convert.ToUInt64(Exists.Owner) != Context.User.Id)
             {
                 await ReplyAsync($"You are not the owner of **{Name}**.");
                 return;
@@ -80,10 +80,10 @@ namespace Rick.Modules
                 await ReplyAsync($"**{Name}** doesn't exist.");
                 return;
             }
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}",
-                ThumbUrl: (await Context.Guild.GetUserAsync(GetTag.Owner)).GetAvatarUrl());
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}", 
+                ThumbUrl: (await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner))).GetAvatarUrl());
             embed.AddInlineField("Name", GetTag.Name);
-            embed.AddInlineField("Owner", await Context.Guild.GetUserAsync(GetTag.Owner));
+            embed.AddInlineField("Owner", await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner)));
             embed.AddInlineField("Uses", GetTag.Uses);
             embed.AddInlineField("Creation Date", GetTag.CreationDate);
             embed.AddInlineField("Response", GetTag.Response);
