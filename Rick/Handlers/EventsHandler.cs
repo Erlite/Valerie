@@ -105,13 +105,12 @@ namespace Rick.Handlers
         internal static async Task MessageReceivedAsync(SocketMessage Message)
         {
             await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived);
-            await KarmaHandlerAsync(Message.Author as SocketGuildUser);
+            await KarmaHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
             await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
             await CleanUpAsync(Message.Author as SocketGuildUser);
             await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
             await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
         }
-
 
         // Not Events
         static void RemoveUser(ulong Id)
@@ -122,10 +121,10 @@ namespace Rick.Handlers
             },
             null,
             TimeSpan.FromSeconds(60),
-            TimeSpan.FromSeconds(60));
+            TimeSpan.FromSeconds(0));
         }
 
-        static async Task KarmaHandlerAsync(SocketGuildUser User)
+        static async Task KarmaHandlerAsync(SocketGuildUser User, int Karma)
         {
             RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
@@ -133,7 +132,7 @@ namespace Rick.Handlers
             if (User == null || User.IsBot || !GuildConfig.IsKarmaEnabled ||
                 BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id)) return;
 
-            var RandomKarma = IntExtension.GiveKarma(new Random().Next(1, 5));
+            var RandomKarma = IntExtension.GiveKarma(Karma);
             if (!GuildConfig.KarmaList.ContainsKey(User.Id))
             {
                 await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaAdd, User.Id, RandomKarma);
