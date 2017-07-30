@@ -24,7 +24,7 @@ namespace Rick.Modules
         [Command("RoleAdd"), Alias("RA"), Summary("Adds a role to assignable role list.")]
         public async Task RoleAddAsync(IRole Role)
         {
-            if (ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id))
+            if (ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id.ToString()))
             {
                 await ReplyAsync($"{Role.Name} already exists in assignable roles list.");
                 return;
@@ -36,7 +36,7 @@ namespace Rick.Modules
         [Command("RoleRemove"), Alias("RR"), Summary("Removes a role from assignable role list.")]
         public async Task RoleRemoveAsync(IRole Role)
         {
-            if (!ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id))
+            if (!ServerDB.GuildConfig(Context.Guild.Id).AssignableRoles.Contains(Role.Id.ToString()))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in assignable roles list.");
                 return;
@@ -220,7 +220,7 @@ namespace Rick.Modules
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
             await User.KickAsync(Reason);
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModCases);
-            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != 0)
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
                 embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
@@ -228,7 +228,7 @@ namespace Rick.Modules
                 embed.AddInlineField("Case No.", Config.ModCases);
                 embed.AddInlineField("Case Type", "Kick");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Config.ModLog.TextChannel)).SendMessageAsync("", embed: embed);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed);
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
@@ -240,7 +240,7 @@ namespace Rick.Modules
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
             await Context.Guild.AddBanAsync(User, 7, Reason);
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModCases);
-            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != 0)
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
                 embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
@@ -248,7 +248,7 @@ namespace Rick.Modules
                 embed.AddInlineField("Case No.", Config.ModCases);
                 embed.AddInlineField("Case Type", "Ban");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Config.ModLog.TextChannel)).SendMessageAsync("", embed: embed);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed);
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
