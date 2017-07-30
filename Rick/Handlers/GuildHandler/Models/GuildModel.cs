@@ -20,6 +20,6 @@ namespace Rick.Handlers.GuildHandler.Models
         public List<TagsModel> TagsList { get; set; } = new List<TagsModel>();
         public Dictionary<ulong, string> AFKList { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<ulong, int> KarmaList { get; set; } = new Dictionary<ulong, int>();
-        public List<ulong> AssignableRoles { get; set; } = new List<ulong>();
+        public List<string> AssignableRoles { get; set; } = new List<string>();
     }
 }

@@ -56,8 +56,8 @@ namespace Rick.Handlers.GuildHandler
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
                 switch (ValueType)
                 {
-                    case ModelEnum.RolesAdd: Config.AssignableRoles.Add(Convert.ToUInt64(Value)); break;
-                    case ModelEnum.RolesRemove: Config.AssignableRoles.Remove(Convert.ToUInt64(Value)); break;
+                    case ModelEnum.RolesAdd: Config.AssignableRoles.Add(Value); break;
+                    case ModelEnum.RolesRemove: Config.AssignableRoles.Remove(Value); break;
                     case ModelEnum.KarmaEnabled: Config.IsKarmaEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.LeaveAdd: Config.LeaveMessages.Add(Value); break;
                     case ModelEnum.LeaveRemove: Config.LeaveMessages.Remove(Value); break;
@@ -67,15 +67,15 @@ namespace Rick.Handlers.GuildHandler
                     case ModelEnum.Prefix: Config.Prefix = Value; break;
                     case ModelEnum.WelcomeAdd: Config.WelcomeMessages.Add(Value); break;
                     case ModelEnum.WelcomeRemove: Config.WelcomeMessages.Remove(Value); break;
-                    case ModelEnum.CBChannel: Config.Chatterbot.TextChannel = Convert.ToUInt64(Value); break;
+                    case ModelEnum.CBChannel: Config.Chatterbot.TextChannel = Value; break;
                     case ModelEnum.CBEnabled: Config.Chatterbot.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.JoinChannel: Config.JoinEvent.TextChannel = Convert.ToUInt64(Value); break;
+                    case ModelEnum.JoinChannel: Config.JoinEvent.TextChannel = Value; break;
                     case ModelEnum.JoinEnabled: Config.JoinEvent.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.LeaveChannel: Config.LeaveEvent.TextChannel = Convert.ToUInt64(Value); break;
+                    case ModelEnum.LeaveChannel: Config.LeaveEvent.TextChannel = Value; break;
                     case ModelEnum.LeaveEnabled: Config.LeaveEvent.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.ModChannel: Config.ModLog.TextChannel = Convert.ToUInt64(Value); break;
+                    case ModelEnum.ModChannel: Config.ModLog.TextChannel = Value; break;
                     case ModelEnum.ModEnabled: Config.ModLog.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.StarChannel: Config.Starboard.TextChannel = Convert.ToUInt64(Value); break;
+                    case ModelEnum.StarChannel: Config.Starboard.TextChannel = Value; break;
                     case ModelEnum.StarEnabled: Config.Starboard.IsEnabled = Convert.ToBoolean(Value); break;
 
                 }
@@ -85,7 +85,7 @@ namespace Rick.Handlers.GuildHandler
             }
         }
 
-        public static async Task TagsHandlerAsync(ulong GuildId, ModelEnum ValueType, string Name = null, string Response = null, ulong Owner = 0, string Date = null)
+        public static async Task TagsHandlerAsync(ulong GuildId, ModelEnum ValueType, string Name = null, string Response = null, string Owner = null, string Date = null)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
