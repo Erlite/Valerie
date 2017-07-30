@@ -4,7 +4,7 @@
 
 ---
 
-Rick is written in C# using Discord.Net library 1.0 Beta. Rick can be ran on .Net Framework 4.0+ and .Net Core 1.0+. Rick has over 70+ Commands to keep you busy and happy!
+Valerie is written in C# using Discord.Net library 1.0 Beta. Valerie can be ran on .Net Framework 4.0+ and .Net Core 1.0+.
 
 Leave a 🌟 if you :heart: it. Best way to show support 💪.
 
@@ -20,9 +20,7 @@ Leave a 🌟 if you :heart: it. Best way to show support 💪.
 ### Credits
 ---
 
-Thanks to everyone at Discord API and C# server for helping me out.
-This bot uses some methods/ideas from Markus Gordathian and AntiTCB Bot's and also other bot's I saw on Discord.
-
+Thanks to everyone at Discord API and C# server for helping me out. A special thanks to LupineDream and Dataccountz for suggesting and helping out with the development of Valerie.
 
 ### Testimonials
 ---
