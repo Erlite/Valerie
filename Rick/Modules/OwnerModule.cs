@@ -42,7 +42,7 @@ namespace Rick.Modules
             await ReplyAsync($"{User.Username} has been added to blacklist.");
             var GetOwner = await (Context.Client as DiscordSocketClient).GetApplicationInfoAsync();
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: {Reason}\n\n" +
-                $"If you would like to appeal please send a DM to: {GetOwner.Owner.Username}#{GetOwner.Owner.Discriminator}.");
+                $"If you would like to appeal please send a DM to: {GetOwner.Owner}");
         }
 
         [Command("Whitelist"), Summary("Removes a user from Blacklist.")]
