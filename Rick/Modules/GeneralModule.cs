@@ -18,6 +18,10 @@ namespace Rick.Modules
 {
     public class GeneralModule : ModuleBase
     {
+        [Command("Ping"), Summary("Pings Discord Gateway")]
+        public async Task PingAsync()
+            => await ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
+
         [Command("Rank"), Summary("Shows your current rank and how much Karma is needed for next level.")]
         public async Task RankAsync(IGuildUser User = null)
         {
@@ -48,7 +52,7 @@ namespace Rick.Modules
             }
             var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name} | Top 10 Users");
             var Karmalist = Config.KarmaList.OrderByDescending(x => x.Value).Take(10);
-            foreach(var Value in Karmalist)
+            foreach (var Value in Karmalist)
             {
                 var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
                 if (User == null)
@@ -259,7 +263,7 @@ namespace Rick.Modules
 
             if (Side.ToLower() == GetSide.ToLower())
             {
-                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet*2);
+                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet * 2);
                 await ReplyAsync($"Congratulations! You won {Bet}!");
             }
             else
@@ -332,7 +336,7 @@ namespace Rick.Modules
 
             string Settings = $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
-                $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x=> x)) ?? "None."}\n" +
+                $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
                 $"**Mute Role:** {GConfig.MuteRoleID}\n" +
                 $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
                 $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
