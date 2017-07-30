@@ -4,7 +4,7 @@
 
 ---
 
-Rick is written in C# using Discord.Net library 1.0 Beta. Rick can be ran on .Net Framework 4.0+ and .Net Core 1.0+. Rick has over 70+ Commands to keep you busy and happy!
+Valerie is written in C# using Discord.Net library 1.0 Beta. Valerie can be ran on .Net Framework 4.0+ and .Net Core 1.0+.
 
 Leave a 🌟 if you :heart: it. Best way to show support 💪.
 
