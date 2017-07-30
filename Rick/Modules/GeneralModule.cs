@@ -13,6 +13,9 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text;
 using Rick.Services;
+using System.IO;
+using Rick.Handlers;
+using Rick.Handlers.ConfigHandler;
 
 namespace Rick.Modules
 {
@@ -553,6 +556,24 @@ namespace Rick.Modules
                 await ReplyAsync($"Users matching **{User.Discriminator}** Discriminator:\n{sb.ToString()}");
             else
                 await ReplyAsync($"No usernames found matching **{User.Discriminator}** discriminator.");
+        }
+
+        [Command("Stats"), Summary("Shows information about Bot.")]
+        public async Task StatsAsync()
+        {
+            var cache = Misc.DirSize(new DirectoryInfo(MainHandler.CacheFolder));
+            string Description =
+                $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
+                $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
+                $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
+                $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
+                $"- Cache Size: {Convert.ToInt32((cache / 1024) / 1024.0)} MB\n" +
+                $"- Total Command Used: {BotDB.Config.CommandsUsed}\n" +
+                $"- Total Messages Received: {BotDB.Config.MessagesReceived}";
+
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: "Rick Stats", Description: Description, ThumbUrl:
+                Context.Client.CurrentUser.GetAvatarUrl());
+            await ReplyAsync("", embed: embed);
         }
     }
 }
