@@ -6,7 +6,6 @@ using Rick.Handlers.GuildHandler.Models;
 using Rick.Services.Logger;
 using Rick.Services.Logger.Enums;
 using Rick.Handlers.GuildHandler.Enum;
-using System.Threading;
 
 namespace Rick.Handlers.GuildHandler
 {
