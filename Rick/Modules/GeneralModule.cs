@@ -207,23 +207,13 @@ namespace Rick.Modules
             if (win == 0)
             {
                 await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
-                embed.Author = new EmbedAuthorBuilder()
-                {
-                    Name = $"{Context.User.Username} Lost!",
-                    IconUrl = Context.User.GetAvatarUrl()
-                };
-                embed.Description = $"Uhoh! It seems you weren't lucky this time! Better luck next time! :weary:\nYour current Karma is {UserKarma}";
+                embed.Description = $"You lost {Bet}. Better luck next time! :weary:";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
                 await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet);
-                embed.Author = new EmbedAuthorBuilder()
-                {
-                    Name = $"{Context.User.Username} won!",
-                    IconUrl = Context.User.GetAvatarUrl()
-                };
-                embed.Description = $":tada: Your current Karma is {UserKarma} :tada:";
+                embed.Description = $"You won {Bet} :tada:";
                 embed.Color = new Color(0x93ff89);
             }
             await ReplyAsync("", embed: embed);
@@ -270,12 +260,12 @@ namespace Rick.Modules
             if (Side.ToLower() == GetSide.ToLower())
             {
                 await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet*2);
-                await ReplyAsync($"Congratulations! You won {Bet}! Your current karma is {UserKarma}.");
+                await ReplyAsync($"Congratulations! You won {Bet}!");
             }
             else
             {
                 await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
-                await ReplyAsync($"You lost {Bet}! :frowning: Your current Karma is {UserKarma}.");
+                await ReplyAsync($"You lost {Bet}! :frowning:");
             }
         }
 
