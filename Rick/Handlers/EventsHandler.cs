@@ -48,8 +48,8 @@ namespace Rick.Handlers
 
             ITextChannel Channel = null;
             string WelcomeMessage = null;
-
-            var JoinChannel = User.Guild.GetChannel(Config.JoinEvent.TextChannel);
+            ulong Id = Convert.ToUInt64(Config.JoinEvent.TextChannel);
+            var JoinChannel = User.Guild.GetChannel(Id);
 
             if (Config.WelcomeMessages.Count <= 0)
                 WelcomeMessage = $"{User} just joined {User.Guild.Name}! WELCOME!";
@@ -59,7 +59,7 @@ namespace Rick.Handlers
                 WelcomeMessage = StringExtension.ReplaceWith(ConfigMsg, User.Mention, User.Guild.Name);
             }
 
-            if (User.Guild.GetChannel(Config.JoinEvent.TextChannel) != null)
+            if (User.Guild.GetChannel(Id) != null)
             {
                 Channel = JoinChannel as ITextChannel;
                 await Channel.SendMessageAsync(WelcomeMessage);
@@ -79,8 +79,8 @@ namespace Rick.Handlers
 
             ITextChannel Channel = null;
             string LeaveMessage = null;
-
-            var LeaveChannel = User.Guild.GetChannel(Config.LeaveEvent.TextChannel);
+            ulong Id = Convert.ToUInt64(Config.LeaveEvent.TextChannel);
+            var LeaveChannel = User.Guild.GetChannel(Id);
 
             if (Config.LeaveMessages.Count <= 0)
                 LeaveMessage = $"{User} has left {User.Guild.Name} :wave:";
@@ -90,7 +90,7 @@ namespace Rick.Handlers
                 LeaveMessage = StringExtension.ReplaceWith(configMsg, User.Username, User.Guild.Name);
             }
 
-            if (User.Guild.GetChannel(Config.LeaveEvent.TextChannel) != null)
+            if (User.Guild.GetChannel(Id) != null)
             {
                 Channel = LeaveChannel as ITextChannel;
                 await Channel.SendMessageAsync(LeaveMessage);
@@ -164,9 +164,9 @@ namespace Rick.Handlers
             }
             foreach (var tag in GuildConfig.TagsList)
             {
-                if (tag.Owner == User.Id)
+                if (Convert.ToUInt64(tag.Owner) == User.Id)
                 {
-                    await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagRemove, Owner: User.Id);
+                    await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagRemove, Owner: $"{User.Id}");
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace Rick.Handlers
         {
             var Config = ServerDB.GuildConfig(Guild.Id);
             var IsEnabled = Config.Chatterbot.IsEnabled;
-            var Channel = Guild.GetChannel(Config.Chatterbot.TextChannel) as IMessageChannel;
+            var Channel = Guild.GetChannel(Convert.ToUInt64(Config.Chatterbot.TextChannel)) as IMessageChannel;
             if (Message.Author.IsBot || !IsEnabled || !Message.Content.StartsWith("Rick") || Message.Channel != Channel) return;
             string UserMsg = null;
             if (Message.Content.StartsWith("Rick"))
