@@ -99,7 +99,7 @@ namespace Rick.Modules
                 await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
                 return;
             }
-            await ReplyAsync(string.Join(",", Config.TagsList.Select(x => x.Name)));
+            await ReplyAsync(string.Join(", ", Config.TagsList.Select(x => x.Name)));
         }
     }
 }
