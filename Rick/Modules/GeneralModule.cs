@@ -101,7 +101,7 @@ namespace Rick.Modules
         {
             var GuildConfig = ServerDB.GuildConfig(Context.Guild.Id);
             var User = Context.User as SocketGuildUser;
-            if (!GuildConfig.AssignableRoles.Contains(Role.Id))
+            if (!GuildConfig.AssignableRoles.Contains(Role.Id.ToString()))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
                 return;
@@ -122,7 +122,7 @@ namespace Rick.Modules
             var GuildConfig = ServerDB.GuildConfig(Context.Guild.Id);
             var User = Context.User as SocketGuildUser;
 
-            if (!GuildConfig.AssignableRoles.Contains(Role.Id))
+            if (!GuildConfig.AssignableRoles.Contains(Role.Id.ToString()))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
                 return;
@@ -320,13 +320,14 @@ namespace Rick.Modules
             SocketGuildChannel ChatterBotChannel;
             SocketGuildChannel SBChannel;
 
-            if (GConfig.JoinEvent.TextChannel != 0 || GConfig.LeaveEvent.TextChannel != 0 || GConfig.ModLog.TextChannel != 0 || GConfig.Starboard.TextChannel != 0)
+            if (GConfig.JoinEvent.TextChannel != null || GConfig.LeaveEvent.TextChannel != null || 
+                GConfig.ModLog.TextChannel != null || GConfig.Starboard.TextChannel != null)
             {
-                JoinChannel = await Context.Guild.GetChannelAsync(GConfig.JoinEvent.TextChannel) as SocketGuildChannel;
-                LeaveChannel = await Context.Guild.GetChannelAsync(GConfig.LeaveEvent.TextChannel) as SocketGuildChannel;
-                BanChannel = await Context.Guild.GetChannelAsync(GConfig.ModLog.TextChannel) as SocketGuildChannel;
-                ChatterBotChannel = await Context.Guild.GetChannelAsync(GConfig.Chatterbot.TextChannel) as SocketGuildChannel;
-                SBChannel = await Context.Guild.GetChannelAsync(GConfig.Starboard.TextChannel) as SocketGuildChannel;
+                JoinChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.JoinEvent.TextChannel)) as SocketGuildChannel;
+                LeaveChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.LeaveEvent.TextChannel)) as SocketGuildChannel;
+                BanChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.ModLog.TextChannel)) as SocketGuildChannel;
+                ChatterBotChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Chatterbot.TextChannel)) as SocketGuildChannel;
+                SBChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Starboard.TextChannel)) as SocketGuildChannel;
             }
             else
             {
@@ -337,7 +338,8 @@ namespace Rick.Modules
                 SBChannel = null;
             }
 
-            string Settings = $"**Prefix:** {GConfig.Prefix}\n" +
+            string Settings = $"**Guild's Settings**\n" +
+                $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
                 $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
                 $"**Mute Role:** {GConfig.MuteRoleID}\n" +
