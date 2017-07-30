@@ -4,9 +4,9 @@ namespace Rick.Extensions
 {
     public class IntExtension
     {
-        public static int GiveKarma(int karma)
+        public static int GiveKarma(int Karma)
         {
-            return (Convert.ToInt32(Math.Pow(karma, 2)) + 25 * karma) / 5;
+            return (int)Math.Round(Math.Log(Karma));
         }
 
         public static int GetLevel(int Karma)
