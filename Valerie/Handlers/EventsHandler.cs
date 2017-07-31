@@ -183,7 +183,7 @@ namespace Valerie.Handlers
                 UserMsg = Message.Content.Replace("Valerie", "");
             }
             CleverbotResponse Response = null;
-            Response = Cleverbot.Main.Talk(UserMsg, Response);
+            Response = await Cleverbot.Main.TalkAsync(UserMsg, Response);
             if (Channel != null)
                 await Channel.SendMessageAsync(Response.Output);
             else
