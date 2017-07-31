@@ -143,7 +143,7 @@ namespace Valerie.Modules
                 await ReplyAsync("Eval Imports list is empty.");
                 return;
             }
-            await ReplyAsync(string.Join(",", BotDB.Config.EvalImports.Select(x => x)));
+            await ReplyAsync(string.Join(", ", BotDB.Config.EvalImports.Select(x => x)));
         }
 
         [Command("ServerList"), Summary("Get's a list of all guilds the bot is in."), Alias("Sl")]
