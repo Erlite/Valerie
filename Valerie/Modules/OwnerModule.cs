@@ -188,11 +188,11 @@ namespace Valerie.Modules
         }
 
         [Command("GetInvite"), Summary("Makes an invite to the specified guild")]
-        public async Task GetInviteAsync([Summary("Target guild")]ulong guild)
+        public async Task GetInviteAsync(ulong GuildId)
         {
-            var channel = await Context.Client.GetChannelAsync((await Context.Client.GetGuildAsync(guild)).DefaultChannelId);
+            var channel = await Context.Client.GetChannelAsync((await Context.Client.GetGuildAsync(GuildId)).DefaultChannelId);
             var invite = await (channel as SocketGuildChannel).CreateInviteAsync();
-            await ReplyAsync(invite.Url);
+            await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync($"Here is your invite link: <{invite.Url}>");
         }
 
         [Command("Archive"), Summary("Archives a channel and uploads a JSON"), Remarks("Archive #ChannelName 50")]
