@@ -1,24 +1,23 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using Cleverbot.Models;
 
 namespace Cleverbot
 {
     public static class Main
     {
-        public static Models.CleverbotResponse Talk(string message, string state = null)
+        public static async Task<CleverbotResponse> TalkAsync(string Message, string State = null)
         {
-            string jsonStr = Common.ApiCallAsync(message, state);
-            if (jsonStr == null)
+            string JsonString = await Common.ApiCallAsync(Message, State);
+            if (JsonString == null)
                 return null;
-            JToken resp = JObject.Parse(jsonStr);
-            return new Models.CleverbotResponse(resp);
+            JToken Response = JObject.Parse(JsonString);
+            return new CleverbotResponse(Response);
         }
 
-        public static Models.CleverbotResponse Talk(string message, Models.CleverbotResponse previousResponse)
+        public static async Task<CleverbotResponse> TalkAsync(string Message, CleverbotResponse PrevResponse)
         {
-            if (previousResponse != null)
-                return Talk(message, previousResponse.CleverbotState);
-            else
-                return Talk(message);
+            return await TalkAsync(Message, PrevResponse.CleverbotState) ?? await TalkAsync(Message);
         }
 
         public static void SetAPIKey(string apiKey)
