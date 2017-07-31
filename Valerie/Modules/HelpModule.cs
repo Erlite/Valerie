@@ -9,10 +9,10 @@ namespace Valerie.Modules
 {
     public class HelpModule : ModuleBase
     {
-        private CommandService _service;
-        HelpModule(CommandService service)
+        private CommandService CommandService;
+        HelpModule(CommandService Service)
         {
-            _service = service;
+            CommandService = Service;
         }
 
         [Command("Help"), Summary("Shows a list of all commands."), Alias("Cmds")]
@@ -37,7 +37,7 @@ namespace Valerie.Modules
         [Command("Help"), Summary("Displays information about a specific command.")]
         public async Task HelpAsync(string CommandName)
         {
-            var result = _service.Search(Context, CommandName);
+            var result = CommandService.Search(Context, CommandName);
             var SB = new StringBuilder();
 
             if (!result.IsSuccess)
