@@ -6,7 +6,7 @@ namespace Cleverbot
     {
         public static Models.CleverbotResponse Talk(string message, string state = null)
         {
-            string jsonStr = Common.ApiCall(message, state);
+            string jsonStr = Common.ApiCallAsync(message, state);
             if (jsonStr == null)
                 return null;
             JToken resp = JObject.Parse(jsonStr);
