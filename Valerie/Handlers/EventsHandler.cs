@@ -1,14 +1,15 @@
 ﻿using System;
-using Discord.WebSocket;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Discord;
+using Discord.WebSocket;
 using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Extensions;
-using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
-using Discord;
+using Cleverbot;
 using Cleverbot.Models;
 
 namespace Valerie.Handlers
@@ -174,16 +175,11 @@ namespace Valerie.Handlers
         static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
         {
             var Config = ServerDB.GuildConfig(Guild.Id);
-            var IsEnabled = Config.Chatterbot.IsEnabled;
             var Channel = Guild.GetChannel(Convert.ToUInt64(Config.Chatterbot.TextChannel)) as IMessageChannel;
-            if (Message.Author.IsBot || !IsEnabled || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
-            string UserMsg = null;
-            if (Message.Content.StartsWith("Valerie"))
-            {
-                UserMsg = Message.Content.Replace("Valerie", "");
-            }
+            if (Message.Author.IsBot || !Config.Chatterbot.IsEnabled || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
+            string UserMsg = Message.Content.Replace("Valerie", "");
             CleverbotResponse Response = null;
-            Response = await Cleverbot.Main.TalkAsync(UserMsg, Response);
+            Response = await Main.TalkAsync(UserMsg, Response);
             if (Channel != null)
                 await Channel.SendMessageAsync(Response.Output);
             else
