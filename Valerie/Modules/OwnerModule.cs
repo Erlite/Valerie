@@ -40,9 +40,7 @@ namespace Valerie.Modules
             }
             await BotDB.UpdateConfigAsync(ConfigValue.BlacklistAdd, Reason, User.Id);
             await ReplyAsync($"{User.Username} has been added to blacklist.");
-            var GetOwner = await (Context.Client as DiscordSocketClient).GetApplicationInfoAsync();
-            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: {Reason}\n\n" +
-                $"If you would like to appeal please send a DM to: {GetOwner.Owner}");
+            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: ```{Reason}```");
         }
 
         [Command("Whitelist"), Summary("Removes a user from Blacklist.")]
@@ -221,8 +219,6 @@ namespace Valerie.Modules
 
         [Command("SendMsg"), Summary("Sends messages to a guild")]
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
-        {
-            var GetGuild = await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
-        }
+            => await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
     }
 }
