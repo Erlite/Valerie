@@ -10,10 +10,9 @@ Leave a 🌟 if you :heart: it. Best way to show support 💪.
 
 | Documentation | Command List | Invite | Server | Appveyor | Travis-CI |
 |--------------:|:------------:|:------:|:------:|:--------:|----------:|
-| [![](https://png.icons8.com/book/dusk/64)](https://rickbot.cf/Pages/Documentation.html) | [![](https://png.icons8.com/saving-list/dusk/70)](https://rickbot.cf/Pages/Commands.html) | [![](https://png.icons8.com/door-opened/dusk/70)](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175) | [![](https://png.icons8.com/discord/dusk/70)](https://discord.gg/7W6dqCM) | [![Build status](https://ci.appveyor.com/api/projects/status/cs062nlbc9pbycg3?svg=true)](https://ci.appveyor.com/project/Vux/rick) | [![Build Status](https://travis-ci.org/Yucked/Rick.svg?branch=master)](https://travis-ci.org/Yucked/Rick)
+| [![](https://png.icons8.com/book/dusk/64)](https://rickbot.cf/Pages/Documentation.html) | [![](https://png.icons8.com/saving-list/dusk/70)](https://rickbot.cf/Pages/Commands.html) | [![](https://png.icons8.com/door-opened/dusk/70)](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146946175) | [![](https://png.icons8.com/discord/dusk/70)](https://discord.gg/7W6dqCM) | [![Build status](https://ci.appveyor.com/api/projects/status/cs062nlbc9pbycg3?svg=true)](https://ci.appveyor.com/project/Vux/Valerie) | [![Build Status](https://travis-ci.org/Yucked/Rick.svg?branch=master)](https://travis-ci.org/Yucked/Valerie)
 
 [![forthebadge](http://forthebadge.com/images/badges/built-with-swag.svg)](http://forthebadge.com)
-[![forthebadge](http://forthebadge.com/images/badges/fuck-it-ship-it.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/compatibility-club-penguin.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/made-with-c-sharp.svg)](http://forthebadge.com)
 
@@ -30,4 +29,4 @@ Thanks to everyone at Discord API and C# server for helping me out. A special th
 
 ### Screenshot(s)
 ---
-<p align="center"><img src="http://vvcap.com/img/CXGWazZdRSz.png"/></p>
+<p align="center"><img src="http://vvcap.com/img/sWKnRzxeQr8.png"/></p>
