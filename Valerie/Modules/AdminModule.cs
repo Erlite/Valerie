@@ -271,24 +271,17 @@ namespace Valerie.Modules
             await Context.Channel.DeleteMessagesAsync(messageList);
         }
 
-        [Command("PurgeUser"), Summary("Purges 500 messages by the specified user."), Remarks("PurgeUser @Username"), Alias("PUser", "PurgeU")]
+        [Command("PurgeUser"), Summary("Purges 500 messages by the specified user."), Remarks("PurgeUser @Username")]
         public async Task PurgeUserAsync(IGuildUser User)
         {
-            try
+            var Guild = Context.Guild as SocketGuild;
+            foreach (var Channel in Guild.TextChannels)
             {
-                var Guild = Context.Guild as SocketGuild;
-                foreach (var Channel in Guild.TextChannels)
-                {
-                    var Chn = Channel as ITextChannel;
-                    var Messages = (await Chn.GetMessagesAsync(200).Flatten()).Where(x => x.Author.Id == User.Id);
-                    await Chn.DeleteMessagesAsync(Messages);
-                }
-                await ReplyAsync($"Cleaned up {User.Username} messages.");
+                var Chn = Channel as ITextChannel;
+                var Messages = (await Chn.GetMessagesAsync(200).Flatten()).Where(x => x.Author.Id == User.Id);
+                await Chn.DeleteMessagesAsync(Messages);
             }
-            catch (NullReferenceException Ex)
-            {
-                await ReplyAsync(Ex.StackTrace);
-            }
+            await ReplyAsync($"Cleaned up {User.Username} messages.");
         }
 
         [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Remarks("PurgeChannel #ChannelName"), Alias("PChannel", "PurgeC")]
@@ -310,6 +303,90 @@ namespace Valerie.Modules
         {
             await User.RemoveRoleAsync(Role);
             await ReplyAsync($"{User} has been removed from {Role.Name}");
+        }
+
+        [Command("Settings"), Summary("Displays Guild's settings.")]
+        public async Task SettingsAsync()
+        {
+            var GConfig = ServerDB.GuildConfig(Context.Guild.Id);
+
+            string AFKList = null;
+            if (GConfig.AFKList.Count <= 0)
+                AFKList = $"{Context.Guild.Name}'s AFK list is empty.";
+            else
+                AFKList = $"{GConfig.AFKList.Count} members in AFK List.";
+
+            string TagList = null;
+            if (GConfig.TagsList.Count <= 0)
+                TagList = $"{Context.Guild.Name}'s Tag list is empty.";
+            else
+                TagList = $"{Context.Guild.Name} has {GConfig.TagsList.Count} tags.";
+
+            string KarmaList = null;
+            if (GConfig.KarmaList.Count <= 0)
+                KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
+            else
+                KarmaList = $"{GConfig.KarmaList.Count} members in Karma list.";
+
+            string Roles = null;
+            if (GConfig.AssignableRoles.Count <= 0)
+                Roles = $"There are no assignable roles for {Context.Guild.Name}.";
+            else
+                Roles = $"{GConfig.AssignableRoles.Count} assignable roles.";
+
+            var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
+            var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
+            var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
+            var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
+            var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
+            var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
+            var AntiAd = GConfig.AntiAdvertisement ? "Enabled" : "Disabled";
+
+            SocketGuildChannel JoinChannel;
+            SocketGuildChannel LeaveChannel;
+            SocketGuildChannel BanChannel;
+            SocketGuildChannel ChatterBotChannel;
+            SocketGuildChannel SBChannel;
+
+            if (GConfig.JoinEvent.TextChannel != null || GConfig.LeaveEvent.TextChannel != null ||
+                GConfig.ModLog.TextChannel != null || GConfig.Starboard.TextChannel != null)
+            {
+                JoinChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.JoinEvent.TextChannel)) as SocketGuildChannel;
+                LeaveChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.LeaveEvent.TextChannel)) as SocketGuildChannel;
+                BanChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.ModLog.TextChannel)) as SocketGuildChannel;
+                ChatterBotChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Chatterbot.TextChannel)) as SocketGuildChannel;
+                SBChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Starboard.TextChannel)) as SocketGuildChannel;
+            }
+            else
+            {
+                JoinChannel = null;
+                LeaveChannel = null;
+                BanChannel = null;
+                ChatterBotChannel = null;
+                SBChannel = null;
+            }
+
+            string Settings = $"**Guild's Settings**\n\n" +
+                $"**Prefix:** {GConfig.Prefix}\n" +
+                $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
+                $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
+                $"**Mute Role:** {GConfig.MuteRoleID}\n" +
+                $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
+                $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
+                $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
+                $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
+                $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
+                $"**Starboard:** {SBEnabled} [{SBChannel}]\n" +
+                $"**AntiAdvertisement:** {AntiAd}\n" +
+                $"**Chat Karma:** {Karma}\n" +
+                $"**Karma List:** {KarmaList}\n" +
+                $"**AFK List:** {AFKList}\n" +
+                $"**Tags List** {TagList}\n" +
+                $"**Assignable Roles:** {Roles}";
+
+            var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}", 
+                ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
+            await ReplyAsync("", embed: embed);
         }
     }
 }
