@@ -6,7 +6,7 @@ namespace Valerie.Extensions
     {
         public static int GiveKarma(int Karma)
         {
-            return (int)Math.Pow(Karma, 2) + 25 * Karma;
+            return (int)(Math.Pow(Karma, 2) + 25 * Karma ) / 10;
         }
 
         public static int GetLevel(int Karma)
