@@ -1,6 +1,12 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -8,12 +14,7 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.Text;
 using Valerie.Services;
-using System.IO;
 using Valerie.Handlers;
 using Valerie.Handlers.ConfigHandler;
 
@@ -276,7 +277,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
+        [Command("GuildInfo"), Alias("GI, ServerInfo, SI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
             var GConfig = ServerDB.GuildConfig(Context.Guild.Id);
@@ -320,7 +321,7 @@ namespace Valerie.Modules
             SocketGuildChannel ChatterBotChannel;
             SocketGuildChannel SBChannel;
 
-            if (GConfig.JoinEvent.TextChannel != null || GConfig.LeaveEvent.TextChannel != null || 
+            if (GConfig.JoinEvent.TextChannel != null || GConfig.LeaveEvent.TextChannel != null ||
                 GConfig.ModLog.TextChannel != null || GConfig.Starboard.TextChannel != null)
             {
                 JoinChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.JoinEvent.TextChannel)) as SocketGuildChannel;
@@ -338,7 +339,7 @@ namespace Valerie.Modules
                 SBChannel = null;
             }
 
-            string Settings = $"**Guild's Settings**\n" +
+            string Settings = $"**Guild's Settings**\n\n" +
                 $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
                 $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
@@ -484,9 +485,7 @@ namespace Valerie.Modules
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
         public async Task RateAsync([Remainder] string ThingToRate)
-        {
-            await ReplyAsync($":thinking: I would rate '{ThingToRate}' a {new Random().Next(11)}/10");
-        }
+            => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a {new Random().Next(11)}/10");
 
         [Command("Translate"), Summary("Translates a sentence into the specified language.")]
         public async Task TranslateAsync(string Language, [Remainder] string Text)
@@ -508,9 +507,7 @@ namespace Valerie.Modules
 
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public async Task UserAvatarAsync(SocketGuildUser User)
-        {
-            await ReplyAsync(User.GetAvatarUrl(size: 2048));
-        }
+            => await ReplyAsync(User.GetAvatarUrl(size: 2048));
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
@@ -571,7 +568,7 @@ namespace Valerie.Modules
                 $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
                 $"- Cache Size: {Convert.ToInt32((cache / 1024) / 1024.0)} MB\n" +
                 $"- Total Command Used: {BotDB.Config.CommandsUsed}\n" +
-                $"- Total Messages Received: {BotDB.Config.MessagesReceived}";
+                $"- Total Messages Received: {BotDB.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}";
 
             var embed = Vmbed.Embed(VmbedColors.Cyan, Title: "Valerie Stats", Description: Description, ThumbUrl:
                 Context.Client.CurrentUser.GetAvatarUrl());
