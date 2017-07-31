@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Cleverbot
 {
@@ -13,7 +14,7 @@ namespace Cleverbot
 
         private static string resource = "getreply";
 
-        public static async System.Threading.Tasks.Task<string> ApiCallAsync(string message, string state = null)
+        public static async Task<string> ApiCallAsync(string message, string state = null)
         {
             string apiUrl = $"{apiBaseUrl}/{resource}?key={apiKey}&wrapper={wrapperName}&input={message}";
             if (state != null)
@@ -24,7 +25,6 @@ namespace Cleverbot
                 return await new HttpClient().GetStringAsync(apiUrl);
             }
             catch (WebException e) { handleWebException(e); return null; }
-
         }
 
         public static void handleWebException(WebException e)
