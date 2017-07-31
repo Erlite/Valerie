@@ -277,101 +277,24 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("GuildInfo"), Alias("GI, ServerInfo, SI"), Summary("Displays information about guild.")]
+        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
-            var GConfig = ServerDB.GuildConfig(Context.Guild.Id);
-            var gld = Context.Guild;
-
-            string AFKList = null;
-            if (GConfig.AFKList.Count <= 0)
-                AFKList = $"{Context.Guild.Name}'s AFK list is empty.";
-            else
-                AFKList = $"{Context.Guild.Name}'s AFK list contains {GConfig.AFKList.Count} members.";
-
-            string TagList = null;
-            if (GConfig.TagsList.Count <= 0)
-                TagList = $"{Context.Guild.Name}'s Tag list is empty.";
-            else
-                TagList = $"{Context.Guild.Name}'s Tag list contains {GConfig.TagsList.Count} tags.";
-
-            string KarmaList = null;
-            if (GConfig.KarmaList.Count <= 0)
-                KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
-            else
-                KarmaList = $"{Context.Guild.Name}'s Karma list contains {GConfig.KarmaList.Count} members.";
-
-            string Roles = null;
-            if (GConfig.AssignableRoles.Count <= 0)
-                Roles = $"There are no assignable roles for {Context.Guild.Name}.";
-            else
-                Roles = $"{Context.Guild.Name}'s has {GConfig.AssignableRoles.Count} assignable roles!";
-
-            var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
-            var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
-            var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
-            var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
-            var AntiAd = GConfig.AntiAdvertisement ? "Enabled" : "Disabled";
-
-            SocketGuildChannel JoinChannel;
-            SocketGuildChannel LeaveChannel;
-            SocketGuildChannel BanChannel;
-            SocketGuildChannel ChatterBotChannel;
-            SocketGuildChannel SBChannel;
-
-            if (GConfig.JoinEvent.TextChannel != null || GConfig.LeaveEvent.TextChannel != null ||
-                GConfig.ModLog.TextChannel != null || GConfig.Starboard.TextChannel != null)
-            {
-                JoinChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.JoinEvent.TextChannel)) as SocketGuildChannel;
-                LeaveChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.LeaveEvent.TextChannel)) as SocketGuildChannel;
-                BanChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.ModLog.TextChannel)) as SocketGuildChannel;
-                ChatterBotChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Chatterbot.TextChannel)) as SocketGuildChannel;
-                SBChannel = await Context.Guild.GetChannelAsync(Convert.ToUInt64(GConfig.Starboard.TextChannel)) as SocketGuildChannel;
-            }
-            else
-            {
-                JoinChannel = null;
-                LeaveChannel = null;
-                BanChannel = null;
-                ChatterBotChannel = null;
-                SBChannel = null;
-            }
-
-            string Settings = $"**Guild's Settings**\n\n" +
-                $"**Prefix:** {GConfig.Prefix}\n" +
-                $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
-                $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
-                $"**Mute Role:** {GConfig.MuteRoleID}\n" +
-                $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
-                $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
-                $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
-                $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
-                $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
-                $"**Starboard:** {SBEnabled} [{SBChannel}]\n" +
-                $"**AntiAdvertisement:** {AntiAd}\n" +
-                $"**Chat Karma:** {Karma}\n" +
-                $"**Karma List:** {KarmaList}\n" +
-                $"**AFK List:** {AFKList}\n" +
-                $"**Tags List** {TagList}\n" +
-                $"**Assignable Roles:** {Roles}";
-
             string Desc =
-                $"**ID:** {gld.Id}\n" +
-                $"**Owner:** {gld.GetOwnerAsync().GetAwaiter().GetResult().Username}\n" +
-                $"**Default Channel:** {gld.GetDefaultChannelAsync().GetAwaiter().GetResult().Name}\n" +
-                $"**Voice Region:** {gld.VoiceRegionId}\n" +
-                $"**Created At:** {gld.CreatedAt}\n" +
-                $"**Roles:** {gld.Roles.Count}\n" +
-                $"**Users:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
-                $"**Bots:** {(await gld.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
-                $"**Text Channels:** {(gld as SocketGuild).TextChannels.Count}\n" +
-                $"**Voice Channels:** {(gld as SocketGuild).VoiceChannels.Count}" +
-                $"**AFK Timeout:** {gld.AFKTimeout}\n";
+                $"**ID:** {Context.Guild.Id}\n" +
+                $"**Owner:** {Context.Guild.GetOwnerAsync().GetAwaiter().GetResult().Username}\n" +
+                $"**Default Channel:** {Context.Guild.GetDefaultChannelAsync().GetAwaiter().GetResult().Name}\n" +
+                $"**Voice Region:** {Context.Guild.VoiceRegionId}\n" +
+                $"**Created At:** {Context.Guild.CreatedAt}\n" +
+                $"**Roles:** {Context.Guild.Roles.Count}\n```{string.Join(", ", Context.Guild.Roles.OrderByDescending(x=> x.Position))}```\n" +
+                $"**Users:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
+                $"**Bots:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
+                $"**Text Channels:** {(Context.Guild as SocketGuild).TextChannels.Count}\n" +
+                $"**Voice Channels:** {(Context.Guild as SocketGuild).VoiceChannels.Count}\n" +
+                $"**AFK Timeout:** {Context.Guild.AFKTimeout}\n";
 
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"{gld.Name} Information", Description: $"{Desc}\n{Settings}",
-                ThumbUrl: gld.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"{Context.Guild.Name} Information", Description: Desc,
+                ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", false, embed);
         }
 
