@@ -17,7 +17,7 @@ namespace Cleverbot
 
         public static async Task<CleverbotResponse> TalkAsync(string Message, CleverbotResponse PrevResponse)
         {
-            return await TalkAsync(Message, PrevResponse.CleverbotState) ?? await TalkAsync(Message);
+            return PrevResponse != null ? await TalkAsync(Message, PrevResponse.CleverbotState) : await TalkAsync(Message);
         }
 
         public static void SetAPIKey(string apiKey)
