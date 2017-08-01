@@ -384,7 +384,7 @@ namespace Valerie.Modules
                 $"**Tags List** {TagList}\n" +
                 $"**Assignable Roles:** {Roles}";
 
-            var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}", 
+            var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", embed: embed);
         }
