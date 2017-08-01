@@ -27,6 +27,7 @@
         TagRemove,
         TagModify,
         TagUpdate,
+        TagPurge,
         AFKAdd,
         AFKRemove,
         AFKModify,
