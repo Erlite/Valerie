@@ -114,6 +114,9 @@ namespace Valerie.Handlers.GuildHandler
                         var TagToUpdate = Config.TagsList.FirstOrDefault(x => x.Name == Name);
                         TagToUpdate.Uses += 1;
                         break;
+                    case ModelEnum.TagPurge:
+                        Config.TagsList.RemoveAll(x => x.Owner == Owner);
+                        break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();
@@ -138,7 +141,7 @@ namespace Valerie.Handlers.GuildHandler
             }
         }
 
-        public static async Task KarmaHandlerAsync(ulong GuildId, ModelEnum ValueType, ulong Id, int Value)
+        public static async Task KarmaHandlerAsync(ulong GuildId, ModelEnum ValueType, ulong Id, int Value = 0)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
