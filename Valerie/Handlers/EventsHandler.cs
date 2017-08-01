@@ -108,7 +108,6 @@ namespace Valerie.Handlers
             await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived);
             await KarmaHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
             await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
-            await CleanUpAsync(Message.Author as SocketGuildUser);
             await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
             await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
         }
@@ -155,21 +154,10 @@ namespace Valerie.Handlers
         static async Task CleanUpAsync(SocketGuildUser User)
         {
             var GuildConfig = ServerDB.GuildConfig(User.Guild.Id);
-            if (GuildConfig.KarmaList.ContainsKey(User.Id))
-            {
-                await ServerDB.UpdateConfigAsync(User.Guild.Id, ModelEnum.KarmaDelete, $"{User.Id}");
-            }
-            if (GuildConfig.AFKList.ContainsKey(User.Id))
-            {
-                await ServerDB.UpdateConfigAsync(User.Guild.Id, ModelEnum.AFKRemove, $"{User.Id}");
-            }
-            foreach (var tag in GuildConfig.TagsList)
-            {
-                if (Convert.ToUInt64(tag.Owner) == User.Id)
-                {
-                    await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagRemove, Owner: $"{User.Id}");
-                }
-            }
+            if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.KarmaList.ContainsKey(User.Id))) return;
+            await ServerDB.AFKHandlerAsync(User.Guild.Id, ModelEnum.AFKRemove, User.Id);
+            await ServerDB.KarmaHandlerAsync(User.Guild.Id, ModelEnum.KarmaDelete, User.Id);
+            await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagPurge, Owner: User.Id.ToString());
         }
 
         static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
