@@ -7,11 +7,12 @@ using Discord.WebSocket;
 using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
+using Valerie.Attributes;
 
 namespace Valerie.Modules
 {
     [RequireBotPermission(GuildPermission.KickMembers | GuildPermission.BanMembers | GuildPermission.SendMessages),
-        RequireUserPermission(GuildPermission.Administrator)]
+        CustomPermission]
     public class AdminModule : ModuleBase
     {
         [Command("Prefix"), Summary("Changes guild's prefix.")]
@@ -119,7 +120,7 @@ namespace Valerie.Modules
                     }
                     else
                     {
-                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinEnabled, "true");
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinEnabled, "false");
                         await ReplyAsync("Join event has been disabled.");
                     }
                     break;
