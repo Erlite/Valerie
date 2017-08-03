@@ -16,7 +16,7 @@ namespace Valerie.Attributes
                 GuildPermission.ManageRoles | GuildPermission.ManageGuild) || User.Id == AppInfo.Owner.Id)
                 return await Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return await Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** requires one of the following permission: Kick, Ban, Admin, Manage Messages/Guild/Roles"));
+                return await Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** requires one of the following permission: Kick, Ban, Admin, Manage Messages/Guild/Roles."));
             
         }
     }
