@@ -8,6 +8,8 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
 using Valerie.Attributes;
+using System.Collections.Generic;
+using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
@@ -255,36 +257,6 @@ namespace Valerie.Modules
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
         }
 
-        [Command("Delete"), Alias("Del"), Summary("Deletes X amount of messages. Messages can't be old than 2 weeks.")]
-        public async Task DeleteAsync(int MessageAmount)
-        {
-            if (MessageAmount <= 0)
-            {
-                await ReplyAsync("The amount cannot be lower than or equal to 0!");
-                return;
-            }
-            if (MessageAmount > 100)
-            {
-                await ReplyAsync("Amount can't be higher than 100!");
-                return;
-            }
-            var messageList = await Context.Channel.GetMessagesAsync(MessageAmount).Flatten();
-            await Context.Channel.DeleteMessagesAsync(messageList);
-        }
-
-        [Command("PurgeUser"), Summary("Purges 500 messages by the specified user."), Remarks("PurgeUser @Username")]
-        public async Task PurgeUserAsync(IGuildUser User)
-        {
-            var Guild = Context.Guild as SocketGuild;
-            foreach (var Channel in Guild.TextChannels)
-            {
-                var Chn = Channel as ITextChannel;
-                var Messages = (await Chn.GetMessagesAsync(200).Flatten()).Where(x => x.Author.Id == User.Id);
-                await Chn.DeleteMessagesAsync(Messages);
-            }
-            await ReplyAsync($"Cleaned up {User.Username} messages.");
-        }
-
         [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Remarks("PurgeChannel #ChannelName"), Alias("PChannel", "PurgeC")]
         public async Task PurgeChannelAsync(ITextChannel Channel)
         {
@@ -367,7 +339,7 @@ namespace Valerie.Modules
                 SBChannel = null;
             }
 
-            string Settings = $"**Guild's Settings**\n\n" +
+            string Settings =
                 $"**Prefix:** {GConfig.Prefix}\n" +
                 $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
                 $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
@@ -388,6 +360,46 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Purge"), Summary("")]
+        public async Task PurgeAsync(int Count = 10, PurgeType PurgeType = PurgeType.Self, PurgeStrategy PurgeStrategy = PurgeStrategy.BulkDelete, IGuildUser User = null)
+        {
+            int index = 0;
+            var deleteMessages = new List<IMessage>(Count);
+            var messages = Context.Channel.GetMessagesAsync();
+            await messages.ForEachAsync(async m =>
+            {
+                IEnumerable<IMessage> MessagesToDelete = null;
+                if (PurgeType == PurgeType.Self)
+                    MessagesToDelete = m.Where(msg => msg.Author.Id == Context.User.Id);
+                else if (PurgeType == PurgeType.Bot)
+                    MessagesToDelete = m.Where(msg => msg.Author.IsBot);
+                else if (PurgeType == PurgeType.All)
+                    MessagesToDelete = m;
+                else if (PurgeType == PurgeType.User)
+                    MessagesToDelete = m.Where(msg => msg.Author.Id == User.Id);
+
+                foreach (var msg in MessagesToDelete.OrderByDescending(msg => msg.Timestamp))
+                {
+                    if (index >= Count) { await EndClean(deleteMessages, PurgeStrategy); return; }
+                    deleteMessages.Add(msg);
+                    index++;
+                }
+            });
+        }
+
+        internal async Task EndClean(IEnumerable<IMessage> messages, PurgeStrategy strategy)
+        {
+            if (strategy == PurgeStrategy.BulkDelete)
+                await Context.Channel.DeleteMessagesAsync(messages);
+            else if (strategy == PurgeStrategy.Manual)
+            {
+                foreach (var msg in messages.Cast<IUserMessage>())
+                {
+                    await msg.DeleteAsync();
+                }
+            }
         }
     }
 }
