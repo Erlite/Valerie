@@ -63,9 +63,11 @@ namespace Valerie.Handlers.ConfigHandler
                     case ConfigValue.Token: Config.Token = Value; break;
                     case ConfigValue.EvalAdd: Config.EvalImports.Add(Value); break;
                     case ConfigValue.EvalRemove: Config.EvalImports.Remove(Value); break;
-                    case ConfigValue.Games: Config.Games.Add(Value); break;
+                    case ConfigValue.GamesAdd: Config.Games.Add(Value); break;
+                    case ConfigValue.GamesRemove: Config.Games.Remove(Value); break;
                     case ConfigValue.BlacklistAdd: Config.Blacklist.Add(ID, Value); break;
                     case ConfigValue.BlacklistRemove: Config.Blacklist.Remove(ID); break;
+                    case ConfigValue.GuildWelcome: Config.GuildJoinMessage = Value; break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();
