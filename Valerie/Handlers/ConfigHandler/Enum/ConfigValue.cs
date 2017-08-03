@@ -4,12 +4,14 @@
     {
         Token,
         Prefix,
+        GuildWelcome,
         CommandUsed,
         MessageReceived,
         EvalAdd,
         EvalRemove,
         BlacklistAdd,
         BlacklistRemove,
-        Games
+        GamesAdd,
+        GamesRemove
     }
 }
