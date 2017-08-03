@@ -362,7 +362,7 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("Purge"), Summary("")]
+        [Command("Purge"), Summary("Better than the other command.")]
         public async Task PurgeAsync(int Count = 10, PurgeType PurgeType = PurgeType.Self, PurgeStrategy PurgeStrategy = PurgeStrategy.BulkDelete, IGuildUser User = null)
         {
             int index = 0;
