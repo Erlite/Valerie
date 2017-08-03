@@ -58,22 +58,19 @@ namespace Valerie.Modules
         [Command("Eval"), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
         public async Task EvalAsync([Remainder] string Code)
         {
-            var Client = Context.Client as DiscordSocketClient;
-            var options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
+            var Options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
             var working = await Context.Channel.SendMessageAsync("**Evaluating Expression ...**");
             var Globals = new Globals
             {
-                Client = Client,
+                Client = Context.Client as DiscordSocketClient,
                 Context = Context,
                 SocketGuild = Context.Guild as SocketGuild,
                 SocketGuildChannel = Context.Channel as SocketGuildChannel,
                 SocketGuildUser = Context.User as SocketGuildUser
             };
-
-            Code = Code.Trim('`');
             try
             {
-                var eval = await CSharpScript.EvaluateAsync(Code, options, Globals, typeof(Globals));
+                var eval = await CSharpScript.EvaluateAsync(Code, Options, Globals, typeof(Globals));
                 var embed = Vmbed.Embed(VmbedColors.Green, AuthorName: "Code evaluated successfully.");
                 embed.AddField(x =>
                 {
