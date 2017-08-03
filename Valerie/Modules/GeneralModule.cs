@@ -54,7 +54,7 @@ namespace Valerie.Modules
                 await ReplyAsync("There are no top users for this guild.");
                 return;
             }
-            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name} | Top 10 Users");
+            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
             var Karmalist = Config.KarmaList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Karmalist)
             {
@@ -293,7 +293,7 @@ namespace Valerie.Modules
                 $"**Voice Channels:** {(Context.Guild as SocketGuild).VoiceChannels.Count}\n" +
                 $"**AFK Timeout:** {Context.Guild.AFKTimeout}\n";
 
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"{Context.Guild.Name} Information", Description: Desc,
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}", Description: Desc,
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", false, embed);
         }
