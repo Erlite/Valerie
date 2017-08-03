@@ -120,8 +120,8 @@ namespace Valerie.Handlers
                 Waitlist.Remove(Id);
             },
             null,
-            TimeSpan.FromSeconds(60),
-            TimeSpan.FromSeconds(0));
+            TimeSpan.FromSeconds(30.0),
+            TimeSpan.FromSeconds(0.0));
         }
 
         static async Task KarmaHandlerAsync(SocketGuildUser User, int Karma)
