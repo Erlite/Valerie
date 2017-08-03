@@ -28,5 +28,33 @@ namespace Valerie.Services.Logger
             }
             Append($"{Text}", ConsoleColor.Gray);
         }
+
+        static void PrintArt(string Text, ConsoleColor Color)
+        {
+            Console.ForegroundColor = Color;
+            Console.WriteLine(Text);
+        }
+
+        public static void PrintInfo()
+        {
+            Console.WriteLine(Environment.NewLine + "+-----------------------------------------------------------+");
+            var Art = new[]
+            {
+                @"    ▄   ██   █     ▄███▄   █▄▄▄▄ ▄█ ▄███▄   ",
+                @"     █  █ █  █     █▀   ▀  █  ▄▀ ██ █▀   ▀  ",
+                @"█     █ █▄▄█ █     ██▄▄    █▀▀▌  ██ ██▄▄    ",
+                @" █    █ █  █ ███▄  █▄   ▄▀ █  █  ▐█ █▄   ▄▀ ",
+                @"  █  █     █     ▀ ▀███▀     █    ▐ ▀███▀   ",
+                @"   █▐     █                 ▀               ",
+                @"   ▐     ▀                                  "
+            };
+            foreach (string line in Art)
+                PrintArt(line, ConsoleColor.Red);
+
+            Append(
+                "+-----------------------------------------------------------+\n" +
+                "|  Discord.Net 1.0  |  Yucked  |  RavenDB  |  .Net Core 2.0 |\n" +
+                "+-----------------------------------------------------------+", ConsoleColor.White);
+        }
     }
 }
