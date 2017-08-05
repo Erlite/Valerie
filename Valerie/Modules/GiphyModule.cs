@@ -18,7 +18,7 @@ namespace Valerie.Modules
         string Key = $"api_key={BotDB.Config.APIKeys.GiphyKey}";
 
         [Command, Summary("Searches Giphy for your Gifs??"), Alias("Gif"), Priority(0)]
-        public async Task GiphyAsync([Remainder] string Terms)
+        public async Task Giphy([Remainder] string Terms)
         {
             var GetUrl = GifsEndpoint + $"search?q={Terms.Replace(' ', '+')}&" + Key;
             var Response = await new HttpClient().GetAsync(GetUrl);
