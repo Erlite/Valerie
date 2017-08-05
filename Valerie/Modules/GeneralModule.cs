@@ -286,7 +286,7 @@ namespace Valerie.Modules
                 $"**Default Channel:** {Context.Guild.GetDefaultChannelAsync().GetAwaiter().GetResult().Name}\n" +
                 $"**Voice Region:** {Context.Guild.VoiceRegionId}\n" +
                 $"**Created At:** {Context.Guild.CreatedAt}\n" +
-                $"**Roles:** {Context.Guild.Roles.Count}\n```{string.Join(", ", Context.Guild.Roles.OrderByDescending(x=> x.Position))}```\n" +
+                $"**Roles:** {Context.Guild.Roles.Count}\n```{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}```\n" +
                 $"**Users:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
                 $"**Bots:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
                 $"**Text Channels:** {(Context.Guild as SocketGuild).TextChannels.Count}\n" +
@@ -480,21 +480,49 @@ namespace Valerie.Modules
                 await ReplyAsync($"No usernames found matching **{User.Discriminator}** discriminator.");
         }
 
-        [Command("Stats"), Summary("Shows information about Bot.")]
+        [Command("Stats"), Alias("About"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
-            var cache = Misc.DirSize(new DirectoryInfo(MainHandler.CacheFolder));
-            string Description =
-                $"- Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
-                $"- Guilds: {(Context.Client as DiscordSocketClient).Guilds.Count}\n" +
-                $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}\n" +
-                $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}\n" +
-                $"- Cache Size: {Convert.ToInt32((cache / 1024) / 1024.0)} MB\n" +
-                $"- Total Command Used: {BotDB.Config.CommandsUsed}\n" +
-                $"- Total Messages Received: {BotDB.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}";
+            var Client = Context.Client as DiscordSocketClient;
+            string Changes = null;
+            using (var Http = new HttpClient())
+            {
+                Http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+                using (var Response = await Http.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
+                {
+                    if (!Response.IsSuccessStatusCode)
+                        Changes = "There was an error fetching the latest changes.";
+                    else
+                    {
+                        dynamic Result = JArray.Parse(await Response.Content.ReadAsStringAsync());
+                        Changes =
+                            $"[{((string)Result[0].sha).Substring(0, 7)}]({Result[0].html_url}) {Result[0].commit.message}\n" +
+                            $"[{((string)Result[1].sha).Substring(0, 7)}]({Result[1].html_url}) {Result[1].commit.message}\n" +
+                            $"[{((string)Result[2].sha).Substring(0, 7)}]({Result[2].html_url}) {Result[2].commit.message}";
+                    }
+                }
+                Http.Dispose();
+            }
 
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: "Valerie Stats", Description: Description, ThumbUrl:
-                Context.Client.CurrentUser.GetAvatarUrl());
+            var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.ToString()} Official Invite",
+                "https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591",
+                Description: $"**Latest Changes:**\n{Changes}");
+            embed.AddInlineField("Members",
+                $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
+                $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
+                $"Total: {Client.Guilds.Sum(x => x.Users.Count)}");
+            embed.AddInlineField("Channels",
+                $"Text: {Client.Guilds.Sum(x => x.TextChannels.Count)}\n" +
+                $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
+                $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}");
+            embed.AddInlineField("Guilds", Client.Guilds.Count);
+            embed.AddInlineField(":space_invader:",
+                $"Commands Ran: {BotDB.Config.CommandsUsed}\n" +
+                $"Messages Received: {BotDB.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}");
+            embed.AddInlineField(":hammer_pick:",
+                $"Cache: {Convert.ToInt32((Misc.DirSize(new DirectoryInfo(MainHandler.CacheFolder)) / 1024) / 1024.0)} MB\n" +
+                $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB");
+            embed.AddInlineField(":beginner:", "Written by: [Yucked](https://github.com/Yucked)\nLibrary: Discord.Net 1.0");
             await ReplyAsync("", embed: embed);
         }
     }
