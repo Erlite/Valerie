@@ -223,6 +223,7 @@ namespace Valerie.Modules
                     str.AppendLine($"**{result.Name}**\n{result.Snippet}\n<{StringExtension.ShortenUrl(result.URL)}>\n");
                 }
                 await ReplyAsync(str.ToString());
+                Http.Dispose();
             }
         }
 
