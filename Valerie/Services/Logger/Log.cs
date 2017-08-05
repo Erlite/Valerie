@@ -49,7 +49,7 @@ namespace Valerie.Services.Logger
                 @"   ▐     ▀                                  "
             };
             foreach (string line in Art)
-                PrintArt(line, ConsoleColor.Red);
+                PrintArt(line, ConsoleColor.DarkRed);
 
             Append(
                 "+-----------------------------------------------------------+\n" +
