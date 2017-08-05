@@ -112,6 +112,19 @@ namespace Valerie.Handlers
             await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
         }
 
+        internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
+        {
+            var Config = ServerDB.GuildConfig((Reaction.Channel as SocketGuildChannel).Guild.Id);
+            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled) return;
+            int Count = Reaction.Message.Value.Reactions.Count;
+            var msg = await Channel.SendMessageAsync($"⭐ {Count} {(Channel as ITextChannel).Mention} ID: {Reaction.MessageId}\n {Reaction.Message.Value.Content}");
+            if (Count > 5)
+                await msg.ModifyAsync(x =>
+                {
+                    x.Content = $"🌟 {Count} {(Channel as ITextChannel).Mention} ID: {Reaction.MessageId}\n {Reaction.Message.Value.Content}";
+                });
+        }
+
         // Not Events
         static void RemoveUser(ulong Id)
         {
