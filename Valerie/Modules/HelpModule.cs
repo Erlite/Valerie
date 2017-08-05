@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Linq;
 using System.Text;
-using Discord.Commands;
+using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
 using Valerie.Extensions;
 
 namespace Valerie.Modules
@@ -15,22 +16,21 @@ namespace Valerie.Modules
             CommandService = Service;
         }
 
-        [Command("Help"), Summary("Shows a list of all commands."), Alias("Cmds")]
+        [Command("Cmds"), Summary("Shows a list of all commands."), Alias("Help")]
         public async Task CommandsAsync()
         {
-            string Description =
-                "**Admin Commands:** Prefix, AddRole, RemoveRole, WelcomeAdd, WelcomeRemove, LeaveAdd, LeaveRemove, Toggle, Channel, Kick, Ban, Delete, PurgeUser, PurgeChanel, AddRole, RemoveRole" +
-                "**Audio Commands:** Join, Leave, Play, Skip, Queue, Qadd, QClear\n" +
-                "**Bot Commands:** [Group: Bot] Prefix, Avatar, Game, Username, Nickname\n" +
-                "**General Commands:** Rank, Top, AFK, Iam, IamNot, Slotmachine, Flip, GuildInfo, RoleInfo, Rate, Translate, Trump, Avatar, Yomama, Probe, Discrim\n" +
-                "**Giphy Commands:** [Group: Giphy] Tag, Stickers\n**Example:** Giphy Wat is love, Giphy Tag Love\n" +
-                "**Google Commands:** Google, GImage, Youtube, Shorten, Revav\n" +
-                "**Nsfw Commands:** Boobs, Ass, E621, Porn\n" +
-                "**Owner Commands:** Serverlist, LeaveGuild, Boardcast, GetInvite, Archive, Blacklist, Whitelist, Eval, EvalList, EvalRemove, EvalAdd, SendMsg\n" +
-                "**Search Commands:** Urban, Lmgtfy, Imgur, Robohash, Wiki, AdorableAvatar, DuckDuckGo, Docs, BImage, Bing, SNews, Suser\n" +
-                "**Tag Commands:** [Group: Tag] Create, Remove, Info, Modify, List, Find\n**Example:** Tag How-To, Tag Remove TagName\n" +
-                "**Twitter Commands:** Tweet, TweetMedia, Reply, DeleteTweet";
-            var embed = Vmbed.Embed(VmbedColors.Gold, Context.Client.CurrentUser.GetAvatarUrl(), $"Commands List.", Description: Description);
+            var embed = Vmbed.Embed(VmbedColors.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
+            foreach (var Module in CommandService.Modules)
+            {
+                string ModuleName = null;
+                ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;
+                embed.AddField(x =>
+                {
+                    x.Name = ModuleName;
+                    x.Value = string.Join(", ", Module.Commands.Select(Cmd => Cmd.Name));
+                    x.IsInline = false;
+                });
+            }
             await ReplyAsync("", embed: embed);
         }
 
