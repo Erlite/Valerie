@@ -27,7 +27,8 @@ namespace Valerie
 
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                LogLevel = Discord.LogSeverity.Info
+                LogLevel = Discord.LogSeverity.Info,
+                MessageCacheSize = 10000
             });
 
             var ServiceProvider = InjectServices();
@@ -41,6 +42,7 @@ namespace Valerie
             Task.Run(() => Client.MessageReceived += EventsHandler.MessageReceivedAsync);
             Client.UserJoined += EventsHandler.UserJoinedAsync;
             Client.UserLeft += EventsHandler.UserLeftAsync;
+            Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
             Client.Ready += async () =>
             {
                 await EventsHandler.ReadyAsync(Client);
