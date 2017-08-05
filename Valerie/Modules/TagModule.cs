@@ -12,7 +12,7 @@ namespace Valerie.Modules
     public class TagModule : ModuleBase
     {
         [Command, Summary("Executes a tag."), Priority(0)]
-        public async Task TagAsync(string TagName)
+        public async Task Tag(string TagName)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
             var Tag = Config.TagsList.FirstOrDefault(x => x.Name == TagName);
