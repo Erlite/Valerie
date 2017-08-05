@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Valerie.Services;
+using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
     [RequireBotPermission(GuildPermission.SendMessages)]
-    public class AudioModule : ModuleBase
+    public class AudioModule : CommandBase
     {
         public static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();
 

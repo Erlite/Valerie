@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -8,14 +9,13 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using System.Collections.Generic;
 using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
     [RequireBotPermission(GuildPermission.KickMembers | GuildPermission.BanMembers | GuildPermission.SendMessages),
         CustomPermission]
-    public class AdminModule : ModuleBase
+    public class AdminModule : CommandBase
     {
         [Command("Prefix"), Summary("Changes guild's prefix.")]
         public async Task PrefixAsync(string NewPrefix)

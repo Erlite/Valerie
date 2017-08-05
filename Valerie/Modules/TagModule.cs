@@ -9,7 +9,7 @@ using Valerie.Extensions;
 namespace Valerie.Modules
 {
     [Group("Tag"), RequireBotPermission(Discord.GuildPermission.SendMessages)]
-    public class TagModule : ModuleBase
+    public class TagModule : CommandBase
     {
         [Command, Summary("Executes a tag."), Priority(0)]
         public async Task Tag(string TagName)

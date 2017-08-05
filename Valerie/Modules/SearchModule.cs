@@ -18,7 +18,7 @@ using Valerie.Attributes;
 namespace Valerie.Modules
 {
     [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
-    public class SearchModule : ModuleBase
+    public class SearchModule : CommandBase
     {
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)

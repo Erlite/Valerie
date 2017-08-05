@@ -21,7 +21,7 @@ using Valerie.Extensions;
 namespace Valerie.Modules
 {
     [RequireOwner]
-    public class OwnerModule : ModuleBase
+    public class OwnerModule : CommandBase
     {
         private static MemoryStream GenerateStreamFromString(string value)
         {

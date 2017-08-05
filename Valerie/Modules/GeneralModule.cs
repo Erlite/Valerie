@@ -20,7 +20,7 @@ using Valerie.Handlers.ConfigHandler;
 
 namespace Valerie.Modules
 {
-    public class GeneralModule : ModuleBase
+    public class GeneralModule : CommandBase
     {
         [Command("Ping"), Summary("Pings Discord Gateway")]
         public async Task PingAsync()

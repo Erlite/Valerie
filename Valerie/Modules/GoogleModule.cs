@@ -7,16 +7,16 @@ using Newtonsoft.Json.Linq;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
-using Valerie.Handlers.ConfigHandler;
-using Valerie.Attributes;
 using Google.Apis.Customsearch.v1;
 using Google.Apis.Services;
+using Valerie.Handlers.ConfigHandler;
+using Valerie.Attributes;
 using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
     [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
-    public class GoogleModule : ModuleBase
+    public class GoogleModule : CommandBase
     {
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string search)

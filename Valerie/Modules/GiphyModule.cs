@@ -7,11 +7,12 @@ using Discord.Commands;
 using Valerie.Attributes;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Models;
+using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
     [Group("Giphy"), RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
-    public class GiphyModule : ModuleBase
+    public class GiphyModule : CommandBase
     {
         string GifsEndpoint = "https://api.giphy.com/v1/gifs/";
         string StickersEndpoint = "http://api.giphy.com/v1/stickers/";

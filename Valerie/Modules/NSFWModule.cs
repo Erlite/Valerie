@@ -11,7 +11,7 @@ using Valerie.Extensions;
 namespace Valerie.Modules
 {
     [RequireNsfw, RequireBotPermission(GuildPermission.SendMessages)]
-    public class NSFWModule : ModuleBase
+    public class NSFWModule : CommandBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()

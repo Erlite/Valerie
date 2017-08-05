@@ -1,14 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
+using Valerie.Extensions;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Handlers.ConfigHandler.Enum;
-using System.IO;
-using Discord;
 
 namespace Valerie.Modules
 {
     [Group("Bot"), RequireOwner]
-    public class BotModule : ModuleBase
+    public class BotModule : CommandBase
     {
         [Command("Prefix"), Summary("Changes bot's prefix.")]
         public async Task PrefixAsync(string NewPrefix)

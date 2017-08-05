@@ -8,7 +8,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    public class HelpModule : ModuleBase
+    public class HelpModule : CommandBase
     {
         private CommandService CommandService;
         HelpModule(CommandService Service)
