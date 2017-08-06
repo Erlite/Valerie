@@ -6,7 +6,7 @@ using Discord.WebSocket;
 
 namespace Valerie.Attributes
 {
-    public class CustomPermission : PreconditionAttribute
+    public class CustomUserPermission : PreconditionAttribute
     {
         public override async Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
