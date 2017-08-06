@@ -93,11 +93,11 @@ namespace Valerie.Extensions
         public static string GetCommitDay(string Date)
         {
             var GetDate = DateTime.Parse(Date);
-            var Diff = DateTime.Now.Subtract(GetDate);
-            if (Diff.Days == 0)
-                return $"{Diff.Hours} Hours";
+            var Diff = GetDate.Subtract(DateTime.Today).Days;
+            if (Diff == 0)
+                return $"Just Now";
             else
-                return $"{Diff.Days} Days";
+                return $"{Diff} Day(s)";
         }
     }
 }
