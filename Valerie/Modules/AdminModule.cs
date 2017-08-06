@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -9,12 +8,11 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
-    [RequireBotPermission(GuildPermission.KickMembers | GuildPermission.BanMembers | GuildPermission.SendMessages),
-        CustomPermission]
+    [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages),
+        CustomUserPermission]
     public class AdminModule : CommandBase
     {
         [Command("Prefix"), Summary("Changes guild's prefix.")]
@@ -217,7 +215,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Kick"), Summary("Kicks user from the guild.")]
+        [Command("Kick"), Summary("Kicks user from the guild."), RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickAsync(IGuildUser User, [Remainder]string Reason = "No reason provided by moderator.")
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -237,7 +235,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
         }
 
-        [Command("Ban"), Summary("Bans user from the guild.")]
+        [Command("Ban"), Summary("Bans user from the guild."), RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(IGuildUser User, [Remainder] string Reason = "No reason provided by moderator.")
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -257,11 +255,33 @@ namespace Valerie.Modules
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
         }
 
-        [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Remarks("PurgeChannel #ChannelName"), Alias("PChannel", "PurgeC")]
+        [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Alias("PC")]
         public async Task PurgeChannelAsync(ITextChannel Channel)
         {
             var Messages = await Channel.GetMessagesAsync(500).Flatten();
             await Channel.DeleteMessagesAsync(Messages);
+        }
+
+        [Command("PurgeUser"), Summary("Purges User messages from current channel."), Alias("PU")]
+        public async Task PurgeUserAsync(int Amount, IGuildUser User)
+        {
+            var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).Flatten()).Where(x => x.Author.Id == User.Id);
+            if (Amount <= 100)
+                await Context.Channel.DeleteMessagesAsync(GetMessages);
+            else if (Amount > 100)
+                foreach (var msg in GetMessages)
+                    await msg.DeleteAsync();
+        }
+
+        [Command("Purge"), Summary("Deletes all messages from a channel."), Alias("Del")]
+        public async Task Purge(int Amount)
+        {
+            var GetMessages = await Context.Channel.GetMessagesAsync(Amount).Flatten();
+            if (Amount <= 100)
+                await Context.Channel.DeleteMessagesAsync(GetMessages);
+            else if (Amount > 100)
+                foreach (var msg in GetMessages)
+                    await msg.DeleteAsync();
         }
 
         [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role.")]
@@ -360,46 +380,6 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", embed: embed);
-        }
-
-        [Command("Purge"), Summary("Better than the other command.")]
-        public async Task PurgeAsync(int Count = 10, PurgeType PurgeType = PurgeType.Self, PurgeStrategy PurgeStrategy = PurgeStrategy.BulkDelete, IGuildUser User = null)
-        {
-            int index = 0;
-            var deleteMessages = new List<IMessage>(Count);
-            var messages = Context.Channel.GetMessagesAsync();
-            await messages.ForEachAsync(async m =>
-            {
-                IEnumerable<IMessage> MessagesToDelete = null;
-                if (PurgeType == PurgeType.Self)
-                    MessagesToDelete = m.Where(msg => msg.Author.Id == Context.User.Id);
-                else if (PurgeType == PurgeType.Bot)
-                    MessagesToDelete = m.Where(msg => msg.Author.IsBot);
-                else if (PurgeType == PurgeType.All)
-                    MessagesToDelete = m;
-                else if (PurgeType == PurgeType.User)
-                    MessagesToDelete = m.Where(msg => msg.Author.Id == User.Id);
-
-                foreach (var msg in MessagesToDelete.OrderByDescending(msg => msg.Timestamp))
-                {
-                    if (index >= Count) { await EndClean(deleteMessages, PurgeStrategy); return; }
-                    deleteMessages.Add(msg);
-                    index++;
-                }
-            });
-        }
-
-        internal async Task EndClean(IEnumerable<IMessage> messages, PurgeStrategy strategy)
-        {
-            if (strategy == PurgeStrategy.BulkDelete)
-                await Context.Channel.DeleteMessagesAsync(messages);
-            else if (strategy == PurgeStrategy.Manual)
-            {
-                foreach (var msg in messages.Cast<IUserMessage>())
-                {
-                    await msg.DeleteAsync();
-                }
-            }
         }
     }
 }
