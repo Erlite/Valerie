@@ -14,7 +14,7 @@ using Valerie.Handlers;
 
 namespace Valerie.Modules
 {
-    [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class TwitterModule : CommandBase
     {
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), Cooldown(30)]

@@ -8,7 +8,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [Group("Tag"), RequireBotPermission(Discord.GuildPermission.SendMessages)]
+    [Group("Tag"), RequireBotPermission(Discord.ChannelPermission.SendMessages)]
     public class TagModule : CommandBase
     {
         [Command, Summary("Executes a tag."), Priority(0)]

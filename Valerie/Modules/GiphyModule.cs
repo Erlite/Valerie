@@ -11,7 +11,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [Group("Giphy"), RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
+    [Group("Giphy"), RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class GiphyModule : CommandBase
     {
         string GifsEndpoint = "https://api.giphy.com/v1/gifs/";

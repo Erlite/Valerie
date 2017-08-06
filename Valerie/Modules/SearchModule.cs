@@ -17,7 +17,7 @@ using Valerie.Attributes;
 
 namespace Valerie.Modules
 {
-    [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class SearchModule : CommandBase
     {
         [Command("Urban"), Summary("Searches urban dictionary for your word")]

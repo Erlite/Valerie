@@ -6,6 +6,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
+    [RequireBotPermission(Discord.ChannelPermission.SendMessages)]
     public class HelpModule : CommandBase
     {
         private CommandService CommandService;

@@ -8,7 +8,7 @@ using Valerie.Handlers.ConfigHandler.Enum;
 
 namespace Valerie.Modules
 {
-    [Group("Bot"), RequireOwner]
+    [Group("Bot"), RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
     public class BotModule : CommandBase
     {
         [Command("Prefix"), Summary("Changes bot's prefix.")]

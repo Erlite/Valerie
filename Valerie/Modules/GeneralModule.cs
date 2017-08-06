@@ -20,6 +20,7 @@ using Valerie.Handlers.ConfigHandler;
 
 namespace Valerie.Modules
 {
+    [RequireBotPermission(ChannelPermission.SendMessages)]
     public class GeneralModule : CommandBase
     {
         [Command("Ping"), Summary("Pings Discord Gateway")]

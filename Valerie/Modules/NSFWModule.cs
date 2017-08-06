@@ -10,7 +10,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [RequireNsfw, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireNsfw, RequireBotPermission(ChannelPermission.SendMessages)]
     public class NSFWModule : CommandBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]

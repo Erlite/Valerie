@@ -20,7 +20,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [RequireOwner]
+    [RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
     public class OwnerModule : CommandBase
     {
         private static MemoryStream GenerateStreamFromString(string value)

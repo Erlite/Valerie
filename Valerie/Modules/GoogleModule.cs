@@ -15,7 +15,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [RequireAPIKeys, RequireBotPermission(GuildPermission.SendMessages)]
+    [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class GoogleModule : CommandBase
     {
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
