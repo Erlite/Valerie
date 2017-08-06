@@ -496,9 +496,9 @@ namespace Valerie.Modules
                     {
                         dynamic Result = JArray.Parse(await Response.Content.ReadAsStringAsync());
                         Changes =
-                            $"[{((string)Result[0].sha).Substring(0, 7)}]({Result[0].html_url}) {Result[0].commit.message} ({StringExtension.GetCommitDay(((string)Result[0].commit["author"]["date"])).ToString()})\n" +
-                            $"[{((string)Result[1].sha).Substring(0, 7)}]({Result[1].html_url}) {Result[1].commit.message} ({StringExtension.GetCommitDay(((string)Result[1].commit["author"]["date"])).ToString()})\n" +
-                            $"[{((string)Result[2].sha).Substring(0, 7)}]({Result[2].html_url}) {Result[2].commit.message} ({StringExtension.GetCommitDay(((string)Result[2].commit["author"]["date"])).ToString()})";
+                            $"[{((string)Result[0].sha).Substring(0, 7)}]({Result[0].html_url}) {Result[0].commit.message}\n" +
+                            $"[{((string)Result[1].sha).Substring(0, 7)}]({Result[1].html_url}) {Result[1].commit.message}\n" +
+                            $"[{((string)Result[2].sha).Substring(0, 7)}]({Result[2].html_url}) {Result[2].commit.message}";
                     }
                 }
                 Http.Dispose();
