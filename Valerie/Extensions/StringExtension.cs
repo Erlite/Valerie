@@ -89,5 +89,15 @@ namespace Valerie.Extensions
                 return "";
             }
         }
+
+        public static string GetCommitDay(string Date)
+        {
+            var GetDate = DateTime.Parse(Date);
+            var Diff = DateTime.Now.Subtract(GetDate);
+            if (Diff.Days == 0)
+                return $"{Diff.Hours} Hours";
+            else
+                return $"{Diff.Days} Days";
+        }
     }
 }
