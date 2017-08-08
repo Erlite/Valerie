@@ -447,7 +447,7 @@ namespace Valerie.Modules
                 $"Text: {Client.Guilds.Sum(x => x.TextChannels.Count)}\n" +
                 $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
                 $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}");
-            embed.AddInlineField("Guilds", Client.Guilds.Count);
+            embed.AddInlineField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)");
             embed.AddInlineField(":space_invader:",
                 $"Commands Ran: {BotDB.Config.CommandsUsed}\n" +
                 $"Messages Received: {BotDB.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}");
