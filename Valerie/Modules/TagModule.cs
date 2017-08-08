@@ -80,7 +80,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"**{Name}** doesn't exist.");
                 return;
             }
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}", 
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}",
                 ThumbUrl: (await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner))).GetAvatarUrl());
             embed.AddInlineField("Name", GetTag.Name);
             embed.AddInlineField("Owner", await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner)));
@@ -100,6 +100,28 @@ namespace Valerie.Modules
                 return;
             }
             await ReplyAsync(string.Join(", ", Config.TagsList.Select(x => x.Name)));
+        }
+
+        [Command("User"), Summary("Shows all tags owned by you."), Priority(1)]
+        public async Task MineAsync(Discord.IGuildUser User = null)
+        {
+            User = User ?? Context.User as Discord.IGuildUser;
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.TagsList.Any())
+            {
+                await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
+                return;
+            }
+            await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags." +
+                $"\n```{string.Join(", ", Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Select(y => y.Name))}```");
+        }
+
+        [Command("Top"), Summary("Shows the top 5 tags."), Priority(1)]
+        public async Task TopAsync()
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            var Top5 = Config.TagsList.OrderByDescending(x => x.Uses).Take(5);
+            await ReplyAsync($"{Context.Guild.Name} Top 5 Tags:\n{string.Join(", ", Top5.Select(x => x.Name))}");
         }
     }
 }
