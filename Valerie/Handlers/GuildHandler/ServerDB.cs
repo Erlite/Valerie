@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using System;
 using System.Linq;
-using Raven.Client;
 using Valerie.Handlers.GuildHandler.Models;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
 using Valerie.Handlers.GuildHandler.Enum;
+using Raven.Client;
 
 namespace Valerie.Handlers.GuildHandler
 {

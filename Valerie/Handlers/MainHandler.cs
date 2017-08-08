@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net;
-using Raven.Client;
-using Raven.Client.Document;
 using Tweetinvi;
 using Cleverbot;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
 using System.IO;
+using Raven.Client;
+using Raven.Client.Document;
 
 namespace Valerie.Handlers
 {
