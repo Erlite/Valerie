@@ -318,7 +318,7 @@ namespace Valerie.Modules
         [Command("UserInfo"), Alias("UI"), Summary("Displays information about a user.")]
         public async Task UserInfoAsync(IGuildUser User = null)
         {
-            User = User != null ? User : Context.User as IGuildUser;
+            User = User ?? Context.User as IGuildUser;
             var embed = Vmbed.Embed(VmbedColors.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
             List<IRole> Roles = new List<IRole>();
             foreach (var role in User.RoleIds)
@@ -332,7 +332,6 @@ namespace Valerie.Modules
             embed.AddInlineField("Is Bot?", User.IsBot ? "Yes" : "No");
             embed.AddInlineField("Creation Date", User.CreatedAt);
             embed.AddInlineField("Join Date", User.JoinedAt);
-            embed.AddInlineField("Game", User.Game.Value.Name ?? "No Game.");
             embed.AddInlineField("Status", User.Status);
             embed.AddInlineField("Permissions", string.Join(", ", User.GuildPermissions.ToList()));
             embed.AddInlineField("Roles", string.Join(", ", Roles.OrderByDescending(x => x.Position)));
