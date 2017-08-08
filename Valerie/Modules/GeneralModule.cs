@@ -281,130 +281,62 @@ namespace Valerie.Modules
         [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
-            string Desc =
-                $"**ID:** {Context.Guild.Id}\n" +
-                $"**Owner:** {Context.Guild.GetOwnerAsync().GetAwaiter().GetResult().Username}\n" +
-                $"**Default Channel:** {Context.Guild.GetDefaultChannelAsync().GetAwaiter().GetResult().Name}\n" +
-                $"**Voice Region:** {Context.Guild.VoiceRegionId}\n" +
-                $"**Created At:** {Context.Guild.CreatedAt}\n" +
-                $"**Roles:** {Context.Guild.Roles.Count}\n```{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}```\n" +
-                $"**Users:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false)}\n" +
-                $"**Bots:** {(await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true)}\n" +
-                $"**Text Channels:** {(Context.Guild as SocketGuild).TextChannels.Count}\n" +
-                $"**Voice Channels:** {(Context.Guild as SocketGuild).VoiceChannels.Count}\n" +
-                $"**AFK Timeout:** {Context.Guild.AFKTimeout}\n";
-
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}", Description: Desc,
+            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
+
+            embed.AddInlineField("ID", Context.Guild.Id);
+            embed.AddInlineField("Owner", await Context.Guild.GetOwnerAsync());
+            embed.AddInlineField("Default Channel", await Context.Guild.GetDefaultChannelAsync());
+            embed.AddInlineField("Voice Region", Context.Guild.VoiceRegionId);
+            embed.AddInlineField("Created At", Context.Guild.CreatedAt);
+            embed.AddInlineField("Roles", $"{Context.Guild.Roles.Count }\n{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}");
+            embed.AddInlineField("Users", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false));
+            embed.AddInlineField("Bots", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true));
+            embed.AddInlineField("Text Channels", (Context.Guild as SocketGuild).TextChannels.Count);
+            embed.AddInlineField("Voice Channels", (Context.Guild as SocketGuild).VoiceChannels.Count);
             await ReplyAsync("", false, embed);
         }
 
-        [Command("Roleinfo"), Alias("RI"), Summary("Displays information about a role")]
-        public async Task RoleInfoAsync(IRole role)
+        [Command("RoleInfo"), Alias("RI"), Summary("Displays information about a role.")]
+        public async Task RoleInfoAsync(IRole Role)
         {
-            var gld = Context.Guild;
-            var chn = Context.Channel;
-            var msg = Context.Message;
-            var grp = role;
-            if (grp == null)
-                throw new ArgumentException("You must supply a role.");
-            var grl = grp as SocketRole;
-            var gls = gld as SocketGuild;
-
-            var embed = new EmbedBuilder()
+            var embed = new EmbedBuilder
             {
-                Title = "Role"
+                Color = Role.Color,
+                Title = $"INFORMATION | {Role.Name}"
             };
-            embed.AddField(x =>
-            {
-                x.IsInline = true;
-                x.Name = "Name";
-                x.Value = grl.Name;
-            });
+            embed.AddInlineField("ID", Role.Id);
+            embed.AddInlineField("Color", Role.Color);
+            embed.AddInlineField("Creation Date", Role.CreatedAt);
+            embed.AddInlineField("Is Hoisted?", Role.IsHoisted ? "Yes" : "No");
+            embed.AddInlineField("Is Mentionable?", Role.IsMentionable ? "Yes" : "No");
+            embed.AddInlineField("Is Managed?", Role.IsManaged ? "Yes" : "No");
+            embed.AddInlineField("Permissions", string.Join(", ", Role.Permissions.ToList()));
+            await ReplyAsync("", embed: embed);
+        }
 
-            embed.AddField(x =>
+        [Command("UserInfo"), Alias("UI"), Summary("Displays information about a user.")]
+        public async Task UserInfoAsync(IGuildUser User = null)
+        {
+            User = User != null ? User : Context.User as IGuildUser;
+            var embed = Vmbed.Embed(VmbedColors.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
+            List<IRole> Roles = new List<IRole>();
+            foreach (var role in User.RoleIds)
             {
-                x.IsInline = true;
-                x.Name = "ID";
-                x.Value = grl.Id.ToString();
-            });
-
-            embed.AddField(x =>
-            {
-                x.IsInline = true;
-                x.Name = "Color";
-                x.Value = grl.Color.RawValue.ToString("X6");
-            });
-
-            embed.AddField(x =>
-            {
-                x.IsInline = true;
-                x.Name = "Hoisted?";
-                x.Value = grl.IsHoisted ? "Yes" : "No";
-            });
-
-            embed.AddField(x =>
-            {
-                x.IsInline = true;
-                x.Name = "Mentionable?";
-                x.Value = grl.IsMentionable ? "Yes" : "No";
-            });
-
-            var perms = new List<string>(23);
-            if (grl.Permissions.Administrator)
-                perms.Add("Administrator");
-            if (grl.Permissions.AttachFiles)
-                perms.Add("Can attach files");
-            if (grl.Permissions.BanMembers)
-                perms.Add("Can ban members");
-            if (grl.Permissions.ChangeNickname)
-                perms.Add("Can change nickname");
-            if (grl.Permissions.Connect)
-                perms.Add("Can use voice chat");
-            if (grl.Permissions.CreateInstantInvite)
-                perms.Add("Can create instant invites");
-            if (grl.Permissions.DeafenMembers)
-                perms.Add("Can deafen members");
-            if (grl.Permissions.EmbedLinks)
-                perms.Add("Can embed links");
-            if (grl.Permissions.KickMembers)
-                perms.Add("Can kick members");
-            if (grl.Permissions.ManageChannels)
-                perms.Add("Can manage channels");
-            if (grl.Permissions.ManageMessages)
-                perms.Add("Can manage messages");
-            if (grl.Permissions.ManageNicknames)
-                perms.Add("Can manage nicknames");
-            if (grl.Permissions.ManageRoles)
-                perms.Add("Can manage roles");
-            if (grl.Permissions.ManageGuild)
-                perms.Add("Can manage guild");
-            if (grl.Permissions.MentionEveryone)
-                perms.Add("Can mention everyone group");
-            if (grl.Permissions.MoveMembers)
-                perms.Add("Can move members between voice channels");
-            if (grl.Permissions.MuteMembers)
-                perms.Add("Can mute members");
-            if (grl.Permissions.ReadMessageHistory)
-                perms.Add("Can read message history");
-            if (grl.Permissions.ReadMessages)
-                perms.Add("Can read messages");
-            if (grl.Permissions.SendMessages)
-                perms.Add("Can send messages");
-            if (grl.Permissions.SendTTSMessages)
-                perms.Add("Can send TTS messages");
-            if (grl.Permissions.Speak)
-                perms.Add("Can speak");
-            if (grl.Permissions.UseVAD)
-                perms.Add("Can use voice activation");
-            embed.AddField(x =>
-            {
-                x.IsInline = false;
-                x.Name = "Permissions";
-                x.Value = string.Join(", ", perms);
-            });
-
-            await chn.SendMessageAsync("", false, embed);
+                var Role = Context.Guild.GetRole(role);
+                Roles.Add(Role);
+            }
+            embed.AddInlineField("Username", User.Username);
+            embed.AddInlineField("ID", User.Id);
+            embed.AddInlineField("Muted?", User.IsMuted ? "Yes" : "No");
+            embed.AddInlineField("Is Bot?", User.IsBot ? "Yes" : "No");
+            embed.AddInlineField("Creation Date", User.CreatedAt);
+            embed.AddInlineField("Join Date", User.JoinedAt);
+            embed.AddInlineField("Game", User.Game.Value.Name ?? "No Game.");
+            embed.AddInlineField("Status", User.Status);
+            embed.AddInlineField("Permissions", string.Join(", ", User.GuildPermissions.ToList()));
+            embed.AddInlineField("Roles", string.Join(", ", Roles.OrderByDescending(x => x.Position)));
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
