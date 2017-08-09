@@ -19,7 +19,7 @@ namespace Valerie.Modules
             await ReplyAsync($"Bot's Prefix has been set to: {NewPrefix}");
         }
 
-        [Command("Avatar"), Summary("Changes Bot's avatar.")]
+        [Command("Avatar", RunMode = RunMode.Async), Summary("Changes Bot's avatar.")]
         public async Task AvatarAsync([Remainder] string Path)
         {
             using (var stream = new FileStream(Path, FileMode.Open))
@@ -71,7 +71,7 @@ namespace Valerie.Modules
             await ReplyAsync("Nickname has been updated.");
         }
 
-        [Command("GuildJoin"), Summary("Custom Guild Join Message")]
+        [Command("JoinWelcome"), Summary("Custom Guild Join Message")]
         public async Task GuildJoinMessageAsync([Remainder] string JoinMessage)
         {
             await BotDB.UpdateConfigAsync(ConfigValue.GuildWelcome, JoinMessage);
