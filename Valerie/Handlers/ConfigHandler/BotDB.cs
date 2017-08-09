@@ -1,6 +1,6 @@
-﻿using Raven.Client;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Raven.Client.Documents.Session;
 using Valerie.Handlers.ConfigHandler.Enum;
 using Valerie.Handlers.ConfigHandler.Models;
 using Valerie.Services.Logger;

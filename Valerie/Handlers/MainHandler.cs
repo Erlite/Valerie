@@ -6,8 +6,7 @@ using Valerie.Handlers.ConfigHandler;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
 using System.IO;
-using Raven.Client;
-using Raven.Client.Document;
+using Raven.Client.Documents;
 
 namespace Valerie.Handlers
 {
@@ -18,12 +17,11 @@ namespace Valerie.Handlers
 
         static IDocumentStore CreateDocStore()
         {
-            IDocumentStore IDS = new DocumentStore()
+            return new DocumentStore()
             {
-                Url = "http://localhost:8080",
-                DefaultDatabase = "Database"
+                Database = "Valerie",
+                Urls = new string[] { "http://localhost:8080" }
             }.Initialize();
-            return IDS;
         }
 
         public static IDocumentStore Store
@@ -60,7 +58,7 @@ namespace Valerie.Handlers
 
         public static void DirectoryCheck()
         {
-            if (! Directory.Exists(CacheFolder))
+            if (!Directory.Exists(CacheFolder))
             {
                 Directory.CreateDirectory(CacheFolder);
             }

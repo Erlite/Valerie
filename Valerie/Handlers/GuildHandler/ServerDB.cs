@@ -5,7 +5,7 @@ using Valerie.Handlers.GuildHandler.Models;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
 using Valerie.Handlers.GuildHandler.Enum;
-using Raven.Client;
+using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers.GuildHandler
 {
