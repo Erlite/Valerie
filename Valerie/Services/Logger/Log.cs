@@ -26,7 +26,7 @@ namespace Valerie.Services.Logger
                 case Source.Client: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
                 case Source.ServerDatabase: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
             }
-            Append($"{Text}", ConsoleColor.Gray);
+            Append($" {Text}", ConsoleColor.Gray);
         }
 
         static void PrintArt(string Text, ConsoleColor Color)
