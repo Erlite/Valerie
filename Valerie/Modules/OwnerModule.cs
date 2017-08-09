@@ -55,7 +55,7 @@ namespace Valerie.Modules
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync("You have been removed from my Blacklist! You may use my commands again.");
         }
 
-        [Command("Eval"), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
+        [Command("Eval", RunMode = RunMode.Async), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
         public async Task EvalAsync([Remainder] string Code)
         {
             var Options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
@@ -190,7 +190,7 @@ namespace Valerie.Modules
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync($"Here is your invite link: <{invite.Url}>");
         }
 
-        [Command("Archive"), Summary("Archives a channel and uploads a JSON"), Remarks("Archive #ChannelName 50")]
+        [Command("Archive", RunMode = RunMode.Async), Summary("Archives a channel and uploads a JSON"), Remarks("Archive #ChannelName 50")]
         public async Task ArchiveCommand(IMessageChannel Channel, int Amount = 9000)
         {
             if (Amount >= 10000)
