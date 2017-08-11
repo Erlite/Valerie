@@ -8,7 +8,7 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.Connect | ChannelPermission.Speak)]
+    [RequireBotPermission(ChannelPermission.SendMessages)]
     public class AudioModule : CommandBase
     {
         public static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();
