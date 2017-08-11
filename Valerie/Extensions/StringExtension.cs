@@ -22,6 +22,14 @@ namespace Valerie.Extensions
             return sb.ToString();
         }
 
+        public static string JoinReplace(string Msg, string GuildPrefix, string BotPrefix)
+        {
+            StringBuilder sb = new StringBuilder(Msg);
+            sb.Replace("{gprefix}", GuildPrefix);
+            sb.Replace("{bprefix}", BotPrefix);
+            return sb.ToString();
+        }
+
         public static string Censor(string Text)
         {
             Regex Swear = new Regex(BotDB.Config.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
