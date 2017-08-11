@@ -40,7 +40,7 @@ namespace Valerie.Handlers
             if (Msg == null || Msg.Author.IsBot || BotDB.Config.Blacklist.ContainsKey(Msg.Author.Id)) return;
             var Context = new SocketCommandContext(Client, Msg);
 
-            if (!(Msg.HasStringPrefix(BotDB.Config.Prefix, ref argPos) ||  Msg.HasStringPrefix(GuildConfig.Prefix, ref argPos))) return;
+            if (!(Msg.HasStringPrefix(BotDB.Config.Prefix, ref argPos) || Msg.HasStringPrefix(GuildConfig.Prefix, ref argPos))) return;
             await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.CommandUsed);
 
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
@@ -63,7 +63,7 @@ namespace Valerie.Handlers
                     break;
                 case PreconditionResult PdR:
                     ErrorMsg = PdR.ErrorReason;
-                    Log.Write(Status.ERR, Source.Client, PdR.ErrorReason);
+                    Log.Write(Status.ERR, Source.Client, $"[{Context.Guild.Name} | {Command.Name}] {PdR.ErrorReason} ");
                     break;
                 case ParseResult PR:
                     ErrorMsg = $"{Format.Bold("Usage:")} {BotDB.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => x.Name))}\n" +
