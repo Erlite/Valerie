@@ -294,3 +294,4 @@ config.codekit3
 *.vs/
 packages/
 data/
+Valerie/Cache/
