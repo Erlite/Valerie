@@ -33,8 +33,8 @@ namespace Valerie.Handlers
                 JoinMessage = $"Thank you for inviting me to your guild!\n" +
                     $"Your Guild Prefix: {Config.Prefix}  | Default Prefix: {BotDB.Config.Prefix}";
             else
-                JoinMessage = BotDB.Config.GuildJoinMessage;
-            await Guild.DefaultChannel.SendMessageAsync(JoinMessage);
+                JoinMessage = StringExtension.JoinReplace(BotDB.Config.GuildJoinMessage, Config.Prefix, BotDB.Config.Prefix);
+            await (await Guild.Owner.GetOrCreateDMChannelAsync()).SendMessageAsync(JoinMessage);
         }
 
         internal static async Task LeftGuildAsync(SocketGuild Guild)
