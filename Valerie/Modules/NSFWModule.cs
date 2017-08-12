@@ -7,10 +7,11 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using Valerie.Models;
 using Valerie.Extensions;
+using Valerie.Attributes;
 
 namespace Valerie.Modules
 {
-    [RequireNsfw, RequireBotPermission(ChannelPermission.SendMessages)]
+    [RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
     public class NSFWModule : CommandBase
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
