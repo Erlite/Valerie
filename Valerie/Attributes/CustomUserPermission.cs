@@ -12,12 +12,12 @@ namespace Valerie.Attributes
         {
             var AppInfo = await (Context.Client as DiscordSocketClient).GetApplicationInfoAsync();
             var User = Context.User as IGuildUser;
-            if (User.GuildPermissions.Has(GuildPermission.KickMembers | GuildPermission.BanMembers | GuildPermission.Administrator | GuildPermission.ManageMessages |
-                GuildPermission.ManageRoles | GuildPermission.ManageGuild) || User.Id == AppInfo.Owner.Id)
+            if (User.GuildPermissions.KickMembers || User.GuildPermissions.BanMembers || User.GuildPermissions.Administrator ||
+                User.GuildPermissions.ManageMessages || User.GuildPermissions.ManageRoles || User.GuildPermissions.ManageGuild ||
+                User.Id == AppInfo.Owner.Id)
                 return await Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return await Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** requires one of the following permission: Kick, Ban, Admin, Manage Messages/Guild/Roles."));
-            
+                return await Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** requires one of the following user permission: Kick/Ban/Admin/Manage [Messages/Guild/Roles]."));
         }
     }
 }
