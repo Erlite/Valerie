@@ -145,7 +145,7 @@ namespace Valerie.Modules
             {
                 SB.AppendLine($":point_right:  {Res.Text}: <{StringExtension.ShortenUrl(Res.FirstURL)}>");
             }
-            string Description = $"**{Convert.Heading}**\n\n" +
+            string Description = $"**{Convert.Heading}**\n" +
                 $"{Convert.Abstract}\n" +
                 $"<{StringExtension.ShortenUrl(Convert.AbstractURL)}>\n\n" +
                 $"**Related Topics:**\n" +
@@ -166,13 +166,17 @@ namespace Valerie.Modules
             var ConvertedJson = JsonConvert.DeserializeObject<DocsRoot>(await Response.Content.ReadAsStringAsync());
             foreach (var result in ConvertedJson.Results.Take(3).OrderBy(x => x.Name))
             {
-                Builder.AppendLine($"**{result.Name}**\n" +
+                Builder.AppendLine(
+                    $"**{result.Name}**\n" +
                     $"**Kind: **{result.Kind} || **Type: **{result.Type}\n" +
                     $"**Summary: **{result.Snippet}\n" +
                     $"**URL: ** {StringExtension.ShortenUrl(result.URL)}\n");
             }
             var embed = Vmbed.Embed(VmbedColors.Snow, Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
-            await ReplyAsync("", embed: embed);
+            if (string.IsNullOrWhiteSpace(Builder.ToString()))
+                await ReplyAsync("No results found.");
+            else
+                await ReplyAsync("", embed: embed);
         }
 
         [Command("BImage"), Summary("Performs a bing image search for your query and replies back with a random image.")]
