@@ -48,10 +48,10 @@ namespace Valerie.Services.Logger
             };
             foreach (string line in Art)
                 PrintArt(line, ConsoleColor.Magenta);
-            Append("+-----------------------------------------------------+\n", ConsoleColor.Gray);
-            Append("Source Code(Github Repo): https://Github.com/Yucked/Valerie", ConsoleColor.Yellow);
-            Append("\nBuild with love by Yucked | Powered by RavenDB", ConsoleColor.Red);
-            Append("\n+-----------------------------------------------------+", ConsoleColor.Gray);
+            Append("+--------------------------------------------------------------+\n", ConsoleColor.Gray);
+            Append("   Source Code(Github Repo): https://Github.com/Yucked/Valerie", ConsoleColor.Yellow);
+            Append("\n         Build with love by Yucked | Powered by RavenDB", ConsoleColor.Red);
+            Append("\n+--------------------------------------------------------------+", ConsoleColor.Gray);
         }
     }
 }
