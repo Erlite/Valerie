@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Net;
+using System.IO;
+using System.Threading.Tasks;
 using Tweetinvi;
 using Cleverbot;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
-using System.IO;
 using Raven.Client.Documents;
 
 namespace Valerie.Handlers
@@ -32,12 +32,12 @@ namespace Valerie.Handlers
             }
         }
 
-        public static void ServicesLogin()
+        public static async Task GetReadyAsync()
         {
-            var Config = BotDB.Config;
-            var TwitterConfig = Config.APIKeys.TwitterKeys;
+            Log.PrintInfo();
+            await BotDB.LoadConfigAsync();
 
-
+            var TwitterConfig = BotDB.Config.APIKeys.TwitterKeys;
             Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
             var AuthUser = User.GetAuthenticatedUser();
             if (AuthUser == null)
@@ -48,20 +48,14 @@ namespace Valerie.Handlers
                 Log.Write(Status.KAY, Source.BotDatabase, "Logged into Twitter.");
             try
             {
-                Main.SetAPIKey(Config.APIKeys.CleverBotKey);
+                Main.SetAPIKey(BotDB.Config.APIKeys.CleverBotKey);
             }
-            catch (WebException Ex)
+            catch (Cleverbot.Exceptions.CleverbotApiException Ex)
             {
                 Log.Write(Status.ERR, Source.BotDatabase, Ex.Message);
             }
-        }
-
-        public static void DirectoryCheck()
-        {
             if (!Directory.Exists(CacheFolder))
-            {
                 Directory.CreateDirectory(CacheFolder);
-            }
         }
     }
 }
