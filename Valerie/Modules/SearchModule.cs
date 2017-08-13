@@ -23,20 +23,23 @@ namespace Valerie.Modules
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)
         {
-            SearchTerm = SearchTerm.Replace(' ', '+');
-            var Client = await new HttpClient().GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm}");
+            var Client = await new HttpClient().GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm.Replace(' ', '+')}");
             if (!Client.IsSuccessStatusCode)
             {
                 await ReplyAsync("Couldn't communicate with Urban's API.");
                 return;
             }
             var Data = JToken.Parse(await Client.Content.ReadAsStringAsync()).ToObject<Urban>();
+            if (!Data.List.Any())
+            {
+                await ReplyAsync($"Couldn't find anything related to *{SearchTerm}*.");
+                return;
+            }
             var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
-            string Response = $"**Definition of {TermInfo.Word}:**" +
-                $"```{TermInfo.Definition}```" +
-                $"**Example:**```{TermInfo.Example}```" +
-                $"**Tags:**```{ string.Join(", ", Data.Tags)}```";
-            await ReplyAsync(Response ?? "Couldn't find anything, dammit.");
+            var embed = Vmbed.Embed(VmbedColors.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
+            embed.AddInlineField($"Definition of {TermInfo.Word}", TermInfo.Definition);
+            embed.AddInlineField("Example", TermInfo.Example);
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
