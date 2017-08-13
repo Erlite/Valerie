@@ -77,9 +77,7 @@ namespace Valerie.Modules
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
         public async Task LmgtfyAsync([Remainder] string search = "How to use Lmgtfy")
-        {
-            await ReplyAsync($"**Your special URL: **<http://lmgtfy.com/?q={ Uri.EscapeUriString(search) }>");
-        }
+            => await ReplyAsync($"**Your special URL: **<http://lmgtfy.com/?q={ Uri.EscapeUriString(search) }>");
 
         [Command("Imgur"), Summary("Imgur XD"), Remarks("Searches imgure for your image")]
         public async Task ImgurAsync([Remainder] string search)
