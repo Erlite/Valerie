@@ -37,24 +37,21 @@ namespace Valerie.Services.Logger
 
         public static void PrintInfo()
         {
-            Console.WriteLine(Environment.NewLine + "+-----------------------------------------------------------+");
             var Art = new[]
             {
-                @"    ▄   ██   █     ▄███▄   █▄▄▄▄ ▄█ ▄███▄   ",
-                @"     █  █ █  █     █▀   ▀  █  ▄▀ ██ █▀   ▀  ",
-                @"█     █ █▄▄█ █     ██▄▄    █▀▀▌  ██ ██▄▄    ",
-                @" █    █ █  █ ███▄  █▄   ▄▀ █  █  ▐█ █▄   ▄▀ ",
-                @"  █  █     █     ▀ ▀███▀     █    ▐ ▀███▀   ",
-                @"   █▐     █                 ▀               ",
-                @"   ▐     ▀                                  "
+                @"____   ____      .__               .__        ",
+                @"\   \ /   /____  |  |   ___________|__| ____   ",
+                @" \   Y   /\__  \ |  | _/ __ \_  __ \  |/ __ \ ",
+                @"  \     /  / __ \|  |_\  ___/|  | \/  \  ___/ ",
+                @"   \___/  (____  /____/\___  >__|  |__|\___  >",
+                @"               \/          \/              \/ "
             };
             foreach (string line in Art)
-                PrintArt(line, ConsoleColor.DarkRed);
-
-            Append(
-                "+-----------------------------------------------------------+\n" +
-                "|  Discord.Net 1.0  |  Yucked  |  RavenDB  |  .Net Core 2.0 |\n" +
-                "+-----------------------------------------------------------+", ConsoleColor.White);
+                PrintArt(line, ConsoleColor.Magenta);
+            Append("+-----------------------------------------------------+\n", ConsoleColor.Gray);
+            Append("Source Code(Github Repo): https://Github.com/Yucked/Valerie", ConsoleColor.Yellow);
+            Append("\nBuild with love by Yucked | Powered by RavenDB", ConsoleColor.Red);
+            Append("\n+-----------------------------------------------------+", ConsoleColor.Gray);
         }
     }
 }
