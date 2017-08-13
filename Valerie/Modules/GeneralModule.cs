@@ -34,16 +34,14 @@ namespace Valerie.Modules
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
             if (!Config.KarmaList.ContainsKey(User.Id))
             {
-                await ReplyAsync($"{User.Username} doesn't exist in Karma list.");
+                await ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
                 return;
             }
             var UserKarma = Config.KarmaList.TryGetValue(User.Id, out int Karma);
-            var embed = Vmbed.Embed(VmbedColors.Pastel, ThumbUrl: User.GetAvatarUrl());
-            embed.AddInlineField("Karma", Karma);
-            embed.AddInlineField("Level", IntExtension.GetLevel(Karma));
-            embed.AddInlineField("Previous Level", IntExtension.GetKarmaForLastLevel(IntExtension.GetLevel(Karma)));
-            embed.AddInlineField("Next Level", IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma)));
-            await ReplyAsync("", embed: embed);
+            string Reply =
+                $"**TOTAL KARMA:** {Karma} | **LEVEL:** | {IntExtension.GetLevel(Karma)} | " +
+                $"**KARMA:** {Karma}/{IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma))}";
+            await ReplyAsync(Reply);
         }
 
         [Command("Top"), Summary("Shows top 10 users in the Karma list.")]
