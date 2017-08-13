@@ -23,49 +23,20 @@ namespace Valerie.Modules
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)
         {
-            var embed = Vmbed.Embed(VmbedColors.Gold);
-            var vc = new HttpClient();
-            string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + SearchTerm);
-            MatchCollection col = Regex.Matches(req, @"(?<=definition"":"")[ -z~-🧀]+(?="",""permalink)");
-            MatchCollection col2 = Regex.Matches(req, @"(?<=example"":"")[ -z~-🧀]+(?="",""thumbs_down)");
-            if (col.Count == 0)
+            SearchTerm = SearchTerm.Replace(' ', '+');
+            var Client = await new HttpClient().GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm}");
+            if (!Client.IsSuccessStatusCode)
             {
-                await ReplyAsync("Couldn't find anything, dammit.");
+                await ReplyAsync("Couldn't communicate with Urban's API.");
                 return;
             }
-            Random r = new Random();
-            string outpt = "Failed fetching embed from Urban Dictionary, please try later!";
-            string outpt2 = "No Example";
-            int max = r.Next(0, col.Count);
-            for (int i = 0; i <= max; i++)
-            {
-                outpt = SearchTerm + "\r\n\r\n" + col[i].Value;
-            }
-
-            for (int i = 0; i <= max; i++)
-            {
-                outpt2 = "\r\n\r\n" + col2[i].Value;
-            }
-
-            outpt = outpt.Replace("\\r", "\r");
-            outpt = outpt.Replace("\\n", "\n");
-            outpt2 = outpt2.Replace("\\r", "\r");
-            outpt2 = outpt2.Replace("\\n", "\n");
-
-            embed.AddField(x =>
-            {
-                x.Name = $"Definition";
-                x.Value = outpt;
-            });
-
-            embed.AddField(x =>
-            {
-                x.Name = "Example";
-                x.Value = outpt2;
-            });
-
-            await ReplyAsync("", embed: embed);
-            vc.Dispose();
+            var Data = JToken.Parse(await Client.Content.ReadAsStringAsync()).ToObject<Urban>();
+            var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
+            string Response = $"**Definition of {TermInfo.Word}:**" +
+                $"```{TermInfo.Definition}```" +
+                $"**Example:**```{TermInfo.Example}```" +
+                $"**Tags:**```{ string.Join(", ", Data.Tags)}```";
+            await ReplyAsync(Response ?? "Couldn't find anything, dammit.");
         }
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
@@ -102,7 +73,7 @@ namespace Valerie.Modules
         {
             HttpClient HttpClient = new HttpClient();
             var GetResult = HttpClient.GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}").Result;
-            var GetContent = GetResult.Content.ReadAsStringAsync().Result;
+            var GetContent = await GetResult.Content.ReadAsStringAsync();
             dynamic responseObject = JsonConvert.DeserializeObject(GetContent);
             string title = responseObject[1][0];
             string firstParagraph = responseObject[2][0];
@@ -190,8 +161,7 @@ namespace Valerie.Modules
                     await ReplyAsync("No results found.");
                     return;
                 }
-                var Random = new Random();
-                var RandomNum = Random.Next(1, 50);
+                var RandomNum = new Random().Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
                 var embed = Vmbed.Embed(VmbedColors.Black, ImageUrl: (string)image["contentUrl"]);
                 await ReplyAsync("", embed: embed);
