@@ -20,10 +20,7 @@ namespace Valerie
 
         async Task StartAsync()
         {
-            Log.PrintInfo();
-            await BotDB.LoadConfigAsync();
-            MainHandler.DirectoryCheck();
-            MainHandler.ServicesLogin();
+            await MainHandler.GetReadyAsync();
 
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
