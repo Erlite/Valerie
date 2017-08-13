@@ -145,7 +145,7 @@ namespace Valerie.Handlers
             if (User == null || User.IsBot || !GuildConfig.IsKarmaEnabled ||
                 BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id)) return;
 
-            var RandomKarma = IntExtension.GiveKarma(Karma);
+            var RandomKarma = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
             if (!GuildConfig.KarmaList.ContainsKey(User.Id))
             {
                 await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaAdd, User.Id, RandomKarma);
