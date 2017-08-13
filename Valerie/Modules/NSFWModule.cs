@@ -17,54 +17,27 @@ namespace Valerie.Modules
         [Command("Boobs", RunMode = RunMode.Async), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
-            try
-            {
-                JToken obj;
-                using (var http = new HttpClient())
-                {
-                    obj = JArray.Parse(await http.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }"))[0];
-                }
-                await Context.Channel.SendMessageAsync($"http://media.oboobs.ru/{ obj["preview"].ToString() }");
-            }
-            catch (Exception ex)
-            {
-                await ReplyAsync(ex.Message);
-            }
+            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }"))[0];
+            await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
         }
 
         [Command("Ass", RunMode = RunMode.Async), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
-            try
-            {
-                JToken obj;
-                using (var http = new HttpClient())
-                {
-                    obj = JArray.Parse(await http.GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4222) }"))[0];
-                }
-                await Context.Channel.SendMessageAsync($"http://media.obutts.ru/{ obj["preview"].ToString() }");
-            }
-            catch (Exception ex)
-            {
-                await ReplyAsync(ex.Message);
-            }
+            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4222) }"))[0];
+            await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
         }
 
         [Command("E621", RunMode = RunMode.Async), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
         public async Task E621Async(string search)
         {
-            if (string.IsNullOrWhiteSpace(search))
-            {
-                await ReplyAsync("Please provide me a search term!");
-                return;
-            }
             search = search?.Trim() ?? "";
             string url = await StringExtension.GetE621ImageLinkAsync(search);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
             {
-                var embed = Vmbed.Embed(VmbedColors.Pastel, url, $"{Context.User.Username} searched for {search}", ImageUrl: url);
+                var embed = Vmbed.Embed(VmbedColors.Pastel, url, ImageUrl: url);
                 await ReplyAsync("", embed: embed);
             }
         }
