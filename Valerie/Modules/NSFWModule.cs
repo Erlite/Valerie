@@ -14,7 +14,7 @@ namespace Valerie.Modules
     [RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
     public class NSFWModule : CommandBase
     {
-        [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
+        [Command("Boobs", RunMode = RunMode.Async), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
             try
@@ -32,7 +32,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
+        [Command("Ass", RunMode = RunMode.Async), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
             try
@@ -50,7 +50,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("E621"), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
+        [Command("E621", RunMode = RunMode.Async), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
         public async Task E621Async(string search)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -69,7 +69,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
+        [Command("Porn", RunMode = RunMode.Async), Summary("Uses Porn.com API to fetch videos.")]
         public async Task PornAsync([Remainder] string Search)
         {
             var Response = await new HttpClient().GetAsync($"http://api.porn.com/videos/find.json?search={Uri.EscapeDataString(Search)}");
