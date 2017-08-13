@@ -255,6 +255,14 @@ namespace Valerie.Modules
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
         }
 
+        [Command("Unban"), Summary("Unbans user from the guild"), RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task UnBanAsync(ulong Id)
+        {
+            await Context.Guild.RemoveBanAsync(Id);
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModCases);
+            await ReplyAsync("User has been unbanned from Guild.");
+        }
+
         [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Alias("PC")]
         public async Task PurgeChannelAsync(ITextChannel Channel)
         {
