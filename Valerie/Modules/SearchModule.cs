@@ -23,21 +23,14 @@ namespace Valerie.Modules
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)
         {
-            var embed = new EmbedBuilder();
+            var embed = Vmbed.Embed(VmbedColors.Gold);
             var vc = new HttpClient();
-            embed.WithAuthor(x =>
-            {
-                x.Name = "Urban Dictionary";
-                x.WithIconUrl("https://lh3.googleusercontent.com/4hpSJ4pAfwRUg-RElZ2QXNh_pV01Z96iJGT2BFuk_RRsNc-AVY7cZhbN2g1zWII9PBQ=w170");
-            });
             string req = await vc.GetStringAsync("http://api.urbandictionary.com/v0/define?term=" + SearchTerm);
-            embed.WithColor(new Color(153, 30, 87));
-
             MatchCollection col = Regex.Matches(req, @"(?<=definition"":"")[ -z~-🧀]+(?="",""permalink)");
             MatchCollection col2 = Regex.Matches(req, @"(?<=example"":"")[ -z~-🧀]+(?="",""thumbs_down)");
             if (col.Count == 0)
             {
-                await ReplyAsync("Couldn't find anything dammit");
+                await ReplyAsync("Couldn't find anything, dammit.");
                 return;
             }
             Random r = new Random();
