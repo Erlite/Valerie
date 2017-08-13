@@ -8,11 +8,10 @@ using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
-    [RequireBotPermission(ChannelPermission.SendMessages)]
+    [RequireBotPermission(GuildPermission.SendMessages)]
     public class AudioModule : CommandBase
     {
-        public static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();
-
+        static Dictionary<ulong, List<string>> Queue = new Dictionary<ulong, List<string>>();
         private Audio Audio;
         public AudioModule(Audio Ad)
         {
