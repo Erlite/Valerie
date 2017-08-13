@@ -186,7 +186,7 @@ namespace Valerie.Modules
         public async Task GetInviteAsync(ulong GuildId)
         {
             var channel = await Context.Client.GetChannelAsync((await Context.Client.GetGuildAsync(GuildId)).DefaultChannelId);
-            var invite = await (channel as SocketGuildChannel).CreateInviteAsync(3600);
+            var invite = await (channel as SocketGuildChannel).CreateInviteAsync(null);
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync($"Here is your invite link: <{invite.Url}>");
         }
 
