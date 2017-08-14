@@ -141,19 +141,6 @@ namespace Valerie.Modules
             await ReplyAsync(string.Join(", ", BotDB.Config.EvalImports.Select(x => x)));
         }
 
-        [Command("ServerList"), Summary("Get's a list of all guilds the bot is in."), Alias("Sl")]
-        public async Task ServerListAsync()
-        {
-            var client = Context.Client as DiscordSocketClient;
-            var Sb = new StringBuilder();
-            foreach (SocketGuild guild in client.Guilds)
-            {
-                Sb.AppendLine($"{guild.Name} ({guild.Id})\n");
-            }
-            await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync(Sb.ToString());
-            await ReplyAsync("Serverlist has been sent :point_up: ");
-        }
-
         [Command("LeaveGuild"), Summary("Tells the bot to leave a certain guild")]
         public async Task LeaveAsync(ulong ID, [Remainder] string msg = "No reason provided by the owner.")
         {
