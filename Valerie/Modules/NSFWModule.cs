@@ -24,7 +24,7 @@ namespace Valerie.Modules
         [Command("Ass", RunMode = RunMode.Async), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
-            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4222) }"))[0];
+            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }"))[0];
             await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
         }
 
