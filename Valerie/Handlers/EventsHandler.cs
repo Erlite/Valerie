@@ -114,15 +114,72 @@ namespace Valerie.Handlers
 
         internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
-            var Config = ServerDB.GuildConfig((Reaction.Channel as SocketGuildChannel).Guild.Id);
-            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled) return;
-            int Count = Reaction.Message.Value.Reactions.Count;
-            var msg = await Channel.SendMessageAsync($"⭐ {Count} {(Channel as ITextChannel).Mention} ID: {Reaction.MessageId}\n {Reaction.Message.Value.Content}");
-            if (Count > 5)
-                await msg.ModifyAsync(x =>
+            SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
+            var Message = await Cache.GetOrDownloadAsync();
+            var Config = ServerDB.GuildConfig(Guild.Id);
+            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null) return;
+            ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
+            var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username);
+            if (!string.IsNullOrWhiteSpace(Message.Content))
+                Embed.WithDescription(Message.Content);
+            else if (Message.Attachments.FirstOrDefault() != null)
+                Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+            var Exists = Config.StarredMessages.FirstOrDefault(x => x.MessageId == Message.Id.ToString());
+            if (Config.StarredMessages.Contains(Exists))
+            {
+                await ServerDB.StarboardHandlerAsync(Guild.Id, ModelEnum.StarAdd, Message.Id, Message.Channel.Id, Reaction.MessageId);
+                var SMsg = await StarboardChannel.GetMessageAsync(Convert.ToUInt64(Exists.StarboardMessageId), CacheMode.AllowDownload) as IUserMessage;
+                await SMsg.ModifyAsync(x =>
                 {
-                    x.Content = $"🌟 {Count} {(Channel as ITextChannel).Mention} ID: {Reaction.MessageId}\n {Reaction.Message.Value.Content}";
+                    x.Content =
+                    $"{StringExtension.StarType(Exists.Stars + 1)}{Exists.Stars + 1} {(Reaction.Channel as ITextChannel).Mention} ID: {Exists.StarboardMessageId}";
+                    x.Embed = Embed.Build();
                 });
+            }
+            else
+            {
+                var msg = await StarboardChannel.SendMessageAsync(
+                    $"{StringExtension.StarType(Message.Reactions.Count)}{Message.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed);
+                await ServerDB.StarboardHandlerAsync(Guild.Id, ModelEnum.StarNew, Message.Id, Message.Channel.Id, msg.Id);
+            }
+        }
+
+        internal static async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
+        {
+            SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
+            var Message = await Cache.GetOrDownloadAsync();
+            var Config = ServerDB.GuildConfig(Guild.Id);
+            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null) return;
+            ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
+
+            var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username);
+            if (!string.IsNullOrWhiteSpace(Message.Content))
+                Embed.WithDescription(Message.Content);
+            else if (Message.Attachments.FirstOrDefault() != null)
+                Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+
+            var Exists = Config.StarredMessages.FirstOrDefault(x => x.MessageId == Message.Id.ToString());
+            if (!Config.StarredMessages.Contains(Exists)) return;
+
+            await ServerDB.StarboardHandlerAsync(Guild.Id, ModelEnum.StarSubtract, Message.Id, Message.Channel.Id, Reaction.MessageId);
+
+            var SMsg = await StarboardChannel.GetMessageAsync(Convert.ToUInt64(Exists.StarboardMessageId), CacheMode.AllowDownload) as IUserMessage;
+            while (true)
+            {
+                if (Message.Reactions.Count > 0)
+                    await SMsg.ModifyAsync(x =>
+                    {
+                        x.Content =
+                        $"{StringExtension.StarType(Exists.Stars - 1)}{Exists.Stars - 1} {(Reaction.Channel as ITextChannel).Mention} ID: {Exists.StarboardMessageId}";
+                        x.Embed = Embed.Build();
+                    });
+                else
+                {
+                    await ServerDB.StarboardHandlerAsync(Guild.Id, ModelEnum.StarDelete, Message.Id, Message.Channel.Id, SMsg.Id);
+                    await SMsg.DeleteAsync();
+                }
+            }
+
         }
 
         // Not Events
@@ -148,7 +205,7 @@ namespace Valerie.Handlers
             var RandomKarma = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
             if (!GuildConfig.KarmaList.ContainsKey(User.Id))
             {
-                await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaAdd, User.Id, RandomKarma);
+                await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaNew, User.Id, RandomKarma);
                 return;
             }
             await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaUpdate, User.Id, RandomKarma);
