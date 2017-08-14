@@ -148,10 +148,45 @@ namespace Valerie.Handlers.GuildHandler
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
                 switch (ValueType)
                 {
-                    case ModelEnum.KarmaAdd: Config.KarmaList.Add(Id, Value); break;
+                    case ModelEnum.KarmaNew: Config.KarmaList.Add(Id, Value); break;
                     case ModelEnum.KarmaDelete: Config.KarmaList.Remove(Id); break;
                     case ModelEnum.KarmaUpdate: Config.KarmaList[Id] += Value; break;
                     case ModelEnum.KarmaSubtract: Config.KarmaList[Id] -= Value; break;
+                }
+                await Session.StoreAsync(Config);
+                await Session.SaveChangesAsync();
+                Session.Dispose();
+            }
+        }
+
+        public static async Task StarboardHandlerAsync(ulong GuildId, ModelEnum ValueType, ulong MsgId, ulong ChannelId, ulong SMsgId)
+        {
+            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
+            {
+                var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
+                switch (ValueType)
+                {
+                    case ModelEnum.StarAdd:
+                        var AddStars = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
+                        AddStars.Stars += 1;
+                        break;
+                    case ModelEnum.StarDelete:
+                        var StarToRemove = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
+                        Config.StarredMessages.Remove(StarToRemove);
+                        break;
+                    case ModelEnum.StarNew:
+                        Config.StarredMessages.Add(new Starboard
+                        {
+                            ChannelId = ChannelId.ToString(),
+                            MessageId = MsgId.ToString(),
+                            StarboardMessageId = SMsgId.ToString(),
+                            Stars = 1
+                        });
+                        break;
+                    case ModelEnum.StarSubtract:
+                        var RemoveStars = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
+                        RemoveStars.Stars -= 1;
+                        break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();
