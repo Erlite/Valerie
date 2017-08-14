@@ -39,7 +39,7 @@ namespace Valerie.Modules
             }
             var UserKarma = Config.KarmaList.TryGetValue(User.Id, out int Karma);
             string Reply =
-                $"**TOTAL KARMA:** {Karma} | **LEVEL:** | {IntExtension.GetLevel(Karma)} | " +
+                $"**TOTAL KARMA:** {Karma} | **LEVEL:** {IntExtension.GetLevel(Karma)} | " +
                 $"**KARMA:** {Karma}/{IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma))}";
             await ReplyAsync(Reply);
         }
