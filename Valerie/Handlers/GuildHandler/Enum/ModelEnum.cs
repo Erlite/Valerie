@@ -31,9 +31,13 @@
         AFKAdd,
         AFKRemove,
         AFKModify,
-        KarmaAdd,
+        KarmaNew,
         KarmaDelete,
         KarmaUpdate,
-        KarmaSubtract
+        KarmaSubtract,
+        StarNew,
+        StarDelete,
+        StarAdd,
+        StarSubtract
     }
 }
