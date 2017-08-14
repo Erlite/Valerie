@@ -40,6 +40,7 @@ namespace Valerie
             Client.UserJoined += EventsHandler.UserJoinedAsync;
             Client.UserLeft += EventsHandler.UserLeftAsync;
             Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
+            Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
             Client.Ready += async () =>
             {
                 await EventsHandler.ReadyAsync(Client);
