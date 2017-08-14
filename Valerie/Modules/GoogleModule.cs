@@ -18,7 +18,7 @@ namespace Valerie.Modules
     [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class GoogleModule : CommandBase
     {
-        [Command("Google", RunMode = RunMode.Async), Alias("G"), Summary("Searches google for your search terms.")]
+        [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string search)
         {
             var Str = new StringBuilder();

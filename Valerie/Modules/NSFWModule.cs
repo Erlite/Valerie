@@ -14,21 +14,21 @@ namespace Valerie.Modules
     [RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
     public class NSFWModule : CommandBase
     {
-        [Command("Boobs", RunMode = RunMode.Async), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
+        [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
             JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }"))[0];
             await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
         }
 
-        [Command("Ass", RunMode = RunMode.Async), Summary("I can't believe you need help with this command."), Alias("Butt")]
+        [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
             JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }"))[0];
             await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
         }
 
-        [Command("E621", RunMode = RunMode.Async), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
+        [Command("E621"), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
         public async Task E621Async(string search)
         {
             search = search?.Trim() ?? "";
@@ -42,7 +42,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Porn", RunMode = RunMode.Async), Summary("Uses Porn.com API to fetch videos.")]
+        [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
         public async Task PornAsync([Remainder] string Search)
         {
             var Response = await new HttpClient().GetAsync($"http://api.porn.com/videos/find.json?search={Uri.EscapeDataString(Search)}");
