@@ -18,8 +18,5 @@ Leave a 🌟 if you :heart: it. Best way to show support 💪.
 
 Thanks to everyone at Discord API and C# server for helping me out. A special thanks to LupineDream and Dataccountz for suggesting and helping out with the development of Valerie.
 
-### Testimonials
----
-
-<p align="center"><img src="http://vvcap.com/img/2Nrq8h0UJ8o.png"/></p>
-<p align="center"><img src="http://vvcap.com/img/tVF34reZRX4.png"/></p>
+<p align="center">
+<img src="http://vvcap.com/img/hlmIBIKFvea.png" /> </p>
