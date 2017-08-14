@@ -97,5 +97,17 @@ namespace Valerie.Extensions
                 return "";
             }
         }
+
+        public static string StarType(int Stars)
+        {
+            if (Stars <= 5 && Stars > 0)
+                return "⭐";
+            else if (Stars > 5)
+                return "🌟";
+            else if (Stars > 15)
+                return "💫";
+            else
+                return "✨";
+        }
     }
 }
