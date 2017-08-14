@@ -39,8 +39,8 @@ namespace Valerie
             Task.Run(() => Client.MessageReceived += EventsHandler.MessageReceivedAsync);
             Client.UserJoined += EventsHandler.UserJoinedAsync;
             Client.UserLeft += EventsHandler.UserLeftAsync;
-            Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
-            Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
+            Task.Run(() => Client.ReactionAdded += EventsHandler.ReactionAddedAsync);
+            Task.Run(() => Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync);
             Client.Ready += async () =>
             {
                 await EventsHandler.ReadyAsync(Client);
@@ -62,7 +62,8 @@ namespace Valerie
                 .AddSingleton(new Audio())
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
-                    ThrowOnError = false
+                    ThrowOnError = false,
+                    DefaultRunMode = RunMode.Async
                 }));
 
             var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
