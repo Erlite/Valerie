@@ -21,5 +21,6 @@ namespace Valerie.Handlers.GuildHandler.Models
         public Dictionary<ulong, string> AFKList { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<ulong, int> KarmaList { get; set; } = new Dictionary<ulong, int>();
         public List<string> AssignableRoles { get; set; } = new List<string>();
+        public List<Starboard> StarredMessages { get; set; } = new List<Starboard>();
     }
 }
