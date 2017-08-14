@@ -360,7 +360,7 @@ namespace Valerie.Modules
 
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public async Task UserAvatarAsync(SocketGuildUser User)
-            => await ReplyAsync(User.GetAvatarUrl(size: 2048));
+            => await ReplyAsync(User.GetAvatarUrl(size: 4096));
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
@@ -369,7 +369,7 @@ namespace Valerie.Modules
 
             if (!Get.IsSuccessStatusCode)
             {
-                await ReplyAsync("Yomomma so fat that she crashed yomomma API.");
+                await ReplyAsync("Yomomma so fat that she crashed yomomma's API.");
                 return;
             }
             await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync())["joke"].ToString());
