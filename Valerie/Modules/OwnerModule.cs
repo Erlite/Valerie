@@ -193,6 +193,7 @@ namespace Valerie.Modules
             {
                 Author = message.Author.Username,
                 Message = message.Content,
+                Attachments = message.Attachments.FirstOrDefault().Url,
                 Timestamp = message.Timestamp,
             });
             var jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
