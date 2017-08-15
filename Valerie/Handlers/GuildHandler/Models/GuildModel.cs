@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Valerie.Models;
 
 namespace Valerie.Handlers.GuildHandler.Models
 {

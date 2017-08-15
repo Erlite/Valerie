@@ -6,6 +6,7 @@ namespace Valerie.Models
     {
         public string Author { get; set; }
         public string Message { get; set; }
+        public string Attachments { get; set; }
         public DateTimeOffset Timestamp { get; set; }
     }
 }
