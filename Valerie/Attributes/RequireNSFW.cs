@@ -16,7 +16,6 @@ namespace Valerie.Attributes
         }
 
         static bool IsNSFW(IChannel Channel) =>
-            Channel.Name == "nsfw" || Channel.Name.Contains("nsfw") || Channel.Name.StartsWith("nsfw-") ||
-            Channel.Name.StartsWith("nsfw_");
+            Channel.Name.Contains("nsfw");
     }
 }
