@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Addons.Interactive;
 using Valerie.Handlers;
-using Valerie.Services;
 using Valerie.Services.Logger.Enums;
 using Valerie.Services.Logger;
 using Valerie.Handlers.ConfigHandler;
@@ -60,7 +59,6 @@ namespace Valerie
         {
             return new ServiceCollection()
                 .AddSingleton(Client)
-                .AddSingleton(new AudioService())
                 .AddSingleton<InteractiveService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
