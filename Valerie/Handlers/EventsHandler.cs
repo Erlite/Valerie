@@ -268,7 +268,7 @@ namespace Valerie.Handlers
         {
             var KarmaHandler = ServerDB.GuildConfig(GuildId).KarmaHandler;
             if (!CheckLevel || !KarmaHandler.LevelUpRoles.Any() ||
-                IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]) > KarmaHandler.MaxRolesLevel) return;
+                IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]) > KarmaHandler.MaxRoleLevel) return;
             int GetLevel = IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]);
             var GetRole = KarmaHandler.LevelUpRoles.FirstOrDefault(x => x.Value >= GetLevel).Key;
             await User.AddRoleAsync(User.Guild.GetRole(GetRole));
