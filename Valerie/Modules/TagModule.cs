@@ -112,8 +112,8 @@ namespace Valerie.Modules
                 await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
                 return;
             }
-            await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags." +
-                $"\n```{string.Join(", ", Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Select(y => y.Name))}```");
+            string list = $"\n```{string.Join(", ", Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Select(y => y.Name))}```";
+            await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags.\n{list ?? null}");
         }
 
         [Command("Top"), Summary("Shows the top 5 tags."), Priority(1)]
