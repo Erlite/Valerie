@@ -106,7 +106,7 @@ namespace Valerie.Handlers
         internal static async Task MessageReceivedAsync(SocketMessage Message)
         {
             await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived);
-            await KarmaHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
+            await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
             await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
             await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
             await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
@@ -194,28 +194,28 @@ namespace Valerie.Handlers
             TimeSpan.FromSeconds(0.0));
         }
 
-        static async Task KarmaHandlerAsync(SocketGuildUser User, int Karma)
+        static async Task EridiumHandlerAsync(SocketGuildUser User, int Eridium)
         {
             RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
             var GuildConfig = ServerDB.GuildConfig(GuildID);
 
-            var HasRole = (User as IGuildUser).RoleIds.Intersect(GuildConfig.KarmaHandler.BlacklistRoles.Select(x => UInt64.Parse(x))).Any();
+            var HasRole = (User as IGuildUser).RoleIds.Intersect(GuildConfig.EridiumHandler.BlacklistRoles.Select(x => UInt64.Parse(x))).Any();
 
-            if (User == null || User.IsBot || !GuildConfig.KarmaHandler.IsKarmaEnabled ||
+            if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEridiumEnabled ||
                 BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id) || HasRole) return;
 
-            var KarmaToGive = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
-            if (!GuildConfig.KarmaHandler.UsersList.ContainsKey(User.Id))
+            var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
+            if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
-                await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaNew, User.Id, KarmaToGive);
+                await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumNew, User.Id, EridiumToGive);
                 return;
             }
 
-            int OldLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id]);
-            int NewLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id] + KarmaToGive);
+            int OldLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id]);
+            int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
 
-            await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaUpdate, User.Id, KarmaToGive);
+            await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumUpdate, User.Id, EridiumToGive);
             Waitlist.Add(User.Id);
 
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
@@ -233,9 +233,9 @@ namespace Valerie.Handlers
         static async Task CleanUpAsync(SocketGuildUser User)
         {
             var GuildConfig = ServerDB.GuildConfig(User.Guild.Id);
-            if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.KarmaHandler.UsersList.ContainsKey(User.Id))) return;
+            if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))) return;
             await ServerDB.AFKHandlerAsync(User.Guild.Id, ModelEnum.AFKRemove, User.Id);
-            await ServerDB.KarmaHandlerAsync(User.Guild.Id, ModelEnum.KarmaDelete, User.Id);
+            await ServerDB.EridiumHandlerAsync(User.Guild.Id, ModelEnum.EridiumDelete, User.Id);
             await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagPurge, Owner: User.Id.ToString());
         }
 
@@ -266,11 +266,11 @@ namespace Valerie.Handlers
 
         static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
         {
-            var KarmaHandler = ServerDB.GuildConfig(GuildId).KarmaHandler;
-            if (!CheckLevel || !KarmaHandler.LevelUpRoles.Any() ||
-                IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]) > KarmaHandler.MaxRoleLevel) return;
-            int GetLevel = IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]);
-            var GetRole = KarmaHandler.LevelUpRoles.FirstOrDefault(x => x.Value >= GetLevel).Key;
+            var EridiumHandler = ServerDB.GuildConfig(GuildId).EridiumHandler;
+            if (!CheckLevel || !EridiumHandler.LevelUpRoles.Any() ||
+                IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]) > EridiumHandler.MaxRoleLevel) return;
+            int GetLevel = IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]);
+            var GetRole = EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value >= GetLevel).Key;
             await User.AddRoleAsync(User.Guild.GetRole(GetRole));
         }
 

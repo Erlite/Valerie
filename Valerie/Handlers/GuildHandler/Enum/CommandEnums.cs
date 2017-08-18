@@ -2,7 +2,7 @@
 {
     public enum CommandEnums
     {
-        Karma,
+        Eridium,
         CB,
         Join,
         Leave,

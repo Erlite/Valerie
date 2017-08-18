@@ -58,7 +58,7 @@ namespace Valerie.Handlers.GuildHandler
                 {
                     case ModelEnum.RolesAdd: Config.AssignableRoles.Add(Value); break;
                     case ModelEnum.RolesRemove: Config.AssignableRoles.Remove(Value); break;
-                    case ModelEnum.KarmaEnabled: Config.KarmaHandler.IsKarmaEnabled = Convert.ToBoolean(Value); break;
+                    case ModelEnum.EridiumEnabled: Config.EridiumHandler.IsEridiumEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.LeaveAdd: Config.LeaveMessages.Add(Value); break;
                     case ModelEnum.LeaveRemove: Config.LeaveMessages.Remove(Value); break;
                     case ModelEnum.ModCases: Config.ModCases += 1; break;
@@ -77,7 +77,7 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.ModEnabled: Config.ModLog.IsEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.StarChannel: Config.Starboard.TextChannel = Value; break;
                     case ModelEnum.StarEnabled: Config.Starboard.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.KarmaMaxRoleLevel: Config.KarmaHandler.MaxRoleLevel = int.Parse(Value); break;
+                    case ModelEnum.EridiumMaxRoleLevel: Config.EridiumHandler.MaxRoleLevel = int.Parse(Value); break;
 
                 }
                 await Session.StoreAsync(Config);
@@ -134,21 +134,21 @@ namespace Valerie.Handlers.GuildHandler
             }
         }
 
-        public static async Task KarmaHandlerAsync(ulong GuildId, ModelEnum ValueType, ulong Id, int Value = 0)
+        public static async Task EridiumHandlerAsync(ulong GuildId, ModelEnum ValueType, ulong Id, int Value = 0)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
                 switch (ValueType)
                 {
-                    case ModelEnum.KarmaNew: Config.KarmaHandler.UsersList.Add(Id, Value); break;
-                    case ModelEnum.KarmaDelete: Config.KarmaHandler.UsersList.Remove(Id); break;
-                    case ModelEnum.KarmaUpdate: Config.KarmaHandler.UsersList[Id] += Value; break;
-                    case ModelEnum.KarmaSubtract: Config.KarmaHandler.UsersList[Id] -= Value; break;
-                    case ModelEnum.KarmaBLAdd: Config.KarmaHandler.BlacklistRoles.Add(Id.ToString()); break;
-                    case ModelEnum.KarmaBLRemove: Config.KarmaHandler.BlacklistRoles.Remove(Id.ToString()); break;
-                    case ModelEnum.KarmaRoleAdd: Config.KarmaHandler.LevelUpRoles.Add(Id, Value); break;
-                    case ModelEnum.KarmaRoleRemove: Config.KarmaHandler.LevelUpRoles.Remove(Id); break;
+                    case ModelEnum.EridiumNew: Config.EridiumHandler.UsersList.Add(Id, Value); break;
+                    case ModelEnum.EridiumDelete: Config.EridiumHandler.UsersList.Remove(Id); break;
+                    case ModelEnum.EridiumUpdate: Config.EridiumHandler.UsersList[Id] += Value; break;
+                    case ModelEnum.EridiumSubtract: Config.EridiumHandler.UsersList[Id] -= Value; break;
+                    case ModelEnum.EridiumBLAdd: Config.EridiumHandler.BlacklistRoles.Add(Id.ToString()); break;
+                    case ModelEnum.EridiumBLRemove: Config.EridiumHandler.BlacklistRoles.Remove(Id.ToString()); break;
+                    case ModelEnum.EridiumRoleAdd: Config.EridiumHandler.LevelUpRoles.Add(Id, Value); break;
+                    case ModelEnum.EridiumRoleRemove: Config.EridiumHandler.LevelUpRoles.Remove(Id); break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();

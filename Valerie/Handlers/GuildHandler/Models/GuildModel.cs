@@ -18,7 +18,7 @@ namespace Valerie.Handlers.GuildHandler.Models
         public Wrapper Starboard { get; set; } = new Wrapper();
         public List<TagsModel> TagsList { get; set; } = new List<TagsModel>();
         public Dictionary<ulong, string> AFKList { get; set; } = new Dictionary<ulong, string>();
-        public KarmaModel KarmaHandler { get; set; } = new KarmaModel();
+        public EridiumModel EridiumHandler { get; set; } = new EridiumModel();
         public List<string> AssignableRoles { get; set; } = new List<string>();
         public List<Starboard> StarredMessages { get; set; } = new List<Starboard>();
     }

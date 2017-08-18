@@ -2,9 +2,9 @@
 
 namespace Valerie.Handlers.GuildHandler.Models
 {
-    public class KarmaModel
+    public class EridiumModel
     {
-        public bool IsKarmaEnabled { get; set; }
+        public bool IsEridiumEnabled { get; set; }
         public int MaxRoleLevel { get; set; } = 50;
         public List<string> BlacklistRoles { get; set; } = new List<string>();
         public Dictionary<ulong, int> LevelUpRoles { get; set; } = new Dictionary<ulong, int>();

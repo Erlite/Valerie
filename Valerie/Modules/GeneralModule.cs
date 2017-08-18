@@ -27,40 +27,40 @@ namespace Valerie.Modules
         public async Task PingAsync()
             => await ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
 
-        [Command("Rank"), Summary("Shows your current rank and how much Karma is needed for next level.")]
+        [Command("Rank"), Summary("Shows your current rank and how much Eridium is needed for next level.")]
         public async Task RankAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (!Config.KarmaHandler.UsersList.ContainsKey(User.Id))
+            if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
                 await ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
                 return;
             }
-            var UserKarma = Config.KarmaHandler.UsersList.TryGetValue(User.Id, out int Karma);
+            var UserEridium = Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Eridium);
             string Reply =
-                $"**TOTAL KARMA:** {Karma} | **LEVEL:** {IntExtension.GetLevel(Karma)} | " +
-                $"**KARMA:** {Karma}/{IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma))}";
+                $"**TOTAL Eridium:** {Eridium} | **LEVEL:** {IntExtension.GetLevel(Eridium)} | " +
+                $"**Eridium:** {Eridium}/{IntExtension.GetEridiumForNextLevel(IntExtension.GetLevel(Eridium))}";
             await ReplyAsync(Reply);
         }
 
-        [Command("Top"), Summary("Shows top 10 users in the Karma list.")]
-        public async Task KarmaAsync()
+        [Command("Top"), Summary("Shows top 10 users in the Eridium list.")]
+        public async Task EridiumAsync()
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (Config.KarmaHandler.UsersList.Count == 0)
+            if (Config.EridiumHandler.UsersList.Count == 0)
             {
                 await ReplyAsync("There are no top users for this guild.");
                 return;
             }
             var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
-            var Karmalist = Config.KarmaHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
-            foreach (var Value in Karmalist)
+            var Eridiumlist = Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
+            foreach (var Value in Eridiumlist)
             {
                 var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
                 if (User == null)
-                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaDelete, $"{User.Id}");
-                embed.AddInlineField(User.Username, $"Karma: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}");
+                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumDelete, $"{User.Id}");
+                embed.AddInlineField(User.Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}");
             }
             await ReplyAsync("", embed: embed);
         }
@@ -138,7 +138,7 @@ namespace Valerie.Modules
             await ReplyAsync($"You have been removed from **{Role.Name}** role!");
         }
 
-        [Command("Slotmachine"), Summary("Want to earn quick karma? That's how you earn some."), Cooldown(5)]
+        [Command("Slotmachine"), Summary("Want to earn quick Eridium? That's how you earn some."), Cooldown(5)]
         public async Task SlotMachineAsync(int Bet = 50)
         {
             string[] Slots = new string[]
@@ -153,16 +153,16 @@ namespace Valerie.Modules
             };
             var Rand = new Random(DateTime.Now.Millisecond);
             var Guild = ServerDB.GuildConfig(Context.Guild.Id);
-            var UserKarma = Guild.KarmaHandler.UsersList[Context.User.Id];
-            if (Guild.KarmaHandler.IsKarmaEnabled == false)
+            var UserEridium = Guild.EridiumHandler.UsersList[Context.User.Id];
+            if (Guild.EridiumHandler.IsEridiumEnabled == false)
             {
-                await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
+                await ReplyAsync("Chat Eridium is disabled! Ask Admin or server owner to enable Chat Eridium!");
                 return;
             }
 
-            if (UserKarma <= 0 || UserKarma < Bet)
+            if (UserEridium <= 0 || UserEridium < Bet)
             {
-                await ReplyAsync("You don't have enough karma for slot machine!");
+                await ReplyAsync("You don't have enough Eridium for slot machine!");
                 return;
             }
 
@@ -213,13 +213,13 @@ namespace Valerie.Modules
 
             if (win == 0)
             {
-                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
+                await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumSubtract, Context.User.Id, Bet);
                 embed.Description = $"You lost {Bet}. Better luck next time! :weary:";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
-                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet);
+                await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumUpdate, Context.User.Id, Bet);
                 embed.Description = $"You won {Bet} :tada:";
                 embed.Color = new Color(0x93ff89);
             }
@@ -230,10 +230,10 @@ namespace Valerie.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            int UserKarma = Config.KarmaHandler.UsersList[Context.User.Id];
-            if (Config.KarmaHandler.IsKarmaEnabled == false)
+            int UserEridium = Config.EridiumHandler.UsersList[Context.User.Id];
+            if (Config.EridiumHandler.IsEridiumEnabled == false)
             {
-                await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
+                await ReplyAsync("Chat Eridium is disabled! Ask the admin to enable ChatEridium!");
                 return;
             }
 
@@ -243,9 +243,9 @@ namespace Valerie.Modules
                 return;
             }
 
-            if (UserKarma < Bet || UserKarma <= 0)
+            if (UserEridium < Bet || UserEridium <= 0)
             {
-                await ReplyAsync("You don't have enough karma!");
+                await ReplyAsync("You don't have enough Eridium!");
                 return;
             }
 
@@ -266,12 +266,12 @@ namespace Valerie.Modules
 
             if (Side.ToLower() == GetSide.ToLower())
             {
-                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaUpdate, Context.User.Id, Bet * 2);
+                await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumUpdate, Context.User.Id, Bet * 2);
                 await ReplyAsync($"Congratulations! You won {Bet}!");
             }
             else
             {
-                await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaSubtract, Context.User.Id, Bet);
+                await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumSubtract, Context.User.Id, Bet);
                 await ReplyAsync($"You lost {Bet}! :frowning:");
             }
         }
