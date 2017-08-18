@@ -8,6 +8,7 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Extensions;
 using Valerie.Attributes;
+using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
@@ -388,6 +389,65 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("KarmaBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("KB")]
+        public async Task BlacklistRoleAsync(Actions Action, IRole Role)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            switch (Action)
+            {
+                case Actions.Add:
+                    if (Config.KarmaHandler.BlacklistRoles.Contains(Role.Id.ToString()))
+                    {
+                        await ReplyAsync($"{Role} already exists in roles blacklist."); return;
+                    }
+                    await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaBLAdd, Role.Id);
+                    await ReplyAsync($"{Role} has been added."); break;
+
+                case Actions.Remove:
+                    if (!Config.KarmaHandler.BlacklistRoles.Contains(Role.Id.ToString()))
+                    {
+                        await ReplyAsync($"{Role} doesn't exists in roles blacklist."); return;
+                    }
+                    await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaBLRemove, Role.Id);
+                    await ReplyAsync($"{Role} has been removed."); break;
+            }
+        }
+
+        [Command("LevelAdd"), Summary("Adds a level to level up list."), Alias("LA")]
+        public async Task LevelAddAsync(IRole Role, int Level)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (Config.KarmaHandler.LevelUpRoles.ContainsKey(Role.Id))
+            {
+                await ReplyAsync($"{Role} already exists in level up roles."); return;
+            }
+            await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaRoleAdd, Role.Id, Level);
+            await ReplyAsync($"{Role} has been added.");
+        }
+
+        [Command("LevelRemove"), Summary("Removes a role from level up roles"), Alias("LR")]
+        public async Task KarmaLevelAsync(IRole Role)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.KarmaHandler.LevelUpRoles.ContainsKey(Role.Id))
+            {
+                await ReplyAsync($"{Role} doesn't exists in level up roles."); return;
+            }
+            await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaRoleRemove, Role.Id);
+            await ReplyAsync($"{Role} has been removed.");
+        }
+
+        [Command("SetLevel"), Summary("Sets Max level for auto roles")]
+        public async Task SetLevelAsync(int MaxLevel)
+        {
+            if (MaxLevel < 10)
+            {
+                await ReplyAsync("Max level can't be lower than 10"); return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaMaxRoleLevel, MaxLevel.ToString());
+            await ReplyAsync($"Max auto assign role leve has been set to: {MaxLevel}");
         }
     }
 }
