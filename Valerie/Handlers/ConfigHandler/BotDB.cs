@@ -30,7 +30,7 @@ namespace Valerie.Handlers.ConfigHandler
                 var Config = await Session.LoadAsync<ConfigModel>(BotConfig);
                 if (Config == null)
                 {
-                    Log.Write(Status.ERR, Source.BotDatabase, "No Bot's table found! Creating one..");
+                    Log.Write(Status.ERR, Source.BotDatabase, "Creating config ...");
                     Log.Write(Status.WRN, Source.BotDatabase, "Enter Bot Token: ");
                     string Token = Console.ReadLine();
                     Log.Write(Status.WRN, Source.BotDatabase, "Enter Bot Prefix: ");
@@ -41,12 +41,12 @@ namespace Valerie.Handlers.ConfigHandler
                         Token = Token,
                         Prefix = Prefix
                     });
-                    Log.Write(Status.KAY, Source.BotDatabase, "Bot's table created!");
+                    Log.Write(Status.KAY, Source.BotDatabase, "Config created succesfully.");
                     await Session.SaveChangesAsync();
                     Session.Dispose();
                 }
                 else
-                    Log.Write(Status.KAY, Source.BotDatabase, "Bot's table loaded.");
+                    Log.Write(Status.KAY, Source.BotDatabase, "Config locked and loaded.");
             }
         }
 
