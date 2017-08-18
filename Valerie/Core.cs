@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord.WebSocket;
 using Discord.Commands;
+using Discord.Addons.Interactive;
 using Valerie.Handlers;
 using Valerie.Services;
 using Valerie.Services.Logger.Enums;
@@ -28,7 +29,7 @@ namespace Valerie
                 MessageCacheSize = 10000
             });
 
-            var ServiceProvider = InjectServices();
+            var ServiceProvider = IServiceProvider();
             CommandHandler = new CommandHandler(ServiceProvider);
             await CommandHandler.ConfigureCommandsAsync();
 
@@ -55,19 +56,18 @@ namespace Valerie
             await Task.Delay(-1);
         }
 
-        IServiceProvider InjectServices()
+        IServiceProvider IServiceProvider()
         {
-            var Services = new ServiceCollection()
+            return new ServiceCollection()
                 .AddSingleton(Client)
                 .AddSingleton(new AudioService())
+                .AddSingleton<InteractiveService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
                     DefaultRunMode = RunMode.Async
-                }));
-
-            var Provider = new DefaultServiceProviderFactory().CreateServiceProvider(Services);
-            return Provider;
+                }))
+                .BuildServiceProvider();
         }
     }
 }
