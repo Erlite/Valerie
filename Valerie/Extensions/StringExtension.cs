@@ -73,7 +73,7 @@ namespace Valerie.Extensions
             SearchRequest.Q = Search;
             SearchRequest.MaxResults = 1;
             SearchRequest.Type = "video";
-            return (SearchRequest.Execute()).Items.Select(x => x.Id.VideoId).FirstOrDefault();
+            return SearchRequest.Execute().Items.Select(x => x.Id.VideoId).FirstOrDefault();
         }
 
         public static async Task<string> GetE621ImageLinkAsync(string tag)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Discord;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Valerie.Extensions
@@ -32,5 +33,9 @@ namespace Valerie.Extensions
             };
             return (URLS.Any(x => Message.Contains(x) | Message.StartsWith(x)));
         }
+
+        public static bool HasLeveledUp(int Previous, int New) => Previous < New;
+
+        public static bool IsNSFW(IChannel Channel) => Channel.Name.Contains("nsfw");
     }
 }
