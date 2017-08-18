@@ -59,7 +59,7 @@ namespace Valerie
         {
             var Services = new ServiceCollection()
                 .AddSingleton(Client)
-                .AddSingleton(new Audio())
+                .AddSingleton(new AudioService())
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
