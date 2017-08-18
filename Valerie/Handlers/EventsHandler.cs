@@ -199,17 +199,26 @@ namespace Valerie.Handlers
             RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
             var GuildConfig = ServerDB.GuildConfig(GuildID);
-            if (User == null || User.IsBot || !GuildConfig.IsKarmaEnabled ||
-                BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id)) return;
+
+            var HasRole = (User as IGuildUser).RoleIds.Intersect(GuildConfig.KarmaHandler.BlacklistRoles.Select(x => UInt64.Parse(x))).Any();
+
+            if (User == null || User.IsBot || !GuildConfig.KarmaHandler.IsKarmaEnabled ||
+                BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id) || HasRole) return;
 
             var RandomKarma = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
-            if (!GuildConfig.KarmaList.ContainsKey(User.Id))
+            if (!GuildConfig.KarmaHandler.UsersList.ContainsKey(User.Id))
             {
                 await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaNew, User.Id, RandomKarma);
                 return;
             }
+
+            int OldLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id]);
+            int NewLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id] + RandomKarma);
+
             await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaUpdate, User.Id, RandomKarma);
             Waitlist.Add(User.Id);
+
+            await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
         }
 
         static async Task AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
@@ -224,7 +233,7 @@ namespace Valerie.Handlers
         static async Task CleanUpAsync(SocketGuildUser User)
         {
             var GuildConfig = ServerDB.GuildConfig(User.Guild.Id);
-            if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.KarmaList.ContainsKey(User.Id))) return;
+            if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.KarmaHandler.UsersList.ContainsKey(User.Id))) return;
             await ServerDB.AFKHandlerAsync(User.Guild.Id, ModelEnum.AFKRemove, User.Id);
             await ServerDB.KarmaHandlerAsync(User.Guild.Id, ModelEnum.KarmaDelete, User.Id);
             await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagPurge, Owner: User.Id.ToString());
@@ -253,6 +262,16 @@ namespace Valerie.Handlers
                 await Message.DeleteAsync();
                 await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
             }
+        }
+
+        static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
+        {
+            var KarmaHandler = ServerDB.GuildConfig(GuildId).KarmaHandler;
+            if (!CheckLevel || !KarmaHandler.LevelUpRoles.Any() ||
+                IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]) > KarmaHandler.MaxRolesLevel) return;
+            int GetLevel = IntExtension.GetLevel(KarmaHandler.UsersList[User.Id]);
+            var GetRole = KarmaHandler.LevelUpRoles.FirstOrDefault(x => x.Value >= GetLevel).Key;
+            await User.AddRoleAsync(User.Guild.GetRole(GetRole));
         }
 
         public static async Task LatencyUpdatedAsync(DiscordSocketClient Client, int Older, int Newer)

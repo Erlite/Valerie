@@ -58,7 +58,7 @@ namespace Valerie.Handlers.GuildHandler
                 {
                     case ModelEnum.RolesAdd: Config.AssignableRoles.Add(Value); break;
                     case ModelEnum.RolesRemove: Config.AssignableRoles.Remove(Value); break;
-                    case ModelEnum.KarmaEnabled: Config.IsKarmaEnabled = Convert.ToBoolean(Value); break;
+                    case ModelEnum.KarmaEnabled: Config.KarmaHandler.IsKarmaEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.LeaveAdd: Config.LeaveMessages.Add(Value); break;
                     case ModelEnum.LeaveRemove: Config.LeaveMessages.Remove(Value); break;
                     case ModelEnum.ModCases: Config.ModCases += 1; break;
@@ -77,6 +77,7 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.ModEnabled: Config.ModLog.IsEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.StarChannel: Config.Starboard.TextChannel = Value; break;
                     case ModelEnum.StarEnabled: Config.Starboard.IsEnabled = Convert.ToBoolean(Value); break;
+                    case ModelEnum.KarmaMaxRoleLevel: Config.KarmaHandler.MaxRolesLevel = int.Parse(Value); break;
 
                 }
                 await Session.StoreAsync(Config);
@@ -90,6 +91,7 @@ namespace Valerie.Handlers.GuildHandler
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
+                var GetTag = Config.TagsList.FirstOrDefault(x => x.Name == Name);
                 switch (ValueType)
                 {
                     case ModelEnum.TagAdd:
@@ -102,18 +104,9 @@ namespace Valerie.Handlers.GuildHandler
                         };
                         Config.TagsList.Add(NewTag);
                         break;
-                    case ModelEnum.TagRemove:
-                        var TagToRemove = Config.TagsList.FirstOrDefault(x => x.Name == Name);
-                        Config.TagsList.Remove(TagToRemove);
-                        break;
-                    case ModelEnum.TagModify:
-                        var GetTag = Config.TagsList.FirstOrDefault(x => x.Name == Name);
-                        GetTag.Response = Response;
-                        break;
-                    case ModelEnum.TagUpdate:
-                        var TagToUpdate = Config.TagsList.FirstOrDefault(x => x.Name == Name);
-                        TagToUpdate.Uses += 1;
-                        break;
+                    case ModelEnum.TagRemove: Config.TagsList.Remove(GetTag); break;
+                    case ModelEnum.TagModify: GetTag.Response = Response; break;
+                    case ModelEnum.TagUpdate: GetTag.Uses += 1; break;
                     case ModelEnum.TagPurge:
                         Config.TagsList.RemoveAll(x => x.Owner == Owner);
                         break;
@@ -148,10 +141,14 @@ namespace Valerie.Handlers.GuildHandler
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
                 switch (ValueType)
                 {
-                    case ModelEnum.KarmaNew: Config.KarmaList.Add(Id, Value); break;
-                    case ModelEnum.KarmaDelete: Config.KarmaList.Remove(Id); break;
-                    case ModelEnum.KarmaUpdate: Config.KarmaList[Id] += Value; break;
-                    case ModelEnum.KarmaSubtract: Config.KarmaList[Id] -= Value; break;
+                    case ModelEnum.KarmaNew: Config.KarmaHandler.UsersList.Add(Id, Value); break;
+                    case ModelEnum.KarmaDelete: Config.KarmaHandler.UsersList.Remove(Id); break;
+                    case ModelEnum.KarmaUpdate: Config.KarmaHandler.UsersList[Id] += Value; break;
+                    case ModelEnum.KarmaSubtract: Config.KarmaHandler.UsersList[Id] -= Value; break;
+                    case ModelEnum.KarmaBLAdd: Config.KarmaHandler.BlacklistRoles.Add(Id.ToString()); break;
+                    case ModelEnum.KarmaBLRemove: Config.KarmaHandler.BlacklistRoles.Remove(Id.ToString()); break;
+                    case ModelEnum.KarmaRoleAdd: Config.KarmaHandler.LevelUpRoles.Add(Id, Value); break;
+                    case ModelEnum.KarmaRoleRemove: Config.KarmaHandler.LevelUpRoles.Remove(Id); break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();
@@ -164,16 +161,9 @@ namespace Valerie.Handlers.GuildHandler
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
                 var Config = await Session.LoadAsync<GuildModel>($"{GuildId}");
+                var GetMessage = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
                 switch (ValueType)
                 {
-                    case ModelEnum.StarAdd:
-                        var AddStars = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
-                        AddStars.Stars += 1;
-                        break;
-                    case ModelEnum.StarDelete:
-                        var StarToRemove = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
-                        Config.StarredMessages.Remove(StarToRemove);
-                        break;
                     case ModelEnum.StarNew:
                         Config.StarredMessages.Add(new Starboard
                         {
@@ -183,10 +173,9 @@ namespace Valerie.Handlers.GuildHandler
                             Stars = 1
                         });
                         break;
-                    case ModelEnum.StarSubtract:
-                        var RemoveStars = Config.StarredMessages.FirstOrDefault(x => x.MessageId == MsgId.ToString());
-                        RemoveStars.Stars -= 1;
-                        break;
+                    case ModelEnum.StarAdd: GetMessage.Stars += 1; break;
+                    case ModelEnum.StarDelete: Config.StarredMessages.Remove(GetMessage); break;
+                    case ModelEnum.StarSubtract: GetMessage.Stars -= 1; break;
                 }
                 await Session.StoreAsync(Config);
                 await Session.SaveChangesAsync();
