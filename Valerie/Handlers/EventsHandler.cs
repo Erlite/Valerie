@@ -205,17 +205,17 @@ namespace Valerie.Handlers
             if (User == null || User.IsBot || !GuildConfig.KarmaHandler.IsKarmaEnabled ||
                 BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id) || HasRole) return;
 
-            var RandomKarma = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
+            var KarmaToGive = IntExtension.GiveKarma(Karma, User.Guild.Users.Count);
             if (!GuildConfig.KarmaHandler.UsersList.ContainsKey(User.Id))
             {
-                await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaNew, User.Id, RandomKarma);
+                await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaNew, User.Id, KarmaToGive);
                 return;
             }
 
             int OldLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id]);
-            int NewLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id] + RandomKarma);
+            int NewLevel = IntExtension.GetLevel(GuildConfig.KarmaHandler.UsersList[User.Id] + KarmaToGive);
 
-            await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaUpdate, User.Id, RandomKarma);
+            await ServerDB.KarmaHandlerAsync(GuildID, ModelEnum.KarmaUpdate, User.Id, KarmaToGive);
             Waitlist.Add(User.Id);
 
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
