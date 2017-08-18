@@ -113,13 +113,20 @@ namespace Valerie.Modules
                 return;
             }
             string list = $"\n```{string.Join(", ", Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Select(y => y.Name))}```";
-            await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags.\n{list ?? null}");
+            if (!string.IsNullOrWhiteSpace(list))
+                await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags.\n{list}");
+            else
+                await ReplyAsync($"{User} has no tags.");
         }
 
         [Command("Top"), Summary("Shows the top 5 tags."), Priority(1)]
         public async Task TopAsync()
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.TagsList.Any())
+            {
+                await ReplyAsync("Guild has no tags."); return;
+            }
             var Top5 = Config.TagsList.OrderByDescending(x => x.Uses).Take(5);
             await ReplyAsync($"{Context.Guild.Name} Top 5 Tags:\n{string.Join(", ", Top5.Select(x => x.Name))}");
         }
