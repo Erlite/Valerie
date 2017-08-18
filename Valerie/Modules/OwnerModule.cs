@@ -55,7 +55,7 @@ namespace Valerie.Modules
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync("You have been removed from my Blacklist! You may use my commands again.");
         }
 
-        [Command("Eval"), Summary("Evaluates some sort of expression for you."), Remarks("Eval Client.Guilds.Count")]
+        [Command("Eval"), Summary("Evaluates some sort of expression for you.")]
         public async Task EvalAsync([Remainder] string Code)
         {
             var Options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);

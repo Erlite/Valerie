@@ -63,10 +63,10 @@ namespace Valerie.Handlers
                     break;
                 case PreconditionResult PdR:
                     ErrorMsg = PdR.ErrorReason;
-                    Log.Write(Status.ERR, Source.Client, $"[{Context.Guild.Name} | {Command.Name}] {PdR.ErrorReason} ");
+                    Log.Write(Status.ERR, Source.Client, $"[{Context.Guild.Name} | {Context.User} | {Command.Name}]");
                     break;
                 case ParseResult PR:
-                    ErrorMsg = $"{Format.Bold("Usage:")} {BotDB.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => x.Name))}\n" +
+                    ErrorMsg = $"{Format.Bold("Usage:")} {BotDB.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}\n" +
                         $"{Format.Bold("Summary:")} {Command.Summary}";
                     break;
             }

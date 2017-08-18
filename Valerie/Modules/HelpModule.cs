@@ -23,9 +23,10 @@ namespace Valerie.Modules
             {
                 string ModuleName = null;
                 ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;
+
                 embed.AddField(x =>
                 {
-                    x.Name = ModuleName;
+                    x.Name = $"{ModuleName} Commands";
                     x.Value = string.Join(", ", Module.Commands.Select(Cmd => Cmd.Name));
                     x.IsInline = false;
                 });
