@@ -77,7 +77,7 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.ModEnabled: Config.ModLog.IsEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.StarChannel: Config.Starboard.TextChannel = Value; break;
                     case ModelEnum.StarEnabled: Config.Starboard.IsEnabled = Convert.ToBoolean(Value); break;
-                    case ModelEnum.KarmaMaxRoleLevel: Config.KarmaHandler.MaxRolesLevel = int.Parse(Value); break;
+                    case ModelEnum.KarmaMaxRoleLevel: Config.KarmaHandler.MaxRoleLevel = int.Parse(Value); break;
 
                 }
                 await Session.StoreAsync(Config);
