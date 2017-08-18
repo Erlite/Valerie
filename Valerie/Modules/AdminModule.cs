@@ -125,7 +125,7 @@ namespace Valerie.Modules
                     }
                     break;
                 case CommandEnums.Karma:
-                    if (!Config.IsKarmaEnabled)
+                    if (!Config.KarmaHandler.IsKarmaEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaEnabled, "true");
                         await ReplyAsync("Karma has been enabled.");
@@ -324,10 +324,10 @@ namespace Valerie.Modules
                 TagList = $"{Context.Guild.Name} has {GConfig.TagsList.Count} tags.";
 
             string KarmaList = null;
-            if (GConfig.KarmaList.Count <= 0)
+            if (GConfig.KarmaHandler.UsersList.Count <= 0)
                 KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
             else
-                KarmaList = $"{GConfig.KarmaList.Count} members in Karma list.";
+                KarmaList = $"{GConfig.KarmaHandler.UsersList.Count} members in Karma list.";
 
             string Roles = null;
             if (GConfig.AssignableRoles.Count <= 0)
@@ -338,7 +338,7 @@ namespace Valerie.Modules
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
             var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
-            var Karma = GConfig.IsKarmaEnabled ? "Enabled" : "Disabled";
+            var Karma = GConfig.KarmaHandler.IsKarmaEnabled ? "Enabled" : "Disabled";
             var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
             var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
             var AntiAd = GConfig.AntiAdvertisement ? "Enabled" : "Disabled";

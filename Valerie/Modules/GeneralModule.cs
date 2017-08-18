@@ -27,44 +27,6 @@ namespace Valerie.Modules
         public async Task PingAsync()
             => await ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
 
-        [Command("Rank"), Summary("Shows your current rank and how much Karma is needed for next level.")]
-        public async Task RankAsync(IGuildUser User = null)
-        {
-            User = User ?? Context.User as IGuildUser;
-            var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (!Config.KarmaList.ContainsKey(User.Id))
-            {
-                await ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
-                return;
-            }
-            var UserKarma = Config.KarmaList.TryGetValue(User.Id, out int Karma);
-            string Reply =
-                $"**TOTAL KARMA:** {Karma} | **LEVEL:** {IntExtension.GetLevel(Karma)} | " +
-                $"**KARMA:** {Karma}/{IntExtension.GetKarmaForNextLevel(IntExtension.GetLevel(Karma))}";
-            await ReplyAsync(Reply);
-        }
-
-        [Command("Top"), Summary("Shows top 10 users in the Karma list.")]
-        public async Task KarmaAsync()
-        {
-            var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (Config.KarmaList.Count == 0)
-            {
-                await ReplyAsync("There are no top users for this guild.");
-                return;
-            }
-            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
-            var Karmalist = Config.KarmaList.OrderByDescending(x => x.Value).Take(10);
-            foreach (var Value in Karmalist)
-            {
-                var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
-                if (User == null)
-                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaDelete, $"{User.Id}");
-                embed.AddInlineField(User.Username, $"Rank: {Value.Value} | Level: {IntExtension.GetLevel(Value.Value)}");
-            }
-            await ReplyAsync("", embed: embed);
-        }
-
         [Command("AFK"), Summary("Adds Or Removes you from AFK list.")]
         public async Task AFKAsync(CommandEnums Action, [Remainder] string AFKMessage = "I'm busy.")
         {
@@ -153,8 +115,8 @@ namespace Valerie.Modules
             };
             var Rand = new Random(DateTime.Now.Millisecond);
             var Guild = ServerDB.GuildConfig(Context.Guild.Id);
-            var UserKarma = Guild.KarmaList[Context.User.Id];
-            if (Guild.IsKarmaEnabled == false)
+            var UserKarma = Guild.KarmaHandler.UsersList[Context.User.Id];
+            if (Guild.KarmaHandler.IsKarmaEnabled == false)
             {
                 await ReplyAsync("Chat Karma is disabled! Ask Admin or server owner to enable Chat Karma!");
                 return;
@@ -230,8 +192,8 @@ namespace Valerie.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            int UserKarma = Config.KarmaList[Context.User.Id];
-            if (Config.IsKarmaEnabled == false)
+            int UserKarma = Config.KarmaHandler.UsersList[Context.User.Id];
+            if (Config.KarmaHandler.IsKarmaEnabled == false)
             {
                 await ReplyAsync("Chat Karma is disabled! Ask the admin to enable ChatKarma!");
                 return;

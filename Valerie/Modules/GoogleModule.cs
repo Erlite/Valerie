@@ -67,10 +67,7 @@ namespace Valerie.Modules
 
         [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube.")]
         public async Task YoutubeAsync([Remainder] string search)
-        {
-            var Link = "http://www.youtube.com/watch?v=" + StringExtension.Youtube(search);
-            await ReplyAsync(Link);
-        }
+            => await ReplyAsync("https://www.youtube.com/watch?v=" + StringExtension.Youtube(search));
 
         [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner.")]
         public async Task ShortenAsync([Remainder] string URL)

@@ -5,6 +5,7 @@ using Discord.Commands;
 using Valerie.Extensions;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Handlers.ConfigHandler.Enum;
+using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
@@ -32,11 +33,11 @@ namespace Valerie.Modules
         }
 
         [Command("Game"), Summary("Adds a game to bot's game list and sets it as current bot's game.")]
-        public async Task GameAsync(Action Action, [Remainder] string GameName)
+        public async Task GameAsync(Actions Action, [Remainder] string GameName)
         {
             switch (Action)
             {
-                case Action.Add:
+                case Actions.Add:
                     if (BotDB.Config.Games.Contains(GameName))
                     {
                         await ReplyAsync("Game already exists in Games list.");
@@ -45,7 +46,7 @@ namespace Valerie.Modules
                     await BotDB.UpdateConfigAsync(ConfigValue.GamesAdd, GameName);
                     await ReplyAsync("Game has been added to games list.");
                     break;
-                case Action.Remove:
+                case Actions.Remove:
                     if (!BotDB.Config.Games.Contains(GameName))
                     {
                         await ReplyAsync("Game doesn't exist in Games list.");
@@ -77,11 +78,5 @@ namespace Valerie.Modules
             await BotDB.UpdateConfigAsync(ConfigValue.GuildWelcome, JoinMessage);
             await ReplyAsync("Guild Join message has been updated.");
         }
-    }
-
-    public enum Action
-    {
-        Add = 0,
-        Remove = 1
     }
 }
