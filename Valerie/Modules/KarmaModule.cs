@@ -100,6 +100,10 @@ namespace Valerie.Modules
         [Command("SetLevel"), Summary("Sets Max level for auto roles")]
         public async Task SetLevelAsync(int MaxLevel)
         {
+            if (MaxLevel < 10)
+            {
+                await ReplyAsync("Max level can't be lower than 10"); return;
+            }
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaMaxRoleLevel, MaxLevel.ToString());
             await ReplyAsync($"Max auto assign role leve has been set to: {MaxLevel}");
         }
