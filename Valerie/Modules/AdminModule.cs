@@ -95,7 +95,7 @@ namespace Valerie.Modules
             await ReplyAsync("Leave message has been removed");
         }
 
-        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType include: CB, Join, Karma, Leave, Starboard, Mod, NoAds.")]
+        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod, NoAds.")]
         public async Task ToggleAsync(CommandEnums ValueType)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -125,16 +125,16 @@ namespace Valerie.Modules
                         await ReplyAsync("Join event has been disabled.");
                     }
                     break;
-                case CommandEnums.Karma:
-                    if (!Config.KarmaHandler.IsKarmaEnabled)
+                case CommandEnums.Eridium:
+                    if (!Config.EridiumHandler.IsEridiumEnabled)
                     {
-                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaEnabled, "true");
-                        await ReplyAsync("Karma has been enabled.");
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumEnabled, "true");
+                        await ReplyAsync("Eridium has been enabled.");
                     }
                     else
                     {
-                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaEnabled, "false");
-                        await ReplyAsync("Karma has been disabled.");
+                        await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumEnabled, "false");
+                        await ReplyAsync("Eridium has been disabled.");
                     }
                     break;
                 case CommandEnums.Leave:
@@ -188,7 +188,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Karma, Leave, Starboard, Mod.")]
+        [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod.")]
         public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
         {
             switch (ValueType)
@@ -324,11 +324,11 @@ namespace Valerie.Modules
             else
                 TagList = $"{Context.Guild.Name} has {GConfig.TagsList.Count} tags.";
 
-            string KarmaList = null;
-            if (GConfig.KarmaHandler.UsersList.Count <= 0)
-                KarmaList = $"{Context.Guild.Name}'s Karma list is empty.";
+            string EridiumList = null;
+            if (GConfig.EridiumHandler.UsersList.Count <= 0)
+                EridiumList = $"{Context.Guild.Name}'s Eridium list is empty.";
             else
-                KarmaList = $"{GConfig.KarmaHandler.UsersList.Count} members in Karma list.";
+                EridiumList = $"{GConfig.EridiumHandler.UsersList.Count} members in Eridium list.";
 
             string Roles = null;
             if (GConfig.AssignableRoles.Count <= 0)
@@ -339,7 +339,7 @@ namespace Valerie.Modules
             var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
             var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
             var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
-            var Karma = GConfig.KarmaHandler.IsKarmaEnabled ? "Enabled" : "Disabled";
+            var Eridium = GConfig.EridiumHandler.IsEridiumEnabled ? "Enabled" : "Disabled";
             var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
             var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
             var AntiAd = GConfig.AntiAdvertisement ? "Enabled" : "Disabled";
@@ -380,8 +380,8 @@ namespace Valerie.Modules
                 $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
                 $"**Starboard:** {SBEnabled} [{SBChannel}]\n" +
                 $"**AntiAdvertisement:** {AntiAd}\n" +
-                $"**Chat Karma:** {Karma}\n" +
-                $"**Karma List:** {KarmaList}\n" +
+                $"**Chat Eridium:** {Eridium}\n" +
+                $"**Eridium List:** {EridiumList}\n" +
                 $"**AFK List:** {AFKList}\n" +
                 $"**Tags List** {TagList}\n" +
                 $"**Assignable Roles:** {Roles}";
@@ -391,26 +391,26 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("KarmaBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("KB")]
+        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("KB")]
         public async Task BlacklistRoleAsync(Actions Action, IRole Role)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
             switch (Action)
             {
                 case Actions.Add:
-                    if (Config.KarmaHandler.BlacklistRoles.Contains(Role.Id.ToString()))
+                    if (Config.EridiumHandler.BlacklistRoles.Contains(Role.Id.ToString()))
                     {
                         await ReplyAsync($"{Role} already exists in roles blacklist."); return;
                     }
-                    await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaBLAdd, Role.Id);
+                    await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumBLAdd, Role.Id);
                     await ReplyAsync($"{Role} has been added."); break;
 
                 case Actions.Remove:
-                    if (!Config.KarmaHandler.BlacklistRoles.Contains(Role.Id.ToString()))
+                    if (!Config.EridiumHandler.BlacklistRoles.Contains(Role.Id.ToString()))
                     {
                         await ReplyAsync($"{Role} doesn't exists in roles blacklist."); return;
                     }
-                    await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaBLRemove, Role.Id);
+                    await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumBLRemove, Role.Id);
                     await ReplyAsync($"{Role} has been removed."); break;
             }
         }
@@ -419,23 +419,23 @@ namespace Valerie.Modules
         public async Task LevelAddAsync(IRole Role, int Level)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (Config.KarmaHandler.LevelUpRoles.ContainsKey(Role.Id))
+            if (Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
             {
                 await ReplyAsync($"{Role} already exists in level up roles."); return;
             }
-            await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaRoleAdd, Role.Id, Level);
+            await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumRoleAdd, Role.Id, Level);
             await ReplyAsync($"{Role} has been added.");
         }
 
         [Command("LevelRemove"), Summary("Removes a role from level up roles"), Alias("LR")]
-        public async Task KarmaLevelAsync(IRole Role)
+        public async Task EridiumLevelAsync(IRole Role)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (!Config.KarmaHandler.LevelUpRoles.ContainsKey(Role.Id))
+            if (!Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
             {
                 await ReplyAsync($"{Role} doesn't exists in level up roles."); return;
             }
-            await ServerDB.KarmaHandlerAsync(Context.Guild.Id, ModelEnum.KarmaRoleRemove, Role.Id);
+            await ServerDB.EridiumHandlerAsync(Context.Guild.Id, ModelEnum.EridiumRoleRemove, Role.Id);
             await ReplyAsync($"{Role} has been removed.");
         }
 
@@ -446,7 +446,7 @@ namespace Valerie.Modules
             {
                 await ReplyAsync("Max level can't be lower than 10"); return;
             }
-            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.KarmaMaxRoleLevel, MaxLevel.ToString());
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumMaxRoleLevel, MaxLevel.ToString());
             await ReplyAsync($"Max auto assign role leve has been set to: {MaxLevel}");
         }
     }
