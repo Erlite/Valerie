@@ -14,6 +14,6 @@ namespace Valerie.Extensions
 
         public static int GetLevel(int Eridium) => 1 + (int)Math.Pow(Eridium, 1 / 4.0);
 
-        public static int GetEridiumForNextLevel(int Level) => Level * Level * Level;
+        public static int GetEridiumForNextLevel(int Level) => Math.Pow(Level, 4);
     }
 }
