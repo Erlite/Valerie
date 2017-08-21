@@ -203,7 +203,7 @@ namespace Valerie.Handlers
             var HasRole = (User as IGuildUser).RoleIds.Intersect(GuildConfig.EridiumHandler.BlacklistRoles.Select(x => UInt64.Parse(x))).Any();
 
             if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEridiumEnabled ||
-                BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id) || HasRole) return;
+                BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id)) return;
 
             var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
             if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
