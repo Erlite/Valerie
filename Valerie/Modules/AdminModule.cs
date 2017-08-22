@@ -324,25 +324,23 @@ namespace Valerie.Modules
             else
                 TagList = $"{Context.Guild.Name} has {GConfig.TagsList.Count} tags.";
 
-            string EridiumList = null;
-            if (GConfig.EridiumHandler.UsersList.Count <= 0)
-                EridiumList = $"{Context.Guild.Name}'s Eridium list is empty.";
+            string WelcomeMessages = null;
+            if (!GConfig.WelcomeMessages.Any())
+                WelcomeMessages = "No Welcome Message(s).";
             else
-                EridiumList = $"{GConfig.EridiumHandler.UsersList.Count} members in Eridium list.";
+                WelcomeMessages = string.Join("\n", GConfig.WelcomeMessages.Select(x => x));
 
-            string Roles = null;
+            string LeaveMessages = null;
+            if (!GConfig.LeaveMessages.Any())
+                LeaveMessages = "No Leave Message(s).";
+            else
+                LeaveMessages = string.Join("\n", GConfig.LeaveMessages.Select(x => x));
+
+            string AssignableRoles = null;
             if (GConfig.AssignableRoles.Count <= 0)
-                Roles = $"There are no assignable roles for {Context.Guild.Name}.";
+                AssignableRoles = $"No Assignable Role(s).";
             else
-                Roles = $"{GConfig.AssignableRoles.Count} assignable roles.";
-
-            var Joins = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Leaves = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
-            var Bans = GConfig.ModLog.IsEnabled ? "Enabled" : "Disabled";
-            var Eridium = GConfig.EridiumHandler.IsEridiumEnabled ? "Enabled" : "Disabled";
-            var IsChatterBotEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
-            var SBEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
-            var AntiAd = GConfig.AntiAdvertisement ? "Enabled" : "Disabled";
+                AssignableRoles = $"{GConfig.AssignableRoles.Count} assignable AssignableRoles.";
 
             SocketGuildChannel JoinChannel;
             SocketGuildChannel LeaveChannel;
@@ -368,30 +366,53 @@ namespace Valerie.Modules
                 SBChannel = null;
             }
 
-            string Settings =
-                $"**Prefix:** {GConfig.Prefix}\n" +
-                $"**Welcome Message(s):**\n{string.Join("\n", GConfig.WelcomeMessages.Select(x => x)) ?? "None."}\n" +
-                $"**Leave Message(s):**\n{string.Join("\n", GConfig.LeaveMessages.Select(x => x)) ?? "None."}\n" +
-                $"**Mute Role:** {GConfig.MuteRoleID}\n" +
-                $"**Kick/Ban Cases:** {GConfig.ModCases}\n" +
-                $"**Ban Logging:** {Bans} [{BanChannel}]\n" +
-                $"**Join Logging:** {Joins} [{JoinChannel}]\n" +
-                $"**Leave Logging:** {Leaves} [{LeaveChannel}]\n" +
-                $"**Chatter Bot:** {IsChatterBotEnabled} [{ChatterBotChannel}]\n" +
-                $"**Starboard:** {SBEnabled} [{SBChannel}]\n" +
-                $"**AntiAdvertisement:** {AntiAd}\n" +
-                $"**Chat Eridium:** {Eridium}\n" +
-                $"**Eridium List:** {EridiumList}\n" +
-                $"**AFK List:** {AFKList}\n" +
-                $"**Tags List** {TagList}\n" +
-                $"**Assignable Roles:** {Roles}";
+            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"SETTINGS | {Context.Guild}");
 
-            var embed = Vmbed.Embed(VmbedColors.Gold, Description: Settings, Title: $"SETTINGS | {Context.Guild}",
-                ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
+            embed.AddInlineField("Prefix", GConfig.Prefix);
+            embed.AddInlineField("Mute Role", GConfig.MuteRoleID);
+            embed.AddInlineField("Mod Cases", GConfig.ModCases);
+            embed.AddInlineField("AntiAdvertisement", GConfig.AntiAdvertisement ? "Enabled" : "Disabled");
+            embed.AddInlineField("Welcome Messages", WelcomeMessages);
+            embed.AddInlineField("Leave Messages", LeaveMessages);
+            embed.AddInlineField("Assignable Roles", AssignableRoles);
+            embed.AddInlineField("AFK List", AFKList);
+            embed.AddInlineField("Tags List", TagList);
+
+            var Eridium = GConfig.EridiumHandler;
+            var EEnabled = Eridium.IsEridiumEnabled ? "Enabled" : "Disabled";
+            string BRoles = null;
+            if (!Eridium.BlacklistRoles.Any())
+                BRoles = "No Blacklisted Roles";
+            else
+                BRoles = string.Join(", ", Eridium.BlacklistRoles.Select(x => Context.Guild.GetRole(UInt64.Parse(x)).Name));
+            string LRoles = null;
+            if (!Eridium.LevelUpRoles.Any())
+                LRoles = "No LevelUp Roles";
+            else
+                LRoles = string.Join(", ", Eridium.LevelUpRoles.Select(x => Context.Guild.GetRole(x.Key).Name));
+            embed.AddField(x =>
+            {
+                x.IsInline = true;
+                x.Name = "Eridium Stats";
+                x.Value = $"**Enabled?** {EEnabled}\n**Total Users:** {Eridium.UsersList.Count}\n**Max Level:** {Eridium.MaxRoleLevel}" +
+                $"\n**Blacklisted Roles:** {BRoles}\n**LevelUp Roles:** {LRoles}";
+            });
+
+            var JEnabled = GConfig.JoinEvent.IsEnabled ? "Enabled" : "Disabled";
+            var LEnabled = GConfig.LeaveEvent.IsEnabled ? "Enabled" : "Disabled";
+            var CEnabled = GConfig.Chatterbot.IsEnabled ? "Enabled" : "Disabled";
+            var SEnabled = GConfig.Starboard.IsEnabled ? "Enabled" : "Disabled";
+            embed.AddField(x =>
+            {
+                x.IsInline = true;
+                x.Name = "Events";
+                x.Value = $"**Join:** {JEnabled} ({JoinChannel})\n**Leave:** {LEnabled} ({LeaveChannel})\n" +
+                $"**Starboard:** {SEnabled} ({SBChannel})\n**Chatter Bot:** {CEnabled} ({ChatterBotChannel})";
+            });
             await ReplyAsync("", embed: embed);
         }
 
-        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("KB")]
+        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("EB")]
         public async Task BlacklistRoleAsync(Actions Action, IRole Role)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -447,7 +468,7 @@ namespace Valerie.Modules
                 await ReplyAsync("Max level can't be lower than 10"); return;
             }
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumMaxRoleLevel, MaxLevel.ToString());
-            await ReplyAsync($"Max auto assign role leve has been set to: {MaxLevel}");
+            await ReplyAsync($"Max level has been set to: {MaxLevel}");
         }
     }
 }
