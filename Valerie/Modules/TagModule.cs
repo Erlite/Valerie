@@ -103,7 +103,7 @@ namespace Valerie.Modules
         }
 
         [Command("User"), Summary("Shows all tags owned by you."), Priority(1)]
-        public async Task MineAsync(Discord.IGuildUser User = null)
+        public async Task UserAsync(Discord.IGuildUser User = null)
         {
             User = User ?? Context.User as Discord.IGuildUser;
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -112,11 +112,14 @@ namespace Valerie.Modules
                 await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
                 return;
             }
-            string list = $"\n```{string.Join(", ", Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Select(y => y.Name))}```";
-            if (!string.IsNullOrWhiteSpace(list))
-                await ReplyAsync($"{User} owns **{Config.TagsList.Where(x => x.Owner == User.Id.ToString()).Count()}** tags.\n{list}");
-            else
+            var UserTag = Config.TagsList.Where(x => x.Owner == User.Id.ToString());
+            if (UserTag.Count() == 0)
+            {
                 await ReplyAsync($"{User} has no tags.");
+                return;
+            }
+            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{User} owns {UserTag.Count()} tags.", Description: string.Join(", ", UserTag.Select(y => y.Name)));
+            await ReplyAsync("", embed: embed);
         }
 
         [Command("Top"), Summary("Shows the top 5 tags."), Priority(1)]
