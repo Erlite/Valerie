@@ -39,8 +39,9 @@ namespace Valerie.Modules
             }
             var UserEridium = Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Eridium);
             string Reply =
-                $"**TOTAL Eridium:** {Eridium} | **LEVEL:** {IntExtension.GetLevel(Eridium)} | " +
-                $"**Eridium:** {Eridium}/{IntExtension.GetEridiumForNextLevel(IntExtension.GetLevel(Eridium))}";
+                $"{User} Stats:\n" +
+                $"**TOTAL ERIDIUM:** {Eridium} | **LEVEL:** {IntExtension.GetLevel(Eridium)} | " +
+                $"**ERIDIUM:** {Eridium}/{IntExtension.GetEridiumForNextLevel(IntExtension.GetLevel(Eridium))}";
             await ReplyAsync(Reply);
         }
 
