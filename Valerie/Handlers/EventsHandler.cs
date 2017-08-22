@@ -16,9 +16,6 @@ namespace Valerie.Handlers
 {
     public class EventsHandler
     {
-        static List<ulong> Waitlist = new List<ulong>();
-        static Timer timer;
-
         internal static async Task GuildAvailableAsync(SocketGuild Guild)
         {
             await ServerDB.LoadGuildConfigsAsync(Guild.Id);
@@ -105,11 +102,11 @@ namespace Valerie.Handlers
 
         internal static async Task MessageReceivedAsync(SocketMessage Message)
         {
-            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived);
-            await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
-            await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
-            await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
-            await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
+            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived).ConfigureAwait(false);
+            await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length).ConfigureAwait(false);
+            await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
+            await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
+            await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
         }
 
         internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
@@ -117,13 +114,18 @@ namespace Valerie.Handlers
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
             var Message = await Cache.GetOrDownloadAsync();
             var Config = ServerDB.GuildConfig(Guild.Id);
-            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null) return;
+
+            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null ||
+                Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
+
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
             var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
+
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
             else if (Message.Attachments.FirstOrDefault() != null)
                 Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+
             var Exists = Config.StarredMessages.FirstOrDefault(x => x.MessageId == Message.Id.ToString());
             if (Config.StarredMessages.Contains(Exists))
             {
@@ -182,28 +184,17 @@ namespace Valerie.Handlers
 
         }
 
-        // Not Events
-        static void RemoveUser(ulong Id)
-        {
-            timer = new Timer(_ =>
-            {
-                Waitlist.Remove(Id);
-            },
-            null,
-            TimeSpan.FromSeconds(30.0),
-            TimeSpan.FromSeconds(0.0));
-        }
+        // Event Related Functions
 
         static async Task EridiumHandlerAsync(SocketGuildUser User, int Eridium)
         {
-            RemoveUser(User.Id);
             var GuildID = User.Guild.Id;
             var GuildConfig = ServerDB.GuildConfig(GuildID);
 
-            var HasRole = (User as IGuildUser).RoleIds.Intersect(GuildConfig.EridiumHandler.BlacklistRoles.Select(x => UInt64.Parse(x))).Any();
+            var BlacklistedRoles = new List<ulong>(GuildConfig.EridiumHandler.BlacklistRoles.Select(x => Convert.ToUInt64(x)));
+            var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
 
-            if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEridiumEnabled ||
-                BotDB.Config.Blacklist.ContainsKey(User.Id) || Waitlist.Contains(User.Id)) return;
+            if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEridiumEnabled || HasRole || BotDB.Config.Blacklist.ContainsKey(User.Id)) return;
 
             var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
             if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
@@ -211,14 +202,23 @@ namespace Valerie.Handlers
                 await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumNew, User.Id, EridiumToGive);
                 return;
             }
+            await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumUpdate, User.Id, EridiumToGive);            
 
             int OldLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id]);
             int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
-
-            await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumUpdate, User.Id, EridiumToGive);
-            Waitlist.Add(User.Id);
-
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
+        }
+
+        static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
+        {
+            var EridiumHandler = ServerDB.GuildConfig(GuildId).EridiumHandler;
+            if (!CheckLevel || !EridiumHandler.LevelUpRoles.Any() ||
+                IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]) > EridiumHandler.MaxRoleLevel) return;
+
+            int GetLevel = IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]);
+            var GetRole = EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value == GetLevel).Key;
+
+            await User.AddRoleAsync(User.Guild.GetRole(GetRole));
         }
 
         static async Task AFKHandlerAsync(SocketGuild Guild, SocketMessage Message)
@@ -234,9 +234,9 @@ namespace Valerie.Handlers
         {
             var GuildConfig = ServerDB.GuildConfig(User.Guild.Id);
             if (!(GuildConfig.AFKList.ContainsKey(User.Id) || GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))) return;
-            await ServerDB.AFKHandlerAsync(User.Guild.Id, ModelEnum.AFKRemove, User.Id);
-            await ServerDB.EridiumHandlerAsync(User.Guild.Id, ModelEnum.EridiumDelete, User.Id);
-            await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagPurge, Owner: User.Id.ToString());
+            await ServerDB.AFKHandlerAsync(User.Guild.Id, ModelEnum.AFKRemove, User.Id).ConfigureAwait(false);
+            await ServerDB.EridiumHandlerAsync(User.Guild.Id, ModelEnum.EridiumDelete, User.Id).ConfigureAwait(false);
+            await ServerDB.TagsHandlerAsync(User.Guild.Id, ModelEnum.TagPurge, Owner: User.Id.ToString()).ConfigureAwait(false);
         }
 
         static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
@@ -264,16 +264,6 @@ namespace Valerie.Handlers
             }
         }
 
-        static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
-        {
-            var EridiumHandler = ServerDB.GuildConfig(GuildId).EridiumHandler;
-            if (!CheckLevel || !EridiumHandler.LevelUpRoles.Any() ||
-                IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]) > EridiumHandler.MaxRoleLevel) return;
-            int GetLevel = IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]);
-            var GetRole = EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value >= GetLevel).Key;
-            await User.AddRoleAsync(User.Guild.GetRole(GetRole));
-        }
-
         public static async Task LatencyUpdatedAsync(DiscordSocketClient Client, int Older, int Newer)
         {
             if (Client == null) return;
@@ -298,6 +288,5 @@ namespace Valerie.Handlers
             else
                 await Client.SetGameAsync(GetGame);
         }
-
     }
 }
