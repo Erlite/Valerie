@@ -41,7 +41,8 @@ namespace Valerie.Handlers
             var Context = new SocketCommandContext(Client, Msg);
 
             if (!(Msg.HasStringPrefix(BotDB.Config.Prefix, ref argPos) || Msg.HasStringPrefix(GuildConfig.Prefix, ref argPos))) return;
-            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.CommandUsed);
+
+            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.CommandUsed).ConfigureAwait(false);
 
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             var Service = CommandService.Search(Context, argPos);
