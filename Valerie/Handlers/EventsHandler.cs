@@ -1,7 +1,6 @@
 ﻿#pragma warning disable 
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Discord;
@@ -126,6 +125,8 @@ namespace Valerie.Handlers
                 Embed.WithDescription(Message.Content);
             else if (Message.Attachments.FirstOrDefault() != null)
                 Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+            else if (BoolExtension.IsMessageUrl(Message.Content))
+                Embed.WithImageUrl(Message.Content);
 
             var Exists = Config.StarredMessages.FirstOrDefault(x => x.MessageId == Message.Id.ToString());
             if (Config.StarredMessages.Contains(Exists))
@@ -160,6 +161,8 @@ namespace Valerie.Handlers
                 Embed.WithDescription(Message.Content);
             else if (Message.Attachments.FirstOrDefault() != null)
                 Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+            else if (BoolExtension.IsMessageUrl(Message.Content))
+                Embed.WithImageUrl(Message.Content);
 
             var Exists = Config.StarredMessages.FirstOrDefault(x => x.MessageId == Message.Id.ToString());
             if (!Config.StarredMessages.Contains(Exists)) return;
@@ -248,7 +251,7 @@ namespace Valerie.Handlers
             if (Message.Author.IsBot || !Config.Chatterbot.IsEnabled || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
             string UserMsg = Message.Content.Replace("Valerie", "");
             CleverbotResponse Response = null;
-            Response = await Main.TalkAsync(UserMsg, Response);
+            Response = await Main.TalkAsync(UserMsg, Response).ConfigureAwait(false);
             await Channel.SendMessageAsync(Response.Output).ConfigureAwait(false);
         }
 

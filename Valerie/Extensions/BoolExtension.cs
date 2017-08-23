@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Valerie.Extensions
 {
@@ -37,5 +38,17 @@ namespace Valerie.Extensions
         public static bool HasLeveledUp(int Previous, int New) => New > Previous;
 
         public static bool IsNSFW(IChannel Channel) => Channel.Name.Contains("nsfw");
+
+        public static bool IsMessageUrl(string Message)
+        {
+            List<string> ImageMatch = new List<string>
+            {
+                ".png",
+                ".gif",
+                ".jpg",
+                ".webp"
+            };
+            return ImageMatch.Any(x => Message.Contains(x)) && Uri.IsWellFormedUriString(Message, UriKind.RelativeOrAbsolute);
+        }
     }
 }
