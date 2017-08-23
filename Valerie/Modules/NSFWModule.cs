@@ -17,14 +17,14 @@ namespace Valerie.Modules
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
-            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }"))[0];
+            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }").ConfigureAwait(false))[0];
             await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
         }
 
         [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
-            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }"))[0];
+            JToken Token = JArray.Parse(await new HttpClient().GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }").ConfigureAwait(false))[0];
             await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
         }
 
@@ -32,7 +32,7 @@ namespace Valerie.Modules
         public async Task E621Async(string search)
         {
             search = search?.Trim() ?? "";
-            string url = await StringExtension.GetE621ImageLinkAsync(search);
+            string url = await StringExtension.GetE621ImageLinkAsync(search).ConfigureAwait(false);
             if (url == null)
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
