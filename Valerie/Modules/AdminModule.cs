@@ -470,5 +470,17 @@ namespace Valerie.Modules
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumMaxRoleLevel, MaxLevel.ToString());
             await ReplyAsync($"Max level has been set to: {MaxLevel}");
         }
+
+        [Command("EridiumRemove"), Summary("Removes a user from Eridium list."), Alias("ER")]
+        public async Task EridiumRemoveAsync(IGuildUser User)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id)) {
+                await ReplyAsync($"{User} was not found in Eridium list.");
+                return;
+            }
+            await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumDelete, User.Id.ToString());
+            await ReplyAsync($"{User} was removed from Eridium list.");
+        }
     }
 }
