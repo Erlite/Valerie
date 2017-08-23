@@ -78,6 +78,7 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.StarChannel: Config.Starboard.TextChannel = Value; break;
                     case ModelEnum.StarEnabled: Config.Starboard.IsEnabled = Convert.ToBoolean(Value); break;
                     case ModelEnum.EridiumMaxRoleLevel: Config.EridiumHandler.MaxRoleLevel = int.Parse(Value); break;
+                    case ModelEnum.EridiumDelete: Config.EridiumHandler.UsersList.Remove(Convert.ToUInt64(Value)); break;
 
                 }
                 await Session.StoreAsync(Config);
@@ -142,7 +143,6 @@ namespace Valerie.Handlers.GuildHandler
                 switch (ValueType)
                 {
                     case ModelEnum.EridiumNew: Config.EridiumHandler.UsersList.Add(Id, Value); break;
-                    case ModelEnum.EridiumDelete: Config.EridiumHandler.UsersList.Remove(Id); break;
                     case ModelEnum.EridiumUpdate: Config.EridiumHandler.UsersList[Id] += Value; break;
                     case ModelEnum.EridiumSubtract: Config.EridiumHandler.UsersList[Id] -= Value; break;
                     case ModelEnum.EridiumBLAdd: Config.EridiumHandler.BlacklistRoles.Add(Id.ToString()); break;
