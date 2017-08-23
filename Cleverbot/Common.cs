@@ -22,7 +22,7 @@ namespace Cleverbot
 
             try
             {
-                return await new HttpClient().GetStringAsync(apiUrl);
+                return await new HttpClient().GetStringAsync(apiUrl).ConfigureAwait(false);
             }
             catch (WebException e) { handleWebException(e); return null; }
         }

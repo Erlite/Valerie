@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,11 +103,11 @@ namespace Valerie.Handlers
 
         internal static async Task MessageReceivedAsync(SocketMessage Message)
         {
-            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived).ConfigureAwait(false);
-            await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length).ConfigureAwait(false);
-            await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
-            await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
-            await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message).ConfigureAwait(false);
+            await BotDB.UpdateConfigAsync(ConfigHandler.Enum.ConfigValue.MessageReceived);
+            await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
+            await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message);
+            Task.Run(async () => await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message));
+            await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message);
         }
 
         internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
@@ -202,7 +203,7 @@ namespace Valerie.Handlers
                 await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumNew, User.Id, EridiumToGive);
                 return;
             }
-            await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumUpdate, User.Id, EridiumToGive);            
+            await ServerDB.EridiumHandlerAsync(GuildID, ModelEnum.EridiumUpdate, User.Id, EridiumToGive);
 
             int OldLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id]);
             int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
@@ -212,11 +213,12 @@ namespace Valerie.Handlers
         static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
         {
             var EridiumHandler = ServerDB.GuildConfig(GuildId).EridiumHandler;
-            if (!CheckLevel || !EridiumHandler.LevelUpRoles.Any() ||
-                IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]) > EridiumHandler.MaxRoleLevel) return;
 
             int GetLevel = IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]);
             var GetRole = EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value == GetLevel).Key;
+
+            if (!CheckLevel || !EridiumHandler.LevelUpRoles.Any() || User.Roles.Contains(User.Guild.GetRole(GetRole)) ||
+                IntExtension.GetLevel(EridiumHandler.UsersList[User.Id]) > EridiumHandler.MaxRoleLevel) return;
 
             await User.AddRoleAsync(User.Guild.GetRole(GetRole));
         }
@@ -247,10 +249,7 @@ namespace Valerie.Handlers
             string UserMsg = Message.Content.Replace("Valerie", "");
             CleverbotResponse Response = null;
             Response = await Main.TalkAsync(UserMsg, Response);
-            if (Channel != null)
-                await Channel.SendMessageAsync(Response.Output);
-            else
-                await Message.Channel.SendMessageAsync(Response.Output);
+            await Channel.SendMessageAsync(Response.Output).ConfigureAwait(false);
         }
 
         static async Task AntiAdvertisementAsync(SocketGuild Guild, SocketMessage Message)
