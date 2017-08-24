@@ -475,7 +475,8 @@ namespace Valerie.Modules
         public async Task EridiumRemoveAsync(IGuildUser User)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
-            if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id)) {
+            if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
+            {
                 await ReplyAsync($"{User} was not found in Eridium list.");
                 return;
             }
