@@ -78,5 +78,12 @@ namespace Valerie.Modules
             await BotDB.UpdateConfigAsync(ConfigValue.GuildWelcome, JoinMessage);
             await ReplyAsync("Guild Join message has been updated.");
         }
+
+        [Command("ReportChannel"), Summary("Sets report channel.")]
+        public async Task ReportChannelAsync(ITextChannel Channel)
+        {
+            await BotDB.UpdateConfigAsync(ConfigValue.ReportChannel, Channel.Id.ToString());
+            await ReplyAsync($"Report channel has been set to: {Channel.Name}");
+        }
     }
 }
