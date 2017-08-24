@@ -59,9 +59,12 @@ namespace Valerie.Modules
             foreach (var Value in Eridiumlist)
             {
                 var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
-                if (User == null)
-                    await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumDelete, $"{User.Id}");
-                embed.AddInlineField(User.Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}");
+                string Username = null;
+                if (string.IsNullOrWhiteSpace(User.Username))
+                    Username = "Unknown User";
+                else
+                    Username = User.Username;
+                embed.AddInlineField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}");
             }
             await ReplyAsync("", embed: embed);
         }
