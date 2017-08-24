@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord.WebSocket;
 using Discord.Commands;
+using Discord.Addons.Interactive;
 using Valerie.Handlers;
 using Valerie.Services.Logger.Enums;
 using Valerie.Services.Logger;
@@ -59,6 +60,7 @@ namespace Valerie
         {
             return new ServiceCollection()
                 .AddSingleton(Client)
+                .AddSingleton<InteractiveService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
