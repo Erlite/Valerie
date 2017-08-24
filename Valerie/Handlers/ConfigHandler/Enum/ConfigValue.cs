@@ -7,6 +7,7 @@
         GuildWelcome,
         CommandUsed,
         MessageReceived,
+        ReportChannel,
         EvalAdd,
         EvalRemove,
         BlacklistAdd,

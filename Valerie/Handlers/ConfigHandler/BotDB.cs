@@ -61,6 +61,7 @@ namespace Valerie.Handlers.ConfigHandler
                     case ConfigValue.MessageReceived: Config.MessagesReceived += 1; break;
                     case ConfigValue.Prefix: Config.Prefix = Value; break;
                     case ConfigValue.Token: Config.Token = Value; break;
+                    case ConfigValue.ReportChannel: Config.ReportChannel = Value; break;
                     case ConfigValue.EvalAdd: Config.EvalImports.Add(Value); break;
                     case ConfigValue.EvalRemove: Config.EvalImports.Remove(Value); break;
                     case ConfigValue.GamesAdd: Config.Games.Add(Value); break;
