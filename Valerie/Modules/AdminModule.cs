@@ -105,7 +105,7 @@ namespace Valerie.Modules
                     if (!Config.Chatterbot.IsEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.CBEnabled, "true");
-                        await ReplyAsync("Chatterbot has been enabled.");
+                        await ReplyAsync($"Chatterbot has been enabled. {StringExtension.Suggestion("Chatterbot", Config.Chatterbot.TextChannel)}");
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace Valerie.Modules
                     if (!Config.JoinEvent.IsEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.JoinEnabled, "true");
-                        await ReplyAsync("Join event has been enabled.");
+                        await ReplyAsync($"Join event has been enabled. {StringExtension.Suggestion("Join", Config.JoinEvent.TextChannel)}");
                     }
                     else
                     {
@@ -141,7 +141,7 @@ namespace Valerie.Modules
                     if (!Config.LeaveEvent.IsEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.LeaveEnabled, "true");
-                        await ReplyAsync("Leave logging has been enabled.");
+                        await ReplyAsync($"Leave logging has been enabled. {StringExtension.Suggestion("Leave", Config.LeaveEvent.TextChannel)}");
                     }
                     else
                     {
@@ -153,7 +153,7 @@ namespace Valerie.Modules
                     if (!Config.Starboard.IsEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.StarEnabled, "true");
-                        await ReplyAsync("Starboard has been enabled.");
+                        await ReplyAsync($"Starboard has been enabled. {StringExtension.Suggestion("Starboard", Config.Starboard.TextChannel)}");
                     }
                     else
                     {
@@ -165,7 +165,7 @@ namespace Valerie.Modules
                     if (!Config.ModLog.IsEnabled)
                     {
                         await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.ModEnabled, "true");
-                        await ReplyAsync("Mod log has been enabled.");
+                        await ReplyAsync($"Mod log has been enabled. {StringExtension.Suggestion("Mod", Config.ModLog.TextChannel)}");
                     }
                     else
                     {
@@ -497,6 +497,52 @@ namespace Valerie.Modules
             }
             await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.EridiumDelete, User.Id.ToString());
             await ReplyAsync($"{User} was removed from Eridium list.");
+        }
+
+        [Command("Mute"), Summary("Mutes a user.")]
+        public async Task MuteAsync(IGuildUser User)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (User.RoleIds.Contains(Convert.ToUInt64(Config.MuteRoleID)))
+            {
+                await ReplyAsync($"{User} is already muted.");
+                return;
+            }
+            OverwritePermissions Permissions = new OverwritePermissions(addReactions: PermValue.Deny, sendMessages: PermValue.Deny, attachFiles: PermValue.Deny, useExternalEmojis: PermValue.Deny);
+            if (Convert.ToUInt64(Config.MuteRoleID) == 0 || Context.Guild.GetRole(Convert.ToUInt64(Config.MuteRoleID)) == null)
+            {
+                var Role = await Context.Guild.CreateRoleAsync("Muted", GuildPermissions.None, Color.Default);
+                foreach (var Channel in (Context.Guild as SocketGuild).TextChannels)
+                {
+                    if (!Channel.PermissionOverwrites.Select(x => x.Permissions).Contains(Permissions))
+                    {
+                        await Channel.AddPermissionOverwriteAsync(Role, Permissions).ConfigureAwait(false);
+                    }
+                }
+                await ServerDB.UpdateConfigAsync(Context.Guild.Id, ModelEnum.MuteId, Role.Id.ToString());
+                await User.AddRoleAsync(Role);
+                await ReplyAsync($"**{User} has been muted** :zipper_mouth:");
+                return;
+            }
+            else
+            {
+                await User.AddRoleAsync(Context.Guild.GetRole(Convert.ToUInt64(Config.MuteRoleID)));
+                await ReplyAsync($"**{User} has been muted** :zipper_mouth:");
+                return;
+            }
+        }
+
+        [Command("Umute"), Summary("Umutes a user.")]
+        public async Task UnMuteAsync(IGuildUser User)
+        {
+            var Config = ServerDB.GuildConfig(Context.Guild.Id);
+            if (!User.RoleIds.Contains(Convert.ToUInt64(Config.MuteRoleID)))
+            {
+                await ReplyAsync($"{User} isn't muted.");
+                return;
+            }
+            await User.RemoveRoleAsync(Context.Guild.GetRole(Convert.ToUInt64(Config.MuteRoleID)));
+            await ReplyAsync($"{User} has been unmuted.");
         }
     }
 }
