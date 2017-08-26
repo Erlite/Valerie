@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Tweetinvi;
-using Cleverbot;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Services.Logger;
 using Valerie.Services.Logger.Enums;
@@ -46,14 +45,6 @@ namespace Valerie.Handlers
             }
             else
                 Log.Write(Status.KAY, Source.BotDatabase, "Logged into Twitter.");
-            try
-            {
-                Main.SetAPIKey(BotDB.Config.APIKeys.CleverBotKey);
-            }
-            catch (Cleverbot.Exceptions.CleverbotApiException Ex)
-            {
-                Log.Write(Status.ERR, Source.BotDatabase, Ex.Message);
-            }
             if (!Directory.Exists(CacheFolder))
                 Directory.CreateDirectory(CacheFolder);
         }

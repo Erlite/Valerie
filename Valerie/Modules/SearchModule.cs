@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Linq;
 using Newtonsoft.Json;
@@ -9,11 +10,11 @@ using Discord.Commands;
 using Valerie.Extensions;
 using Valerie.Models;
 using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Attributes;
+using Cookie.Steam;
 
 namespace Valerie.Modules
 {
@@ -195,114 +196,44 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("SNews"), Summary("Shows news results for the game")]
-        public async Task NewsAsync(int ID)
+        [Command("SteamUser"), Summary("Shows info about a steam user")]
+        public async Task UserAsync(string UserId)
         {
-            var Httpclient = new HttpClient();
-            var RequestUrl = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid={ID}&count=5&maxlength=300&format=json");
-            if (!RequestUrl.IsSuccessStatusCode)
-            {
-                await ReplyAsync(RequestUrl.ReasonPhrase);
-                return;
-            }
-            var Content = await RequestUrl.Content.ReadAsStringAsync();
-            var Convert = JToken.Parse(Content).ToObject<SteamAppNews>();
+            var SteamClient = new SteamClient(BotDB.Config.APIKeys.SteamKey);
+            var UserInfo = await SteamClient.GetUsersInfoAsync(new List<string> { UserId });
+            var UserGames = await SteamClient.OwnedGamesAsync(UserId);
+            var UserRecent = await SteamClient.RecentGamesAsync(UserId);
 
-            var Builder = new EmbedBuilder()
-            {
-                Author = new EmbedAuthorBuilder()
-                {
-                    Name = $"APP ID: {ID}",
-                    IconUrl = Context.User.GetAvatarUrl()
-                },
-                Footer = new EmbedFooterBuilder()
-                {
-                    Text = $"Total Results: {Convert.appnews.count.ToString()}"
-                },
-                Color = new Color(124, 12, 57)
-            };
-
-            foreach (var Result in Convert.appnews.newsitems)
-            {
-                Builder.AddField(x =>
-                {
-                    x.Name = $"{Result.title} || {Result.feedlabel}";
-                    x.Value = $"{Result.contents}\n{Result.url}";
-                });
-            }
-            await ReplyAsync("", embed: Builder);
-        }
-
-        [Command("SUser"), Summary("Shows info about a steam user")]
-        public async Task UserAsync(ulong ID)
-        {
-            var Httpclient = new HttpClient();
-            string IPlayerService = "http://api.steampowered.com/IPlayerService/";
-            var SummarURL = await Httpclient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={BotDB.Config.APIKeys.SteamKey}&steamids={ID}");
-            var GamesOwned = await Httpclient.GetAsync(IPlayerService + $"GetOwnedGames/v0001/?key={BotDB.Config.APIKeys.SteamKey}&steamid={ID}&format=json");
-            var RecentlyPlayed = await Httpclient.GetAsync(IPlayerService + $"GetRecentlyPlayedGames/v0001/?key={BotDB.Config.APIKeys.SteamKey}&steamid={ID}&format=json");
-
-            if (!SummarURL.IsSuccessStatusCode || !GamesOwned.IsSuccessStatusCode || !RecentlyPlayed.IsSuccessStatusCode)
-            {
-                await ReplyAsync(SummarURL.ReasonPhrase);
-                return;
-            }
-
-            var SummaryContent = await SummarURL.Content.ReadAsStringAsync();
-            var SummaryConvert = JToken.Parse(SummaryContent).ToObject<PlayerSummary>();
-
-            var OGames = await GamesOwned.Content.ReadAsStringAsync();
-            var OGamesConvert = JToken.Parse(OGames).ToObject<OwnedGames>();
-
-            var RGames = await RecentlyPlayed.Content.ReadAsStringAsync();
-            var RGamesConvert = JToken.Parse(RGames).ToObject<GetRecent>();
-
-            var Info = SummaryConvert.response.players.FirstOrDefault();
+            var Info = UserInfo.PlayersInfo.Players.FirstOrDefault();
 
             string State;
-            if (Info.personastate == 0)
+            if (Info.ProfileState == 0)
                 State = "Offline";
-            else if (Info.personastate == 1)
+            else if (Info.ProfileState == 1)
                 State = "Online";
-            else if (Info.personastate == 2)
+            else if (Info.ProfileState == 2)
                 State = "Busy";
-            else if (Info.personastate == 3)
+            else if (Info.ProfileState == 3)
                 State = "Away";
-            else if (Info.personastate == 4)
+            else if (Info.ProfileState == 4)
                 State = "Snooze";
-            else if (Info.personastate == 5)
+            else if (Info.ProfileState == 5)
                 State = "Looking to trade";
             else
                 State = "Looking to play";
 
-            var Sb = new StringBuilder();
+            var embed = Vmbed.Embed(VmbedColors.Pastel, Info.AvatarFullUrl, Info.RealName, Info.ProfileLink,
+                FooterText: string.Join(", ", UserRecent.RecentGames.GamesList.Select(x => x.Name)));
+            embed.AddInlineField("Display Name", $"{Info.Name}");
+            embed.AddInlineField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}");
+            embed.AddInlineField("Person State", State);
+            embed.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.TimeCreated));
+            embed.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.LastLogOff));
+            embed.AddInlineField("Primary Clan ID", Info.PrimaryClanId);
+            embed.AddInlineField("Owned Games", UserGames.OwnedGames.GamesCount);
+            embed.AddInlineField("Recently Played Games", UserRecent.RecentGames.TotalCount);
 
-            var Builder = new EmbedBuilder()
-            {
-                Color = new Color(124, 12, 57),
-                Author = new EmbedAuthorBuilder()
-                {
-                    Name = Info.realname,
-                    IconUrl = Info.avatarfull,
-                    Url = Info.profileurl
-                },
-                ThumbnailUrl = Info.avatarfull
-            };
-            Builder.AddInlineField("Display Name", $"{Info.personaname}");
-            Builder.AddInlineField("Location", $"{Info.locstatecode ?? "No State"}, {Info.loccountrycode ?? "No Country"}");
-            Builder.AddInlineField("Person State", State);
-            Builder.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.timecreated));
-            Builder.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.lastlogoff));
-            Builder.AddInlineField("Primary Clan ID", Info.primaryclanid);
-            Builder.AddInlineField("Owned Games", OGamesConvert.response.game_count);
-            Builder.AddInlineField("Recently Played Games", RGamesConvert.response.total_count);
-            Sb.AppendLine(string.Join(", ", RGamesConvert.response.games.Select(game => game.name)));
-            Builder.Footer = new EmbedFooterBuilder()
-            {
-                Text = Sb.ToString()
-            };
-
-            await ReplyAsync("", embed: Builder);
+            await ReplyAsync("", embed: embed);
         }
     }
 }

@@ -9,8 +9,7 @@ using Valerie.Handlers.GuildHandler;
 using Valerie.Handlers.GuildHandler.Enum;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Extensions;
-using Cleverbot;
-using Cleverbot.Models;
+using Cookie.Cleverbot;
 
 namespace Valerie.Handlers
 {
@@ -250,9 +249,8 @@ namespace Valerie.Handlers
             var Channel = Guild.GetChannel(Convert.ToUInt64(Config.Chatterbot.TextChannel)) as IMessageChannel;
             if (Message.Author.IsBot || !Config.Chatterbot.IsEnabled || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
             string UserMsg = Message.Content.Replace("Valerie", "");
-            CleverbotResponse Response = null;
-            Response = await Main.TalkAsync(UserMsg, Response).ConfigureAwait(false);
-            await Channel.SendMessageAsync(Response.Output).ConfigureAwait(false);
+            CleverbotClient Client = new CleverbotClient(BotDB.Config.APIKeys.CleverBotKey);
+            await Channel.SendMessageAsync((await Client.TalkAsync(UserMsg)).CleverOutput).ConfigureAwait(false);
         }
 
         static async Task AntiAdvertisementAsync(SocketGuild Guild, SocketMessage Message)
