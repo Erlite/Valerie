@@ -7,7 +7,7 @@
   
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
-    <PackageReference Include="Cookie" Version="1.1.0" />
+    <PackageReference Include="Cookie" Version="1.1.2" />
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.0" />
     <PackageReference Include="Discord.Net" Version="1.0.2-build-00808" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.28.0.896" />
