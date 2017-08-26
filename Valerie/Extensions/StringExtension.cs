@@ -109,5 +109,13 @@ namespace Valerie.Extensions
             else
                 return "✨";
         }
+
+        public static string Suggestion(string Action, string Channel)
+        {
+            if (string.IsNullOrWhiteSpace(Channel))
+                return $"\n\n**Warn:** {Action} Channel is not set. To Set {Action} Channel: `--Channel {Action} #Some_Channel`";
+            else
+                return null;
+        }
     }
 }
