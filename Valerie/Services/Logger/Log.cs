@@ -22,9 +22,10 @@ namespace Valerie.Services.Logger
             }
             switch (Source)
             {
-                case Source.BotDatabase: Append($"[{Source}]", ConsoleColor.Cyan); break;
+                case Source.Config: Append($"[{Source}]", ConsoleColor.Cyan); break;
                 case Source.Client: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
-                case Source.ServerDatabase: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
+                case Source.Server: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
+                case Source.Database: Append($"[{Source}]", ConsoleColor.White); break;
             }
             Append($" {Text}", ConsoleColor.Gray);
         }

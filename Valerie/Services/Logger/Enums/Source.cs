@@ -3,7 +3,8 @@
     public enum Source
     {
         Client,
-        ServerDatabase,
-        BotDatabase
+        Server,
+        Config,
+        Database
     }
 }
