@@ -7,6 +7,7 @@
   
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
+    <PackageReference Include="Cookie" Version="1.1.0" />
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.0" />
     <PackageReference Include="Discord.Net" Version="1.0.2-build-00808" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.28.0.896" />
@@ -15,10 +16,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.1" />
     <PackageReference Include="RavenDB.Client" Version="4.0.0-beta-40018" />
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Cleverbot\Cleverbot.csproj" />
   </ItemGroup>
 
 </Project>
