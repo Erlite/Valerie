@@ -30,7 +30,7 @@ namespace Valerie.Handlers.GuildHandler
                     {
                         Id = $"{GuildId}"
                     });
-                    Log.Write(Status.KAY, Source.ServerDatabase, $"Database added with ID: {$"{GuildId}"}");
+                    Log.Write(Status.KAY, Source.Server, $"Database added with ID: {$"{GuildId}"}");
                 }
                 await Session.SaveChangesAsync();
                 Session.Dispose();
@@ -43,7 +43,7 @@ namespace Valerie.Handlers.GuildHandler
             {
                 var GetGuild = await Session.LoadAsync<GuildModel>($"{GuildId}");
                 Session.Delete(GetGuild);
-                Log.Write(Status.WRN, Source.ServerDatabase, $"Database removed with ID: {$"{GuildId}"}");
+                Log.Write(Status.WRN, Source.Server, $"Database removed with ID: {$"{GuildId}"}");
                 await Session.SaveChangesAsync();
                 Session.Dispose();
             }
@@ -62,7 +62,7 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.LeaveAdd: Config.LeaveMessages.Add(Value); break;
                     case ModelEnum.LeaveRemove: Config.LeaveMessages.Remove(Value); break;
                     case ModelEnum.ModCases: Config.ModCases += 1; break;
-                    case ModelEnum.MuteId: Config.MuteRoleID = Convert.ToUInt64(Value); break;
+                    case ModelEnum.MuteId: Config.MuteRoleID = Value; break;
                     case ModelEnum.AntiAdvertisement: Config.AntiAdvertisement = Convert.ToBoolean(Value); break;
                     case ModelEnum.Prefix: Config.Prefix = Value; break;
                     case ModelEnum.WelcomeAdd: Config.WelcomeMessages.Add(Value); break;
@@ -145,8 +145,8 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.EridiumNew: Config.EridiumHandler.UsersList.Add(Id, Value); break;
                     case ModelEnum.EridiumUpdate: Config.EridiumHandler.UsersList[Id] += Value; break;
                     case ModelEnum.EridiumSubtract: Config.EridiumHandler.UsersList[Id] -= Value; break;
-                    case ModelEnum.EridiumBLAdd: Config.EridiumHandler.BlacklistRoles.Add(Id.ToString()); break;
-                    case ModelEnum.EridiumBLRemove: Config.EridiumHandler.BlacklistRoles.Remove(Id.ToString()); break;
+                    case ModelEnum.EridiumBLAdd: Config.EridiumHandler.BlacklistRoles.Add($"{Id}"); break;
+                    case ModelEnum.EridiumBLRemove: Config.EridiumHandler.BlacklistRoles.Remove($"{Id}"); break;
                     case ModelEnum.EridiumRoleAdd: Config.EridiumHandler.LevelUpRoles.Add(Id, Value); break;
                     case ModelEnum.EridiumRoleRemove: Config.EridiumHandler.LevelUpRoles.Remove(Id); break;
                 }
@@ -167,9 +167,9 @@ namespace Valerie.Handlers.GuildHandler
                     case ModelEnum.StarNew:
                         Config.StarredMessages.Add(new Starboard
                         {
-                            ChannelId = ChannelId.ToString(),
-                            MessageId = MsgId.ToString(),
-                            StarboardMessageId = SMsgId.ToString(),
+                            ChannelId = $"{ChannelId}",
+                            MessageId = $"{MsgId}",
+                            StarboardMessageId = $"{SMsgId}",
                             Stars = 1
                         });
                         break;
