@@ -15,6 +15,7 @@ using AngleSharp.Dom.Html;
 using Valerie.Handlers.ConfigHandler;
 using Valerie.Attributes;
 using Cookie.Steam;
+using Cookie.Giphy;
 
 namespace Valerie.Modules
 {
@@ -234,6 +235,27 @@ namespace Valerie.Modules
             embed.AddInlineField("Recently Played Games", UserRecent.RecentGames.TotalCount);
 
             await ReplyAsync("", embed: embed);
+        }
+
+        [Command("Giphy"), Summary("Searches Giphy for your Gifs??"), Alias("Gif"), Priority(0)]
+        public async Task Giphy([Remainder] string SearchTerms = null)
+        {
+            GiphyClient Client = new GiphyClient(BotDB.Config.APIKeys.GiphyKey);
+            string Response = null;
+            if (!string.IsNullOrWhiteSpace(SearchTerms))
+            {
+                var GetGif = await Client.SearchAsync(SearchTerms);
+                var RandomGif = new Random().Next(0, GetGif.Pagination.Count);
+                int RandomGIF = RandomGif > 300 ? RandomGif - 250 : new Random().Next(0, 10);
+                Response = GetGif.Datum[RandomGIF].EmbedURL;
+            }
+            else
+            {
+                var gif = await Client.TrendingAsync();
+                var Random = new Random().Next(0, gif.Pagination.Count);
+                Response = gif.Datum[Random].EmbedURL;
+            }
+            await ReplyAsync(Response != null ? Response : "Couldn't find anything.");
         }
     }
 }
