@@ -8,7 +8,7 @@ namespace Valerie.Handlers.GuildHandler.Models
         public string Prefix { get; set; } = "<>";
         public List<string> WelcomeMessages { get; set; } = new List<string>();
         public List<string> LeaveMessages { get; set; } = new List<string>();
-        public ulong MuteRoleID { get; set; }
+        public string MuteRoleID { get; set; }
         public int ModCases { get; set; }
         public bool AntiAdvertisement { get; set; }
         public Wrapper JoinEvent { get; set; } = new Wrapper();
