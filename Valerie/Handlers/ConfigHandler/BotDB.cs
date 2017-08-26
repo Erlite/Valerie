@@ -27,13 +27,22 @@ namespace Valerie.Handlers.ConfigHandler
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                var Config = await Session.LoadAsync<ConfigModel>(BotConfig);
+                try
+                {
+                    var Config = await Session.LoadAsync<ConfigModel>(BotConfig);
+                }
+                catch (AggregateException Ex)
+                {
+                    Log.Write(Status.ERR, Source.Database, $"Database not found.\nMore Details: {Ex.Message}\n\nPress any key to continue ...");
+                    Console.ReadKey();
+                    Environment.Exit(0);
+                }
                 if (Config == null)
                 {
-                    Log.Write(Status.ERR, Source.BotDatabase, "Creating config ...");
-                    Log.Write(Status.WRN, Source.BotDatabase, "Enter Bot Token: ");
+                    Log.Write(Status.ERR, Source.Config, "Creating config ...");
+                    Log.Write(Status.WRN, Source.Config, "Enter Bot Token: ");
                     string Token = Console.ReadLine();
-                    Log.Write(Status.WRN, Source.BotDatabase, "Enter Bot Prefix: ");
+                    Log.Write(Status.WRN, Source.Config, "Enter Bot Prefix: ");
                     string Prefix = Console.ReadLine();
                     await Session.StoreAsync(new ConfigModel
                     {
@@ -41,12 +50,12 @@ namespace Valerie.Handlers.ConfigHandler
                         Token = Token,
                         Prefix = Prefix
                     });
-                    Log.Write(Status.KAY, Source.BotDatabase, "Config created succesfully.");
+                    Log.Write(Status.KAY, Source.Config, "Config created succesfully.");
                     await Session.SaveChangesAsync();
                     Session.Dispose();
                 }
                 else
-                    Log.Write(Status.KAY, Source.BotDatabase, "Config locked and loaded.");
+                    Log.Write(Status.KAY, Source.Config, "Config locked and loaded.");
             }
         }
 
