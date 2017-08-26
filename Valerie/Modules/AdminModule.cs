@@ -314,15 +314,15 @@ namespace Valerie.Modules
 
             string AFKList = null;
             if (GConfig.AFKList.Count <= 0)
-                AFKList = $"{Context.Guild.Name}'s AFK list is empty.";
+                AFKList = $"AFK List is empty.";
             else
-                AFKList = $"{GConfig.AFKList.Count} members in AFK List.";
+                AFKList = $"AFK Users: {GConfig.AFKList.Count}";
 
             string TagList = null;
             if (GConfig.TagsList.Count <= 0)
-                TagList = $"{Context.Guild.Name}'s Tag list is empty.";
+                TagList = $"No Tag(s).";
             else
-                TagList = $"{Context.Guild.Name} has {GConfig.TagsList.Count} tags.";
+                TagList = $"Total Tags: {GConfig.TagsList.Count}";
 
             string WelcomeMessages = null;
             if (!GConfig.WelcomeMessages.Any())
@@ -372,9 +372,6 @@ namespace Valerie.Modules
             embed.AddInlineField("Mute Role", GConfig.MuteRoleID);
             embed.AddInlineField("Mod Cases", GConfig.ModCases);
             embed.AddInlineField("AntiAdvertisement", GConfig.AntiAdvertisement ? "Enabled" : "Disabled");
-            embed.AddInlineField("Welcome Messages", WelcomeMessages);
-            embed.AddInlineField("Leave Messages", LeaveMessages);
-            embed.AddInlineField("Assignable Roles", AssignableRoles);
             embed.AddInlineField("AFK List", AFKList);
             embed.AddInlineField("Tags List", TagList);
 
@@ -408,6 +405,24 @@ namespace Valerie.Modules
                 x.Name = "Events";
                 x.Value = $"**Join:** {JEnabled} ({JoinChannel})\n**Leave:** {LEnabled} ({LeaveChannel})\n" +
                 $"**Starboard:** {SEnabled} ({SBChannel})\n**Chatter Bot:** {CEnabled} ({ChatterBotChannel})";
+            });
+            embed.AddField(x =>
+            {
+                x.IsInline = false;
+                x.Name = "Welcome Messages";
+                x.Value = WelcomeMessages;
+            });
+            embed.AddField(x =>
+            {
+                x.IsInline = false;
+                x.Name = "Leave Messages";
+                x.Value = LeaveMessages;
+            });
+            embed.AddField(x =>
+            {
+                x.IsInline = false;
+                x.Name = "Assignable Roles";
+                x.Value = AssignableRoles;
             });
             await ReplyAsync("", embed: embed);
         }
