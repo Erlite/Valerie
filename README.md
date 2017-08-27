@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://i.imgur.com/bdre5eQ.gif">
+<img src="https://i.imgur.com/N97axQX.png" width="350" alt="logo by logomakr">
 </p>
 
 ---
@@ -12,11 +12,3 @@ Leave a 🌟 if you :heart: it. Best way to show support 💪.
 [![forthebadge](http://forthebadge.com/images/badges/built-with-swag.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/compatibility-club-penguin.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/made-with-c-sharp.svg)](http://forthebadge.com)
-
-### Credits
----
-
-Thanks to everyone at Discord API and C# server for helping me out. A special thanks to LupineDream and Dataccountz for suggesting and helping out with the development of Valerie.
-
-<p align="center">
-<img src="http://vvcap.com/img/hlmIBIKFvea.png" /> </p>
