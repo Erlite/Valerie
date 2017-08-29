@@ -70,7 +70,7 @@ namespace Valerie.Modules
             await ReplyAsync($"**{Name}** has been updated.");
         }
 
-        [Command("Info"), Summary("Shows information about a tag."), Priority(1)]
+        [Command("Info"), Alias("About"), Summary("Shows information about a tag."), Priority(1)]
         public async Task InfoAsync(string Name)
         {
             var Config = ServerDB.GuildConfig(Context.Guild.Id);
@@ -87,7 +87,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Uses", GetTag.Uses);
             embed.AddInlineField("Creation Date", GetTag.CreationDate);
             embed.AddInlineField("Response", GetTag.Response);
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("List"), Summary("Shows a list of all tags."), Priority(1)]
@@ -119,7 +119,7 @@ namespace Valerie.Modules
                 return;
             }
             var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{User} owns {UserTag.Count()} tags.", Description: string.Join(", ", UserTag.Select(y => y.Name)));
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Top"), Summary("Shows the top 5 tags."), Priority(1)]

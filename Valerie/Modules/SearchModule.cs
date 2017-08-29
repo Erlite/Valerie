@@ -41,7 +41,7 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
             embed.AddInlineField($"Definition of {TermInfo.Word}", TermInfo.Definition);
             embed.AddInlineField("Example", TermInfo.Example);
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
@@ -143,7 +143,7 @@ namespace Valerie.Modules
             if (string.IsNullOrWhiteSpace(Builder.ToString()))
                 await ReplyAsync("No results found.");
             else
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("BImage"), Summary("Performs a bing image search for your query and replies back with a random image.")]
@@ -169,7 +169,7 @@ namespace Valerie.Modules
                 var RandomNum = new Random().Next(1, 50);
                 JObject image = (JObject)arr[RandomNum];
                 var embed = Vmbed.Embed(VmbedColors.Black, ImageUrl: (string)image["contentUrl"]);
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
             }
         }
 
@@ -234,7 +234,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Owned Games", UserGames.OwnedGames.GamesCount);
             embed.AddInlineField("Recently Played Games", UserRecent.RecentGames.TotalCount);
 
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Giphy"), Summary("Searches Giphy for your Gifs??"), Alias("Gif"), Priority(0)]

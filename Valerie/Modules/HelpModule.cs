@@ -31,7 +31,7 @@ namespace Valerie.Modules
                     x.IsInline = false;
                 });
             }
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Help"), Summary("Displays information about a specific command.")]
@@ -66,7 +66,7 @@ namespace Valerie.Modules
                 embed.Title = $"COMMAND INFO | {cmd.Name}";
                 embed.Description = $"**Aliases:** {Aliases}\n**Parameters:** {Parameters}\n**Summary:** {cmd.Summary}";
             }
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
     }
 }

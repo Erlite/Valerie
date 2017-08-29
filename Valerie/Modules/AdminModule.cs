@@ -230,7 +230,7 @@ namespace Valerie.Modules
                 embed.AddInlineField("Case No.", Config.ModCases);
                 embed.AddInlineField("Case Type", "Kick");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
@@ -250,7 +250,7 @@ namespace Valerie.Modules
                 embed.AddInlineField("Case No.", Config.ModCases);
                 embed.AddInlineField("Case Type", "Ban");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
@@ -424,7 +424,7 @@ namespace Valerie.Modules
                 x.Name = "Assignable Roles";
                 x.Value = AssignableRoles;
             });
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("EB")]

@@ -46,7 +46,7 @@ namespace Valerie.Modules
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
                 $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("TweetMedia"), Summary("Tweets with media from @Vuxey account!"),
@@ -89,7 +89,7 @@ namespace Valerie.Modules
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {tweet.Id}\n" +
                 $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({tweet.Url})");
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Reply"), Summary("Replies back to a tweet!"), Cooldown(10)]
@@ -125,7 +125,7 @@ namespace Valerie.Modules
                     $"**Tweet:** {TweetMessage}\n" +
                     $"**Tweet ID:** {UserTweet.Id}\n" +
                     $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
             }
         }
 

@@ -42,7 +42,7 @@ namespace Valerie.Modules
             if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
                 await ReplyAsync("No results found!");
             else
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results.")]

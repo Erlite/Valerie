@@ -10,7 +10,7 @@ namespace Valerie.Modules
 {
     public class SupportModule : InteractiveBase
     {
-        [Command("Report"), Summary("Reports an issue to Bot owner / Used to give feedback.")]
+        [Command("Report"), Alias("Feedback"), Summary("Reports an issue to Bot owner / Used to give feedback.")]
         public async Task ReportAsync()
         {
             EmbedBuilder Embed = null;
@@ -51,7 +51,7 @@ namespace Valerie.Modules
             Embed.AddInlineField("User", $"{Context.User}\n{Context.User.Id}");
             Embed.AddInlineField("Additional Information", $"User Count: {Context.Guild.Users.Count}\nChannel Count: {Context.Guild.Channels.Count}");
             var Channel = Context.Client.GetChannel(Convert.ToUInt64(BotDB.Config.ReportChannel)) as ITextChannel;
-            await Channel.SendMessageAsync("", embed: Embed);
+            await Channel.SendMessageAsync("", embed: Embed.Build());
             await ReplyAndDeleteAsync($"Your {ReportType} has been submitted.", timeout: TimeSpan.FromSeconds(5));
         }
 
@@ -106,7 +106,7 @@ namespace Valerie.Modules
                     break;
             }
             var embed = Vmbed.Embed(VmbedColors.Pastel, Title: Title, Description: GuideMessage, ThumbUrl: "https://png.icons8.com/open-book/dusk/250");
-            await ReplyAndDeleteAsync("", embed: embed, timeout: TimeSpan.FromSeconds(60));
+            await ReplyAndDeleteAsync("", embed: embed.Build(), timeout: TimeSpan.FromSeconds(60));
         }
     }
 }

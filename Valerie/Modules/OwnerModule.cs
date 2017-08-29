@@ -83,7 +83,7 @@ namespace Valerie.Modules
                     x.Value = $"```{eval.ToString()}```";
                 });
 
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
             }
             catch (Exception e)
             {
@@ -98,7 +98,7 @@ namespace Valerie.Modules
                     x.Name = "Output";
                     x.Value = $"```{e.GetType().ToString()} : {e.Message}```";
                 });
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
             }
             finally
             {
@@ -155,7 +155,7 @@ namespace Valerie.Modules
                 Name = Context.User.Username,
                 IconUrl = Context.User.GetAvatarUrl()
             };
-            await ch.SendMessageAsync("", embed: embed);
+            await ch.SendMessageAsync("", embed: embed.Build());
             await Task.Delay(5000);
             await gld.LeaveAsync();
             await ReplyAsync("Message has been sent and I've left the guild!");

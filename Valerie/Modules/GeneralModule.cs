@@ -17,6 +17,7 @@ using Valerie.Attributes;
 using Valerie.Services;
 using Valerie.Handlers;
 using Valerie.Handlers.ConfigHandler;
+using Cookie.FOAAS;
 
 namespace Valerie.Modules
 {
@@ -69,7 +70,7 @@ namespace Valerie.Modules
                     Username = User.Username;
                 embed.AddInlineField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}{Id}");
             }
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("AFK"), Summary("Adds Or Removes you from AFK list.")]
@@ -230,7 +231,7 @@ namespace Valerie.Modules
                 embed.Description = $"You won {Bet} :tada:";
                 embed.Color = new Color(0x93ff89);
             }
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!"), Cooldown(5)]
@@ -299,7 +300,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Bots", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true));
             embed.AddInlineField("Text Channels", (Context.Guild as SocketGuild).TextChannels.Count);
             embed.AddInlineField("Voice Channels", (Context.Guild as SocketGuild).VoiceChannels.Count);
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("RoleInfo"), Alias("RI"), Summary("Displays information about a role.")]
@@ -317,7 +318,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Is Mentionable?", Role.IsMentionable ? "Yes" : "No");
             embed.AddInlineField("Is Managed?", Role.IsManaged ? "Yes" : "No");
             embed.AddInlineField("Permissions", string.Join(", ", Role.Permissions.ToList()));
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("UserInfo"), Alias("UI"), Summary("Displays information about a user.")]
@@ -340,7 +341,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Status", User.Status);
             embed.AddInlineField("Permissions", string.Join(", ", User.GuildPermissions.ToList()));
             embed.AddInlineField("Roles", string.Join(", ", Roles.OrderByDescending(x => x.Position)));
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
@@ -359,12 +360,15 @@ namespace Valerie.Modules
         [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
         public async Task TrumpAsync()
         {
-            await ReplyAsync((JObject.Parse((
-                await (await new HttpClient()
-                .GetAsync("https://api.tronalddump.io/random/quote"))
-                .Content.ReadAsStringAsync())))["value"].ToString());
+            var Get = await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("Using TrumpDump API was the worse trade, maybe ever.");
+                return;
+            }
+            await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
+            Get.Dispose();
         }
-
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public async Task UserAvatarAsync(SocketGuildUser User)
             => await ReplyAsync(User.GetAvatarUrl(size: 4096));
@@ -372,14 +376,14 @@ namespace Valerie.Modules
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
         {
-            var Get = await new HttpClient().GetAsync("http://api.yomomma.info/");
-
+            var Get = await new HttpClient().GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
-                await ReplyAsync("Yomomma so fat that she crashed yomomma's API.");
+                await ReplyAsync("Yo mama so fat she crashed Yomomma's API.");
                 return;
             }
-            await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync())["joke"].ToString());
+            await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false))["joke"].ToString());
+            Get.Dispose();
         }
 
         [Command("Probe"), Summary("Probes someone or yourself.")]
@@ -417,7 +421,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"No usernames found matching **{User.Discriminator}** discriminator.");
         }
 
-        [Command("Stats"), Alias("About"), Summary("Shows information about Bot.")]
+        [Command("Stats"), Alias("About", "Info"), Summary("Shows information about Bot.")]
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
@@ -437,17 +441,17 @@ namespace Valerie.Modules
                             $"[{((string)Result[1].sha).Substring(0, 7)}]({Result[1].html_url}) {Result[1].commit.message}\n" +
                             $"[{((string)Result[2].sha).Substring(0, 7)}]({Result[2].html_url}) {Result[2].commit.message}";
                     }
+                    Response.Dispose();
                 }
                 Http.Dispose();
             }
-
-            var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.ToString()} Official Invite",
+            var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 "https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591",
                 Description: $"**Latest Changes:**\n{Changes}");
             embed.AddInlineField("Members",
-                $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
-                $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
-                $"Total: {Client.Guilds.Sum(x => x.Users.Count)}");
+                    $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
+                    $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
+                    $"Total: {Client.Guilds.Sum(x => x.Users.Count)}");
             embed.AddInlineField("Channels",
                 $"Text: {Client.Guilds.Sum(x => x.TextChannels.Count)}\n" +
                 $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
@@ -460,7 +464,11 @@ namespace Valerie.Modules
                 $"Cache: {Convert.ToInt32((Misc.DirSize(new DirectoryInfo(MainHandler.CacheFolder)) / 1024) / 1024.0)} MB\n" +
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB");
             embed.AddInlineField(":beginner:", "Written by: [Yucked](https://github.com/Yucked)\nLibrary: Discord.Net 1.0");
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
+
+        [Command("Fuck"), Summary("Gives a random fuck about your useless fucking command.")]
+        public async Task FoaasAsync(IGuildUser User = null)
+            => await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : "Bob").ConfigureAwait(false));
     }
 }

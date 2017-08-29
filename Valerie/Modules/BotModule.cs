@@ -20,7 +20,7 @@ namespace Valerie.Modules
             await ReplyAsync($"Bot's Prefix has been set to: {NewPrefix}");
         }
 
-        [Command("Avatar", RunMode = RunMode.Async), Summary("Changes Bot's avatar.")]
+        [Command("Avatar"), Summary("Changes Bot's avatar.")]
         public async Task AvatarAsync([Remainder] string Path)
         {
             using (var stream = new FileStream(Path, FileMode.Open))

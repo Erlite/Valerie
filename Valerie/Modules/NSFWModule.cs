@@ -38,7 +38,7 @@ namespace Valerie.Modules
             else
             {
                 var embed = Vmbed.Embed(VmbedColors.Pastel, url, ImageUrl: url);
-                await ReplyAsync("", embed: embed);
+                await ReplyAsync("", embed: embed.Build());
             }
         }
 
@@ -62,7 +62,7 @@ namespace Valerie.Modules
                 FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddInlineField("Video Length", Getvid.duration);
             embed.AddInlineField("Total Views", Getvid.views);
-            await ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed.Build());
         }
     }
 }

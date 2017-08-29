@@ -142,7 +142,7 @@ namespace Valerie.Handlers
             else
             {
                 var msg = await StarboardChannel.SendMessageAsync(
-                    $"{StringExtension.StarType(Message.Reactions.Count)}{Message.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed);
+                    $"{StringExtension.StarType(Message.Reactions.Count)}{Message.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed.Build());
                 await ServerDB.StarboardHandlerAsync(Guild.Id, ModelEnum.StarNew, Message.Id, Message.Channel.Id, msg.Id);
             }
         }
