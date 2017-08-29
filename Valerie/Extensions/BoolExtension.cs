@@ -37,7 +37,7 @@ namespace Valerie.Extensions
 
         public static bool HasLeveledUp(int Previous, int New) => New > Previous;
 
-        public static bool IsNSFW(IChannel Channel) => Channel.Name.Contains("nsfw");
+        public static bool IsNSFW(ITextChannel Channel) => Channel.Name.Contains("nsfw") || Channel.IsNsfw;
 
         public static bool IsMessageUrl(string Message)
         {
