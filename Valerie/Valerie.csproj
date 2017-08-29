@@ -7,9 +7,9 @@
   
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
-    <PackageReference Include="Cookie" Version="1.1.2" />
+    <PackageReference Include="Cookie" Version="2.0.1" />
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.0" />
-    <PackageReference Include="Discord.Net" Version="1.0.2-build-00808" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00822" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.28.0.896" />
     <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.28.0.138" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.28.0.760" />
