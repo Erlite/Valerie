@@ -13,7 +13,7 @@ namespace Valerie.Extensions
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {
-                    using (Stream contentStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync(), stream =
+                    using (Stream contentStream = await (await client.SendAsync(request).ConfigureAwait(false)).Content.ReadAsStreamAsync().ConfigureAwait(false), stream =
                         new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None, 3145728, true))
                     {
                         await contentStream.CopyToAsync(stream).ConfigureAwait(false);

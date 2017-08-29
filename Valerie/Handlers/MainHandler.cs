@@ -20,7 +20,6 @@ namespace Valerie.Handlers
             Urls = new string[] { "http://localhost:8080" }
         }.Initialize();
 
-
         public static IDocumentStore Store => DocumentStore.Value;
 
         public static async Task GetReadyAsync()
