@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -438,7 +436,7 @@ namespace Valerie.Modules
                 Response.Dispose();
             }
             var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
-                "https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591",
+                $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: $"**Latest Changes:**\n{Changes}");
             embed.AddInlineField("Members",
                     $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
@@ -454,7 +452,7 @@ namespace Valerie.Modules
                 $"Messages Received: {BotConfig.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}");
             embed.AddInlineField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB");
-            embed.AddInlineField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nLibrary: Discord.Net {DiscordConfig.Version}");
+            embed.AddInlineField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}");
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -544,7 +542,13 @@ namespace Valerie.Modules
 
         [Command("Schmeckles"), Summary("Shows how many Schmeckles you have.")]
         public async Task SchmecklesAsync()
-            => await ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
-
+        {
+            if (!Config.EridiumHandler.UsersList.ContainsKey(Context.User.Id))
+            {
+                await ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
+                return;
+            }
+            await ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
+        }
     }
 }
