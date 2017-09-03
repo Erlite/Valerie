@@ -10,7 +10,7 @@ namespace Valerie.Modules
 {
     public class SupportModule : InteractiveBase
     {
-        [Command("Report"), Alias("Feedback"), Summary("Reports an issue to Bot owner / Used to give feedback.")]
+        [Command("Report"), Alias("Feedback"), Summary("Reports an issue to Bot owner or give feedback.")]
         public async Task ReportAsync()
         {
             EmbedBuilder Embed = null;
@@ -67,14 +67,15 @@ namespace Valerie.Modules
                 $":three: Help With Tags!\n" +
                 $":four: I think I found a bug! OR I need to give feedback!\n" +
                 $":five: What are Schmeckles? What do they do?\n" +
-                $":six: Updates", timeout: TimeSpan.FromSeconds(20));
+                $":six: Updates\n" +
+                $":seven: Valerie's Status Changing", timeout: TimeSpan.FromSeconds(20));
             var Choice = (await NextMessageAsync()).Content;
             if (!int.TryParse(Choice, out int Num))
             {
                 await ReplyAndDeleteAsync("Your input wasn't valid! Exiting guide ...");
                 return;
             }
-            if (Num > 6 || Num < 1)
+            if (Num > 7 || Num < 1)
             {
                 await ReplyAndDeleteAsync("Not a valid choice. Exiting guide ...");
                 return;
@@ -83,8 +84,8 @@ namespace Valerie.Modules
             {
                 case 1:
                     Title = "GUIDE | NSFW Commands";
-                    GuideMessage = $"NSFW Commands can only be ran in a channel named NSFW or your channel name contains the word \"NSFW\" in it. " +
-                        $"This is to make sure that users can't user the command outside of NSFW channels. For more info: https://github.com/Yucked/Valerie/wiki/Command-Help";
+                    GuideMessage = $"NSFW Commands can only be ran in a channel that has NSFW enabled or if the channel name starts with or contains \"NSFW\" in it." +
+                        $"This is to make sure that users can't user the command outside of NSFW channels.";
 
                     break;
                 case 2:
@@ -109,14 +110,20 @@ namespace Valerie.Modules
                 case 5:
                     Title = "GUIDE | What are Schmeckles and what do they do?";
                     GuideMessage = $"Schmeckles are a new form of currency. In order to get Schmeckles, you need to enable Eridium on your server (Check Guide #2). " +
-                        $"If you have enough Eridium for the command that requires Schmeckles, the bot will automatically subtract that much Eridium and execute the command succesfully.\n" +
+                        $"If you have enough Eridium for the command that requires Schmeckles, the bot will automatically subtract that much Eridium and execute the command succesfully.\n\n" +
                         $"**Why would you add something so stupid?** It's not stupid if it works. The main reason I added this was to make sure users don't abuse a certain command and on the other hand " +
                         $"you get competition in your server for Eridium leaderboards. Who is stupid now?";
                     break;
                 case 6:
                     Title = "GUIDE | Updates";
                     GuideMessage = "Valerie is regularly updating to make sure it is using the latest feature of the library and the API's. How do you get the update logs? You don't. " +
-                        "Why? They are useless. You can check Valerie's commit messages by using the Stats command or visiting Valerie's github repo.";
+                        "Why? They are useless. If you can want, you can check Valerie's commit messages by using the Stats command or visiting Valerie's github repo.";
+                    break;
+                case 7:
+                    Title = "GUIDE | Valerie's Status Changing";
+                    GuideMessage = $"Valerie will automatically change it's status (Which is the green/yellow/red dot you see next to someone's avatar) based on it's ping. If the ping is " +
+                        $"really bad, the status will be set to DND (Do Not Disturb) and it's advised not to use commands during that periods or keep usage to minimum because it will give somewhat delayed " +
+                        $"response.";
                     break;
             }
             var embed = Vmbed.Embed(VmbedColors.Pastel, Title: Title, Description: GuideMessage, ThumbUrl: "https://png.icons8.com/open-book/dusk/250");
