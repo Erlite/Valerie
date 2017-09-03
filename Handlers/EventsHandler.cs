@@ -28,7 +28,9 @@ namespace Valerie.Handlers
                     $"Your Guild Prefix: {Config.Prefix}  | Default Prefix: {BotConfig.Config.Prefix}";
             else
                 JoinMessage = StringExtension.ReplaceWith(BotConfig.Config.ServerMessage, Config.Prefix, BotConfig.Config.Prefix);
-            await (await Guild.Owner.GetOrCreateDMChannelAsync()).SendMessageAsync(JoinMessage);
+            var Msg = await (await Guild.Owner.GetOrCreateDMChannelAsync()).SendMessageAsync(JoinMessage);
+            if (Msg == null)
+                await Guild.DefaultChannel.SendMessageAsync(JoinMessage);
         }
 
         internal static async Task LeftGuildAsync(SocketGuild Guild) => await ServerConfig.LoadOrDeleteAsync(Actions.Remove, Guild.Id).ConfigureAwait(false);
@@ -149,7 +151,7 @@ namespace Valerie.Handlers
                     Stars = 1
                 });
             }
-            await ServerConfig.SaveAsync(Guild.Id).ConfigureAwait(false);
+            await ServerConfig.SaveAsync().ConfigureAwait(false);
         }
 
         internal static async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
@@ -185,7 +187,7 @@ namespace Valerie.Handlers
                 Config.Starboard.StarboardMessages.Remove(Exists);
                 await SMsg.DeleteAsync();
             }
-            await ServerConfig.SaveAsync(Guild.Id).ConfigureAwait(false);
+            await ServerConfig.SaveAsync().ConfigureAwait(false);
         }
 
         static async Task EridiumHandlerAsync(SocketGuildUser User, int Eridium)
@@ -210,7 +212,7 @@ namespace Valerie.Handlers
             GuildConfig.EridiumHandler.UsersList[User.Id] += EridiumToGive;
             int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
 
-            await ServerConfig.SaveAsync(User.Guild.Id).ConfigureAwait(false);
+            await ServerConfig.SaveAsync().ConfigureAwait(false);
 
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
 
@@ -254,7 +256,7 @@ namespace Valerie.Handlers
             GuildConfig.AFKList.Remove(User.Id, out string SomeString);
             GuildConfig.EridiumHandler.UsersList.Remove(User.Id, out int Eridium);
             GuildConfig.TagsList.RemoveAll(x => x.Owner == $"{User.Id}");
-            await ServerConfig.SaveAsync(User.Guild.Id).ConfigureAwait(false);
+            await ServerConfig.SaveAsync().ConfigureAwait(false);
         }
 
         static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
