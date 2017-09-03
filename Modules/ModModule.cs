@@ -1,0 +1,151 @@
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Valerie.Handlers.Server;
+using Valerie.Extensions;
+using Valerie.Handlers.Server.Models;
+
+namespace Valerie.Modules
+{
+    [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages)]
+    public class ModModule : CommandBase
+    {
+        ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
+        ServerModel Config => ServerConfig.Config;
+
+        [Command("Kick"), Summary("Kicks user from the guild."), RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.KickMembers)]
+        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = "No reason provided by moderator.")
+        {
+            await User.KickAsync(Reason);
+            Config.ModLog.Cases += 1;
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
+            {
+                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
+                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
+                embed.AddInlineField("Responsible Moderator", Context.User.Username);
+                embed.AddInlineField("Case No.", Config.ModLog.Cases);
+                embed.AddInlineField("Case Type", "Kick");
+                embed.AddInlineField("Reason", Reason);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
+            }
+            else
+                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+        }
+
+        [Command("Ban"), Summary("Bans user from the guild."), RequireBotPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task BanAsync(IGuildUser User, [Remainder] string Reason = "No reason provided by moderator.")
+        {
+            await Context.Guild.AddBanAsync(User, 7, Reason);
+            Config.ModLog.Cases += 1;
+            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
+            {
+                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
+                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
+                embed.AddInlineField("Responsible Moderator", Context.User.Username);
+                embed.AddInlineField("Case No.", Config.ModLog.Cases);
+                embed.AddInlineField("Case Type", "Ban");
+                embed.AddInlineField("Reason", Reason);
+                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
+            }
+            else
+                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+        }
+
+        [Command("Unban"), Summary("Unbans user from the guild"), RequireBotPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task UnBanAsync(IGuildUser User)
+        {
+            await Context.Guild.RemoveBanAsync(User);
+            await ReplyAsync($"**{User} got unbent.** :v:");
+        }
+
+        [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Alias("PC"), RequireUserPermission(ChannelPermission.ManageMessages)]
+        public async Task PurgeChannelAsync(ITextChannel Channel)
+        {
+            var Messages = await Channel.GetMessagesAsync(500).Flatten();
+            await Channel.DeleteMessagesAsync(Messages);
+        }
+
+        [Command("PurgeUser"), Summary("Purges User messages from current channel."), Alias("PU"), RequireUserPermission(ChannelPermission.ManageMessages)]
+        public async Task PurgeUserAsync(int Amount, IGuildUser User)
+        {
+            var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).Flatten()).Where(x => x.Author.Id == User.Id);
+            if (Amount <= 100)
+                await Context.Channel.DeleteMessagesAsync(GetMessages);
+            else if (Amount > 100)
+                foreach (var msg in GetMessages)
+                    await msg.DeleteAsync();
+        }
+
+        [Command("Purge"), Summary("Deletes all messages from a channel."), Alias("Del"), RequireUserPermission(ChannelPermission.ManageMessages)]
+        public async Task Purge(int Amount)
+        {
+            var GetMessages = await Context.Channel.GetMessagesAsync(Amount).Flatten();
+            if (Amount <= 100)
+                await Context.Channel.DeleteMessagesAsync(GetMessages);
+            else if (Amount > 100)
+                foreach (var msg in GetMessages)
+                    await msg.DeleteAsync();
+        }
+
+        [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role."), RequireUserPermission(GuildPermission.ManageRoles)]
+        public async Task AaddroleAsync(IGuildUser User, IRole Role)
+        {
+            await User.AddRoleAsync(Role);
+            await ReplyAsync($"{User} has been added to {Role.Name}");
+        }
+
+        [Command("Removerole"), Alias("Rrole"), Summary("Removes user from the specified role."), RequireUserPermission(GuildPermission.ManageRoles)]
+        public async Task RemoveRoleAsync(IGuildUser User, IRole Role)
+        {
+            await User.RemoveRoleAsync(Role);
+            await ReplyAsync($"{User} has been removed from {Role.Name}");
+        }
+
+        [Command("Mute"), Summary("Mutes a user."), RequireUserPermission(GuildPermission.MuteMembers)]
+        public async Task MuteAsync(IGuildUser User)
+        {
+            if (User.RoleIds.Contains(Convert.ToUInt64(Config.ModLog.MuteRole)))
+            {
+                await ReplyAsync($"{User} is already muted.");
+                return;
+            }
+            OverwritePermissions Permissions = new OverwritePermissions(addReactions: PermValue.Deny, sendMessages: PermValue.Deny, attachFiles: PermValue.Deny, useExternalEmojis: PermValue.Deny);
+            if (Convert.ToUInt64(Config.ModLog.MuteRole) == 0 || Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)) == null)
+            {
+                var Role = await Context.Guild.CreateRoleAsync("Muted", GuildPermissions.None, Color.Default);
+                foreach (var Channel in (Context.Guild as SocketGuild).TextChannels)
+                {
+                    if (!Channel.PermissionOverwrites.Select(x => x.Permissions).Contains(Permissions))
+                    {
+                        await Channel.AddPermissionOverwriteAsync(Role, Permissions).ConfigureAwait(false);
+                    }
+                }
+                Config.ModLog.MuteRole = $"{Role.Id}";
+                await User.AddRoleAsync(Role);
+                await ReplyAsync($"**{User} has been muted** :zipper_mouth:");
+                return;
+            }
+            else
+            {
+                await User.AddRoleAsync(Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)));
+                await ReplyAsync($"**{User} has been muted** :zipper_mouth:");
+                return;
+            }
+        }
+
+        [Command("Umute"), Summary("Umutes a user."), RequireUserPermission(GuildPermission.MuteMembers)]
+        public async Task UnMuteAsync(IGuildUser User)
+        {
+            if (!User.RoleIds.Contains(Convert.ToUInt64(Config.ModLog.MuteRole)))
+            {
+                await ReplyAsync($"{User} isn't muted.");
+                return;
+            }
+            await User.RemoveRoleAsync(Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)));
+            await ReplyAsync($"**{User} has been unmuted.** :v:");
+        }
+    }
+}
