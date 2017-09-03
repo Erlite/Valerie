@@ -9,7 +9,7 @@ namespace Valerie.Extensions
     {
         protected override async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            await ServerConfig.SaveAsync(Context.Guild.Id).ConfigureAwait(false);
+            await ServerConfig.SaveAsync().ConfigureAwait(false);
             await Context.Channel.TriggerTypingAsync();
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options);
         }
