@@ -1,7 +1,7 @@
-﻿using Raven.Client.Documents.Session;
-using System.Threading.Tasks;
-using Valerie.Handlers.Server.Models;
+﻿using System.Threading.Tasks;
+using Raven.Client.Documents.Session;
 using Valerie.Modules.Enums;
+using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Handlers.Server
 {
@@ -43,7 +43,7 @@ namespace Valerie.Handlers.Server
             }
         }
 
-        public static async Task SaveAsync(ulong GuildId)
+        public static async Task SaveAsync()
         {
             using (IAsyncDocumentSession SaveSession = Database.Store.OpenAsyncSession())
             {
