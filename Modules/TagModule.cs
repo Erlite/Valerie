@@ -18,13 +18,13 @@ namespace Valerie.Modules
         public async Task Tag(string TagName)
         {
             var Tag = Config.TagsList.FirstOrDefault(x => x.Name == TagName);
-            if (Tag == null)
+            if (!Config.TagsList.Contains(Tag))
             {
                 await ReplyAsync($"Tag with name **{TagName}** doesn't exist.");
                 return;
             }
+            Config.TagsList.FirstOrDefault(x => x.Name == TagName).Uses += 1;
             await ReplyAsync(Tag.Response);
-            Tag.Uses += 1;
         }
 
         [Command("Create"), Summary("Creates a tag."), Priority(1)]
@@ -79,7 +79,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"You are not the owner of **{Name}**.");
                 return;
             }
-            Tag.Response = Response;
+            Config.TagsList.FirstOrDefault(x => x.Name == Name).Response = Response;
             await ReplyAsync($"**{Name}** has been updated.");
         }
 
@@ -110,7 +110,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"**{Context.Guild.Name}** doesn't have any tags.");
                 return;
             }
-            await ReplyAsync(string.Join(", ", Config.TagsList.Select(x => x.Name)));
+            await ReplyAsync($"{Context.Guild} Tag's List:\n{string.Join(", ", Config.TagsList.Select(x => x.Name))}");
         }
 
         [Command("User"), Summary("Shows all tags owned by you."), Priority(1)]
