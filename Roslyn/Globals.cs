@@ -7,8 +7,8 @@ namespace Valerie.Roslyn
     {
         public ICommandContext Context { get; internal set; }
         public DiscordSocketClient Client { get; internal set; }
-        public SocketGuildUser SocketGuildUser { get; internal set; }
-        public SocketGuild SocketGuild { get; internal set; }
-        public SocketGuildChannel SocketGuildChannel { get; internal set; }
+        public SocketGuildUser User { get; internal set; }
+        public SocketGuild Guild { get; internal set; }
+        public SocketGuildChannel Channel { get; internal set; }
     }
 }
