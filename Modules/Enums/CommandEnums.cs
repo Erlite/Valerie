@@ -3,13 +3,14 @@
     public enum CommandEnums
     {
         Eridium,
-        DMLevel,
+        DM,
         CB,
         Join,
         Leave,
         Starboard,
         Mod,
         NoAds,
+        AutoAssign,
         Add,
         Remove,
         Modify

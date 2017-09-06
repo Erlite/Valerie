@@ -16,6 +16,6 @@ namespace Valerie.Extensions
 
         public static int ConvertToSchmeckles(int EridiumToConvert) => (int)Math.Pow(EridiumToConvert, 1 / 5);
 
-        public static int ConvertToEridium(int SchmecklesToConvert) => (int)Math.Pow(SchmecklesToConvert, 5);
+        public static int ConvertToEridium(double SchmecklesToConvert) => (int)Math.Pow(SchmecklesToConvert, 5);
     }
 }

@@ -27,24 +27,22 @@ namespace Valerie.Modules
         ServerModel Config => ServerConfig.Config;
 
         [Command("Ping"), Summary("Pings Discord Gateway")]
-        public async Task PingAsync()
-            => await ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
+        public Task PingAsync() => ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
 
         [Command("Rank"), Summary("Shows your current rank and how much Eridium is needed for next level.")]
-        public async Task RankAsync(IGuildUser User = null)
+        public Task RankAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
             if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
-                await ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
-                return;
+                return ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
             }
             var UserEridium = Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Eridium);
             string Reply =
                 $"{User} Stats:\n" +
                 $"**TOTAL ERIDIUM:** {Eridium} | **LEVEL:** {IntExtension.GetLevel(Eridium)} | " +
                 $"**ERIDIUM:** {Eridium}/{IntExtension.GetEridiumForNextLevel(IntExtension.GetLevel(Eridium))}";
-            await ReplyAsync(Reply);
+            return ReplyAsync(Reply);
         }
 
         [Command("Top"), Summary("Shows top 10 users in the Eridium list.")]
@@ -157,7 +155,7 @@ namespace Valerie.Modules
             };
             var Rand = new Random(DateTime.Now.Millisecond);
             var UserEridium = Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Config.EridiumHandler.IsEridiumEnabled == false)
+            if (Config.EridiumHandler.IsEnabled == false)
             {
                 await ReplyAsync("Chat Eridium is disabled! Ask Admin or server owner to enable Chat Eridium!");
                 return;
@@ -233,7 +231,7 @@ namespace Valerie.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             int UserEridium = Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Config.EridiumHandler.IsEridiumEnabled == false)
+            if (Config.EridiumHandler.IsEnabled == false)
             {
                 await ReplyAsync("Chat Eridium is disabled! Ask the admin to enable ChatEridium!");
                 return;
@@ -365,7 +363,7 @@ namespace Valerie.Modules
         }
 
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
-        public async Task UserAvatarAsync(SocketGuildUser User) => await ReplyAsync(User.GetAvatarUrl(size: 2048));
+        public Task UserAvatarAsync(SocketGuildUser User) => ReplyAsync(User.GetAvatarUrl(size: 2048));
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
@@ -381,38 +379,38 @@ namespace Valerie.Modules
         }
 
         [Command("Probe"), Summary("Probes someone or yourself.")]
-        public async Task ProbeAsync(SocketGuildUser User = null)
+        public Task ProbeAsync(SocketGuildUser User = null)
         {
             SocketGuildUser GetUser = null;
             if (User != null)
             {
                 GetUser = User;
-                await ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dirty lilttle slut.");
+                return ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dirty lilttle slut.");
             }
             else
             {
                 GetUser = Context.User as SocketGuildUser;
-                await ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dumb cunt! Don't know how to use a fucking command?!");
+                return
+                    ReplyAsync($"**Probes {GetUser.Username} anus with a massive black dildo** :eggplant:\nYou dumb cunt! Don't know how to use a fucking command?!");
             }
         }
 
         [Command("Discrim"), Summary("Gets all users who match a certain discrim")]
         public async Task DiscrimAsync(IGuildUser User)
         {
-            var Guilds = (Context.Client as DiscordSocketClient).Guilds;
-            var sb = new StringBuilder();
-            foreach (var gld in Guilds)
+            var MatchList = new List<string>();
+            foreach (var Guilds in (Context.Client as DiscordSocketClient).Guilds)
             {
-                var dis = gld.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
-                foreach (var d in dis)
+                var Get = Guilds.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
+                foreach (var Value in Get)
                 {
-                    sb.AppendLine(d.Username);
+                    if (!MatchList.Contains(Value.Username))
+                        MatchList.Add(Value.Username);
                 }
             }
-            if (!string.IsNullOrWhiteSpace(sb.ToString()))
-                await ReplyAsync($"Users matching **{User.Discriminator}** Discriminator:\n{sb.ToString()}");
-            else
-                await ReplyAsync($"No usernames found matching **{User.Discriminator}** discriminator.");
+            string Msg = !MatchList.Any() ? "Couldn't find anything!"
+                : $"Users Matching {User}'s Discrim: {string.Join(", ", MatchList)}";
+            await ReplyAsync(Msg);
         }
 
         [Command("Stats"), Alias("About", "Info"), Summary("Shows information about Bot.")]
@@ -460,7 +458,7 @@ namespace Valerie.Modules
         public async Task FoaasAsync(IGuildUser User = null)
             => await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : "Bob").ConfigureAwait(false));
 
-        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), RequireSchmeckles(1)]
+        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), RequireSchmeckles(.35)]
         public async Task TweetAsync([Remainder] string TweetMessage)
         {
             if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
@@ -492,8 +490,8 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed.Build());
         }
 
-        [Command("Reply"), Summary("Replies back to a tweet!"), RequireSchmeckles(1)]
-        public async Task ReplyAsync(long ID, [Remainder] string TweetMessage)
+        [Command("Reply"), Summary("Replies back to a tweet!"), RequireSchmeckles(.15)]
+        public async Task TweetReplyAsync(long ID, [Remainder] string TweetMessage)
         {
             var ReplyTo = Tweet.GetTweet(ID);
 
@@ -529,7 +527,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("DeleteTweet"), Summary("Deletes a specified tweet!"), RequireSchmeckles(1)]
+        [Command("DeleteTweet"), Summary("Deletes a specified tweet!"), RequireSchmeckles(.5)]
         public async Task DeleteTweetAsync(long ID)
         {
             var GetTweet = Tweet.GetTweet(ID);
@@ -541,14 +539,13 @@ namespace Valerie.Modules
         }
 
         [Command("Schmeckles"), Summary("Shows how many Schmeckles you have.")]
-        public async Task SchmecklesAsync()
+        public Task SchmecklesAsync()
         {
             if (!Config.EridiumHandler.UsersList.ContainsKey(Context.User.Id))
             {
-                await ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
-                return;
+                return ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
             }
-            await ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
+            return ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
         }
     }
 }

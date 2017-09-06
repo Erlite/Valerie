@@ -108,7 +108,8 @@ namespace Valerie.Modules
             await ReplyAsync("Leave Message has been removed.");
         }
 
-        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod, NoAds, DMLevel")]
+        [Command("Toggle"), 
+            Summary("Enables/Disables various guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod, NoAds, DM.")]
         public async Task ToggleAsync(CommandEnums ValueType)
         {
             switch (ValueType)
@@ -138,14 +139,14 @@ namespace Valerie.Modules
                     }
                     break;
                 case CommandEnums.Eridium:
-                    if (!Config.EridiumHandler.IsEridiumEnabled)
+                    if (!Config.EridiumHandler.IsEnabled)
                     {
-                        Config.EridiumHandler.IsEridiumEnabled = true;
+                        Config.EridiumHandler.IsEnabled = true;
                         await ReplyAsync("Eridium has been enabled.");
                     }
                     else
                     {
-                        Config.EridiumHandler.IsEridiumEnabled = false;
+                        Config.EridiumHandler.IsEnabled = false;
                         await ReplyAsync("Eridium has been disabled.");
                     }
                     break;
@@ -197,17 +198,32 @@ namespace Valerie.Modules
                         await ReplyAsync("AntiAdvertisement has been disabled.");
                     }
                     break;
-                case CommandEnums.DMLevel:
+                case CommandEnums.DM:
                     if (!Config.EridiumHandler.IsDMEnabled)
                     {
                         Config.EridiumHandler.IsDMEnabled = true;
-                        string Tip = string.IsNullOrWhiteSpace(Config.EridiumHandler.LevelUpMessage) ? "Level up message hasn't been set. Use `--LevelUpMessage` command." : "";
+                        string Tip = string.IsNullOrWhiteSpace(Config.EridiumHandler.LevelUpMessage) ? 
+                            "Level up message hasn't been set. Use Guide command and read topic #2." : "";
                         await ReplyAsync($"Level Up DM has been enabled.\n{Tip}");
                     }
                     else
                     {
                         Config.EridiumHandler.IsDMEnabled = false;
                         await ReplyAsync("Level Up DM has been enabled.");
+                    }
+                    break;
+                case CommandEnums.AutoAssign:
+                    if (!Config.ModLog.IsAutoRoleEnabled)
+                    {
+                        Config.ModLog.IsAutoRoleEnabled = true;
+                        string Tip = string.IsNullOrWhiteSpace(Config.ModLog.AutoAssignRole) ? 
+                            "Auto assign role hasn't been set. Use `--SetAutoRole` command to set role." : "";
+                        await ReplyAsync($"Auto role assigning has been enabled.\n{Tip}");
+                    }
+                    else
+                    {
+                        Config.ModLog.IsAutoRoleEnabled = true;
+                        await ReplyAsync("Auto role assigning has been disabled");
                     }
                     break;
             }
@@ -308,7 +324,7 @@ namespace Valerie.Modules
             embed.AddInlineField("Tags List", TagList);
 
             var Eridium = Config.EridiumHandler;
-            var EEnabled = Eridium.IsEridiumEnabled ? "Enabled" : "Disabled";
+            var EEnabled = Eridium.IsEnabled ? "Enabled" : "Disabled";
             string BRoles = null;
             if (!Eridium.BlacklistedRoles.Any())
                 BRoles = "No Blacklisted Roles";
@@ -413,6 +429,13 @@ namespace Valerie.Modules
             }
             Config.EridiumHandler.MaxRoleLevel = MaxLevel;
             await ReplyAsync($"Max level has been set to: {MaxLevel}");
+        }
+
+        [Command("SetAutoRole"), Summary("Sets auto assign role for when user joins.")]
+        public Task SetAutoAssignRoleAsync(IRole Role)
+        {
+            Config.ModLog.AutoAssignRole = $"{Role.Id}";
+            return ReplyAsync($"**Auto assign role has been set to {Role}** :v:");
         }
 
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message.")]

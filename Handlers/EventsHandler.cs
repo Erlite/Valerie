@@ -40,10 +40,8 @@ namespace Valerie.Handlers
             var Config = await ServerConfig.ConfigAsync(User.Guild.Id).ConfigureAwait(false);
             if (!Config.JoinLog.IsEnabled) return;
 
-            ITextChannel Channel = null;
             string WelcomeMessage = null;
-            ulong Id = Convert.ToUInt64(Config.JoinLog.TextChannel);
-            var JoinChannel = User.Guild.GetChannel(Id);
+            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinLog.TextChannel));
 
             if (Config.WelcomeMessages.Count <= 0)
                 WelcomeMessage = $"{User} just joined {User.Guild.Name}! WELCOME!";
@@ -53,16 +51,14 @@ namespace Valerie.Handlers
                 WelcomeMessage = StringExtension.ReplaceWith(ConfigMsg, User.Mention, User.Guild.Name);
             }
 
-            if (User.Guild.GetChannel(Id) != null)
-            {
-                Channel = JoinChannel as ITextChannel;
+            if (Channel != null)
                 await Channel.SendMessageAsync(WelcomeMessage);
-            }
             else
-            {
-                Channel = User.Guild.DefaultChannel as ITextChannel;
-                await Channel.SendMessageAsync(WelcomeMessage);
-            }
+                await User.Guild.DefaultChannel.SendMessageAsync(WelcomeMessage);
+
+            var Role = User.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole));
+            if (Role == null || !Config.ModLog.IsAutoRoleEnabled) return;
+            await User.AddRoleAsync(Role);
         }
 
         internal static async Task UserLeftAsync(SocketGuildUser User)
@@ -199,7 +195,7 @@ namespace Valerie.Handlers
             var BlacklistedRoles = new List<ulong>(GuildConfig.EridiumHandler.BlacklistedRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
 
-            if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEridiumEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
+            if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
 
             var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
             if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
@@ -222,7 +218,7 @@ namespace Valerie.Handlers
             if (!string.IsNullOrWhiteSpace(GuildConfig.EridiumHandler.LevelUpMessage))
                 Msg = GuildConfig.EridiumHandler.LevelUpMessage.ReplaceWith(User.Mention, $"{NewLevel}");
             else
-                Msg = $"You have hit level {NewLevel} :beginner:";
+                Msg = $"You have hit level {NewLevel}! :V: Keep on chatting!";
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(Msg);
         }
 

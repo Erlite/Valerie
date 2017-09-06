@@ -11,7 +11,7 @@ namespace Valerie.Handlers.Server.Models
 
     public class EridiumWrapper
     {
-        public bool IsEridiumEnabled { get; set; }
+        public bool IsEnabled { get; set; }
         public bool IsDMEnabled { get; set; }
         public int MaxRoleLevel { get; set; } = 50;
         public string LevelUpMessage { get; set; }
@@ -51,6 +51,8 @@ namespace Valerie.Handlers.Server.Models
         public bool AntiAdvertisement { get; set; }
         public bool IsAutoModEnabled { get; set; }
         public bool IsEnabled { get; set; }
+        public bool IsAutoRoleEnabled { get; set; }
+        public string AutoAssignRole { get; set; }
         public string TextChannel { get; set; }
         public ConcurrentDictionary<ulong, int> Warnings { get; set; } = new ConcurrentDictionary<ulong, int>();
     }
