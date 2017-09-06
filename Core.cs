@@ -32,8 +32,8 @@ namespace Valerie
 
             Client.Log += (log) => Task.Run(() => Log.Write(Status.KAY, Source.Client, log.Message ?? log.Exception.StackTrace));
             Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
-            Client.JoinedGuild += EventsHandler.JoinedGuildAsync;
             Client.LeftGuild += EventsHandler.LeftGuildAsync;
+            Task.Run(() => Client.JoinedGuild += EventsHandler.JoinedGuildAsync);
             Task.Run(() => Client.MessageReceived += EventsHandler.MessageReceivedAsync);
             Task.Run(() => Client.UserJoined += EventsHandler.UserJoinedAsync);
             Task.Run(() => Client.UserLeft += EventsHandler.UserLeftAsync);
