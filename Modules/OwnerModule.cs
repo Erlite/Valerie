@@ -63,9 +63,9 @@ namespace Valerie.Modules
             {
                 Client = Context.Client as DiscordSocketClient,
                 Context = Context,
-                SocketGuild = Context.Guild as SocketGuild,
-                SocketGuildChannel = Context.Channel as SocketGuildChannel,
-                SocketGuildUser = Context.User as SocketGuildUser
+                Guild = Context.Guild as SocketGuild,
+                Channel = Context.Channel as SocketGuildChannel,
+                User = Context.User as SocketGuildUser
             };
             try
             {
@@ -82,7 +82,10 @@ namespace Valerie.Modules
                     x.Value = $"```{eval.ToString()}```";
                 });
 
-                await ReplyAsync("", embed: embed.Build());
+                await working.ModifyAsync(x =>
+                {
+                    x.Embed = embed.Build();
+                });
             }
             catch (Exception e)
             {
@@ -97,11 +100,10 @@ namespace Valerie.Modules
                     x.Name = "Output";
                     x.Value = $"```{e.GetType().ToString()} : {e.Message}```";
                 });
-                await ReplyAsync("", embed: embed.Build());
-            }
-            finally
-            {
-                await working.DeleteAsync();
+                await working.ModifyAsync(x =>
+                {
+                    x.Embed = embed.Build();
+                });
             }
         }
 
