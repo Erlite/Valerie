@@ -96,7 +96,10 @@ namespace Valerie.Modules
                         $"**Starboard:** When you star a message it will post that message on starboard.\n**NoAds:** AntiAdvertisement system. No posting discord links.\n" +
                         $"**Mod:** Sets channel for ban/kick logging.\n\n" +
                         $"If a channel isn't set for a toggle action, it will show a small tip when you enable an action saying that the channel isn't set for that action and it's advised you set the channel " +
-                        $"to get the feature to work to it's fullest.";
+                        $"to get the feature to work to it's fullest.\n\n" +
+                        $"You can also enable Level Up DM messages, which will send message to user when they level up. You can also set custom Level up message! " +
+                        "To show user level or mention user in your custom message, you need to type `{user}` `{level}`. This will replace `{user}` and Mention user and " +
+                        "replace `{level}` with user's level!";
                     break;
                 case 3:
                     Title = "GUIDE | Help With Tags";
