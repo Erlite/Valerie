@@ -6,7 +6,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Extensions;
 using Valerie.Handlers.Server;
-using Valerie.Modules.Enums;
 using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Modules
@@ -185,7 +184,7 @@ namespace Valerie.Modules
             }
 
             Config.ModLog.Warnings.TryGetValue(User.Id, out int OldValue);
-            Config.ModLog.Warnings.TryUpdate(User.Id, Config.ModLog.Warnings[User.Id] += 1, OldValue);
+            Config.ModLog.Warnings.TryUpdate(User.Id, OldValue += 1, OldValue);
 
             if (Config.ModLog.Warnings[User.Id] == 3)
             {
