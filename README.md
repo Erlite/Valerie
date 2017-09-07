@@ -1,11 +1,12 @@
 <p align="center">
-<img src="https://i.imgur.com/N97axQX.png" width="350" alt="logo by logomakr">
+<img src="https://i.imgur.com/h7Tv00N.png" width="200">
+<br><h2>Valerie</h2></br>
 </p>
 
----
-Leave a 🌟 if you :heart: it. Best way to show support 💪.
+***Invite Link:*** https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591
 
-| Invite | Server | Appveyor | Travis-CI |
-|-------:|:------:|:--------:|----------:|
-| [![](https://png.icons8.com/door-opened/dusk/70)](https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591) | [![](https://png.icons8.com/discord/dusk/70)](https://discord.gg/nzYTzxD) | [![Build status](https://ci.appveyor.com/api/projects/status/qojigwf797mw91vb?svg=true)](https://ci.appveyor.com/project/Vux/valerie)| [![Build Status](https://travis-ci.org/Yucked/Valerie.svg?branch=master)](https://travis-ci.org/Yucked/Valerie)
+***Support Server:*** https://discord.me/Glitched
 
+***Commands:*** Use help command.
+
+Smash that :star: button.
