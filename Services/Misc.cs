@@ -22,7 +22,7 @@ namespace Valerie.Services
             message.RequestUri = new Uri("https://watson-api-explorer.mybluemix.net/language-translator/api/v2/identify");
             message.Headers.Add("Accept", "text/plain");
             message.Headers.Add("accept", "text/plain");
-            var result = await HTTPExtension.HttpClient.SendAsync(message).ConfigureAwait(false);
+            var result = await new HttpClient().SendAsync(message).ConfigureAwait(false);
             string lang = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             message = new HttpRequestMessage();
             message.Method = HttpMethod.Post;
@@ -30,7 +30,7 @@ namespace Valerie.Services
             message.RequestUri = new Uri("https://watson-api-explorer.mybluemix.net/language-translator/api/v2/translate");
             message.Headers.Add("Accept", "application/json");
             message.Headers.Add("accept", "application/json");
-            result = await HTTPExtension.HttpClient.SendAsync(message).ConfigureAwait(false);
+            result = await new HttpClient().SendAsync(message).ConfigureAwait(false);
             json = await result.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<Watson>(json);
         }
