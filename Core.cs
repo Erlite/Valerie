@@ -6,10 +6,9 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Addons.Interactive;
+using Valerie.Services;
 using Valerie.Handlers;
 using Valerie.Handlers.Config;
-using Valerie.Services.Logger;
-using Valerie.Services.Logger.Enums;
 
 namespace Valerie
 {
@@ -26,11 +25,10 @@ namespace Valerie
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Info,
-                MessageCacheSize = 50000
+                LogLevel = LogSeverity.Info
             });
 
-            Client.Log += (log) => Task.Run(() => Log.Write(Status.KAY, Source.Client, log.Message ?? log.Exception.StackTrace));
+            Client.Log += (log) => Task.Run(() => Log.Write(Log.Status.KAY, Log.Source.Client, log.Message));
             Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
             Client.LeftGuild += EventsHandler.LeftGuildAsync;
             Task.Run(() => Client.JoinedGuild += EventsHandler.JoinedGuildAsync);
