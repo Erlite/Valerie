@@ -6,8 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Services.Logger;
-using Valerie.Services.Logger.Enums;
+using Valerie.Services;
 using Valerie.Handlers.Server;
 using Valerie.Handlers.Config;
 
@@ -61,11 +60,11 @@ namespace Valerie.Handlers
             {
                 case SearchResult SR: break;
                 case ExecuteResult ER:
-                    Log.Write(Status.ERR, Source.Client, ER.ErrorReason + "\n" + ER.Exception.StackTrace);
+                    Log.Write(Log.Status.ERR, Log.Source.Client, ER.ErrorReason + "\n" + ER.Exception.StackTrace);
                     break;
                 case PreconditionResult PdR:
                     ErrorMsg = PdR.ErrorReason;
-                    Log.Write(Status.ERR, Source.Client, $"[{Context.Guild.Name} | {Context.User} | {Command.Name}]");
+                    Log.Write(Log.Status.ERR, Log.Source.Client, $"[{Context.Guild.Name} | {Context.User} | {Command.Name}]");
                     break;
                 case ParseResult PR:
                     ErrorMsg = $"{Format.Bold("Usage:")} {BotConfig.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}\n" +

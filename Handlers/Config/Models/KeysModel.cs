@@ -9,6 +9,7 @@
         public string CleverBotKey { get; set; }
         public string SteamKey { get; set; }
         public string GiphyKey { get; set; } = "dc6zaTOxFJmzC";
+        public string NewsKey { get; set; }
         public TwitterWrapper TwitterKeys { get; set; } = new TwitterWrapper();
     }
 

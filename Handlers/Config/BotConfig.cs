@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
+using Valerie.Services;
 using Valerie.Handlers.Config.Models;
-using Valerie.Services.Logger;
-using Valerie.Services.Logger.Enums;
 
 namespace Valerie.Handlers.Config
 {
@@ -18,10 +17,10 @@ namespace Valerie.Handlers.Config
             {
                 if (!await Session.ExistsAsync("Config").ConfigureAwait(false))
                 {
-                    Log.Write(Status.ERR, Source.Config, "No config found! Creating one ...");
-                    Log.Write(Status.WRN, Source.Config, "Input Token: ");
+                    Log.Write(Log.Status.ERR, Log.Source.Config, "No config found! Creating one ...");
+                    Log.Write(Log.Status.WRN, Log.Source.Config, "Input Token: ");
                     string Token = Console.ReadLine();
-                    Log.Write(Status.WRN, Source.Config, "Input Prefix: ");
+                    Log.Write(Log.Status.WRN, Log.Source.Config, "Input Prefix: ");
                     string Prefix = Console.ReadLine();
                     await Session.StoreAsync(new ConfigModel
                     {
@@ -33,7 +32,7 @@ namespace Valerie.Handlers.Config
                     Session.Dispose();
                 }
                 else
-                    Log.Write(Status.KAY, Source.Config, "Config has been locked and loaded!");
+                    Log.Write(Log.Status.KAY, Log.Source.Config, "Config has been locked and loaded!");
             }
         }
 

@@ -43,13 +43,15 @@ namespace Valerie.Handlers.Server
             }
         }
 
-        public static async Task SaveAsync()
+        public static Task SaveAsync()
         {
             using (IAsyncDocumentSession SaveSession = Database.Store.OpenAsyncSession())
             {
-                await SaveSession.StoreAsync(Config).ConfigureAwait(false);
-                await SaveSession.SaveChangesAsync().ConfigureAwait(false);
+                SaveSession.StoreAsync(Config);
+                SaveSession.SaveChangesAsync();
+                SaveSession.Dispose();
             }
+            return Task.CompletedTask;
         }
     }
 }

@@ -18,5 +18,7 @@ namespace Valerie.Handlers.Server.Models
         public EridiumWrapper EridiumHandler { get; set; } = new EridiumWrapper();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
         public IList<string> AssignableRoles { get; set; } = new List<string>();
+        public ConcurrentDictionary<ulong, ConcurrentDictionary<int, string>> ToDo { get; set; } =
+            new ConcurrentDictionary<ulong, ConcurrentDictionary<int, string>>();
     }
 }

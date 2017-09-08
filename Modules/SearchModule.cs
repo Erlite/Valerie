@@ -15,6 +15,7 @@ using Valerie.Handlers.Config;
 using Valerie.Attributes;
 using Cookie.Steam;
 using Cookie.Giphy;
+using System.Net.Http;
 
 namespace Valerie.Modules
 {
@@ -24,7 +25,7 @@ namespace Valerie.Modules
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)
         {
-            var Client = await HTTPExtension.HttpClient.GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm.Replace(' ', '+')}");
+            var Client = await new HttpClient().GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm.Replace(' ', '+')}");
             if (!Client.IsSuccessStatusCode)
             {
                 await ReplyAsync("Couldn't communicate with Urban's API.");
@@ -75,7 +76,7 @@ namespace Valerie.Modules
         [Command("Wiki"), Summary("Wiki KendValerie Lamar"), Remarks("Searches wikipedia for your terms")]
         public async Task WikiAsync([Remainder]string search)
         {
-            var GetResult = HTTPExtension.HttpClient.GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}").Result;
+            var GetResult = new HttpClient().GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}").Result;
             var GetContent = await GetResult.Content.ReadAsStringAsync();
             dynamic responseObject = JsonConvert.DeserializeObject(GetContent);
             string title = responseObject[1][0];
@@ -94,7 +95,7 @@ namespace Valerie.Modules
         {
             var SB = new StringBuilder();
             string APIUrl = $"http://api.duckduckgo.com/?q={Search.Replace(' ', '+')}&format=json&pretty=1";
-            var Response = await HTTPExtension.HttpClient.GetAsync(APIUrl);
+            var Response = await new HttpClient().GetAsync(APIUrl);
             if (!Response.IsSuccessStatusCode)
             {
                 await ReplyAsync("An error occured while trying to fetch results from API."); return;
@@ -122,7 +123,7 @@ namespace Valerie.Modules
         public async Task DocsAsync([Remainder] string Search)
         {
             var Builder = new StringBuilder();
-            var Response = await HTTPExtension.HttpClient.GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
+            var Response = await new HttpClient().GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
             if (!Response.IsSuccessStatusCode)
             {
                 await ReplyAsync(Response.ReasonPhrase);
@@ -147,10 +148,11 @@ namespace Valerie.Modules
         [Command("BImage"), Summary("Performs a bing image search for your query and replies back with a random image.")]
         public async Task ImageAsync([Remainder] string Query)
         {
+            var Client = new HttpClient();
             var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={Query}&count=50&offset=0&mkt=en-us&safeSearch=Off";
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Clear();
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
-            var res = await HTTPExtension.HttpClient.GetAsync(link);
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
+            var res = await Client.GetAsync(link);
             if (!res.IsSuccessStatusCode)
             {
                 await ReplyAsync($"An error occurred while trying to fetch results.");
@@ -172,9 +174,10 @@ namespace Valerie.Modules
         [Command("Bing"), Summary("Performs a bing search for your query and replies back with 5 search results.")]
         public async Task SearchAsync([Remainder]string Query)
         {
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Clear();
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
-            var GetRequest = await HTTPExtension.HttpClient.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
+            var Client = new HttpClient();
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
+            var GetRequest = await Client.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
             if (!GetRequest.IsSuccessStatusCode)
             {
                 await ReplyAsync(GetRequest.ReasonPhrase);
@@ -254,8 +257,27 @@ namespace Valerie.Modules
         [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
         public async Task LewdAsync()
         {
-            JToken Token = JToken.Parse(await HTTPExtension.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false));
+            JToken Token = JToken.Parse(await new HttpClient().GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false));
             await ReplyAsync(Token["neko"].ToString());
+        }
+
+        [Command("News"), Summary("Gets you the latest news.")]
+        public async Task NewsAsync()
+        {
+            var Get = await new HttpClient()
+                .GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={BotConfig.Config.APIKeys.NewsKey}").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync(Get.ReasonPhrase);
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<BBC>(await Get.Content.ReadAsStringAsync());
+            var Builder = new StringBuilder();
+            Content.Articles.ForEach(x =>
+            {
+                Builder.AppendLine($":small_orange_diamond: **[{x.Title}]({x.Url})**\n{x.Description}");
+            });
+            await ReplyAsync($"**Today's Headlines**\n\n{Builder.ToString()}");
         }
     }
 }

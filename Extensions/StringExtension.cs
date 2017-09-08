@@ -8,6 +8,7 @@ using Google.Apis.Urlshortener.v1;
 using Google.Apis.YouTube.v3;
 using Valerie.Handlers.Config;
 using System.Xml;
+using System.Net.Http;
 
 namespace Valerie.Extensions
 {
@@ -43,10 +44,11 @@ namespace Valerie.Extensions
 
         public static async Task<string> MashapeHeaders(string Headers, string Link)
         {
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Clear();
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Add("X-Mashape-Key", BotConfig.Config.APIKeys.MashapeKey);
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Add("Accept", Headers);
-            return await HTTPExtension.HttpClient.GetStringAsync(Link);
+            var Client = new HttpClient();
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Add("X-Mashape-Key", BotConfig.Config.APIKeys.MashapeKey);
+            Client.DefaultRequestHeaders.Add("Accept", Headers);
+            return await Client.GetStringAsync(Link);
         }
 
         public static string Youtube(string Search)
@@ -64,8 +66,8 @@ namespace Valerie.Extensions
 
         public static async Task<string> GetE621ImageLinkAsync(string tag)
         {
-            HTTPExtension.Headers();
-            var data = await HTTPExtension.HttpClient.GetStreamAsync("http://e621.net/post/index.xml?tags=" + tag).ConfigureAwait(false);
+            HTTPExtension.Headers(new HttpClient());
+            var data = await new HttpClient().GetStreamAsync("http://e621.net/post/index.xml?tags=" + tag).ConfigureAwait(false);
             var doc = new XmlDocument();
             doc.Load(data);
             var nodes = doc.GetElementsByTagName("file_url");

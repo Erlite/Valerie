@@ -1,9 +1,8 @@
 ﻿using System;
 using Raven.Client.Documents;
 using System.Threading.Tasks;
-using Valerie.Services.Logger;
 using Tweetinvi;
-using Valerie.Services.Logger.Enums;
+using Valerie.Services;
 using Valerie.Handlers.Config;
 
 namespace Valerie.Handlers
@@ -31,10 +30,10 @@ namespace Valerie.Handlers
             var AuthUser = User.GetAuthenticatedUser();
             if (AuthUser == null)
             {
-                Log.Write(Status.ERR, Source.Config, ExceptionHandler.GetLastException().TwitterDescription);
+                Log.Write(Log.Status.ERR, Log.Source.Config, ExceptionHandler.GetLastException().TwitterDescription);
             }
             else
-                Log.Write(Status.KAY, Source.Config, "Logged into Twitter.");
+                Log.Write(Log.Status.KAY, Log.Source.Config, "Logged into Twitter.");
         }
     }
 }

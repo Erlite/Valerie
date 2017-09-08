@@ -11,6 +11,7 @@ using Google.Apis.Services;
 using Valerie.Handlers.Config;
 using Valerie.Attributes;
 using Valerie.Extensions;
+using System.Net.Http;
 
 namespace Valerie.Modules
 {
@@ -50,7 +51,7 @@ namespace Valerie.Modules
             var rng = new Random();
             var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start=" +
                 $"{ rng.Next(1, 10) }&fields=items%2Flink&key={BotConfig.Config.APIKeys.GoogleKey}";
-            var obj = JObject.Parse(await HTTPExtension.HttpClient.GetStringAsync(reqString));
+            var obj = JObject.Parse(await new HttpClient().GetStringAsync(reqString));
             var items = obj["items"] as JArray;
             string image = items[0]["link"].ToString();
 
@@ -61,21 +62,15 @@ namespace Valerie.Modules
         }
 
         [Command("Youtube"), Alias("Yt"), Summary("Searches the first search result from youtube.")]
-        public async Task YoutubeAsync([Remainder] string search)
-            => await ReplyAsync("https://www.youtube.com/watch?v=" + StringExtension.Youtube(search));
+        public Task YoutubeAsync([Remainder] string search) => ReplyAsync("https://www.youtube.com/watch?v=" + StringExtension.Youtube(search));
 
         [Command("Shorten"), Summary("Shortens a URL using Google URL Shortner.")]
-        public async Task ShortenAsync([Remainder] string URL)
-        {
-            await ReplyAsync($"This is your shortened URL: {StringExtension.ShortenUrl(URL)}");
-        }
+        public Task ShortenAsync([Remainder] string URL) => ReplyAsync($"This is your shortened URL: {StringExtension.ShortenUrl(URL)}");
 
         [Command("Revav"), Summary("Performs a reverse image search for a user avatar.")]
-        public async Task RevavAsync(SocketGuildUser User)
-        {
-            await ReplyAsync(
-                $"Reverse Image Result: " +
+        public Task RevavAsync(SocketGuildUser User)
+            => ReplyAsync($"Reverse Image Result: " +
                 $"{StringExtension.ShortenUrl($"https://images.google.com/searchbyimage?image_url={User.GetAvatarUrl()}")}");
-        }
+
     }
 }

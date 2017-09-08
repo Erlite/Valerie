@@ -7,9 +7,8 @@ namespace Valerie.Extensions
 {
     public static class HTTPExtension
     {
-        public static HttpClient HttpClient = new HttpClient();
 
-        public static async Task DownloadAsync(Uri requestUri, string filename)
+        public static async Task DownloadAsync(this HttpClient HttpClient, Uri requestUri, string filename)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
             {
@@ -22,7 +21,7 @@ namespace Valerie.Extensions
             }
         }
 
-        public static void Headers()
+        public static void Headers(this HttpClient HttpClient)
         {
             HttpClient.DefaultRequestHeaders.Clear();
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1");
