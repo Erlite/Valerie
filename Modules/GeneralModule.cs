@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using Tweetinvi;
+using Cookie.FOAAS;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Services;
-using Cookie.FOAAS;
 using Valerie.Handlers.Config;
 using Valerie.Handlers.Server.Models;
 using Valerie.Handlers.Server;
 using Valerie.Modules.Enums;
-using Tweetinvi;
 
 namespace Valerie.Modules
 {
@@ -352,7 +354,7 @@ namespace Valerie.Modules
         [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
         public async Task TrumpAsync()
         {
-            var Get = await HTTPExtension.HttpClient.GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
+            var Get = await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync("Using TrumpDump API was the worse trade, maybe ever.");
@@ -368,7 +370,7 @@ namespace Valerie.Modules
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
         {
-            var Get = await HTTPExtension.HttpClient.GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
+            var Get = await new HttpClient().GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync("Yo mama so fat she crashed Yomomma's API.");
@@ -417,9 +419,10 @@ namespace Valerie.Modules
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
+            var HttpClient = new HttpClient();
             string Changes = null;
-            HTTPExtension.HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
-            using (var Response = await HTTPExtension.HttpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+            using (var Response = await HttpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
             {
                 if (!Response.IsSuccessStatusCode)
                     Changes = "There was an error fetching the latest changes.";
@@ -546,6 +549,49 @@ namespace Valerie.Modules
                 return ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
             }
             return ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
+        }
+
+        [Command("Todo"), Summary("Creates a new Todo.")]
+        public Task TodoAsync([Remainder] string TodoMessage)
+        {
+            if (!GuildConfig.ToDo.ContainsKey(Context.User.Id))
+            {
+                var TodoList = new ConcurrentDictionary<int, string>();
+                TodoList.TryAdd(TodoList.Count, TodoMessage);
+                Config.ToDo.TryAdd(Context.User.Id, TodoList);
+                return ReplyAsync("Added new Task.");
+            }
+            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
+            if (CurrentTasks.Count == 5)
+                return ReplyAsync("You have reached your max number of tasks.");
+            var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
+            NewTasks.TryAdd(NewTasks.Count, TodoMessage);
+            Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
+            return ReplyAsync("Task created successfully. :v:");
+        }
+
+        [Command("Todo"), Summary("Shows all of your Todo's.")]
+        public Task TodoAsync()
+        {
+            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id))
+                return ReplyAsync("Woopsie, couldn't find any Todo's.");
+            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
+            var Sb = new StringBuilder();
+            foreach (var Item in TodoList)
+                Sb.AppendLine($"**{Item.Key}:** {Item.Value}");
+            return ReplyAsync($"**Here are your current tasks:**\n{Sb.ToString()}");
+        }
+
+        [Command("TodoRemove"), Summary("Removes a task from your todo list.")]
+        public Task TodoAsync(int TaskNumber)
+        {
+            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id))
+                return ReplyAsync("Woopsie, couldn't find any Todo's.");
+            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
+            var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
+            NewTasks.TryRemove(TaskNumber, out string NotNeededValue);
+            Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
+            return ReplyAsync($"Task {TaskNumber} has been removed.");
         }
     }
 }
