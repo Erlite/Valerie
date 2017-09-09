@@ -3,16 +3,9 @@ using System.Collections.Generic;
 
 namespace Valerie.Handlers.Server.Models
 {
-    public class DefaultWrapper
-    {
-        public bool IsEnabled { get; set; }
-        public string TextChannel { get; set; }
-    }
-
     public class EridiumWrapper
     {
         public bool IsEnabled { get; set; }
-        public bool IsDMEnabled { get; set; }
         public int MaxRoleLevel { get; set; } = 50;
         public string LevelUpMessage { get; set; }
         public IList<string> BlacklistedRoles { get; set; } = new List<string>();
@@ -22,7 +15,6 @@ namespace Valerie.Handlers.Server.Models
 
     public class StarboardWrapper
     {
-        public bool IsEnabled { get; set; }
         public string TextChannel { get; set; }
         public IList<StarboardMessages> StarboardMessages { get; set; } = new List<StarboardMessages>();
     }
@@ -50,8 +42,6 @@ namespace Valerie.Handlers.Server.Models
         public string MuteRole { get; set; }
         public bool AntiAdvertisement { get; set; }
         public bool IsAutoModEnabled { get; set; }
-        public bool IsEnabled { get; set; }
-        public bool IsAutoRoleEnabled { get; set; }
         public string AutoAssignRole { get; set; }
         public string TextChannel { get; set; }
         public ConcurrentDictionary<ulong, int> Warnings { get; set; } = new ConcurrentDictionary<ulong, int>();

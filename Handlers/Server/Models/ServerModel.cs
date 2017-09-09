@@ -7,11 +7,11 @@ namespace Valerie.Handlers.Server.Models
     {
         public string Id { get; set; }
         public string Prefix { get; set; } = "<>";
+        public string JoinChannel { get; set; }
+        public string LeaveChannel { get; set; }
+        public string ChatterChannel { get; set; }
         public IList<string> WelcomeMessages { get; set; } = new List<string>();
         public IList<string> LeaveMessages { get; set; } = new List<string>();
-        public DefaultWrapper JoinLog { get; set; } = new DefaultWrapper();
-        public DefaultWrapper LeaveLog { get; set; } = new DefaultWrapper();
-        public DefaultWrapper Chatterbot { get; set; } = new DefaultWrapper();
         public ConcurrentDictionary<ulong, string> AFKList { get; set; } = new ConcurrentDictionary<ulong, string>();
         public ModWrapper ModLog { get; set; } = new ModWrapper();
         public List<TagWrapper> TagsList { get; set; } = new List<TagWrapper>();
