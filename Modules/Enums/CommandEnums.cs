@@ -10,7 +10,6 @@
         Starboard,
         Mod,
         NoAds,
-        AutoAssign,
         Add,
         Remove,
         Modify
