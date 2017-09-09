@@ -438,7 +438,7 @@ namespace Valerie.Modules
             }
             var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
-                Description: $"**Latest Changes:**\n{Changes}");
+                Description: Changes, Title: "Latest Changes");
             embed.AddInlineField("Members",
                     $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
                     $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
@@ -573,9 +573,9 @@ namespace Valerie.Modules
         [Command("Todo"), Summary("Shows all of your Todo's.")]
         public Task TodoAsync()
         {
-            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id))
-                return ReplyAsync("Woopsie, couldn't find any Todo's.");
             GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
+            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id) || !TodoList.Any())
+                return ReplyAsync("Woopsie, couldn't find any Todo's.");
             var Sb = new StringBuilder();
             foreach (var Item in TodoList)
                 Sb.AppendLine($"**{Item.Key}:** {Item.Value}");
