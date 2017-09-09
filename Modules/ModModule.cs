@@ -23,7 +23,8 @@ namespace Valerie.Modules
         {
             await User.KickAsync(Reason);
             Config.ModLog.Cases += 1;
-            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
+            ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel));
+            if (Channel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
                 embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
@@ -31,7 +32,7 @@ namespace Valerie.Modules
                 embed.AddInlineField("Case No.", Config.ModLog.Cases);
                 embed.AddInlineField("Case Type", "Kick");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
+                await Channel.SendMessageAsync("", embed: embed.Build());
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
@@ -44,7 +45,8 @@ namespace Valerie.Modules
         {
             await Context.Guild.AddBanAsync(User, 7, Reason);
             Config.ModLog.Cases += 1;
-            if (Config.ModLog.IsEnabled && Config.ModLog.TextChannel != null)
+            ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel));
+            if (Channel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
                 embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
@@ -52,7 +54,7 @@ namespace Valerie.Modules
                 embed.AddInlineField("Case No.", Config.ModLog.Cases);
                 embed.AddInlineField("Case Type", "Ban");
                 embed.AddInlineField("Reason", Reason);
-                var msg = await (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).SendMessageAsync("", embed: embed.Build());
+                await Channel.SendMessageAsync("", embed: embed.Build());
             }
             else
                 await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");

@@ -38,11 +38,8 @@ namespace Valerie.Handlers
         internal static async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = await ServerConfig.ConfigAsync(User.Guild.Id).ConfigureAwait(false);
-            if (!Config.JoinLog.IsEnabled) return;
-
             string WelcomeMessage = null;
-            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinLog.TextChannel));
-
+            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
             if (Config.WelcomeMessages.Count <= 0)
                 WelcomeMessage = $"{User} just joined {User.Guild.Name}! WELCOME!";
             else
@@ -51,13 +48,10 @@ namespace Valerie.Handlers
                 WelcomeMessage = StringExtension.ReplaceWith(ConfigMsg, User.Mention, User.Guild.Name);
             }
 
-            if (Channel != null)
-                await Channel.SendMessageAsync(WelcomeMessage);
-            else
-                await User.Guild.DefaultChannel.SendMessageAsync(WelcomeMessage);
-
+            if (Channel == null) return;
+            await Channel.SendMessageAsync(WelcomeMessage);
             var Role = User.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole));
-            if (Role == null || !Config.ModLog.IsAutoRoleEnabled) return;
+            if (Role == null) return;
             await User.AddRoleAsync(Role);
         }
 
@@ -65,13 +59,8 @@ namespace Valerie.Handlers
         {
             await CleanUpAsync(User);
             var Config = await ServerConfig.ConfigAsync(User.Guild.Id).ConfigureAwait(false);
-            if (!Config.LeaveLog.IsEnabled) return;
-
-            ITextChannel Channel = null;
             string LeaveMessage = null;
-            ulong Id = Convert.ToUInt64(Config.LeaveLog.TextChannel);
-            var LeaveChannel = User.Guild.GetChannel(Id);
-
+            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             if (Config.LeaveMessages.Count <= 0)
                 LeaveMessage = $"{User} has left {User.Guild.Name} :wave:";
             else
@@ -79,17 +68,8 @@ namespace Valerie.Handlers
                 var configMsg = Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)];
                 LeaveMessage = StringExtension.ReplaceWith(configMsg, User.Username, User.Guild.Name);
             }
-
-            if (User.Guild.GetChannel(Id) != null)
-            {
-                Channel = LeaveChannel as ITextChannel;
-                await Channel.SendMessageAsync(LeaveMessage);
-            }
-            else
-            {
-                Channel = User.Guild.DefaultChannel as ITextChannel;
-                await Channel.SendMessageAsync(LeaveMessage);
-            }
+            if (Channel == null) return;
+            await Channel.SendMessageAsync(LeaveMessage);
         }
 
         internal static async Task MessageReceivedAsync(SocketMessage Message)
@@ -108,11 +88,11 @@ namespace Valerie.Handlers
             var Message = await Cache.GetOrDownloadAsync();
             var GetConfig = await ServerConfig.ConfigAsync(Guild.Id).ConfigureAwait(false);
             var Config = ServerConfig.Config;
+            ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
 
-            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null ||
+            if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null ||
                 Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
 
-            ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
             var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
 
             if (!string.IsNullOrWhiteSpace(Message.Content))
@@ -156,8 +136,8 @@ namespace Valerie.Handlers
             var Message = await Cache.GetOrDownloadAsync();
             var GetConfig = await ServerConfig.ConfigAsync(Guild.Id).ConfigureAwait(false);
             var Config = ServerConfig.Config;
-            if (Reaction.Emote.Name != "⭐" || !Config.Starboard.IsEnabled || Config.Starboard.TextChannel == null || Message == null) return;
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
+            if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null) return;
 
             var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content))
@@ -191,12 +171,9 @@ namespace Valerie.Handlers
             var GuildID = User.Guild.Id;
             var GetConfig = await ServerConfig.ConfigAsync(User.Guild.Id).ConfigureAwait(false);
             var GuildConfig = ServerConfig.Config;
-
             var BlacklistedRoles = new List<ulong>(GuildConfig.EridiumHandler.BlacklistedRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-
             if (User == null || User.IsBot || !GuildConfig.EridiumHandler.IsEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
-
             var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
             if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
@@ -207,19 +184,10 @@ namespace Valerie.Handlers
             int OldLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id]);
             GuildConfig.EridiumHandler.UsersList[User.Id] += EridiumToGive;
             int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
-
             await ServerConfig.SaveAsync().ConfigureAwait(false);
-
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
-
-            if (!GuildConfig.EridiumHandler.IsDMEnabled || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
-
-            string Msg = null;
-            if (!string.IsNullOrWhiteSpace(GuildConfig.EridiumHandler.LevelUpMessage))
-                Msg = GuildConfig.EridiumHandler.LevelUpMessage.ReplaceWith(User.Mention, $"{NewLevel}");
-            else
-                Msg = $"You have hit level {NewLevel}! :V: Keep on chatting!";
-            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(Msg);
+            if (GuildConfig.EridiumHandler.LevelUpMessage == null || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
+            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(GuildConfig.EridiumHandler.LevelUpMessage.ReplaceWith(User.Mention, $"{NewLevel}"));
         }
 
         static async Task AssignRole(bool CheckLevel, ulong GuildId, SocketGuildUser User)
@@ -258,8 +226,8 @@ namespace Valerie.Handlers
         static async Task CleverbotHandlerAsync(SocketGuild Guild, SocketMessage Message)
         {
             var Config = await ServerConfig.ConfigAsync(Guild.Id).ConfigureAwait(false);
-            var Channel = Guild.GetChannel(Convert.ToUInt64(Config.Chatterbot.TextChannel)) as IMessageChannel;
-            if (Message.Author.IsBot || !Config.Chatterbot.IsEnabled || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
+            ITextChannel Channel = Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
+            if (Message.Author.IsBot || Channel == null || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
             string UserMsg = Message.Content.Replace("Valerie", "");
             CleverbotClient Client = new CleverbotClient(BotConfig.Config.APIKeys.CleverBotKey);
             await Channel.SendMessageAsync((await Client.TalkAsync(UserMsg).ConfigureAwait(false)).CleverOutput).ConfigureAwait(false);
