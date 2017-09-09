@@ -63,7 +63,7 @@ namespace Valerie.Modules
             await ReplyAndDeleteAsync(
                 $"Hello {Context.User.Mention}! Please pick a topic (Enter Number):\n" +
                 $":one: NSFW Commands\n" +
-                $":two: Toggle Join/Eridium(Chat XP)/Starboard Etc\n" +
+                $":two: Toggle Eridium(Chat XP), Etc\n" +
                 $":three: Help With Tags!\n" +
                 $":four: I think I found a bug! OR I need to give feedback!\n" +
                 $":five: What are Schmeckles? What do they do?\n" +
@@ -89,17 +89,12 @@ namespace Valerie.Modules
 
                     break;
                 case 2:
-                    Title = "GUIDE | Toggle Join/Eridium(Chat XP)/Starboard Etc";
-                    GuideMessage = $"Here are the following things you can toggle: CB, Join, Eridium, Leave, Starboard, Mod, NoAds, DMLevel.\n\n" +
-                        $"**CB:** Chatterbot\n**Join/Leave:** When a user joins/leaves your server.\n**Eridium:** Gives Eridium based on your message. " +
-                        $"The more you talk, the higher you will rank up in Eridium Leaderboards.\n" +
-                        $"**Starboard:** When you star a message it will post that message on starboard.\n**NoAds:** AntiAdvertisement system. No posting discord links.\n" +
-                        $"**Mod:** Sets channel for ban/kick logging.\n\n" +
-                        $"If a channel isn't set for a toggle action, it will show a small tip when you enable an action saying that the channel isn't set for that action and it's advised you set the channel " +
-                        $"to get the feature to work to it's fullest.\n\n" +
-                        $"You can also enable Level Up DM messages, which will send message to user when they level up. You can also set custom Level up message! " +
-                        "To show user level or mention user in your custom message, you need to type `{user}` `{level}`. This will replace `{user}` and Mention user and " +
-                        "replace `{level}` with user's level!";
+                    Title = "GUIDE | Toggle Eridium(Chat XP), Etc";
+                    GuideMessage = $"Here are the following things you can toggle: Eridium, NoAds\n\n" +
+                        $"**Eridium:** Gives Eridium based on your message. The more you talk, the higher you will rank up in Eridium Leaderboards.\n" +
+                        $"**NoAds:** AntiAdvertisement system. No posting discord links.\n" +
+                        "You need to set custom Level up message! To show user level or mention user in your custom message, " +
+                        "you need to type `{user}` `{level}`. This will replace `{user}` and Mention user and replace `{level}` with user's level!";
                     break;
                 case 3:
                     Title = "GUIDE | Help With Tags";
