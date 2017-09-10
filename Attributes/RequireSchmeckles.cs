@@ -8,9 +8,9 @@ namespace Valerie.Attributes
 {
     public class RequireSchmeckles : PreconditionAttribute
     {
-        double Schmeckles { get; }
+        int Schmeckles { get; }
 
-        public RequireSchmeckles(double RequiredSchmeckles = 25)
+        public RequireSchmeckles(int RequiredSchmeckles = 25)
         {
             Schmeckles = RequiredSchmeckles;
         }
