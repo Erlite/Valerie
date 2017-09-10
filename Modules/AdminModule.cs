@@ -6,6 +6,7 @@ using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Modules.Enums;
 using Valerie.Handlers.Server.Models;
+using System;
 
 namespace Valerie.Modules
 {
@@ -244,6 +245,53 @@ namespace Valerie.Modules
             }
             Config.EridiumHandler.UsersList.TryRemove(User.Id, out int Value);
             await ReplyAsync($"{User} was removed from Eridium list.");
+        }
+
+        [Command("Settings"), Summary("Shows Server Settings.")]
+        public async Task SettingsAsync()
+        {           
+            string AutoRole = Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole)) != null ?
+                 Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole)).Name : "Unknown Role.";
+            string MuteRole = Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)) != null ?
+                 Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)).Name : "Unknown Role";
+            string ModChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel)) != null ?
+                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel))).Name : "Unknown Channel.";
+            string StarboardChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.Starboard.TextChannel)) != null ?
+                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.Starboard.TextChannel))).Name : "Unknown Channel.";
+            string ChatterChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ChatterChannel)) != null ?
+                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ChatterChannel))).Name : "Unknown Channel.";
+            string JoinChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.JoinChannel)) != null ?
+                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.JoinChannel))).Name : "Unknown Channel.";
+            string LeaveChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.JoinChannel)) != null ?
+                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.JoinChannel))).Name : "Unknown Channel.";
+
+            string Description =
+                $"```diff\n- ======== [Main Information] ======== -\n" +
+                $"+ Server's Prefix    : {Config.Prefix}\n" +
+                $"+ AFK Entries        : {Config.AFKList.Count}\n" +
+                $"+ Todo Entries       : {Config.ToDo.Count}\n" +
+                $"+ Tags Entries       : {Config.TagsList.Count}\n" +
+                $"+ Join Channel       : {JoinChannel}\n" +
+                $"+ Leave Channel      : {LeaveChannel}\n" +
+                $"+ Chatter Channel    : {ChatterChannel}\n" +
+                $"+ Starboard Channel  : {StarboardChannel}\n" +
+                $"+ Starred Messages   : {Config.Starboard.StarboardMessages.Count}\n" +
+                $"+ Welcome Messages   : {Config.WelcomeMessages.Count}\n" +
+                $"+ Leave Messages     : {Config.LeaveMessages.Count}\n" +
+                $"\n- ======== [Mod  Information] ======== -\n" +
+                $"+ Auto Assign Role   : {AutoRole}\n" +
+                $"+ User Mute Role     : {MuteRole}\n" +
+                $"+ Ban/Kick Cases     : {Config.ModLog.Cases}\n" +
+                $"+ Auto Mod Enabled   : {Config.ModLog.IsAutoModEnabled}\n" +
+                $"+ Mod Channel        : {ModChannel}\n" +
+                $"\n- ======== [Eridium  Information] ======== -\n" +
+                $"+ Blacklisted Roles  : {Config.EridiumHandler.BlacklistedRoles.Count}\n" +
+                $"+ User LevelUp Roles : {Config.EridiumHandler.LevelUpRoles.Count}\n" +
+                $"+ Is Eridium Enabled : {Config.EridiumHandler.IsEnabled}\n" +
+                $"+ Level Up Message   : {Config.EridiumHandler.LevelUpMessage ?? "No Level Up Message."}\n" +
+                $"+ Max LevelUp Level  : {Config.EridiumHandler.MaxRoleLevel}\n" +
+                $"```";
+            await ReplyAsync(Description);
         }
     }
 }
