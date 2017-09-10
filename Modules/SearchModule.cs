@@ -22,10 +22,12 @@ namespace Valerie.Modules
     [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
     public class SearchModule : CommandBase
     {
+        readonly HttpClient HttpClient = new HttpClient();
+
         [Command("Urban"), Summary("Searches urban dictionary for your word")]
         public async Task UrbanAsync([Remainder] string SearchTerm)
         {
-            var Client = await new HttpClient().GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm.Replace(' ', '+')}");
+            var Client = await HttpClient.GetAsync($"http://api.urbandictionary.com/v0/define?term={SearchTerm.Replace(' ', '+')}");
             if (!Client.IsSuccessStatusCode)
             {
                 await ReplyAsync("Couldn't communicate with Urban's API.");
@@ -39,14 +41,14 @@ namespace Valerie.Modules
             }
             var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
             var embed = Vmbed.Embed(VmbedColors.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
-            embed.AddInlineField($"Definition of {TermInfo.Word}", TermInfo.Definition);
-            embed.AddInlineField("Example", TermInfo.Example);
+            embed.AddField($"Definition of {TermInfo.Word}", TermInfo.Definition, true);
+            embed.AddField("Example", TermInfo.Example, true);
             await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
-        public async Task LmgtfyAsync([Remainder] string search = "How to use Lmgtfy")
-            => await ReplyAsync($"**Your special URL: **<http://lmgtfy.com/?q={ Uri.EscapeUriString(search) }>");
+        public Task LmgtfyAsync([Remainder] string search = "How to use Lmgtfy")
+            => ReplyAsync($"**Your special URL: **<http://lmgtfy.com/?q={ Uri.EscapeUriString(search) }>");
 
         [Command("Imgur"), Summary("Imgur XD"), Remarks("Searches imgure for your image")]
         public async Task ImgurAsync([Remainder] string search)
@@ -76,7 +78,7 @@ namespace Valerie.Modules
         [Command("Wiki"), Summary("Wiki KendValerie Lamar"), Remarks("Searches wikipedia for your terms")]
         public async Task WikiAsync([Remainder]string search)
         {
-            var GetResult = new HttpClient().GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}").Result;
+            var GetResult = await HttpClient.GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={search}");
             var GetContent = await GetResult.Content.ReadAsStringAsync();
             dynamic responseObject = JsonConvert.DeserializeObject(GetContent);
             string title = responseObject[1][0];
@@ -95,7 +97,7 @@ namespace Valerie.Modules
         {
             var SB = new StringBuilder();
             string APIUrl = $"http://api.duckduckgo.com/?q={Search.Replace(' ', '+')}&format=json&pretty=1";
-            var Response = await new HttpClient().GetAsync(APIUrl);
+            var Response = await HttpClient.GetAsync(APIUrl);
             if (!Response.IsSuccessStatusCode)
             {
                 await ReplyAsync("An error occured while trying to fetch results from API."); return;
@@ -123,7 +125,7 @@ namespace Valerie.Modules
         public async Task DocsAsync([Remainder] string Search)
         {
             var Builder = new StringBuilder();
-            var Response = await new HttpClient().GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
+            var Response = await HttpClient.GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
             if (!Response.IsSuccessStatusCode)
             {
                 await ReplyAsync(Response.ReasonPhrase);
@@ -221,14 +223,14 @@ namespace Valerie.Modules
 
             var embed = Vmbed.Embed(VmbedColors.Pastel, Info.AvatarFullUrl, Info.RealName, Info.ProfileLink,
                 FooterText: string.Join(", ", UserRecent.RecentGames.GamesList.Select(x => x.Name)));
-            embed.AddInlineField("Display Name", $"{Info.Name}");
-            embed.AddInlineField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}");
-            embed.AddInlineField("Person State", State);
-            embed.AddInlineField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.TimeCreated));
-            embed.AddInlineField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.LastLogOff));
-            embed.AddInlineField("Primary Clan ID", Info.PrimaryClanId);
-            embed.AddInlineField("Owned Games", UserGames.OwnedGames.GamesCount);
-            embed.AddInlineField("Recently Played Games", UserRecent.RecentGames.TotalCount);
+            embed.AddField("Display Name", $"{Info.Name}", true);
+            embed.AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true);
+            embed.AddField("Person State", State, true);
+            embed.AddField("Profile Created", DateTimeExtension.UnixTimeStampToDateTime(Info.TimeCreated), true);
+            embed.AddField("Last Online", DateTimeExtension.UnixTimeStampToDateTime(Info.LastLogOff), true);
+            embed.AddField("Primary Clan ID", Info.PrimaryClanId, true);
+            embed.AddField("Owned Games", UserGames.OwnedGames.GamesCount, true);
+            embed.AddField("Recently Played Games", UserRecent.RecentGames.TotalCount, true);
 
             await ReplyAsync("", embed: embed.Build());
         }
@@ -257,15 +259,14 @@ namespace Valerie.Modules
         [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
         public async Task LewdAsync()
         {
-            JToken Token = JToken.Parse(await new HttpClient().GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false));
+            JToken Token = JToken.Parse(await HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false));
             await ReplyAsync(Token["neko"].ToString());
         }
 
         [Command("News"), Summary("Gets you the latest news.")]
         public async Task NewsAsync()
         {
-            var Get = await new HttpClient()
-                .GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={BotConfig.Config.APIKeys.NewsKey}").ConfigureAwait(false);
+            var Get = await HttpClient.GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={BotConfig.Config.APIKeys.NewsKey}").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync(Get.ReasonPhrase);
@@ -273,11 +274,10 @@ namespace Valerie.Modules
             }
             var Content = JsonConvert.DeserializeObject<BBC>(await Get.Content.ReadAsStringAsync());
             var Builder = new StringBuilder();
-            Content.Articles.ForEach(x =>
-            {
+            foreach (var x in Content.Articles.Take(5))
                 Builder.AppendLine($":small_orange_diamond: **[{x.Title}]({x.Url})**\n{x.Description}");
-            });
-            await ReplyAsync($"**Today's Headlines**\n\n{Builder.ToString()}");
+            var embed = Vmbed.Embed(VmbedColors.Pastel, Title: "Today's Headlines", Description: Builder.ToString());
+            await ReplyAsync("", embed: embed.Build());
         }
     }
 }

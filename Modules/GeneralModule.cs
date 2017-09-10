@@ -25,6 +25,7 @@ namespace Valerie.Modules
     [RequireBotPermission(ChannelPermission.SendMessages)]
     public class GeneralModule : CommandBase
     {
+        readonly HttpClient HttpClient = new HttpClient();
         ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
         ServerModel Config => ServerConfig.Config;
 
@@ -68,7 +69,7 @@ namespace Valerie.Modules
                 }
                 else
                     Username = User.Username;
-                embed.AddInlineField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}{Id}");
+                embed.AddField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}{Id}", true);
             }
             await ReplyAsync("", embed: embed.Build());
         }
@@ -284,16 +285,16 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
 
-            embed.AddInlineField("ID", Context.Guild.Id);
-            embed.AddInlineField("Owner", await Context.Guild.GetOwnerAsync());
-            embed.AddInlineField("Default Channel", await Context.Guild.GetDefaultChannelAsync());
-            embed.AddInlineField("Voice Region", Context.Guild.VoiceRegionId);
-            embed.AddInlineField("Created At", Context.Guild.CreatedAt);
-            embed.AddInlineField("Roles", $"{Context.Guild.Roles.Count }\n{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}");
-            embed.AddInlineField("Users", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false));
-            embed.AddInlineField("Bots", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true));
-            embed.AddInlineField("Text Channels", (Context.Guild as SocketGuild).TextChannels.Count);
-            embed.AddInlineField("Voice Channels", (Context.Guild as SocketGuild).VoiceChannels.Count);
+            embed.AddField("ID", Context.Guild.Id, true);
+            embed.AddField("Owner", await Context.Guild.GetOwnerAsync(), true);
+            embed.AddField("Default Channel", await Context.Guild.GetDefaultChannelAsync(), true);
+            embed.AddField("Voice Region", Context.Guild.VoiceRegionId, true);
+            embed.AddField("Created At", Context.Guild.CreatedAt, true);
+            embed.AddField("Roles", $"{Context.Guild.Roles.Count }\n{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}", true);
+            embed.AddField("Users", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false), true);
+            embed.AddField("Bots", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true), true);
+            embed.AddField("Text Channels", (Context.Guild as SocketGuild).TextChannels.Count, true);
+            embed.AddField("Voice Channels", (Context.Guild as SocketGuild).VoiceChannels.Count, true);
             await ReplyAsync("", false, embed.Build());
         }
 
@@ -305,13 +306,13 @@ namespace Valerie.Modules
                 Color = Role.Color,
                 Title = $"INFORMATION | {Role.Name}"
             };
-            embed.AddInlineField("ID", Role.Id);
-            embed.AddInlineField("Color", Role.Color);
-            embed.AddInlineField("Creation Date", Role.CreatedAt);
-            embed.AddInlineField("Is Hoisted?", Role.IsHoisted ? "Yes" : "No");
-            embed.AddInlineField("Is Mentionable?", Role.IsMentionable ? "Yes" : "No");
-            embed.AddInlineField("Is Managed?", Role.IsManaged ? "Yes" : "No");
-            embed.AddInlineField("Permissions", string.Join(", ", Role.Permissions.ToList()));
+            embed.AddField("ID", Role.Id, true);
+            embed.AddField("Color", Role.Color, true);
+            embed.AddField("Creation Date", Role.CreatedAt, true);
+            embed.AddField("Is Hoisted?", Role.IsHoisted ? "Yes" : "No", true);
+            embed.AddField("Is Mentionable?", Role.IsMentionable ? "Yes" : "No", true);
+            embed.AddField("Is Managed?", Role.IsManaged ? "Yes" : "No", true);
+            embed.AddField("Permissions", string.Join(", ", Role.Permissions.ToList()), true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -326,15 +327,15 @@ namespace Valerie.Modules
                 var Role = Context.Guild.GetRole(role);
                 Roles.Add(Role);
             }
-            embed.AddInlineField("Username", User.Username);
-            embed.AddInlineField("ID", User.Id);
-            embed.AddInlineField("Muted?", User.IsMuted ? "Yes" : "No");
-            embed.AddInlineField("Is Bot?", User.IsBot ? "Yes" : "No");
-            embed.AddInlineField("Creation Date", User.CreatedAt);
-            embed.AddInlineField("Join Date", User.JoinedAt);
-            embed.AddInlineField("Status", User.Status);
-            embed.AddInlineField("Permissions", string.Join(", ", User.GuildPermissions.ToList()));
-            embed.AddInlineField("Roles", string.Join(", ", Roles.OrderByDescending(x => x.Position)));
+            embed.AddField("Username", User.Username, true);
+            embed.AddField("ID", User.Id, true);
+            embed.AddField("Muted?", User.IsMuted ? "Yes" : "No", true);
+            embed.AddField("Is Bot?", User.IsBot ? "Yes" : "No", true);
+            embed.AddField("Creation Date", User.CreatedAt, true);
+            embed.AddField("Join Date", User.JoinedAt, true);
+            embed.AddField("Status", User.Status, true);
+            embed.AddField("Permissions", string.Join(", ", User.GuildPermissions.ToList()), true);
+            embed.AddField("Roles", string.Join(", ", Roles.OrderByDescending(x => x.Position)), true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -354,7 +355,7 @@ namespace Valerie.Modules
         [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
         public async Task TrumpAsync()
         {
-            var Get = await new HttpClient().GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
+            var Get = await HttpClient.GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync("Using TrumpDump API was the worse trade, maybe ever.");
@@ -370,7 +371,7 @@ namespace Valerie.Modules
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
         public async Task YommaAsync()
         {
-            var Get = await new HttpClient().GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
+            var Get = await HttpClient.GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync("Yo mama so fat she crashed Yomomma's API.");
@@ -419,10 +420,10 @@ namespace Valerie.Modules
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
-            var HttpClient = new HttpClient();
+            var HClient = new HttpClient();
             string Changes = null;
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
-            using (var Response = await HttpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
+            HClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+            using (var Response = await HClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
             {
                 if (!Response.IsSuccessStatusCode)
                     Changes = "There was an error fetching the latest changes.";
@@ -439,21 +440,21 @@ namespace Valerie.Modules
             var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: Changes, Title: "Latest Changes");
-            embed.AddInlineField("Members",
+            embed.AddField("Members",
                     $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
                     $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
-                    $"Total: {Client.Guilds.Sum(x => x.Users.Count)}");
-            embed.AddInlineField("Channels",
+                    $"Total: {Client.Guilds.Sum(x => x.Users.Count)}", true);
+            embed.AddField("Channels",
                 $"Text: {Client.Guilds.Sum(x => x.TextChannels.Count)}\n" +
                 $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
-                $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}");
-            embed.AddInlineField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)");
-            embed.AddInlineField(":space_invader:",
+                $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
+            embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
+            embed.AddField(":space_invader:",
                 $"Commands Ran: {BotConfig.Config.CommandsUsed}\n" +
-                $"Messages Received: {BotConfig.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}");
-            embed.AddInlineField(":hammer_pick:",
-                $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB");
-            embed.AddInlineField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}");
+                $"Messages Received: {BotConfig.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+            embed.AddField(":hammer_pick:",
+                $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
+            embed.AddField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -461,7 +462,7 @@ namespace Valerie.Modules
         public async Task FoaasAsync(IGuildUser User = null)
             => await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : "Bob").ConfigureAwait(false));
 
-        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), RequireSchmeckles(.35)]
+        [Command("Tweet"), Summary("Tweets from @Vuxey account!"), RequireSchmeckles(6)]
         public async Task TweetAsync([Remainder] string TweetMessage)
         {
             if (TweetMessage.Length >= 120 || TweetMessage.Length <= 25)
@@ -493,7 +494,7 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed.Build());
         }
 
-        [Command("Reply"), Summary("Replies back to a tweet!"), RequireSchmeckles(.15)]
+        [Command("Reply"), Summary("Replies back to a tweet!"), RequireSchmeckles(4)]
         public async Task TweetReplyAsync(long ID, [Remainder] string TweetMessage)
         {
             var ReplyTo = Tweet.GetTweet(ID);
@@ -530,7 +531,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("DeleteTweet"), Summary("Deletes a specified tweet!"), RequireSchmeckles(.5)]
+        [Command("DeleteTweet"), Summary("Deletes a specified tweet!"), RequireSchmeckles(1)]
         public async Task DeleteTweetAsync(long ID)
         {
             var GetTweet = Tweet.GetTweet(ID);

@@ -61,8 +61,8 @@ namespace Valerie.Modules
             var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
             var embed = Vmbed.Embed(VmbedColors.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
                 FooterText: $"Total Results: {ConvertJson.Count}");
-            embed.AddInlineField("Video Length", Getvid.duration);
-            embed.AddInlineField("Total Views", Getvid.views);
+            embed.AddField("Video Length", Getvid.duration, true);
+            embed.AddField("Total Views", Getvid.views, true);
             await ReplyAsync("", embed: embed.Build());
         }
 

@@ -94,11 +94,11 @@ namespace Valerie.Modules
             }
             var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}",
                 ThumbUrl: (await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner))).GetAvatarUrl());
-            embed.AddInlineField("Name", GetTag.Name);
-            embed.AddInlineField("Owner", await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner)));
-            embed.AddInlineField("Uses", GetTag.Uses);
-            embed.AddInlineField("Creation Date", GetTag.CreationDate);
-            embed.AddInlineField("Response", GetTag.Response);
+            embed.AddField("Name", GetTag.Name, true);
+            embed.AddField("Owner", await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner)), true);
+            embed.AddField("Uses", GetTag.Uses, true);
+            embed.AddField("Creation Date", GetTag.CreationDate, true);
+            embed.AddField("Response", GetTag.Response, true);
             await ReplyAsync("", embed: embed.Build());
         }
 
