@@ -27,11 +27,11 @@ namespace Valerie.Modules
             if (Channel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
-                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
-                embed.AddInlineField("Responsible Moderator", Context.User.Username);
-                embed.AddInlineField("Case No.", Config.ModLog.Cases);
-                embed.AddInlineField("Case Type", "Kick");
-                embed.AddInlineField("Reason", Reason);
+                embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
+                embed.AddField("Responsible Moderator", Context.User.Username, true);
+                embed.AddField("Case No.", Config.ModLog.Cases, true);
+                embed.AddField("Case Type", "Kick", true);
+                embed.AddField("Reason", Reason, true);
                 await Channel.SendMessageAsync("", embed: embed.Build());
             }
             else
@@ -49,11 +49,11 @@ namespace Valerie.Modules
             if (Channel != null)
             {
                 var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
-                embed.AddInlineField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}");
-                embed.AddInlineField("Responsible Moderator", Context.User.Username);
-                embed.AddInlineField("Case No.", Config.ModLog.Cases);
-                embed.AddInlineField("Case Type", "Ban");
-                embed.AddInlineField("Reason", Reason);
+                embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
+                embed.AddField("Responsible Moderator", Context.User.Username, true);
+                embed.AddField("Case No.", Config.ModLog.Cases, true);
+                embed.AddField("Case Type", "Ban", true);
+                embed.AddField("Reason", Reason, true);
                 await Channel.SendMessageAsync("", embed: embed.Build());
             }
             else
@@ -107,7 +107,7 @@ namespace Valerie.Modules
         [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role."),
             RequireBotPermission(GuildPermission.ManageRoles),
             RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task AaddroleAsync(IGuildUser User, IRole Role)
+        public async Task AddroleAsync(IGuildUser User, IRole Role)
         {
             await User.AddRoleAsync(Role);
             await ReplyAsync($"**{User} has been added to {Role.Name}.** :v:");
@@ -131,8 +131,15 @@ namespace Valerie.Modules
                 await ReplyAsync($"{User} is already muted.");
                 return;
             }
+            if (Context.Guild.Roles.Contains(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted")))
+            {
+                Config.ModLog.MuteRole = $"{ Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted").Id}";
+                await ReplyAsync($"**{User} has been muted** :zipper_mouth:");
+                await User.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted"));
+                return;
+            }
             OverwritePermissions Permissions = new OverwritePermissions(addReactions: PermValue.Deny, sendMessages: PermValue.Deny, attachFiles: PermValue.Deny, useExternalEmojis: PermValue.Deny);
-            if (Convert.ToUInt64(Config.ModLog.MuteRole) == 0 || Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)) == null)
+            if (Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)) == null)
             {
                 var Role = await Context.Guild.CreateRoleAsync("Muted", GuildPermissions.None, Color.Default);
                 foreach (var Channel in (Context.Guild as SocketGuild).TextChannels)
@@ -157,11 +164,17 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Umute"), Summary("Umutes a user."),
+        [Command("Unmute"), Summary("Umutes a user."),
             RequireUserPermission(GuildPermission.MuteMembers)]
         public async Task UnMuteAsync(SocketGuildUser User)
         {
-            if (!User.Roles.Contains(Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole))))
+            IRole Role = Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole));
+            if (Role == null)
+            {
+                await ReplyAsync("Woopsie, Mute role is empty.");
+                return;
+            }
+            if (!User.Roles.Contains(Role))
             {
                 await ReplyAsync($"**{User} isn't muted.** :thinking:");
                 return;
@@ -185,6 +198,7 @@ namespace Valerie.Modules
                 return;
             }
 
+            Config.ModLog.Cases += 1;
             Config.ModLog.Warnings.TryGetValue(User.Id, out int OldValue);
             Config.ModLog.Warnings.TryUpdate(User.Id, OldValue += 1, OldValue);
 
