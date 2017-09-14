@@ -23,7 +23,7 @@ using Valerie.Modules.Enums;
 namespace Valerie.Modules
 {
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    public class GeneralModule : CommandBase
+    public class GeneralModule : ValerieContext
     {
         readonly HttpClient HttpClient = new HttpClient();
         ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
@@ -56,7 +56,7 @@ namespace Valerie.Modules
                 await ReplyAsync("There are no top users for this guild.");
                 return;
             }
-            var embed = Vmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
+            var embed = ValerieEmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
             var Eridiumlist = Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Eridiumlist)
             {
@@ -282,7 +282,7 @@ namespace Valerie.Modules
         [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
-            var embed = Vmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
+            var embed = ValerieEmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
 
             embed.AddField("ID", Context.Guild.Id, true);
@@ -320,7 +320,7 @@ namespace Valerie.Modules
         public async Task UserInfoAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            var embed = Vmbed.Embed(VmbedColors.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
+            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
             List<IRole> Roles = new List<IRole>();
             foreach (var role in User.RoleIds)
             {
@@ -437,7 +437,7 @@ namespace Valerie.Modules
                 }
                 Response.Dispose();
             }
-            var embed = Vmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
+            var embed = ValerieEmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: Changes, Title: "Latest Changes");
             embed.AddField("Members",
@@ -487,7 +487,7 @@ namespace Valerie.Modules
             else
                 ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-            var embed = Vmbed.Embed(VmbedColors.Green, Description:
+            var embed = ValerieEmbed.Embed(VmbedColors.Green, Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
                 $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
@@ -523,7 +523,7 @@ namespace Valerie.Modules
                 else
                     ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-                var embed = Vmbed.Embed(VmbedColors.Green, Description:
+                var embed = ValerieEmbed.Embed(VmbedColors.Green, Description:
                     $"**Tweet:** {TweetMessage}\n" +
                     $"**Tweet ID:** {UserTweet.Id}\n" +
                     $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");

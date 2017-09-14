@@ -14,13 +14,12 @@ using Discord.WebSocket;
 using Valerie.Handlers.Config;
 using Valerie.Models;
 using Valerie.Services;
-using Valerie.Roslyn;
 using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
     [RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class OwnerModule : CommandBase
+    public class OwnerModule : ValerieContext
     {
         private static MemoryStream GenerateStreamFromString(string value)
         {
@@ -58,7 +57,6 @@ namespace Valerie.Modules
         public async Task EvalAsync([Remainder] string Code)
         {
             var Options = ScriptOptions.Default.AddReferences(Assemblies).AddImports(Imports);
-            var working = await Context.Channel.SendMessageAsync("**Evaluating Expression ...**");
             var Globals = new Globals
             {
                 Client = Context.Client as DiscordSocketClient,
@@ -70,7 +68,7 @@ namespace Valerie.Modules
             try
             {
                 var eval = await CSharpScript.EvaluateAsync(Code, Options, Globals, typeof(Globals));
-                var embed = Vmbed.Embed(VmbedColors.Green, AuthorName: "Code evaluated successfully.");
+                var embed = ValerieEmbed.Embed(VmbedColors.Green, AuthorName: "Code evaluated successfully.");
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -79,17 +77,13 @@ namespace Valerie.Modules
                 .AddField(x =>
                 {
                     x.Name = "Output";
-                    x.Value = $"```{eval.ToString()}```";
+                    x.Value = $"```{eval.ToString() ?? "No Result."}```";
                 });
-
-                await working.ModifyAsync(x =>
-                {
-                    x.Embed = embed.Build();
-                });
+                await ReplyAsync("", embed: embed.Build());
             }
             catch (Exception e)
             {
-                var embed = Vmbed.Embed(VmbedColors.Red, AuthorName: "Failed to evaluate code.", FooterText: $"From: {e.Source}");
+                var embed = ValerieEmbed.Embed(VmbedColors.Red, AuthorName: "Failed to evaluate code.", FooterText: $"From: {e.Source}");
                 embed.AddField(x =>
                 {
                     x.Name = "Input";
@@ -100,10 +94,7 @@ namespace Valerie.Modules
                     x.Name = "Output";
                     x.Value = $"```{e.GetType().ToString()} : {e.Message}```";
                 });
-                await working.ModifyAsync(x =>
-                {
-                    x.Embed = embed.Build();
-                });
+                await ReplyAsync("", embed: embed.Build());
             }
         }
 
@@ -206,5 +197,14 @@ namespace Valerie.Modules
         [Command("SendMsg"), Summary("Sends messages to a guild")]
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
             => await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
+    }
+
+    public class Globals
+    {
+        public ICommandContext Context { get; internal set; }
+        public DiscordSocketClient Client { get; internal set; }
+        public SocketGuildUser User { get; internal set; }
+        public SocketGuild Guild { get; internal set; }
+        public SocketGuildChannel Channel { get; internal set; }
     }
 }

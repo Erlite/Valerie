@@ -11,7 +11,7 @@ using Valerie.Modules.Enums;
 namespace Valerie.Modules
 {
     [Group("Bot"), RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class BotModule : CommandBase
+    public class BotModule : ValerieContext
     {
         [Command("Prefix"), Summary("Changes bot's prefix.")]
         public async Task PrefixAsync(string NewPrefix) => BotConfig.Config.Prefix = NewPrefix;

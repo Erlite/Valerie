@@ -11,7 +11,7 @@ using Valerie.Handlers.Server.Models;
 namespace Valerie.Modules
 {
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages)]
-    public class ModModule : CommandBase
+    public class ModModule : ValerieContext
     {
         ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
         ServerModel Config => ServerConfig.Config;
@@ -26,7 +26,7 @@ namespace Valerie.Modules
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel));
             if (Channel != null)
             {
-                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
+                var embed = ValerieEmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
                 embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
                 embed.AddField("Responsible Moderator", Context.User.Username, true);
                 embed.AddField("Case No.", Config.ModLog.Cases, true);
@@ -48,7 +48,7 @@ namespace Valerie.Modules
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Config.ModLog.TextChannel));
             if (Channel != null)
             {
-                var embed = Vmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
+                var embed = ValerieEmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
                 embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
                 embed.AddField("Responsible Moderator", Context.User.Username, true);
                 embed.AddField("Case No.", Config.ModLog.Cases, true);

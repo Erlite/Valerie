@@ -11,7 +11,7 @@ using System;
 namespace Valerie.Modules
 {
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages), CustomUserPermission]
-    public class AdminModule : CommandBase
+    public class AdminModule : ValerieContext
     {
         ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
         ServerModel Config => ServerConfig.Config;

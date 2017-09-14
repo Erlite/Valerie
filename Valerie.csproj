@@ -14,13 +14,13 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="Cookie" Version="2.0.1" />
-    <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00824" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00828" />
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.1" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.29.1.896" />
     <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.29.1.138" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.29.1.760" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.2" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-beta-40018" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-rc-40019" />
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
   </ItemGroup>
 </Project>

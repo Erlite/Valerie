@@ -5,7 +5,7 @@ using Valerie.Handlers.Server;
 
 namespace Valerie.Extensions
 {
-    public class CommandBase : ModuleBase<ICommandContext>
+    public class ValerieContext : ModuleBase<ICommandContext>
     {
         protected override async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {

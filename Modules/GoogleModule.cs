@@ -16,7 +16,7 @@ using System.Net.Http;
 namespace Valerie.Modules
 {
     [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class GoogleModule : CommandBase
+    public class GoogleModule : ValerieContext
     {
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string search)
@@ -37,7 +37,7 @@ namespace Valerie.Modules
                 Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{StringExtension.ShortenUrl(result.Link)}\n");
             }
 
-            var embed = Vmbed.Embed(VmbedColors.Pastel, Description: Str.ToString(), ThumbUrl: URL);
+            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Description: Str.ToString(), ThumbUrl: URL);
 
             if (string.IsNullOrWhiteSpace(Str.ToString()) || Str.ToString() == null)
                 await ReplyAsync("No results found!");

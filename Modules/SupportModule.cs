@@ -28,12 +28,12 @@ namespace Valerie.Modules
             if (GetType.Content.ToLower() == "f")
             {
                 ReportType = "Feedback";
-                Embed = Vmbed.Embed(VmbedColors.Green, Title: $"New {ReportType}");
+                Embed = ValerieEmbed.Embed(VmbedColors.Green, Title: $"New {ReportType}");
             }
             else if (GetType.Content.ToLower() == "r")
             {
                 ReportType = "Report";
-                Embed = Vmbed.Embed(VmbedColors.Red, Title: $"New {ReportType}");
+                Embed = ValerieEmbed.Embed(VmbedColors.Red, Title: $"New {ReportType}");
             }
             else
             {
@@ -132,7 +132,7 @@ namespace Valerie.Modules
                         $"response.";
                     break;
             }
-            var embed = Vmbed.Embed(VmbedColors.Pastel, Title: Title, Description: GuideMessage, ThumbUrl: "https://png.icons8.com/open-book/dusk/250");
+            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Title: Title, Description: GuideMessage, ThumbUrl: "https://png.icons8.com/open-book/dusk/250");
             await ReplyAndDeleteAsync("", embed: embed.Build(), timeout: TimeSpan.FromSeconds(60));
         }
 

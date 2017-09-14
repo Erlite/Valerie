@@ -7,7 +7,7 @@ using Valerie.Extensions;
 namespace Valerie.Modules
 {
     [RequireBotPermission(Discord.ChannelPermission.SendMessages)]
-    public class HelpModule : CommandBase
+    public class HelpModule : ValerieContext
     {
         private CommandService CommandService;
         HelpModule(CommandService Service)
@@ -18,8 +18,8 @@ namespace Valerie.Modules
         [Command("Cmds"), Summary("Shows a list of all commands."), Alias("Help")]
         public async Task CommandsAsync()
         {
-            var embed = Vmbed.Embed(VmbedColors.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
-            foreach (var Module in CommandService.Modules.Where(x => x.Name != "CommandBase"))
+            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
+            foreach (var Module in CommandService.Modules.Where(x => x.Name != "ValerieContext"))
             {
                 string ModuleName = null;
                 ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;
@@ -45,7 +45,7 @@ namespace Valerie.Modules
                 return;
             }
 
-            var embed = Vmbed.Embed(VmbedColors.Pastel);
+            var embed = ValerieEmbed.Embed(VmbedColors.Pastel);
 
             foreach (var match in result.Commands)
             {

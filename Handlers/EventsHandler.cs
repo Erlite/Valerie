@@ -93,7 +93,7 @@ namespace Valerie.Handlers
             if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null ||
                 Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
 
-            var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
+            var Embed = ValerieEmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
 
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
@@ -139,7 +139,7 @@ namespace Valerie.Handlers
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
             if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null) return;
 
-            var Embed = Vmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
+            var Embed = ValerieEmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
             else if (Message.Attachments.FirstOrDefault() != null)

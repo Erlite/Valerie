@@ -7,7 +7,6 @@ using Valerie.Models;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using Valerie.Extensions;
 
 namespace Valerie.Services
 {

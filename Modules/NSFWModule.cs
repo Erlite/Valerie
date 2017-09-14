@@ -12,7 +12,7 @@ using System.Net.Http;
 namespace Valerie.Modules
 {
     [RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class NSFWModule : CommandBase
+    public class NSFWModule : ValerieContext
     {
         readonly HttpClient Client = new HttpClient();
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
@@ -38,7 +38,7 @@ namespace Valerie.Modules
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
             {
-                var embed = Vmbed.Embed(VmbedColors.Pastel, url, ImageUrl: url);
+                var embed = ValerieEmbed.Embed(VmbedColors.Pastel, url, ImageUrl: url);
                 await ReplyAsync("", embed: embed.Build());
             }
         }
@@ -59,7 +59,7 @@ namespace Valerie.Modules
                 return;
             }
             var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
-            var embed = Vmbed.Embed(VmbedColors.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
+            var embed = ValerieEmbed.Embed(VmbedColors.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
                 FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddField("Video Length", Getvid.duration, true);
             embed.AddField("Total Views", Getvid.views, true);

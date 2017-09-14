@@ -3,7 +3,7 @@ using Discord;
 
 namespace Valerie.Extensions
 {
-    public class Vmbed
+    public class ValerieEmbed
     {
         static readonly Random Random = new Random();
 
