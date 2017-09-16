@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Valerie.Handlers.Server;
@@ -6,7 +7,6 @@ using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Modules.Enums;
 using Valerie.Handlers.Server.Models;
-using System;
 
 namespace Valerie.Modules
 {
@@ -137,34 +137,6 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod.")]
-        public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
-        {
-            switch (ValueType)
-            {
-                case CommandEnums.CB:
-                    Config.ChatterChannel = $"{Channel.Id}";
-                    await ReplyAsync($"Chatterbot channel has been set to: {Channel.Mention}");
-                    break;
-                case CommandEnums.Join:
-                    Config.JoinChannel = $"{Channel.Id}";
-                    await ReplyAsync($"Join channel has been set to: {Channel.Mention}");
-                    break;
-                case CommandEnums.Leave:
-                    Config.LeaveChannel = $"{Channel.Id}";
-                    await ReplyAsync($"Leave channel has been set to: {Channel.Mention}");
-                    break;
-                case CommandEnums.Starboard:
-                    Config.Starboard.TextChannel = $"{Channel.Id}";
-                    await ReplyAsync($"Starboard channel has been set to: {Channel.Mention}");
-                    break;
-                case CommandEnums.Mod:
-                    Config.ModLog.TextChannel = $"{Channel.Id}";
-                    await ReplyAsync($"Mod channel has been set to: {Channel.Mention}");
-                    break;
-            }
-        }
-
         [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("EB")]
         public async Task BlacklistRoleAsync(Actions Action, IRole Role)
         {
@@ -210,24 +182,6 @@ namespace Valerie.Modules
             return ReplyAsync($"{Role} has been removed.");
         }
 
-        [Command("SetLevel"), Summary("Sets Max level for auto roles")]
-        public Task SetLevelAsync(int MaxLevel)
-        {
-            if (MaxLevel < 10)
-            {
-                return ReplyAsync("Max level can't be lower than 10");
-            }
-            Config.EridiumHandler.MaxRoleLevel = MaxLevel;
-            return ReplyAsync($"Max level has been set to: {MaxLevel}");
-        }
-
-        [Command("SetAutoRole"), Summary("Sets auto assign role for when user joins.")]
-        public Task SetAutoAssignRoleAsync(IRole Role)
-        {
-            Config.ModLog.AutoAssignRole = $"{Role.Id}";
-            return ReplyAsync($"**Auto assign role has been set to {Role}** :v:");
-        }
-
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message.")]
         public async Task LevelUpMessageAsync([Remainder]string Message)
         {
@@ -249,7 +203,7 @@ namespace Valerie.Modules
 
         [Command("Settings"), Summary("Shows Server Settings.")]
         public async Task SettingsAsync()
-        {           
+        {
             string AutoRole = Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole)) != null ?
                  Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole)).Name : "Unknown Role.";
             string MuteRole = Context.Guild.GetRole(Convert.ToUInt64(Config.ModLog.MuteRole)) != null ?
@@ -292,6 +246,73 @@ namespace Valerie.Modules
                 $"+ Max LevelUp Level  : {Config.EridiumHandler.MaxRoleLevel}\n" +
                 $"```";
             await ReplyAsync(Description);
+        }
+
+        [Command("Clear"), Summary("Clears up blacklisted and levelup roles. ClearType: Blacklist, LevelUps")]
+        public async Task ClearAsync(CommandEnums ClearType)
+        {
+            switch (ClearType)
+            {
+                case CommandEnums.Blacklist:
+                    Config.EridiumHandler.BlacklistedRoles.Clear();
+                    await ReplyAsync("Blacklisted Roles have been cleared up."); break;
+                case CommandEnums.LevelUps:
+                    Config.EridiumHandler.LevelUpRoles.Clear();
+                    await ReplyAsync("Level Up Roles have been cleared up."); break;
+            }
+        }
+
+        [Group("Set")]
+        public class SetModule : ValerieContext
+        {
+            ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
+            ServerModel Config => ServerConfig.Config;
+
+            [Command("Level"), Summary("Sets Max level for auto roles")]
+            public Task LevelAsync(int MaxLevel)
+            {
+                if (MaxLevel < 10)
+                {
+                    return ReplyAsync("Max level can't be lower than 10");
+                }
+                Config.EridiumHandler.MaxRoleLevel = MaxLevel;
+                return ReplyAsync($"Max level has been set to: {MaxLevel}");
+            }
+
+            [Command("AutoRole"), Summary("Sets auto assign role for when user joins.")]
+            public Task AssignRoleAsync(IRole Role)
+            {
+                Config.ModLog.AutoAssignRole = $"{Role.Id}";
+                return ReplyAsync($"**Auto assign role has been set to {Role}** :v:");
+            }
+
+            [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod.")]
+            public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
+            {
+                switch (ValueType)
+                {
+                    case CommandEnums.CB:
+                        Config.ChatterChannel = $"{Channel.Id}";
+                        await ReplyAsync($"Chatterbot channel has been set to: {Channel.Mention}");
+                        break;
+                    case CommandEnums.Join:
+                        Config.JoinChannel = $"{Channel.Id}";
+                        await ReplyAsync($"Join channel has been set to: {Channel.Mention}");
+                        break;
+                    case CommandEnums.Leave:
+                        Config.LeaveChannel = $"{Channel.Id}";
+                        await ReplyAsync($"Leave channel has been set to: {Channel.Mention}");
+                        break;
+                    case CommandEnums.Starboard:
+                        Config.Starboard.TextChannel = $"{Channel.Id}";
+                        await ReplyAsync($"Starboard channel has been set to: {Channel.Mention}");
+                        break;
+                    case CommandEnums.Mod:
+                        Config.ModLog.TextChannel = $"{Channel.Id}";
+                        await ReplyAsync($"Mod channel has been set to: {Channel.Mention}");
+                        break;
+                }
+            }
         }
     }
 }
