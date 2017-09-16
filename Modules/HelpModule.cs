@@ -16,21 +16,35 @@ namespace Valerie.Modules
         }
 
         [Command("Cmds"), Summary("Shows a list of all commands."), Alias("Help")]
-        public async Task CommandsAsync()
+        public async Task HelpAsync()
         {
             var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
-            foreach (var Module in CommandService.Modules.Where(x => x.Name != "ValerieContext"))
+            string AdminCommands = null;
+            string BotCommands = null;
+            foreach (var Admin in CommandService.Modules.Where(x => x.Name == "AdminModule"))
+                AdminCommands += string.Join(", ", Admin.Commands.Select(x => x.Name));
+            foreach (var Set in CommandService.Modules.Where(x => x.Name == "Set"))
+                AdminCommands += $", {string.Join(", ", Set.Commands.Select(x => $"Set {x.Name}"))}";
+            foreach (var Bot in CommandService.Modules.Where(x => x.Name == "Bot"))
+                BotCommands = string.Join(", ", Bot.Commands.Select(x => $"Bot {x.Name}"));
+
+            embed.AddField("Admin Commands", AdminCommands);
+            embed.AddField("Bot Commands", BotCommands);
+
+            foreach (var Module in CommandService.Modules.Where(x => x.Name != "ValerieContext" && x.Name != "AdminModule"
+            && x.Name != "Set" && x.Name != "Tag" && x.Name != "Bot"))
             {
                 string ModuleName = null;
                 ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;
-
-                embed.AddField(x =>
-                {
-                    x.Name = $"{ModuleName} Commands";
-                    x.Value = string.Join(", ", Module.Commands.Select(Cmd => Cmd.Name));
-                    x.IsInline = false;
-                });
+                embed.AddField($"{ModuleName} Commands", string.Join(", ", Module.Commands.Select(Cmd => Cmd.Name)));
             }
+            string TagCommands = "Tag, ";
+            foreach (var Tag in CommandService.Modules.Where(x => x.Name == "Tag"))
+            {
+                var Commands = Tag.Commands.Where(x => x.Name != "Tag");
+                TagCommands += string.Join(", ", Commands.Select(x => $"Tag {x.Name}"));
+            }
+            embed.AddField("Tag Commands", TagCommands);
             await ReplyAsync("", embed: embed.Build());
         }
 
