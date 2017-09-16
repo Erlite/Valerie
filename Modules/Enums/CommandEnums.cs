@@ -12,6 +12,8 @@
         NoAds,
         Add,
         Remove,
-        Modify
+        Modify,
+        Blacklist,
+        LevelUps
     }
 }
