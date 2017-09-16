@@ -2,6 +2,7 @@
 using Raven.Client.Documents;
 using System.Threading.Tasks;
 using Tweetinvi;
+using Tweetinvi.Exceptions;
 using Valerie.Services;
 using Valerie.Handlers.Config;
 
@@ -26,14 +27,14 @@ namespace Valerie.Handlers
             await BotConfig.LoadConfigAsync().ConfigureAwait(false);
 
             var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
-            Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
-            var AuthUser = User.GetAuthenticatedUser();
-            if (AuthUser == null)
+            try
             {
-                Log.Write(Log.Status.ERR, Log.Source.Config, ExceptionHandler.GetLastException().TwitterDescription);
+                Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
             }
-            else
-                Log.Write(Log.Status.KAY, Log.Source.Config, "Logged into Twitter.");
+            catch (TwitterInvalidCredentialsException E)
+            {
+                Log.Write(Log.Status.ERR, Log.Source.Config, E.Message);
+            }
         }
     }
 }
