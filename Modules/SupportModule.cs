@@ -175,9 +175,13 @@ namespace Valerie.Modules
             var response = (await NextMessageAsync()).Content;
             if (response.ToLower() == "y")
             {
-                AFKRemove.Where(x => Config.AFKList.Remove(x, out string SomeValue));
-                EridiumRemove.Where(x => Config.EridiumHandler.UsersList.Remove(x, out int ER));
-                RoleRemove.Where(x => Config.AssignableRoles.Remove(x));
+                foreach (var value in AFKRemove)
+                    Config.AFKList.Remove(value, out string Value);
+                foreach (var value in EridiumRemove)
+                    Config.EridiumHandler.UsersList.Remove(value, out int Eridium);
+                foreach (var value in RoleRemove)
+                    Config.AssignableRoles.Remove(value);
+
                 await choice.ModifyAsync(x =>
                 {
                     x.Content = "All cleared up! 😊 Have a good day.";
