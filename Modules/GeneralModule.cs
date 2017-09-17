@@ -61,15 +61,12 @@ namespace Valerie.Modules
             foreach (var Value in Eridiumlist)
             {
                 var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
-                string Username, Id = null;
+                string Username = null;
                 if (User == null)
-                {
                     Username = "Unknown User";
-                    Id = $"\nID: {Value.Key}";
-                }
                 else
                     Username = User.Username;
-                embed.AddField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}{Id}", true);
+                embed.AddField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}", true);
             }
             await ReplyAsync("", embed: embed.Build());
         }
@@ -560,7 +557,7 @@ namespace Valerie.Modules
                 var TodoList = new ConcurrentDictionary<int, string>();
                 TodoList.TryAdd(TodoList.Count, TodoMessage);
                 Config.ToDo.TryAdd(Context.User.Id, TodoList);
-                return ReplyAsync("Added new Task.");
+                return ReplyAsync("Task added successfully. :v:");
             }
             GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
             if (CurrentTasks.Count == 5)
@@ -583,15 +580,19 @@ namespace Valerie.Modules
             return ReplyAsync($"**Here are your current tasks:**\n{Sb.ToString()}");
         }
 
-        [Command("TodoRemove"), Summary("Removes a task from your todo list.")]
+        [Command("TodoRemove"), Summary("Removes a task from your todo list."), Alias("TDR")]
         public Task TodoAsync(int TaskNumber)
         {
-            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id))
+            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id)
+                || !GuildConfig.ToDo[Context.User.Id].Any())
                 return ReplyAsync("Woopsie, couldn't find any Todo's.");
             GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
             var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
             NewTasks.TryRemove(TaskNumber, out string NotNeededValue);
-            Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
+            if (NewTasks.Count == 0)
+                Config.ToDo.Remove(Context.User.Id, out ConcurrentDictionary<int, string> Useless);
+            else
+                Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
             return ReplyAsync($"Task {TaskNumber} has been removed.");
         }
     }
