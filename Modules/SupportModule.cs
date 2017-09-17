@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
 using Discord.Addons.Interactive;
-using Valerie.Attributes;
 using Valerie.Extensions;
 using Valerie.Handlers.Config;
-using Valerie.Handlers.Server;
-using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Modules
 {
     public class SupportModule : InteractiveBase
     {
-        ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
-        ServerModel Config => ServerConfig.Config;
-
         [Command("Report"), Alias("Feedback"), Summary("Reports an issue to Bot owner or give feedback.")]
         public async Task ReportAsync()
         {
@@ -134,68 +126,6 @@ namespace Valerie.Modules
             }
             var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Title: Title, Description: GuideMessage, ThumbUrl: "https://png.icons8.com/open-book/dusk/250");
             await ReplyAndDeleteAsync("", embed: embed.Build(), timeout: TimeSpan.FromSeconds(60));
-        }
-
-        [Command("Debug"), Summary("Takes a debug report for your server's config."), CustomUserPermission]
-        public async Task DebugAsync()
-        {
-            var msg = await ReplyAsync($"Starting up {Context.Guild}'s diagonastic  ...");
-            var AFKRemove = new List<ulong>();
-            var EridiumRemove = new List<ulong>();
-            var RoleRemove = new List<string>();
-            foreach (var Item in Config.AFKList)
-            {
-                var GetUser = Context.Guild.GetUser(Item.Key);
-                if (GetUser == null)
-                    AFKRemove.Add(Item.Key);
-            }
-            foreach (var Item in Config.EridiumHandler.UsersList)
-            {
-                var GetUser = Context.Guild.GetUser(Item.Key);
-                if (GetUser == null)
-                    EridiumRemove.Add(Item.Key);
-            }
-            foreach (var Item in Config.AssignableRoles)
-            {
-                var GetRole = Context.Guild.GetRole(Convert.ToUInt64(Item));
-                if (GetRole == null)
-                    RoleRemove.Add(Item);
-            }
-            if (AFKRemove.Count + EridiumRemove.Count + RoleRemove.Count == 0)
-            {
-                await ReplyAsync("No major errors were found. 😊");
-                return;
-            }
-            await msg.ModifyAsync(x =>
-            {
-                x.Content = $"⚠ **Debug Report**\n" +
-                $"Total Null Values: {AFKRemove.Count + EridiumRemove.Count + RoleRemove.Count}";
-            });
-            var choice = await ReplyAsync("Would you like to fix these errors? (y/n)");
-            var response = (await NextMessageAsync()).Content;
-            if (response.ToLower() == "y")
-            {
-                foreach (var value in AFKRemove)
-                    Config.AFKList.Remove(value, out string Value);
-                foreach (var value in EridiumRemove)
-                    Config.EridiumHandler.UsersList.Remove(value, out int Eridium);
-                foreach (var value in RoleRemove)
-                    Config.AssignableRoles.Remove(value);
-
-                await choice.ModifyAsync(x =>
-                {
-                    x.Content = "All cleared up! 😊 Have a good day.";
-                });
-                return;
-            }
-            else
-            {
-                await choice.ModifyAsync(x =>
-                {
-                    x.Content = "Woopsie, invalid response. Exiting debug .. :x:";
-                });
-                return;
-            }
         }
     }
 }
