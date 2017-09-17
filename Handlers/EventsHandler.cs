@@ -72,16 +72,6 @@ namespace Valerie.Handlers
             await Channel.SendMessageAsync(LeaveMessage);
         }
 
-        internal static async Task MessageReceivedAsync(SocketMessage Message)
-        {
-            BotConfig.Config.MessagesReceived += 1;
-            await BotConfig.SaveAsync().ConfigureAwait(false);
-            Task.Run(async () => await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length));
-            Task.Run(async () => await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message));
-            Task.Run(async () => await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message));
-            Task.Run(async () => await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message));
-        }
-
         internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
@@ -166,6 +156,16 @@ namespace Valerie.Handlers
             await ServerConfig.SaveAsync().ConfigureAwait(false);
         }
 
+        internal static async Task MessageReceivedAsync(SocketMessage Message)
+        {
+            BotConfig.Config.MessagesReceived += 1;
+            await BotConfig.SaveAsync().ConfigureAwait(false);
+            Task.Run(async () => await EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length));
+            Task.Run(async () => await AFKHandlerAsync((Message.Author as SocketGuildUser).Guild, Message));
+            Task.Run(async () => await CleverbotHandlerAsync((Message.Author as SocketGuildUser).Guild, Message));
+            Task.Run(async () => await AntiAdvertisementAsync((Message.Author as SocketGuildUser).Guild, Message));
+        }
+
         static async Task EridiumHandlerAsync(SocketGuildUser User, int Eridium)
         {
             var GuildID = User.Guild.Id;
@@ -178,12 +178,13 @@ namespace Valerie.Handlers
             if (!GuildConfig.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
                 GuildConfig.EridiumHandler.UsersList.TryAdd(User.Id, EridiumToGive);
+                await ServerConfig.SaveAsync().ConfigureAwait(false);
                 return;
             }
-
-            int OldLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id]);
-            GuildConfig.EridiumHandler.UsersList[User.Id] += EridiumToGive;
-            int NewLevel = IntExtension.GetLevel(GuildConfig.EridiumHandler.UsersList[User.Id] + EridiumToGive);
+            GuildConfig.EridiumHandler.UsersList.TryGetValue(User.Id, out int Old);
+            int OldLevel = IntExtension.GetLevel(Old);
+            GuildConfig.EridiumHandler.UsersList.TryUpdate(User.Id, Old + EridiumToGive, Old);
+            int NewLevel = IntExtension.GetLevel(Old + EridiumToGive);
             await ServerConfig.SaveAsync().ConfigureAwait(false);
             await AssignRole(BoolExtension.HasLeveledUp(OldLevel, NewLevel), GuildID, User);
             if (GuildConfig.EridiumHandler.LevelUpMessage == null || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
