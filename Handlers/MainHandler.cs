@@ -1,14 +1,14 @@
 ﻿using System;
-using Raven.Client.Documents;
 using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Exceptions;
-using Valerie.Services;
+using Raven.Client.Documents;
 using Valerie.Handlers.Config;
+using Valerie.Services;
 
 namespace Valerie.Handlers
 {
-    public class Database
+    class MainHandler
     {
         static Lazy<IDocumentStore> DocumentStore = new Lazy<IDocumentStore>(new DocumentStore()
         {
@@ -16,16 +16,15 @@ namespace Valerie.Handlers
             {
                 "http://localhost:8080"
             },
-            Database = "ValerieAlpha"
+            Database = "Valerie"
         }.Initialize());
 
         public static IDocumentStore Store => DocumentStore.Value;
 
         public static async Task GetReadyAsync()
         {
-            Log.PrintInfo();
-            await BotConfig.LoadConfigAsync().ConfigureAwait(false);
-
+            Logger.PrintInfo();
+            await BotConfig.LoadConfigAsync();
             var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
             try
             {
@@ -33,7 +32,7 @@ namespace Valerie.Handlers
             }
             catch (TwitterInvalidCredentialsException E)
             {
-                Log.Write(Log.Status.ERR, Log.Source.Config, E.Message);
+                Logger.Write(Logger.Status.ERR, Logger.Source.Config, E.Message);
             }
         }
     }
