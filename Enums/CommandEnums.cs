@@ -1,4 +1,4 @@
-﻿namespace Valerie.Modules.Enums
+﻿namespace Valerie.Enums
 {
     public enum CommandEnums
     {
