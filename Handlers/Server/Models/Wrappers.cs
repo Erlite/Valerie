@@ -40,10 +40,9 @@ namespace Valerie.Handlers.Server.Models
     {
         public int Cases { get; set; }
         public string MuteRole { get; set; }
-        public bool AntiAdvertisement { get; set; }
-        public bool IsAutoModEnabled { get; set; }
-        public string AutoAssignRole { get; set; }
         public string TextChannel { get; set; }
+        public string AutoAssignRole { get; set; }
+        public bool IsAutoModEnabled { get; set; }
         public ConcurrentDictionary<ulong, int> Warnings { get; set; } = new ConcurrentDictionary<ulong, int>();
     }
 }
