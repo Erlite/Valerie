@@ -1,4 +1,5 @@
-﻿# pragma warning disable 4014
+﻿# pragma warning disable 1998, 4014
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,8 +7,8 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Addons.Interactive;
-using Valerie.Services;
 using Valerie.Handlers;
+using Valerie.Handlers.Server;
 using Valerie.Handlers.Config;
 
 namespace Valerie
@@ -20,7 +21,7 @@ namespace Valerie
 
         async Task StartAsync()
         {
-            await Database.GetReadyAsync();
+            await MainHandler.GetReadyAsync().ConfigureAwait(false);
 
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -28,27 +29,19 @@ namespace Valerie
                 LogLevel = LogSeverity.Info
             });
 
-            Client.Log += (log) => Task.Run(() => Log.Write(Log.Status.KAY, Log.Source.Client, log.Message));
-            Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
-            Client.LeftGuild += EventsHandler.LeftGuildAsync;
-            Task.Run(() => Client.JoinedGuild += EventsHandler.JoinedGuildAsync);
-            Task.Run(() => Client.MessageReceived += EventsHandler.MessageReceivedAsync);
-            Task.Run(() => Client.UserJoined += EventsHandler.UserJoinedAsync);
-            Task.Run(() => Client.UserLeft += EventsHandler.UserLeftAsync);
-            Task.Run(() => Client.ReactionAdded += EventsHandler.ReactionAddedAsync);
-            Task.Run(() => Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync);
-            Client.Ready += async () =>
-            {
-                await EventsHandler.ReadyAsync(Client);
-            };
-            Client.LatencyUpdated += async (int Older, int Newer) =>
-            {
-                await EventsHandler.LatencyUpdatedAsync(Client, Older, Newer);
-            };
-
-            var ServiceProvider = IServiceProvider();
-            CommandHandler = new CommandHandler(ServiceProvider);
+            CommandHandler = new CommandHandler(IServiceProvider());
             await CommandHandler.ConfigureCommandsAsync();
+            EventsHandler.Provider = IServiceProvider();
+
+            Client.Log += EventsHandler.Log;
+            Client.JoinedGuild += EventsHandler.JoinedGuild;
+            Client.LeftGuild += EventsHandler.LeftGuild;
+            Client.GuildAvailable += EventsHandler.GuildAvailable;
+            Client.UserJoined += EventsHandler.UserJoined;
+            Client.UserLeft += EventsHandler.UserLeft;
+            Client.MessageReceived += EventsHandler.MessageReceivedAsync;
+            Client.LatencyUpdated += (Older, Newer) => EventsHandler.LatencyUpdated(Client, Older, Newer);
+            Client.Ready += async () => EventsHandler.ReadyAsync(Client);
 
             await Client.LoginAsync(TokenType.Bot, BotConfig.Config.Token);
             await Client.StartAsync();
@@ -59,6 +52,7 @@ namespace Valerie
         {
             return new ServiceCollection()
                 .AddSingleton(Client)
+                .AddSingleton<ServerConfig>()
                 .AddSingleton<InteractiveService>()
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
