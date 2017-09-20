@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
+using Valerie.Handlers;
 using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
     [RequireBotPermission(Discord.ChannelPermission.SendMessages)]
-    public class HelpModule : ValerieContext
+    public class HelpModule : ValerieBase<ValerieContext>
     {
         private CommandService CommandService;
         HelpModule(CommandService Service)
@@ -31,8 +32,8 @@ namespace Valerie.Modules
             embed.AddField("Admin Commands", AdminCommands);
             embed.AddField("Bot Commands", BotCommands);
 
-            foreach (var Module in CommandService.Modules.Where(x => x.Name != "ValerieContext" && x.Name != "AdminModule"
-            && x.Name != "Set" && x.Name != "Tag" && x.Name != "Bot"))
+            foreach (var Module in CommandService.Modules.Where(x => x.Name != "AdminModule" && x.Name != "Set" && 
+            x.Name != "Tag" && x.Name != "Bot" && x.Name != "ValerieBase`1"))
             {
                 string ModuleName = null;
                 ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;

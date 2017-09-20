@@ -4,6 +4,7 @@ using Discord;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Valerie.Handlers;
 using Valerie.Models;
 using Valerie.Extensions;
 using Valerie.Attributes;
@@ -12,7 +13,7 @@ using System.Net.Http;
 namespace Valerie.Modules
 {
     [RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class NSFWModule : ValerieContext
+    public class NSFWModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient Client = new HttpClient();
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]

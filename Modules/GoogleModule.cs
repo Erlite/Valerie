@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord;
 using Google.Apis.Customsearch.v1;
 using Google.Apis.Services;
+using Valerie.Handlers;
 using Valerie.Handlers.Config;
 using Valerie.Attributes;
 using Valerie.Extensions;
@@ -16,7 +17,7 @@ using System.Net.Http;
 namespace Valerie.Modules
 {
     [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class GoogleModule : ValerieContext
+    public class GoogleModule : ValerieBase<ValerieContext>
     {
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string search)

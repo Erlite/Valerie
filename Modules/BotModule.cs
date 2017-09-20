@@ -1,20 +1,18 @@
-﻿# pragma warning disable 1998
-
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Valerie.Extensions;
+using Valerie.Enums;
+using Valerie.Handlers;
 using Valerie.Handlers.Config;
-using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
     [Group("Bot"), RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class BotModule : ValerieContext
+    public class BotModule : ValerieBase<ValerieContext>
     {
         [Command("Prefix"), Summary("Changes bot's prefix.")]
-        public async Task PrefixAsync(string NewPrefix) => BotConfig.Config.Prefix = NewPrefix;
+        public Task PrefixAsync(string NewPrefix) { BotConfig.Config.Prefix = NewPrefix; return ReplyAsync("Prefix Updates."); }
 
         [Command("Avatar"), Summary("Changes Bot's avatar.")]
         public async Task AvatarAsync([Remainder] string Path)
@@ -42,7 +40,7 @@ namespace Valerie.Modules
                     BotConfig.Config.BotGames.Add(GameName);
                     await ReplyAsync("Game has been added to games list.");
                     break;
-                case Actions.Remove:
+                case Actions.Delete:
                     if (!BotConfig.Config.BotGames.Contains(GameName))
                     {
                         await ReplyAsync("Game doesn't exist in Games list.");
@@ -63,9 +61,17 @@ namespace Valerie.Modules
             => await (await Context.Guild.GetCurrentUserAsync()).ModifyAsync(x => x.Nickname = Nickname);
 
         [Command("ServerMessage"), Summary("Custom Guild Join Message")]
-        public async Task GuildJoinMessageAsync([Remainder] string ServerMessage) => BotConfig.Config.ServerMessage = ServerMessage;
+        public Task GuildJoinMessageAsync([Remainder] string ServerMessage)
+        {
+            BotConfig.Config.ServerMessage = ServerMessage;
+            return ReplyAsync("Server message updated.");
+        }
 
         [Command("ReportChannel"), Summary("Sets report channel.")]
-        public async Task ReportChannelAsync(ITextChannel Channel) => BotConfig.Config.ReportChannel = $"{Channel.Id}";
+        public Task ReportChannelAsync(ITextChannel Channel)
+        {
+            BotConfig.Config.ReportChannel = $"{Channel.Id}";
+            return ReplyAsync("Report channel updated.");
+        }
     }
 }

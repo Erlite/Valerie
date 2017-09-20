@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Valerie.Handlers;
 using Valerie.Handlers.Config;
 using Valerie.Models;
 using Valerie.Services;
@@ -19,7 +20,7 @@ using Valerie.Extensions;
 namespace Valerie.Modules
 {
     [RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class OwnerModule : ValerieContext
+    public class OwnerModule : ValerieBase<ValerieContext>
     {
         private static MemoryStream GenerateStreamFromString(string value)
         {

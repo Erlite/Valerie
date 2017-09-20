@@ -12,22 +12,19 @@ using Cookie.FOAAS;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Valerie.Enums;
+using Valerie.Handlers;
 using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Services;
 using Valerie.Handlers.Config;
-using Valerie.Handlers.Server.Models;
-using Valerie.Handlers.Server;
-using Valerie.Modules.Enums;
 
 namespace Valerie.Modules
 {
     [RequireBotPermission(ChannelPermission.SendMessages)]
-    public class GeneralModule : ValerieContext
+    public class GeneralModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient HttpClient = new HttpClient();
-        ServerModel GuildConfig => ServerConfig.ConfigAsync(Context.Guild.Id).GetAwaiter().GetResult();
-        ServerModel Config => ServerConfig.Config;
 
         [Command("Ping"), Summary("Pings Discord Gateway")]
         public Task PingAsync() => ReplyAsync($"Latency: {(Context.Client as DiscordSocketClient).Latency} ms.");
@@ -36,11 +33,11 @@ namespace Valerie.Modules
         public Task RankAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
+            if (!Context.Config.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
                 return ReplyAsync($"{User.Username} isn't ranked yet! :weary:");
             }
-            var UserEridium = Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Eridium);
+            var UserEridium = Context.Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Eridium);
             string Reply =
                 $"{User} Stats:\n" +
                 $"**TOTAL ERIDIUM:** {Eridium} | **LEVEL:** {IntExtension.GetLevel(Eridium)} | " +
@@ -51,13 +48,13 @@ namespace Valerie.Modules
         [Command("Top"), Summary("Shows top 10 users in the Eridium list.")]
         public async Task EridiumAsync()
         {
-            if (Config.EridiumHandler.UsersList.Count == 0)
+            if (Context.Config.EridiumHandler.UsersList.Count == 0)
             {
                 await ReplyAsync("There are no top users for this guild.");
                 return;
             }
             var embed = ValerieEmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
-            var Eridiumlist = Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
+            var Eridiumlist = Context.Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Eridiumlist)
             {
                 var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
@@ -77,25 +74,25 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case CommandEnums.Add:
-                    if (Config.AFKList.ContainsKey(Context.User.Id))
+                    if (Context.Config.AFKList.ContainsKey(Context.User.Id))
                     {
                         await ReplyAsync("You are already in the AFK list.");
                         return;
                     }
-                    Config.AFKList.TryAdd(Context.User.Id, AFKMessage);
+                    Context.Config.AFKList.TryAdd(Context.User.Id, AFKMessage);
                     await ReplyAsync("You have been added to the AFK list.");
                     break;
                 case CommandEnums.Remove:
-                    if (!Config.AFKList.ContainsKey(Context.User.Id))
+                    if (!Context.Config.AFKList.ContainsKey(Context.User.Id))
                     {
                         await ReplyAsync("You are not in the AFK list.");
                         return;
                     }
-                    Config.AFKList.TryRemove(Context.User.Id, out string Value);
+                    Context.Config.AFKList.TryRemove(Context.User.Id, out string Value);
                     await ReplyAsync("You have been removed from the AFK list.");
                     break;
                 case CommandEnums.Modify:
-                    Config.AFKList.TryUpdate(Context.User.Id, AFKMessage, Config.AFKList[Context.User.Id]);
+                    Context.Config.AFKList.TryUpdate(Context.User.Id, AFKMessage, Context.Config.AFKList[Context.User.Id]);
                     await ReplyAsync("Your AFK message have been modified.");
                     break;
             }
@@ -105,7 +102,7 @@ namespace Valerie.Modules
         public async Task IAmAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (!Config.AssignableRoles.Contains($"{Role.Id}"))
+            if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
                 return;
@@ -124,7 +121,7 @@ namespace Valerie.Modules
         public async Task IAmNotAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (!Config.AssignableRoles.Contains($"{Role.Id}"))
+            if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
                 return;
@@ -154,8 +151,8 @@ namespace Valerie.Modules
                 ":pizza:"
             };
             var Rand = new Random(DateTime.Now.Millisecond);
-            var UserEridium = Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Config.EridiumHandler.IsEnabled == false)
+            var UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
+            if (Context.Config.EridiumHandler.IsEnabled == false)
             {
                 await ReplyAsync("Chat Eridium is disabled! Ask Admin or server owner to enable Chat Eridium!");
                 return;
@@ -230,8 +227,8 @@ namespace Valerie.Modules
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!")]
         public async Task FlipAsync(string Side, int Bet = 50)
         {
-            int UserEridium = Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Config.EridiumHandler.IsEnabled == false)
+            int UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
+            if (Context.Config.EridiumHandler.IsEnabled == false)
             {
                 await ReplyAsync("Chat Eridium is disabled! Ask the admin to enable ChatEridium!");
                 return;
@@ -542,37 +539,37 @@ namespace Valerie.Modules
         [Command("Schmeckles"), Summary("Shows how many Schmeckles you have.")]
         public Task SchmecklesAsync()
         {
-            if (!Config.EridiumHandler.UsersList.ContainsKey(Context.User.Id))
+            if (!Context.Config.EridiumHandler.UsersList.ContainsKey(Context.User.Id))
             {
                 return ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
             }
-            return ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
+            return ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Context.Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
         }
 
         [Command("Todo"), Summary("Creates a new Todo.")]
         public Task TodoAsync([Remainder] string TodoMessage)
         {
-            if (!GuildConfig.ToDo.ContainsKey(Context.User.Id))
+            if (!Context.Config.ToDo.ContainsKey(Context.User.Id))
             {
                 var TodoList = new ConcurrentDictionary<int, string>();
                 TodoList.TryAdd(TodoList.Count, TodoMessage);
-                Config.ToDo.TryAdd(Context.User.Id, TodoList);
+                Context.Config.ToDo.TryAdd(Context.User.Id, TodoList);
                 return ReplyAsync("Task added successfully. :v:");
             }
-            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
+            Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
             if (CurrentTasks.Count == 5)
                 return ReplyAsync("You have reached your max number of tasks.");
             var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
             NewTasks.TryAdd(NewTasks.Count, TodoMessage);
-            Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
+            Context.Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
             return ReplyAsync("Task created successfully. :v:");
         }
 
         [Command("Todo"), Summary("Shows all of your Todo's.")]
         public Task TodoAsync()
         {
-            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
-            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id) || !TodoList.Any())
+            Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
+            if (!Context.Config.ToDo.Any() || !Context.Config.ToDo.ContainsKey(Context.User.Id) || !TodoList.Any())
                 return ReplyAsync("Woopsie, couldn't find any Todo's.");
             var Sb = new StringBuilder();
             foreach (var Item in TodoList)
@@ -583,16 +580,16 @@ namespace Valerie.Modules
         [Command("TodoRemove"), Summary("Removes a task from your todo list."), Alias("TDR")]
         public Task TodoAsync(int TaskNumber)
         {
-            if (!GuildConfig.ToDo.Any() || !GuildConfig.ToDo.ContainsKey(Context.User.Id)
-                || !GuildConfig.ToDo[Context.User.Id].Any())
+            if (!Context.Config.ToDo.Any() || !Context.Config.ToDo.ContainsKey(Context.User.Id)
+                || !Context.Config.ToDo[Context.User.Id].Any())
                 return ReplyAsync("Woopsie, couldn't find any Todo's.");
-            GuildConfig.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
+            Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
             var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
             NewTasks.TryRemove(TaskNumber, out string NotNeededValue);
             if (NewTasks.Count == 0)
-                Config.ToDo.Remove(Context.User.Id, out ConcurrentDictionary<int, string> Useless);
+                Context.Config.ToDo.Remove(Context.User.Id, out ConcurrentDictionary<int, string> Useless);
             else
-                Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
+                Context.Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
             return ReplyAsync($"Task {TaskNumber} has been removed.");
         }
     }

@@ -1,26 +1,27 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Discord;
 using Discord.Commands;
-using Valerie.Extensions;
-using Valerie.Models;
-using Newtonsoft.Json.Linq;
 using AngleSharp;
 using AngleSharp.Dom.Html;
+using Valerie.Models;
+using Valerie.Handlers;
+using Valerie.Extensions;
 using Valerie.Handlers.Config;
 using Valerie.Attributes;
 using Cookie.Steam;
 using Cookie.Giphy;
-using System.Net.Http;
 
 namespace Valerie.Modules
 {
     [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
-    public class SearchModule : ValerieContext
+    public class SearchModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient HttpClient = new HttpClient();
 
