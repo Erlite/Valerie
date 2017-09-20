@@ -1,27 +1,32 @@
 ﻿using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
-using Valerie.Modules.Enums;
+using Valerie.Enums;
 using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Handlers.Server
 {
     public class ServerConfig
     {
-        public static ServerModel Config = null;
-
-        public static async Task<ServerModel> ConfigAsync(ulong GuildId)
+        public ServerModel LoadConfig(ulong GuildId)
         {
-            using (IAsyncDocumentSession Session = Database.Store.OpenAsyncSession())
+            using (IDocumentSession Session = MainHandler.Store.OpenSession())
+                return Session.Load<ServerModel>($"{GuildId}");
+        }
+
+        public Task Save(ServerModel Model, ulong GuildId)
+        {
+            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                var Load = await Session.LoadAsync<ServerModel>($"{GuildId}").ConfigureAwait(false);
-                Config = Load;
-                return Load;
+                Session.StoreAsync(Model, id: $"{GuildId}");
+                Session.SaveChangesAsync();
+                Session.Dispose();
             }
+            return Task.CompletedTask;
         }
 
         public static async Task LoadOrDeleteAsync(Actions Action, ulong GuildId)
         {
-            using (IAsyncDocumentSession Session = Database.Store.OpenAsyncSession())
+            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
                 switch (Action)
                 {
@@ -33,7 +38,7 @@ namespace Valerie.Handlers.Server
                                 Prefix = "?>"
                             }).ConfigureAwait(false);
                         break;
-                    case Actions.Remove:
+                    case Actions.Delete:
                         if (await Session.ExistsAsync($"{GuildId}").ConfigureAwait(false))
                             Session.Delete($"{GuildId}");
                         break;
@@ -41,17 +46,6 @@ namespace Valerie.Handlers.Server
                 await Session.SaveChangesAsync().ConfigureAwait(false);
                 Session.Dispose();
             }
-        }
-
-        public static Task SaveAsync()
-        {
-            using (IAsyncDocumentSession SaveSession = Database.Store.OpenAsyncSession())
-            {
-                SaveSession.StoreAsync(Config);
-                SaveSession.SaveChangesAsync();
-                SaveSession.Dispose();
-            }
-            return Task.CompletedTask;
         }
     }
 }
