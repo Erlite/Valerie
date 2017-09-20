@@ -2,7 +2,7 @@
 
 namespace Valerie.Services
 {
-    public class Log
+    public class Logger
     {
         public enum Status
         {
