@@ -6,7 +6,7 @@ namespace Valerie.Handlers.Server.Models
     public class ServerModel
     {
         public string Id { get; set; }
-        public string Prefix { get; set; } = "<>";
+        public string Prefix { get; set; }
         public string JoinChannel { get; set; }
         public string LeaveChannel { get; set; }
         public string ChatterChannel { get; set; }
