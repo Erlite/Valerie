@@ -8,19 +8,19 @@ namespace Valerie.Handlers.Config
 {
     public class BotConfig
     {
-        static IDocumentSession BotSession = Database.Store.OpenSession();
+        static IDocumentSession BotSession = MainHandler.Store.OpenSession();
         public static ConfigModel Config => BotSession.Load<ConfigModel>("Config");
 
         public static async Task LoadConfigAsync()
         {
-            using (IAsyncDocumentSession Session = Database.Store.OpenAsyncSession())
+            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
                 if (!await Session.ExistsAsync("Config").ConfigureAwait(false))
                 {
-                    Log.Write(Log.Status.ERR, Log.Source.Config, "No config found! Creating one ...");
-                    Log.Write(Log.Status.WRN, Log.Source.Config, "Input Token: ");
+                    Logger.Write(Logger.Status.ERR, Logger.Source.Config, "No config found! Creating one ...");
+                    Logger.Write(Logger.Status.WRN, Logger.Source.Config, "Input Token: ");
                     string Token = Console.ReadLine();
-                    Log.Write(Log.Status.WRN, Log.Source.Config, "Input Prefix: ");
+                    Logger.Write(Logger.Status.WRN, Logger.Source.Config, "Input Prefix: ");
                     string Prefix = Console.ReadLine();
                     await Session.StoreAsync(new ConfigModel
                     {
@@ -32,17 +32,19 @@ namespace Valerie.Handlers.Config
                     Session.Dispose();
                 }
                 else
-                    Log.Write(Log.Status.KAY, Log.Source.Config, "Config has been locked and loaded!");
+                    Logger.Write(Logger.Status.KAY, Logger.Source.Config, "Config has been locked and loaded!");
             }
         }
 
-        public static async Task SaveAsync()
+        public static Task SaveAsync()
         {
-            using (IAsyncDocumentSession Session = Database.Store.OpenAsyncSession())
+            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                await Session.StoreAsync(Config).ConfigureAwait(false);
-                await Session.SaveChangesAsync().ConfigureAwait(false);
+                Session.StoreAsync(Config).ConfigureAwait(false);
+                Session.SaveChangesAsync().ConfigureAwait(false);
+                Session.Dispose();
             }
+            return Task.CompletedTask;
         }
     }
 }
