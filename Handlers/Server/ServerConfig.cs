@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Raven.Client.Documents.Session;
+﻿using Raven.Client.Documents.Session;
+using System.Threading.Tasks;
 using Valerie.Enums;
 using Valerie.Handlers.Server.Models;
 
@@ -13,7 +13,7 @@ namespace Valerie.Handlers.Server
                 return Session.Load<ServerModel>($"{GuildId}");
         }
 
-        public Task Save(ServerModel Model, ulong GuildId)
+        public Task SaveAsync(ServerModel Model, ulong GuildId)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
@@ -24,14 +24,15 @@ namespace Valerie.Handlers.Server
             return Task.CompletedTask;
         }
 
-        public static async Task LoadOrDeleteAsync(Actions Action, ulong GuildId)
+        public async Task LoadOrDeleteAsync(Actions Action, ulong GuildId)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
+                var Load = await Session.LoadAsync<ServerModel>($"{GuildId}");
                 switch (Action)
                 {
                     case Actions.Add:
-                        if (!await Session.ExistsAsync($"{GuildId}").ConfigureAwait(false))
+                        if (Load == null)
                             await Session.StoreAsync(new ServerModel
                             {
                                 Id = $"{GuildId}",
@@ -39,7 +40,7 @@ namespace Valerie.Handlers.Server
                             }).ConfigureAwait(false);
                         break;
                     case Actions.Delete:
-                        if (await Session.ExistsAsync($"{GuildId}").ConfigureAwait(false))
+                        if (Load != null)
                             Session.Delete($"{GuildId}");
                         break;
                 }

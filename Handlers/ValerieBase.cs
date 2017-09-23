@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Valerie.Handlers.Server;
+using Valerie.Handlers.Config;
 
 namespace Valerie.Handlers
 {
@@ -13,7 +14,8 @@ namespace Valerie.Handlers
 
         protected override Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            Provider.GetService<ServerConfig>().Save(Context.Config, Context.Guild.Id);
+            Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
+            Provider.GetRequiredService<BotConfig>().SaveAsync(Context.BotConfig);
             Context.Channel.TriggerTypingAsync();
             return Context.Channel.SendMessageAsync(message, isTTS, embed, options);
         }

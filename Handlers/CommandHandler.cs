@@ -1,42 +1,47 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Services;
 using Valerie.Handlers.Config;
+using Valerie.Services;
 
 namespace Valerie.Handlers
 {
     class CommandHandler
     {
+        BotConfig BotConfig;
         IServiceProvider Provider;
         DiscordSocketClient Client;
         CommandService CommandService;
 
-        public CommandHandler(IServiceProvider IServiceProvider)
+        public CommandHandler(DiscordSocketClient SocketClient, CommandService Commands, BotConfig Config)
         {
-            Provider = IServiceProvider;
-            Client = Provider.GetService<DiscordSocketClient>();
-
+            Client = SocketClient;
+            CommandService = Commands;
+            BotConfig = Config;
             Client.MessageReceived += HandleMessagesAsync;
-            CommandService = Provider.GetService<CommandService>();
         }
 
-        public async Task ConfigureCommandsAsync() => await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
+        public async Task InitializeAsync(IServiceProvider IServiceProvider)
+        {
+            Provider = IServiceProvider;
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
+        }
 
         async Task HandleMessagesAsync(SocketMessage Message)
         {
-            var Msg = Message as SocketUserMessage;
+            if (!(Message is SocketUserMessage Msg)) return;
+            if (Msg.Source != MessageSource.User | Msg.Author.IsBot || BotConfig.Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
             int argPos = 0;
-            if (Msg == null || Msg.Author.IsBot || BotConfig.Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
-
             var Context = new ValerieContext(Client, Msg as IUserMessage, Provider);
             if (!(Msg.HasStringPrefix(BotConfig.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos))) return;
-
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
+            BotConfig.Config.CommandsUsed += 1;
+            BotConfig.SaveAsync(BotConfig.Config);
+            if (!Result.Error.HasValue && Result.Error.Value != CommandError.UnknownCommand)
+                Logger.Write(Logger.Status.ERR, Logger.Source.Client, $"{Result}");
         }
     }
 }

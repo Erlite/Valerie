@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Xml;
 using System.Text;
-using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Google.Apis.Services;
 using Google.Apis.Urlshortener.v1;
-using Google.Apis.YouTube.v3;
 using Valerie.Handlers.Config;
-using System.Xml;
-using System.Net.Http;
 
 namespace Valerie.Extensions
 {
-    public static class StringExtension
+    public class StringExtension
     {
-        public static string ReplaceWith(this string Msg, string ValueOne, string ValueTwo)
+        static BotConfig BotConfig;
+        public StringExtension(BotConfig Config) => BotConfig = Config;
+
+        public static string ReplaceWith(string Msg, string ValueOne, string ValueTwo)
         {
             StringBuilder Builder = new StringBuilder(Msg);
             Builder.Replace("{user}", ValueOne);
@@ -25,7 +26,7 @@ namespace Valerie.Extensions
             return Builder.ToString();
         }
 
-        public static string Censor(this string Text)
+        public static string Censor(string Text)
         {
             Regex Swear = new Regex(BotConfig.Config.CensoredWords, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return Swear.Replace(Text, "BEEP");
@@ -49,19 +50,6 @@ namespace Valerie.Extensions
             Client.DefaultRequestHeaders.Add("X-Mashape-Key", BotConfig.Config.APIKeys.MashapeKey);
             Client.DefaultRequestHeaders.Add("Accept", Headers);
             return await Client.GetStringAsync(Link);
-        }
-
-        public static string Youtube(string Search)
-        {
-            var Service = new YouTubeService(new BaseClientService.Initializer
-            {
-                ApiKey = BotConfig.Config.APIKeys.GoogleKey
-            });
-            var SearchRequest = Service.Search.List("snippet");
-            SearchRequest.Q = Search;
-            SearchRequest.MaxResults = 1;
-            SearchRequest.Type = "video";
-            return SearchRequest.Execute().Items.Select(x => x.Id.VideoId).FirstOrDefault();
         }
 
         public static async Task<string> GetE621ImageLinkAsync(string tag)

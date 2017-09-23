@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Raven.Client.Documents.Session;
 using Valerie.Services;
 using Valerie.Handlers.Config.Models;
+using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers.Config
 {
     public class BotConfig
     {
-        static IDocumentSession BotSession = MainHandler.Store.OpenSession();
-        public static ConfigModel Config => BotSession.Load<ConfigModel>("Config");
+        public ConfigModel Config
+        {
+            get
+            {
+                using (IDocumentSession Session = MainHandler.Store.OpenSession())
+                    return Session.Load<ConfigModel>("Config");
+            }
+        }
 
-        public static async Task LoadConfigAsync()
+        public async Task LoadConfigAsync()
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                if (!await Session.ExistsAsync("Config").ConfigureAwait(false))
+                if (await Session.LoadAsync<ConfigModel>("Config") == null)
                 {
                     Logger.Write(Logger.Status.ERR, Logger.Source.Config, "No config found! Creating one ...");
                     Logger.Write(Logger.Status.WRN, Logger.Source.Config, "Input Token: ");
@@ -36,12 +42,12 @@ namespace Valerie.Handlers.Config
             }
         }
 
-        public static Task SaveAsync()
+        public Task SaveAsync(ConfigModel GetConfig)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                Session.StoreAsync(Config).ConfigureAwait(false);
-                Session.SaveChangesAsync().ConfigureAwait(false);
+                Session.StoreAsync(GetConfig, id: "Config");
+                Session.SaveChangesAsync();
                 Session.Dispose();
             }
             return Task.CompletedTask;

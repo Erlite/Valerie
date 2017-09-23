@@ -2,6 +2,8 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
+using Valerie.Handlers.Config;
+using Valerie.Handlers.Config.Models;
 using Valerie.Handlers.Server;
 using Valerie.Handlers.Server.Models;
 
@@ -16,6 +18,7 @@ namespace Valerie.Handlers
         public IMessageChannel Channel { get; }
         public IServiceProvider Provider { get; set; }
         public ServerModel Config { get; set; }
+        public ConfigModel BotConfig { get; set; }
 
         public ValerieContext(IDiscordClient DiscordClient, IUserMessage UserMessage, IServiceProvider ServiceProvider)
         {
@@ -25,7 +28,8 @@ namespace Valerie.Handlers
             Client = DiscordClient;
             Channel = UserMessage.Channel;
             Provider = ServiceProvider;
-            Config = Provider.GetService<ServerConfig>().LoadConfig(Guild.Id);
+            Config = Provider.GetRequiredService<ServerConfig>().LoadConfig(Guild.Id);
+            BotConfig = Provider.GetRequiredService<BotConfig>().Config;
         }
     }
 }
