@@ -19,7 +19,7 @@ namespace Valerie.Modules
         [Command("Cmds"), Summary("Shows a list of all commands."), Alias("Help")]
         public async Task HelpAsync()
         {
-            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
             string AdminCommands = null;
             string BotCommands = null;
             foreach (var Admin in CommandService.Modules.Where(x => x.Name == "AdminModule"))
@@ -60,7 +60,7 @@ namespace Valerie.Modules
                 return;
             }
 
-            var embed = ValerieEmbed.Embed(VmbedColors.Pastel);
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel);
 
             foreach (var match in result.Commands)
             {

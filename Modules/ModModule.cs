@@ -22,7 +22,7 @@ namespace Valerie.Modules
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
             if (Channel != null)
             {
-                var embed = ValerieEmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
+                var embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
                 embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
                 embed.AddField("Responsible Moderator", Context.User.Username, true);
                 embed.AddField("Case No.", Context.Config.ModLog.Cases, true);
@@ -44,7 +44,7 @@ namespace Valerie.Modules
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
             if (Channel != null)
             {
-                var embed = ValerieEmbed.Embed(VmbedColors.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
+                var embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
                 embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
                 embed.AddField("Responsible Moderator", Context.User.Username, true);
                 embed.AddField("Case No.", Context.Config.ModLog.Cases, true);
@@ -172,10 +172,10 @@ namespace Valerie.Modules
             }
             if (!User.Roles.Contains(Role))
             {
-                await ReplyAsync($"**{User} isn't muted.** :thinking:");
+                await ReplyAsync($"**{User} isn't muted.** :eyes:");
                 return;
             }
-            await User.RemoveRoleAsync(Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.MuteRole)));
+            await User.RemoveRoleAsync(Role);
             await ReplyAsync($"**{User} has been unmuted.** :v:");
         }
 

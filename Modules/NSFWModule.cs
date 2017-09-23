@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -8,7 +9,6 @@ using Valerie.Handlers;
 using Valerie.Models;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using System.Net.Http;
 
 namespace Valerie.Modules
 {
@@ -16,6 +16,7 @@ namespace Valerie.Modules
     public class NSFWModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient Client = new HttpClient();
+
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
@@ -39,7 +40,7 @@ namespace Valerie.Modules
                 await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
             else
             {
-                var embed = ValerieEmbed.Embed(VmbedColors.Pastel, url, ImageUrl: url);
+                var embed = ValerieEmbed.Embed(EmbedColor.Pastel, url, ImageUrl: url);
                 await ReplyAsync("", embed: embed.Build());
             }
         }
@@ -60,7 +61,7 @@ namespace Valerie.Modules
                 return;
             }
             var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
-            var embed = ValerieEmbed.Embed(VmbedColors.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
+            var embed = ValerieEmbed.Embed(EmbedColor.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
                 FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddField("Video Length", Getvid.duration, true);
             embed.AddField("Total Views", Getvid.views, true);

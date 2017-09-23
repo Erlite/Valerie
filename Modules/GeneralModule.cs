@@ -17,7 +17,6 @@ using Valerie.Handlers;
 using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Services;
-using Valerie.Handlers.Config;
 
 namespace Valerie.Modules
 {
@@ -53,7 +52,7 @@ namespace Valerie.Modules
                 await ReplyAsync("There are no top users for this guild.");
                 return;
             }
-            var embed = ValerieEmbed.Embed(VmbedColors.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
+            var embed = ValerieEmbed.Embed(EmbedColor.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
             var Eridiumlist = Context.Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Eridiumlist)
             {
@@ -68,7 +67,7 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed.Build());
         }
 
-        [Command("AFK"), Summary("Adds Or Removes you from AFK list.")]
+        [Command("AFK"), Summary("Adds Or Removes you from AFK list. Actions: Add/Remove/Modify")]
         public async Task AFKAsync(CommandEnums Action, [Remainder] string AFKMessage = "I'm busy.")
         {
             switch (Action)
@@ -138,7 +137,7 @@ namespace Valerie.Modules
         }
 
         [Command("Slotmachine"), Summary("Want to earn quick Eridium? That's how you earn some.")]
-        public async Task SlotMachineAsync(int Bet = 50)
+        public async Task SlotMachineAsync(int Bet = 100)
         {
             string[] Slots = new string[]
             {
@@ -152,11 +151,6 @@ namespace Valerie.Modules
             };
             var Rand = new Random(DateTime.Now.Millisecond);
             var UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Context.Config.EridiumHandler.IsEnabled == false)
-            {
-                await ReplyAsync("Chat Eridium is disabled! Ask Admin or server owner to enable Chat Eridium!");
-                return;
-            }
 
             if (UserEridium <= 0 || UserEridium < Bet)
             {
@@ -166,13 +160,7 @@ namespace Valerie.Modules
 
             if (Bet <= 0)
             {
-                await ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
-                return;
-            }
-
-            if (Bet > 5000)
-            {
-                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
+                await ReplyAsync("Bet is too low. :-1:");
                 return;
             }
 
@@ -211,14 +199,14 @@ namespace Valerie.Modules
 
             if (win == 0)
             {
-                UserEridium += Bet;
-                embed.Description = $"You lost {Bet}. Better luck next time! :weary:";
+                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium - Bet, UserEridium);
+                embed.Description = $"You lost {Bet} Eridium. Better luck next time! :weary: ";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
-                UserEridium -= Bet;
-                embed.Description = $"You won {Bet} :tada:";
+                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium += Bet, UserEridium);
+                embed.Description = $"You won {Bet} Eridium :tada: Your current Eridium is: {UserEridium + Bet}";
                 embed.Color = new Color(0x93ff89);
             }
             await ReplyAsync("", embed: embed.Build());
@@ -228,15 +216,10 @@ namespace Valerie.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             int UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
-            if (Context.Config.EridiumHandler.IsEnabled == false)
-            {
-                await ReplyAsync("Chat Eridium is disabled! Ask the admin to enable ChatEridium!");
-                return;
-            }
-
+ 
             if (int.TryParse(Side, out int res))
             {
-                await ReplyAsync("Side can't be a number. Use help command for more information!");
+                await ReplyAsync("Pick either heads or tails.");
                 return;
             }
 
@@ -252,31 +235,26 @@ namespace Valerie.Modules
                 return;
             }
 
-            if (Bet > 5000)
-            {
-                await ReplyAsync("Bet is too high! Bet needs to be lower than 5000.");
-                return;
-            }
 
             string[] Sides = { "Heads", "Tails" };
             var GetSide = Sides[new Random().Next(0, Sides.Length)];
 
             if (Side.ToLower() == GetSide.ToLower())
             {
-                UserEridium += Bet;
-                await ReplyAsync($"Congratulations! You won {Bet}!");
+                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium += Bet, UserEridium);
+                await ReplyAsync($"Congratulations! You won {Bet} Eridium!");
             }
             else
             {
-                UserEridium -= Bet;
-                await ReplyAsync($"You lost {Bet}! :frowning:");
+                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium -= Bet, UserEridium);
+                await ReplyAsync($"You lost {Bet} Eridium! :frowning:");
             }
         }
 
         [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
-            var embed = ValerieEmbed.Embed(VmbedColors.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
+            var embed = ValerieEmbed.Embed(EmbedColor.Cyan, Title: $"INFORMATION | {Context.Guild.Name}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
 
             embed.AddField("ID", Context.Guild.Id, true);
@@ -314,7 +292,7 @@ namespace Valerie.Modules
         public async Task UserInfoAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: $"INFORMATION | {User}", ThumbUrl: User.GetAvatarUrl());
             List<IRole> Roles = new List<IRole>();
             foreach (var role in User.RoleIds)
             {
@@ -431,7 +409,7 @@ namespace Valerie.Modules
                 }
                 Response.Dispose();
             }
-            var embed = ValerieEmbed.Embed(VmbedColors.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
+            var embed = ValerieEmbed.Embed(EmbedColor.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: Changes, Title: "Latest Changes");
             embed.AddField("Members",
@@ -444,8 +422,8 @@ namespace Valerie.Modules
                 $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
             embed.AddField(":space_invader:",
-                $"Commands Ran: {BotConfig.Config.CommandsUsed}\n" +
-                $"Messages Received: {BotConfig.Config.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+                $"Commands Ran: {Context.BotConfig.CommandsUsed}\n" +
+                $"Messages Received: {Context.BotConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
             embed.AddField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
@@ -481,7 +459,7 @@ namespace Valerie.Modules
             else
                 ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-            var embed = ValerieEmbed.Embed(VmbedColors.Green, Description:
+            var embed = ValerieEmbed.Embed(EmbedColor.Green, Description:
                 $"**Tweet:** {TweetMessage}\n" +
                 $"**Tweet ID:** {UserTweet.Id}\n" +
                 $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
@@ -517,7 +495,7 @@ namespace Valerie.Modules
                 else
                     ThumbImage = Context.Client.CurrentUser.GetAvatarUrl();
 
-                var embed = ValerieEmbed.Embed(VmbedColors.Green, Description:
+                var embed = ValerieEmbed.Embed(EmbedColor.Green, Description:
                     $"**Tweet:** {TweetMessage}\n" +
                     $"**Tweet ID:** {UserTweet.Id}\n" +
                     $"[Follow @Vuxey](https://twitter.com/Vuxey) | [Tweet Link]({UserTweet.Url})");
@@ -591,6 +569,19 @@ namespace Valerie.Modules
             else
                 Context.Config.ToDo.TryUpdate(Context.User.Id, NewTasks, CurrentTasks);
             return ReplyAsync($"Task {TaskNumber} has been removed.");
+        }
+
+        [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
+        public async Task FeedbackAsync([Remainder]string Message)
+        {
+            if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
+            ITextChannel ReportChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.BotConfig.ReportChannel));
+            string Content =
+                $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
+                $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
+                $"**Feedback:** {Message}";
+            await ReportChannel.SendMessageAsync(Content);
+            await ReplyAsync("Thank you for sumbitting your feedback. :v:");
         }
     }
 }

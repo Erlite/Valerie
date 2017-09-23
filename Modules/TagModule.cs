@@ -89,7 +89,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"**{Name}** doesn't exist.");
                 return;
             }
-            var embed = ValerieEmbed.Embed(VmbedColors.Cyan, Title: $"TAG INFO | {Name}",
+            var embed = ValerieEmbed.Embed(EmbedColor.Cyan, Title: $"TAG INFO | {Name}",
                 ThumbUrl: (await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner))).GetAvatarUrl());
             embed.AddField("Name", GetTag.Name, true);
             embed.AddField("Owner", await Context.Guild.GetUserAsync(Convert.ToUInt64(GetTag.Owner)), true);
@@ -125,7 +125,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"{User} has no tags.");
                 return;
             }
-            var embed = ValerieEmbed.Embed(VmbedColors.Gold, Title: $"{User} owns {UserTag.Count()} tags.", Description: string.Join(", ", UserTag.Select(y => y.Name)));
+            var embed = ValerieEmbed.Embed(EmbedColor.Gold, Title: $"{User} owns {UserTag.Count()} tags.", Description: string.Join(", ", UserTag.Select(y => y.Name)));
             await ReplyAsync("", embed: embed.Build());
         }
 

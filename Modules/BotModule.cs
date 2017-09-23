@@ -4,7 +4,6 @@ using Discord;
 using Discord.Commands;
 using Valerie.Enums;
 using Valerie.Handlers;
-using Valerie.Handlers.Config;
 
 namespace Valerie.Modules
 {
@@ -12,7 +11,10 @@ namespace Valerie.Modules
     public class BotModule : ValerieBase<ValerieContext>
     {
         [Command("Prefix"), Summary("Changes bot's prefix.")]
-        public Task PrefixAsync(string NewPrefix) { BotConfig.Config.Prefix = NewPrefix; return ReplyAsync("Prefix Updates."); }
+        public Task PrefixAsync(string NewPrefix)
+        {
+            Context.BotConfig.Prefix = NewPrefix; return ReplyAsync("Prefix Updates.");
+        }
 
         [Command("Avatar"), Summary("Changes Bot's avatar.")]
         public async Task AvatarAsync([Remainder] string Path)
@@ -32,21 +34,21 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case Actions.Add:
-                    if (BotConfig.Config.BotGames.Contains(GameName))
+                    if (Context.BotConfig.BotGames.Contains(GameName))
                     {
                         await ReplyAsync("Game already exists in Games list.");
                         return;
                     }
-                    BotConfig.Config.BotGames.Add(GameName);
+                    Context.BotConfig.BotGames.Add(GameName);
                     await ReplyAsync("Game has been added to games list.");
                     break;
                 case Actions.Delete:
-                    if (!BotConfig.Config.BotGames.Contains(GameName))
+                    if (!Context.BotConfig.BotGames.Contains(GameName))
                     {
                         await ReplyAsync("Game doesn't exist in Games list.");
                         return;
                     }
-                    BotConfig.Config.BotGames.Remove(GameName);
+                    Context.BotConfig.BotGames.Remove(GameName);
                     await ReplyAsync("Game has been removed from games list.");
                     break;
             }
@@ -63,14 +65,14 @@ namespace Valerie.Modules
         [Command("ServerMessage"), Summary("Custom Guild Join Message")]
         public Task GuildJoinMessageAsync([Remainder] string ServerMessage)
         {
-            BotConfig.Config.ServerMessage = ServerMessage;
+            Context.BotConfig.ServerMessage = ServerMessage;
             return ReplyAsync("Server message updated.");
         }
 
         [Command("ReportChannel"), Summary("Sets report channel.")]
         public Task ReportChannelAsync(ITextChannel Channel)
         {
-            BotConfig.Config.ReportChannel = $"{Channel.Id}";
+            Context.BotConfig.ReportChannel = $"{Channel.Id}";
             return ReplyAsync("Report channel updated.");
         }
     }

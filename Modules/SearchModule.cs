@@ -13,14 +13,12 @@ using AngleSharp.Dom.Html;
 using Valerie.Models;
 using Valerie.Handlers;
 using Valerie.Extensions;
-using Valerie.Handlers.Config;
-using Valerie.Attributes;
 using Cookie.Steam;
 using Cookie.Giphy;
 
 namespace Valerie.Modules
 {
-    [RequireAPIKeys, RequireBotPermission(ChannelPermission.SendMessages)]
+    [RequireBotPermission(ChannelPermission.SendMessages)]
     public class SearchModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient HttpClient = new HttpClient();
@@ -41,7 +39,7 @@ namespace Valerie.Modules
                 return;
             }
             var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
-            var embed = ValerieEmbed.Embed(VmbedColors.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
+            var embed = ValerieEmbed.Embed(EmbedColor.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
             embed.AddField($"Definition of {TermInfo.Word}", TermInfo.Definition, true);
             embed.AddField("Example", TermInfo.Example, true);
             await ReplyAsync("", embed: embed.Build());
@@ -141,7 +139,7 @@ namespace Valerie.Modules
                     $"**Summary: **{result.Snippet}\n" +
                     $"**URL: ** {StringExtension.ShortenUrl(result.URL)}\n");
             }
-            var embed = ValerieEmbed.Embed(VmbedColors.Snow, Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
+            var embed = ValerieEmbed.Embed(EmbedColor.Snow, Description: Builder.ToString(), FooterText: $"Total Results: {ConvertedJson.Count.ToString()}");
             if (string.IsNullOrWhiteSpace(Builder.ToString()))
                 await ReplyAsync("No results found.");
             else
@@ -154,7 +152,7 @@ namespace Valerie.Modules
             var Client = new HttpClient();
             var link = $"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={Query}&count=50&offset=0&mkt=en-us&safeSearch=Off";
             Client.DefaultRequestHeaders.Clear();
-            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
+            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Context.BotConfig.APIKeys.BingKey);
             var res = await Client.GetAsync(link);
             if (!res.IsSuccessStatusCode)
             {
@@ -170,7 +168,7 @@ namespace Valerie.Modules
             }
             var RandomNum = new Random().Next(1, 50);
             JObject image = (JObject)arr[RandomNum];
-            var embed = ValerieEmbed.Embed(VmbedColors.Black, ImageUrl: (string)image["contentUrl"]);
+            var embed = ValerieEmbed.Embed(EmbedColor.Black, ImageUrl: (string)image["contentUrl"]);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -179,7 +177,7 @@ namespace Valerie.Modules
         {
             var Client = new HttpClient();
             Client.DefaultRequestHeaders.Clear();
-            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BotConfig.Config.APIKeys.BingKey);
+            Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Context.BotConfig.APIKeys.BingKey);
             var GetRequest = await Client.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/search?q={Query}&count=5&offset=0&mkt=en-us&safeSearch=moderate");
             if (!GetRequest.IsSuccessStatusCode)
             {
@@ -199,7 +197,7 @@ namespace Valerie.Modules
         [Command("SteamUser"), Summary("Shows info about a steam user")]
         public async Task UserAsync(string UserId)
         {
-            var SteamClient = new SteamClient(BotConfig.Config.APIKeys.SteamKey);
+            var SteamClient = new SteamClient(Context.BotConfig.APIKeys.SteamKey);
             var UserInfo = await SteamClient.GetUsersInfoAsync(new List<string> { UserId });
             var UserGames = await SteamClient.OwnedGamesAsync(UserId);
             var UserRecent = await SteamClient.RecentGamesAsync(UserId);
@@ -222,7 +220,7 @@ namespace Valerie.Modules
             else
                 State = "Looking to play";
 
-            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Info.AvatarFullUrl, Info.RealName, Info.ProfileLink,
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Info.AvatarFullUrl, Info.RealName, Info.ProfileLink,
                 FooterText: string.Join(", ", UserRecent.RecentGames.GamesList.Select(x => x.Name)));
             embed.AddField("Display Name", $"{Info.Name}", true);
             embed.AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true);
@@ -239,7 +237,7 @@ namespace Valerie.Modules
         [Command("Giphy"), Summary("Searches Giphy for your Gifs??"), Alias("Gif")]
         public async Task Giphy([Remainder] string SearchTerms = null)
         {
-            GiphyClient Client = new GiphyClient(BotConfig.Config.APIKeys.GiphyKey);
+            GiphyClient Client = new GiphyClient(Context.BotConfig.APIKeys.GiphyKey);
             string Response = null;
             if (!string.IsNullOrWhiteSpace(SearchTerms))
             {
@@ -267,7 +265,7 @@ namespace Valerie.Modules
         [Command("News"), Summary("Gets you the latest news.")]
         public async Task NewsAsync()
         {
-            var Get = await HttpClient.GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={BotConfig.Config.APIKeys.NewsKey}").ConfigureAwait(false);
+            var Get = await HttpClient.GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={Context.BotConfig.APIKeys.NewsKey}").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync(Get.ReasonPhrase);
@@ -277,7 +275,7 @@ namespace Valerie.Modules
             var Builder = new StringBuilder();
             foreach (var x in Content.Articles.Take(5))
                 Builder.AppendLine($":small_orange_diamond: **[{x.Title}]({x.Url})**\n{x.Description}");
-            var embed = ValerieEmbed.Embed(VmbedColors.Pastel, Title: "Today's Headlines", Description: Builder.ToString());
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: "Today's Headlines", Description: Builder.ToString());
             await ReplyAsync("", embed: embed.Build());
         }
     }

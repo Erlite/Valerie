@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Valerie.Handlers;
-using Valerie.Handlers.Server;
 using Valerie.Attributes;
-using Valerie.Handlers.Server.Models;
 using Valerie.Enums;
 
 namespace Valerie.Modules
@@ -20,7 +18,7 @@ namespace Valerie.Modules
             await ReplyAsync("Done.");
         }
 
-        [Command("RoleAdd"), Alias("RA"), Summary("Adds a role to assignable role list.")]
+        [Command("RoleAdd"), Summary("Adds a role to assignable role list.")]
         public async Task RoleAddAsync(IRole Role)
         {
             if (Context.Config.AssignableRoles.Contains($"{Role.Id}"))
@@ -32,7 +30,7 @@ namespace Valerie.Modules
             await ReplyAsync("Done.");
         }
 
-        [Command("RoleRemove"), Alias("RR"), Summary("Removes a role from assignable role list.")]
+        [Command("RoleRemove"), Summary("Removes a role from assignable role list.")]
         public async Task RoleRemoveAsync(IRole Role)
         {
             if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
@@ -44,7 +42,8 @@ namespace Valerie.Modules
             await ReplyAsync("Done.");
         }
 
-        [Command("WelcomeAdd"), Alias("WA"), Summary("Adds a welcome message to welcome messages list.")]
+        [Command("WelcomeAdd"),
+            Summary("Adds a welcome message to welcome messages. User `{user}` to mention user and `{guild}` for guild name.")]
         public async Task WelcomeAddAsync([Remainder] string WelcomeMessage)
         {
             if (Context.Config.WelcomeMessages.Count == 3)
@@ -61,7 +60,7 @@ namespace Valerie.Modules
             await ReplyAsync("Welcome Message has been added.");
         }
 
-        [Command("WelcomeRemove"), Alias("WR"), Summary("Removes a welcome message from welcome messages list.")]
+        [Command("WelcomeRemove"), Summary("Removes a welcome message from welcome messages.")]
         public async Task WelcomeRemoveAsync([Remainder] string WelcomeMessage)
         {
             if (!Context.Config.WelcomeMessages.Contains(WelcomeMessage))
@@ -73,7 +72,7 @@ namespace Valerie.Modules
             await ReplyAsync("Welcome Message has been removed");
         }
 
-        [Command("LeaveAdd"), Alias("LA"), Summary("Adds a leave message to leave messages list.")]
+        [Command("LeaveAdd"), Summary("Adds a leave message to leave messages. User `{user}` to mention user and `{guild}` for guild name.")]
         public async Task LeaveAddAsync([Remainder] string LeaveMessage)
         {
             if (Context.Config.LeaveMessages.Count == 3)
@@ -90,7 +89,7 @@ namespace Valerie.Modules
             await ReplyAsync("Leave Message has been added.");
         }
 
-        [Command("LeaveRemove"), Alias("LR"), Summary("Removes a leave message from leaves message list.")]
+        [Command("LeaveRemove"), Summary("Removes a leave message from leave messages.")]
         public async Task LeaveRemoveAsync([Remainder] string LeaveMessage)
         {
             if (!Context.Config.LeaveMessages.Contains(LeaveMessage))
@@ -102,7 +101,7 @@ namespace Valerie.Modules
             await ReplyAsync("Leave Message has been removed.");
         }
 
-        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType include: Eridium, AutoMod")]
+        [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType: Eridium, AutoMod")]
         public async Task ToggleAsync(CommandEnums ValueType)
         {
             switch (ValueType)
@@ -119,7 +118,7 @@ namespace Valerie.Modules
                         await ReplyAsync("Eridium has been disabled.");
                     }
                     break;
-                case CommandEnums.NoAds:
+                case CommandEnums.AutoMod:
                     if (!Context.Config.ModLog.IsAutoModEnabled)
                     {
                         Context.Config.ModLog.IsAutoModEnabled = true;
@@ -134,7 +133,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles"), Alias("EB")]
+        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles."), Alias("EB")]
         public async Task BlacklistRoleAsync(Actions Action, IRole Role)
         {
             switch (Action)
@@ -157,7 +156,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("LevelAdd"), Summary("Adds a level to level up list."), Alias("LA")]
+        [Command("LevelAdd"), Summary("Adds a level to level up list.")]
         public Task LevelAddAsync(IRole Role, int Level)
         {
             if (Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
@@ -168,7 +167,7 @@ namespace Valerie.Modules
             return ReplyAsync($"{Role} has been added.");
         }
 
-        [Command("LevelRemove"), Summary("Removes a role from level up roles"), Alias("LR")]
+        [Command("LevelRemove"), Summary("Removes a role from level up roles.")]
         public Task EridiumLevelAsync(IRole Role)
         {
             if (!Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
@@ -179,14 +178,14 @@ namespace Valerie.Modules
             return ReplyAsync($"{Role} has been removed.");
         }
 
-        [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message.")]
+        [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message for when a user level ups.")]
         public async Task LevelUpMessageAsync([Remainder]string Message)
         {
             Context.Config.EridiumHandler.LevelUpMessage = Message;
             await ReplyAsync("Done.");
         }
 
-        [Command("EridiumRemove"), Summary("Removes a user from Eridium list."), Alias("ER")]
+        [Command("EridiumRemove"), Summary("Removes a user from Eridium leaderboards.")]
         public async Task EridiumRemoveAsync(IGuildUser User)
         {
             if (!Context.Config.EridiumHandler.UsersList.ContainsKey(User.Id))
@@ -217,7 +216,9 @@ namespace Valerie.Modules
                 (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.JoinChannel))).Name : "Unknown Channel.";
 
             string Description =
-                $"```diff\n- ======== [Main Information] ======== -\n" +
+                $"```diff\n" +
+                $"+ [{Context.Guild} SETTINGS]\n" +
+                $"- ======== [Main Information] ======== -\n" +
                 $"+ Server's Prefix    : {Context.Config.Prefix}\n" +
                 $"+ AFK Entries        : {Context.Config.AFKList.Count}\n" +
                 $"+ Todo Entries       : {Context.Config.ToDo.Count}\n" +
@@ -245,17 +246,22 @@ namespace Valerie.Modules
             await ReplyAsync(Description);
         }
 
-        [Command("Clear"), Summary("Clears up blacklisted and levelup roles. ClearType: Blacklist, LevelUps")]
+        [Command("Clear"),
+            Summary("Clears up blacklisted and levelup roles. ClearType: Blacklist, LevelUps, Join, Leave, Mod, CB, Starboard, EridiumLevel.")]
         public async Task ClearAsync(CommandEnums ClearType)
         {
             switch (ClearType)
             {
                 case CommandEnums.Blacklist:
-                    Context.Config.EridiumHandler.BlacklistedRoles.Clear();
-                    await ReplyAsync("Blacklisted Roles have been cleared up."); break;
+                    Context.Config.EridiumHandler.BlacklistedRoles.Clear(); await ReplyAsync("Blacklisted Roles have been cleared up."); break;
                 case CommandEnums.LevelUps:
-                    Context.Config.EridiumHandler.LevelUpRoles.Clear();
-                    await ReplyAsync("Level Up Roles have been cleared up."); break;
+                    Context.Config.EridiumHandler.LevelUpRoles.Clear(); await ReplyAsync("Level Up Roles have been cleared up."); break;
+                case CommandEnums.Join: Context.Config.JoinChannel = null; await ReplyAsync("Join channel has been cleared."); break;
+                case CommandEnums.Leave: Context.Config.LeaveChannel = null; await ReplyAsync("Leave channel has been cleared."); break;
+                case CommandEnums.Mod: Context.Config.ModLog.TextChannel = null; await ReplyAsync("Mod channel has been cleared."); break;
+                case CommandEnums.CB: Context.Config.ChatterChannel = null; await ReplyAsync("Chatterbot channel has been cleared."); break;
+                case CommandEnums.Starboard: Context.Config.Starboard.TextChannel = null; await ReplyAsync("Starboard channel has been cleared."); break;
+                case CommandEnums.EridiumLevel: Context.Config.EridiumHandler.LevelUpMessage = null; await ReplyAsync("Eridium message has been cleared."); break;
             }
         }
 
@@ -316,7 +322,7 @@ namespace Valerie.Modules
         [Group("Set"), RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages), CustomUserPermission]
         public class SetModule : ValerieBase<ValerieContext>
         {
-            [Command("Level"), Summary("Sets Max level for auto roles")]
+            [Command("Level"), Summary("Sets Max level for auto roles.")]
             public Task LevelAsync(int MaxLevel)
             {
                 if (MaxLevel < 10)
