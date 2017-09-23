@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Cookie.Cleverbot;
@@ -18,23 +17,33 @@ namespace Valerie.Handlers
 {
     class EventsHandler
     {
-        public static IServiceProvider Provider { get; set; }
-        internal static Task Log(LogMessage Log) => Task.Run(() => Logger.Write(Logger.Status.KAY, Logger.Source.Client, Log.Message));
-        internal static Task LeftGuild(SocketGuild Guild) => Task.Run(() => ServerConfig.LoadOrDeleteAsync(Actions.Delete, Guild.Id));
-        internal static Task GuildAvailable(SocketGuild Guild) => Task.Run(() => ServerConfig.LoadOrDeleteAsync(Actions.Add, Guild.Id));
+        readonly ServerConfig ServerConfig;
+        readonly BotConfig BotConfig;
 
-        internal static async Task JoinedGuild(SocketGuild Guild)
+        public EventsHandler(ServerConfig Config, BotConfig _Config)
         {
-            Task.Run(() => ServerConfig.LoadOrDeleteAsync(Actions.Delete, Guild.Id));
-            var Msg = await (await Guild.Owner.GetOrCreateDMChannelAsync())
-                .SendMessageAsync(BotConfig.Config.ServerMessage.ReplaceWith("?>", BotConfig.Config.Prefix));
-            if (Msg == null)
-                await Guild.DefaultChannel.SendMessageAsync(BotConfig.Config.ServerMessage.ReplaceWith("?>", BotConfig.Config.Prefix));
+            ServerConfig = Config;
+            BotConfig = _Config;
         }
 
-        internal static Task UserJoined(SocketGuildUser User)
+        internal Task Log(LogMessage Log) => Task.Run(() => Logger.Write(Logger.Status.KAY, Logger.Source.Client, Log.Message ?? Log.Exception.StackTrace));
+        internal Task LeftGuild(SocketGuild Guild) => ServerConfig.LoadOrDeleteAsync(Actions.Delete, Guild.Id);
+        internal Task GuildAvailable(SocketGuild Guild) => ServerConfig.LoadOrDeleteAsync(Actions.Add, Guild.Id);
+
+        internal async Task JoinedGuild(SocketGuild Guild)
         {
-            var Config = Provider.GetService<ServerConfig>().LoadConfig(User.Guild.Id);
+            ServerConfig.LoadOrDeleteAsync(Actions.Delete, Guild.Id);
+            if (BotConfig.Config.ServerMessage == null) return;
+            var Msg = await (await Guild.Owner.GetOrCreateDMChannelAsync())
+                .SendMessageAsync(StringExtension.ReplaceWith(BotConfig.Config.ServerMessage, "?>", BotConfig.Config.Prefix));
+            if (Msg == null)
+                await Guild.DefaultChannel.SendMessageAsync(StringExtension.ReplaceWith(BotConfig.Config.ServerMessage, "?>", BotConfig.Config.Prefix));
+        }
+
+        internal Task UserJoined(SocketGuildUser User)
+        {
+            var Config = ServerConfig.LoadConfig(User.Guild.Id);
+            if (Config == null) return Task.CompletedTask;
             string WelcomeMessage = null;
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
             if (Config.WelcomeMessages.Count <= 0)
@@ -53,11 +62,11 @@ namespace Valerie.Handlers
             return Task.CompletedTask;
         }
 
-        internal static Task UserLeft(SocketGuildUser User)
+        internal Task UserLeft(SocketGuildUser User)
         {
-            var GetInstance = Provider.GetService<ServerConfig>();
-            CleanupAsync(GetInstance, User);
-            var Config = GetInstance.LoadConfig(User.Guild.Id);
+            CleanupAsync(User);
+            var Config = ServerConfig.LoadConfig(User.Guild.Id);
+            if (Config == null) return Task.CompletedTask;
             string LeaveMessage = null;
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             if (Config.LeaveMessages.Count <= 0)
@@ -72,18 +81,18 @@ namespace Valerie.Handlers
             return Task.CompletedTask;
         }
 
-        internal static async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
+        internal async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
             var Message = await Cache.GetOrDownloadAsync();
-            var GetInstance = Provider.GetService<ServerConfig>();
-            var Config = GetInstance.LoadConfig(Guild.Id);
+            var Config = ServerConfig.LoadConfig(Guild.Id);
+            if (Config == null) return;
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
 
             if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null ||
                 Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
 
-            var Embed = ValerieEmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
+            var Embed = ValerieEmbed.Embed(EmbedColor.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
 
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
@@ -115,19 +124,19 @@ namespace Valerie.Handlers
                     Stars = 1
                 });
             }
-            GetInstance.Save(Config, Guild.Id);
+            ServerConfig.SaveAsync(Config, Guild.Id);
         }
 
-        internal static async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
+        internal async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
             var Message = await Cache.GetOrDownloadAsync();
-            var GetInstance = Provider.GetService<ServerConfig>();
-            var Config = GetInstance.LoadConfig(Guild.Id);
+            var Config = ServerConfig.LoadConfig(Guild.Id);
+            if (Config == null) return;
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
             if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null) return;
 
-            var Embed = ValerieEmbed.Embed(VmbedColors.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
+            var Embed = ValerieEmbed.Embed(EmbedColor.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
             else if (Message.Attachments.FirstOrDefault() != null)
@@ -149,47 +158,46 @@ namespace Valerie.Handlers
                 Config.Starboard.StarboardMessages.Remove(Exists);
                 await SMsg.DeleteAsync();
             }
-            GetInstance.Save(Config, Guild.Id);
+            ServerConfig.SaveAsync(Config, Guild.Id);
         }
 
-        internal static Task LatencyUpdated(DiscordSocketClient Client, int Older, int Newer)
-        {
-            Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
+        internal Task LatencyUpdated(DiscordSocketClient Client, int Older, int Newer)
+            => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
-            return Task.CompletedTask;
-        }
 
-        public static Task ReadyAsync(DiscordSocketClient Client)
+        internal Task ReadyAsync(DiscordSocketClient Client)
         {
             string Game = BotConfig.Config.BotGames.Count == 0 ? $"{BotConfig.Config.Prefix}Cmds" :
                 BotConfig.Config.BotGames[new Random().Next(BotConfig.Config.BotGames.Count)];
             return Client.SetGameAsync(Game);
         }
 
-        internal static async Task MessageReceivedAsync(SocketMessage Message)
+        internal async Task MessageReceivedAsync(SocketMessage Message)
         {
             BotConfig.Config.MessagesReceived += 1;
-            BotConfig.SaveAsync();
-            var GetInstance = Provider.GetService<ServerConfig>();
-            AFKHandlerAsync(GetInstance, Message);
-            CleverbotHandlerAsync(GetInstance, Message);
-            EridiumHandlerAsync(GetInstance, Message.Author as SocketGuildUser, Message.Content.Length);
-            AutoMod(GetInstance, Message as SocketUserMessage);
+            BotConfig.SaveAsync(BotConfig.Config);
+            if (Message == null || (Message.Author as SocketGuildUser) == null) return;
+            AFKHandlerAsync(Message);
+            CleverbotHandlerAsync(Message);
+            EridiumHandlerAsync(Message.Author as SocketGuildUser, Message.Content.Length);
+            AutoModAsync(Message as SocketUserMessage);
         }
 
-        static async Task AFKHandlerAsync(ServerConfig GetInstance, SocketMessage Message)
+        Task AFKHandlerAsync(SocketMessage Message)
         {
-            var Config = GetInstance.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
+            var Config = ServerConfig.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
+            if (Config == null) return Task.CompletedTask;
             string afkReason = null;
             SocketUser gldUser = Message.MentionedUsers.FirstOrDefault(u => Config.AFKList.TryGetValue(u.Id, out afkReason));
-            if (gldUser != null)
-                await Message.Channel.SendMessageAsync($"**Message left from {gldUser.Username}:** {afkReason}");
+            if (gldUser == null) return Task.CompletedTask;
+            return Message.Channel.SendMessageAsync($"**Message left from {gldUser.Username}:** {afkReason}");
         }
 
-        static async Task CleverbotHandlerAsync(ServerConfig GetInstance, SocketMessage Message)
+        async Task CleverbotHandlerAsync(SocketMessage Message)
         {
-            var Config = GetInstance.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
+            var Config = ServerConfig.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
+            if (Config == null) return;
             ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
             if (Message.Author.IsBot || Channel == null || !Message.Content.StartsWith("Valerie") || Message.Channel != Channel) return;
             string UserMsg = Message.Content.Replace("Valerie", "");
@@ -197,30 +205,32 @@ namespace Valerie.Handlers
             await Channel.SendMessageAsync((await Client.TalkAsync(UserMsg).ConfigureAwait(false)).CleverOutput).ConfigureAwait(false);
         }
 
-        static async Task EridiumHandlerAsync(ServerConfig GetInstance, SocketGuildUser User, int Eridium)
+        async Task EridiumHandlerAsync(SocketGuildUser User, int Eridium)
         {
-            var Config = GetInstance.LoadConfig(User.Guild.Id);
+            var Config = ServerConfig.LoadConfig(User.Guild.Id);
+            if (Config == null) return;
             var BlacklistedRoles = new List<ulong>(Config.EridiumHandler.BlacklistedRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (User == null || User.IsBot || !Config.EridiumHandler.IsEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
+            if (!Config.EridiumHandler.IsEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
             var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
             if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
                 Config.EridiumHandler.UsersList.TryAdd(User.Id, EridiumToGive);
-                await GetInstance.Save(Config, User.Guild.Id).ConfigureAwait(false);
+                await ServerConfig.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
                 return;
             }
             Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Old);
             int OldLevel = IntExtension.GetLevel(Old);
             Config.EridiumHandler.UsersList.TryUpdate(User.Id, Old + EridiumToGive, Old);
             int NewLevel = IntExtension.GetLevel(Old + EridiumToGive);
-            GetInstance.Save(Config, User.Guild.Id);
-            await AssignRole(Config, BoolExtension.HasLeveledUp(OldLevel, NewLevel), User);
+            ServerConfig.SaveAsync(Config, User.Guild.Id);
+            await AssignRoleAsync(Config, BoolExtension.HasLeveledUp(OldLevel, NewLevel), User);
             if (Config.EridiumHandler.LevelUpMessage == null || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
-            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(Config.EridiumHandler.LevelUpMessage.ReplaceWith(User.Mention, $"{NewLevel}"));
+            await (await User.GetOrCreateDMChannelAsync())
+                .SendMessageAsync(StringExtension.ReplaceWith(Config.EridiumHandler.LevelUpMessage, User.Mention, $"{NewLevel}"));
         }
 
-        static Task AssignRole(ServerModel Config, bool CheckLevel, SocketGuildUser User)
+        Task AssignRoleAsync(ServerModel Config, bool CheckLevel, SocketGuildUser User)
         {
             int GetLevel = IntExtension.GetLevel(Config.EridiumHandler.UsersList[User.Id]);
             var GetRole = Config.EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value == GetLevel).Key;
@@ -230,23 +240,48 @@ namespace Valerie.Handlers
             return Task.CompletedTask;
         }
 
-        static Task AutoMod(ServerConfig GetInstance, SocketUserMessage Message)
+        Task AutoModAsync(SocketUserMessage Message)
         {
-            var Config = GetInstance.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
-            if (!Config.ModLog.IsAutoModEnabled || !BoolExtension.Advertisement(Message.Content)) return Task.CompletedTask;
+            var Config = ServerConfig.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
+            if (Config == null) return Task.CompletedTask;
+            if (!Config.ModLog.IsAutoModEnabled || !BoolExtension.Advertisement(Message.Content))
+                return Task.CompletedTask;
             Message.DeleteAsync();
             Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
+            Config.ModLog.Cases += 1;
+            if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
+            {
+                Config.ModLog.Warnings.TryAdd(Message.Author.Id, 1);
+                return Task.CompletedTask;
+            }
+            Config.ModLog.Warnings.TryGetValue(Message.Author.Id, out int PreviousWarns);
+            if (!(PreviousWarns >= 3))
+                Config.ModLog.Warnings.TryUpdate(Message.Author.Id, PreviousWarns += 1, PreviousWarns);
+            else
+            {
+                (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
+                ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
+                var Embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: Message.Author.GetAvatarUrl(), FooterText: $"Kick on {DateTime.Now}");
+                Embed.AddField("User", $"{Message.Author}\n{Message.Author.Id}", true);
+                Embed.AddField("Responsible Moderator", "Auto Moderator", true);
+                Embed.AddField("Case No.", Config.ModLog.Cases, true);
+                Embed.AddField("Case Type", "Kick", true);
+                if (Channel != null)
+                    return Channel.SendMessageAsync("", embed: Embed.Build());
+            }
+            ServerConfig.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
             return Task.CompletedTask;
         }
 
-        static async Task CleanupAsync(ServerConfig GetInstance, SocketGuildUser User)
+        async Task CleanupAsync(SocketGuildUser User)
         {
-            var Config = GetInstance.LoadConfig(User.Guild.Id);
+            var Config = ServerConfig.LoadConfig(User.Guild.Id);
+            if (Config == null) return;
             if (!(Config.AFKList.ContainsKey(User.Id) || Config.EridiumHandler.UsersList.ContainsKey(User.Id))) return;
             Config.AFKList.Remove(User.Id, out string SomeString);
             Config.EridiumHandler.UsersList.Remove(User.Id, out int Eridium);
             Config.TagsList.RemoveAll(x => x.Owner == $"{User.Id}");
-            GetInstance.Save(Config, User.Guild.Id);
+            ServerConfig.SaveAsync(Config, User.Guild.Id);
         }
     }
 }
