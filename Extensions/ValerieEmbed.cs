@@ -1,13 +1,10 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 
 namespace Valerie.Extensions
 {
     public class ValerieEmbed
     {
-        static readonly Random Random = new Random();
-
-        public static EmbedBuilder Embed(VmbedColors Color,
+        public static EmbedBuilder Embed(EmbedColor Color,
             string AuthorIcon = null, string AuthorName = null, string AuthorUrl = null,
             string Description = null, string FooterIcon = null, string FooterText = null,
             string ImageUrl = null, string ThumbUrl = null, string Title = null, string Url = null)
@@ -31,24 +28,24 @@ namespace Valerie.Extensions
                 .WithUrl(Url);
         }
 
-        static EmbedBuilder Embed(VmbedColors Color)
+        static EmbedBuilder Embed(EmbedColor Color)
         {
             var embed = new EmbedBuilder();
             switch (Color)
             {
-                case VmbedColors.Black: embed.Color = new Color(0x000000); break;
-                case VmbedColors.Cyan: embed.Color = new Color(0x00FFFF); break;
-                case VmbedColors.Gold: embed.Color = new Color(0xFFDF00); break;
-                case VmbedColors.Green: embed.Color = new Color(0x00FA9A); break;
-                case VmbedColors.Pastel: embed.Color = new Color(0xFF86E3); break;
-                case VmbedColors.Red: embed.Color = new Color(0xDC143C); break;
-                case VmbedColors.Snow: embed.Color = new Color(0xFFFAFA); break;
+                case EmbedColor.Black: embed.Color = new Color(0x000000); break;
+                case EmbedColor.Cyan: embed.Color = new Color(0x00FFFF); break;
+                case EmbedColor.Gold: embed.Color = new Color(0xFFDF00); break;
+                case EmbedColor.Green: embed.Color = new Color(0x00FA9A); break;
+                case EmbedColor.Pastel: embed.Color = new Color(0xFF86E3); break;
+                case EmbedColor.Red: embed.Color = new Color(0xDC143C); break;
+                case EmbedColor.Snow: embed.Color = new Color(0xFFFAFA); break;
             }
             return embed;
         }
     }
 
-    public enum VmbedColors
+    public enum EmbedColor
     {
         Red,
         Gold,
