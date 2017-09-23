@@ -28,7 +28,7 @@ namespace Valerie.Attributes
             else
             {
                 Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, GetUserEridium - ConvertedEridium, GetUserEridium);
-                GetService.Save(Config, Context.Guild.Id);
+                GetService.SaveAsync(Config, Context.Guild.Id);
                 return Task.FromResult(PreconditionResult.FromSuccess());
             }
         }

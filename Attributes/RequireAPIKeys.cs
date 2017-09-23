@@ -1,7 +1,7 @@
 ﻿using System;
-using Discord.Commands;
-using Valerie.Handlers.Config;
 using System.Threading.Tasks;
+using Discord.Commands;
+using Valerie.Handlers;
 
 namespace Valerie.Attributes
 {
@@ -9,7 +9,7 @@ namespace Valerie.Attributes
     {
         public override Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
-            var Keys = BotConfig.Config.APIKeys;
+            var Keys = (Context as ValerieContext).BotConfig.APIKeys;
             string Msg = null;
             bool IsNull = false;
 
