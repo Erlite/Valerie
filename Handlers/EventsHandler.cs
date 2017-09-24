@@ -30,7 +30,7 @@ namespace Valerie.Handlers
 
         internal async Task JoinedGuild(SocketGuild Guild)
         {
-            await ServerConfig.LoadOrDeleteAsync(Actions.Delete, Guild.Id).ConfigureAwait(false);
+            await ServerConfig.LoadOrDeleteAsync(Actions.Add, Guild.Id).ConfigureAwait(false);
             if (BotConfig.Config.ServerMessage == null) return;
             var Msg = await (await Guild.Owner.GetOrCreateDMChannelAsync())
                 .SendMessageAsync(StringExtension.ReplaceWith(BotConfig.Config.ServerMessage, "?>", BotConfig.Config.Prefix));
@@ -66,8 +66,7 @@ namespace Valerie.Handlers
         {
             var Config = ServerConfig.LoadConfig(Guild.Id);
             Config.ModLog.Cases++;
-            _ = ServerConfig.SaveAsync(Config, Guild.Id);
-            return Task.CompletedTask;
+            return ServerConfig.SaveAsync(Config, Guild.Id);
         }
 
         internal async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
