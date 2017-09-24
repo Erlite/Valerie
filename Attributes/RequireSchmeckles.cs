@@ -10,12 +10,9 @@ namespace Valerie.Attributes
     public class RequireSchmeckles : PreconditionAttribute
     {
         int Schmeckles { get; }
-        public RequireSchmeckles(int RequiredSchmeckles = 25)
-        {
-            Schmeckles = RequiredSchmeckles;
-        }
+        public RequireSchmeckles(int RequiredSchmeckles) => Schmeckles = RequiredSchmeckles;
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
+        public override async Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
             var GetService = Provider.GetService<ServerConfig>();
             var Config = GetService.LoadConfig(Context.Guild.Id);
@@ -23,14 +20,16 @@ namespace Valerie.Attributes
             var UserSchmeckles = IntExtension.ConvertToSchmeckles(GetUserEridium);
             int ConvertedEridium = IntExtension.ConvertToEridium(Schmeckles);
 
+            var GetOwner = await Context.Client.GetApplicationInfoAsync();
+            if (Context.User == GetOwner.Owner)
+                return await Task.FromResult(PreconditionResult.FromSuccess());
+
             if (Schmeckles > UserSchmeckles)
-                return Task.FromResult(PreconditionResult.FromError($"{Discord.Format.Bold(Info.Name)} requires **{Schmeckles}** Schmeckles."));
-            else
-            {
-                Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, GetUserEridium - ConvertedEridium, GetUserEridium);
-                GetService.SaveAsync(Config, Context.Guild.Id);
-                return Task.FromResult(PreconditionResult.FromSuccess());
-            }
+                return await Task.FromResult(PreconditionResult.FromError($"{Discord.Format.Bold(Info.Name)} requires **{Schmeckles}** Schmeckles."));
+
+            Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, GetUserEridium - ConvertedEridium, GetUserEridium);
+            await GetService.SaveAsync(Config, Context.Guild.Id);
+            return await Task.FromResult(PreconditionResult.FromSuccess());
         }
     }
 }
