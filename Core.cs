@@ -25,9 +25,7 @@ namespace Valerie
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
-                    DefaultRunMode = RunMode.Async,
-                    LogLevel = LogSeverity.Error,
-                    ThrowOnError = false
+                    DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<BotConfig>()
@@ -38,7 +36,6 @@ namespace Valerie
             var Provider = Services.BuildServiceProvider();
             Provider.GetRequiredService<MainHandler>().StartAsync(Provider);
             Provider.GetRequiredService<CommandHandler>().InitializeAsync(Provider);
-            Provider.GetRequiredService<EventsHandler>();
 
             await Task.Delay(-1);
         }
