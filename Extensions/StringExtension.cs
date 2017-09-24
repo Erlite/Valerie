@@ -12,9 +12,6 @@ namespace Valerie.Extensions
 {
     public class StringExtension
     {
-        static BotConfig BotConfig;
-        public StringExtension(BotConfig Config) => BotConfig = Config;
-
         public static string ReplaceWith(string Msg, string ValueOne, string ValueTwo)
         {
             StringBuilder Builder = new StringBuilder(Msg);
@@ -61,6 +58,7 @@ namespace Valerie.Extensions
             doc.Load(data);
             var nodes = doc.GetElementsByTagName("file_url");
             var node = nodes[new Random().Next(0, nodes.Count)];
+            Client.Dispose();
             return node.InnerText;
         }
 
