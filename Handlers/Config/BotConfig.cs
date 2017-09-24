@@ -8,7 +8,7 @@ namespace Valerie.Handlers.Config
 {
     public class BotConfig
     {
-        public ConfigModel Config
+        public static ConfigModel Config
         {
             get
             {
@@ -23,10 +23,10 @@ namespace Valerie.Handlers.Config
             {
                 if (await Session.LoadAsync<ConfigModel>("Config") == null)
                 {
-                    Logger.Write(Logger.Status.ERR, Logger.Source.Config, "No config found! Creating one ...");
-                    Logger.Write(Logger.Status.WRN, Logger.Source.Config, "Input Token: ");
+                    Logger.Write(Status.ERR, Source.Config, "No config found! Creating one ...");
+                    Logger.Write(Status.WRN, Source.Config, "Input Token: ");
                     string Token = Console.ReadLine();
-                    Logger.Write(Logger.Status.WRN, Logger.Source.Config, "Input Prefix: ");
+                    Logger.Write(Status.WRN, Source.Config, "Input Prefix: ");
                     string Prefix = Console.ReadLine();
                     await Session.StoreAsync(new ConfigModel
                     {
@@ -38,19 +38,18 @@ namespace Valerie.Handlers.Config
                     Session.Dispose();
                 }
                 else
-                    Logger.Write(Logger.Status.KAY, Logger.Source.Config, "Config has been locked and loaded!");
+                    Logger.Write(Status.KAY, Source.Config, "Config has been locked and loaded!");
             }
         }
 
-        public Task SaveAsync(ConfigModel GetConfig)
+        public async Task SaveAsync(ConfigModel GetConfig)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                Session.StoreAsync(GetConfig, id: "Config");
-                Session.SaveChangesAsync();
+                await Session.StoreAsync(GetConfig, id: "Config").ConfigureAwait(false);
+                await Session.SaveChangesAsync().ConfigureAwait(false);
                 Session.Dispose();
             }
-            return Task.CompletedTask;
         }
     }
 }
