@@ -13,36 +13,33 @@ namespace Valerie.Handlers.Server
                 return Session.Load<ServerModel>($"{GuildId}");
         }
 
-        public Task SaveAsync(ServerModel Model, ulong GuildId)
+        public async Task SaveAsync(ServerModel Model, ulong GuildId)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                Session.StoreAsync(Model, id: $"{GuildId}");
-                Session.SaveChangesAsync();
+                await Session.StoreAsync(Model, id: $"{GuildId}").ConfigureAwait(false);
+                await Session.SaveChangesAsync().ConfigureAwait(false);
                 Session.Dispose();
             }
-            return Task.CompletedTask;
         }
 
         public async Task LoadOrDeleteAsync(Actions Action, ulong GuildId)
         {
             using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
             {
-                var Load = await Session.LoadAsync<ServerModel>($"{GuildId}");
                 switch (Action)
                 {
                     case Actions.Add:
-                        if (Load == null)
-                            await Session.StoreAsync(new ServerModel
-                            {
-                                Id = $"{GuildId}",
-                                Prefix = "?>"
-                            }).ConfigureAwait(false);
+                        if (!await Session.ExistsAsync($"{GuildId}"))
+                            await Session.StoreAsync(
+                                new ServerModel
+                                {
+                                    Id = $"{GuildId}",
+                                    Prefix = "?>"
+                                }).ConfigureAwait(false);
                         break;
                     case Actions.Delete:
-                        if (Load != null)
-                            Session.Delete($"{GuildId}");
-                        break;
+                        if (await Session.ExistsAsync($"{GuildId}")) Session.Delete($"{GuildId}"); break;
                 }
                 await Session.SaveChangesAsync().ConfigureAwait(false);
                 Session.Dispose();
