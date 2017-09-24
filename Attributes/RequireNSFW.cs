@@ -12,7 +12,7 @@ namespace Valerie.Attributes
             if (BoolExtension.IsNSFW(Context.Channel as Discord.ITextChannel))
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError("Command can only be ran in NSFW channel, pervert."));
+                return Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** command can only be ran in NSFW channel, pervert."));
         }
     }
 }

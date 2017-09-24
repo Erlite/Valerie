@@ -15,7 +15,7 @@ namespace Valerie.Attributes
             if (User.GuildPermissions.Administrator || User.GuildPermissions.ManageGuild || User.Id == AppInfo.Owner.Id || Context.User.Id == Context.Guild.OwnerId)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** required Admin or ManageGuild permission."));
+                return Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** command required Admin or ManageGuild permission."));
         }
     }
 }
