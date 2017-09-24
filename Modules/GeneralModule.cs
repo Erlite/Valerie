@@ -101,6 +101,7 @@ namespace Valerie.Modules
         public async Task IAmAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
+            if (Role.Name == "everyone") return;
             if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
@@ -120,6 +121,7 @@ namespace Valerie.Modules
         public async Task IAmNotAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
+            if (Role.Name == "everyone") return;
             if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
             {
                 await ReplyAsync($"{Role.Name} doesn't exist in guild's assignable role list.");
@@ -330,7 +332,7 @@ namespace Valerie.Modules
             var Get = await HttpClient.GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
-                await ReplyAsync("Using TrumpDump API was the worse trade, maybe ever.");
+                await ReplyAsync("Using TrumpDump API was the worse trade deal, maybe ever.");
                 return;
             }
             await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
