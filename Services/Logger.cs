@@ -2,23 +2,26 @@
 
 namespace Valerie.Services
 {
+    public enum Status
+    {
+        ERR,
+        WRN,
+        KAY
+    }
+
+    public enum Source
+    {       
+        Exception,               
+        UnmetPrecondition,
+        UnSuccesful,
+        Client,
+        Server,
+        Config,
+        Database
+    }
+
     public class Logger
     {
-        public enum Status
-        {
-            ERR,
-            WRN,
-            KAY
-        }
-
-        public enum Source
-        {
-            Client,
-            Server,
-            Config,
-            Database
-        }
-
         static void Append(string Text, ConsoleColor Color)
         {
             Console.ForegroundColor = Color;
@@ -36,6 +39,8 @@ namespace Valerie.Services
             }
             switch (Source)
             {
+                case Source.Exception: Append($"[{Source}]", ConsoleColor.Red); break;
+                case Source.UnSuccesful: Append($"[{Source}]", ConsoleColor.Red); break;
                 case Source.Config: Append($"[{Source}]", ConsoleColor.Cyan); break;
                 case Source.Client: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
                 case Source.Server: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
