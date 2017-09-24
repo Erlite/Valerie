@@ -41,8 +41,8 @@ namespace Valerie.Modules
             }
             var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
             var embed = ValerieEmbed.Embed(EmbedColor.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
-            embed.AddField($"Definition of {TermInfo.Word}", TermInfo.Definition, true);
-            embed.AddField("Example", TermInfo.Example, true);
+            embed.AddField($"Definition of {TermInfo.Word}", TermInfo.Definition, false);
+            embed.AddField("Example", TermInfo.Example, false);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -90,7 +90,7 @@ namespace Valerie.Modules
         }
 
         [Command("AdorableAvatar"), Summary("Generates an avatar from provided name/string"), Alias("AA")]
-        public async Task AdorableAvatarAsync(string Name) => await ReplyAsync($"https://api.adorable.io/avatars/500/{Name}.png");
+        public async Task AdorableAvatarAsync(IGuildUser User = null) => await ReplyAsync($"https://api.adorable.io/avatars/500/{User.Username ?? Context.User.Username}.png");
 
         [Command("DuckDuckGo"), Alias("DDG"), Summary("Uses Duck Duck Go search engine to get your results.")]
         public async Task DuckDuckGoAsync([Remainder] string Search)
@@ -267,15 +267,14 @@ namespace Valerie.Modules
             var Get = await HttpClient.GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={Context.ValerieConfig.APIKeys.NewsKey}").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode)
             {
-                await ReplyAsync(Get.ReasonPhrase);
+                await ReplyAsync("Failed to get today's headlines.");
                 return;
             }
             var Content = JsonConvert.DeserializeObject<BBC>(await Get.Content.ReadAsStringAsync());
             var Builder = new StringBuilder();
             foreach (var x in Content.Articles.Take(5))
                 Builder.AppendLine($":small_orange_diamond: **[{x.Title}]({x.Url})**\n{x.Description}");
-            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: "Today's Headlines", Description: Builder.ToString());
-            await ReplyAsync("", embed: embed.Build());
+            await ReplyAsync($"**Here are today's headlines**\n\n{Builder.ToString()}");
         }
     }
 }
