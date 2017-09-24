@@ -422,8 +422,8 @@ namespace Valerie.Modules
                 $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
             embed.AddField(":space_invader:",
-                $"Commands Ran: {Context.BotConfig.CommandsUsed}\n" +
-                $"Messages Received: {Context.BotConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+                $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\n" +
+                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
             embed.AddField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
@@ -575,7 +575,7 @@ namespace Valerie.Modules
         public async Task FeedbackAsync([Remainder]string Message)
         {
             if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
-            ITextChannel ReportChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.BotConfig.ReportChannel));
+            ITextChannel ReportChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.ValerieConfig.ReportChannel));
             string Content =
                 $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
                 $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +

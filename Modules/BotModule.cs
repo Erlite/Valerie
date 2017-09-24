@@ -13,7 +13,7 @@ namespace Valerie.Modules
         [Command("Prefix"), Summary("Changes bot's prefix.")]
         public Task PrefixAsync(string NewPrefix)
         {
-            Context.BotConfig.Prefix = NewPrefix; return ReplyAsync("Prefix Updates.");
+            Context.ValerieConfig.Prefix = NewPrefix; return ReplyAsync("Prefix Updates.");
         }
 
         [Command("Avatar"), Summary("Changes Bot's avatar.")]
@@ -34,21 +34,21 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case Actions.Add:
-                    if (Context.BotConfig.BotGames.Contains(GameName))
+                    if (Context.ValerieConfig.BotGames.Contains(GameName))
                     {
                         await ReplyAsync("Game already exists in Games list.");
                         return;
                     }
-                    Context.BotConfig.BotGames.Add(GameName);
+                    Context.ValerieConfig.BotGames.Add(GameName);
                     await ReplyAsync("Game has been added to games list.");
                     break;
                 case Actions.Delete:
-                    if (!Context.BotConfig.BotGames.Contains(GameName))
+                    if (!Context.ValerieConfig.BotGames.Contains(GameName))
                     {
                         await ReplyAsync("Game doesn't exist in Games list.");
                         return;
                     }
-                    Context.BotConfig.BotGames.Remove(GameName);
+                    Context.ValerieConfig.BotGames.Remove(GameName);
                     await ReplyAsync("Game has been removed from games list.");
                     break;
             }
@@ -65,14 +65,14 @@ namespace Valerie.Modules
         [Command("ServerMessage"), Summary("Custom Guild Join Message")]
         public Task GuildJoinMessageAsync([Remainder] string ServerMessage)
         {
-            Context.BotConfig.ServerMessage = ServerMessage;
+            Context.ValerieConfig.ServerMessage = ServerMessage;
             return ReplyAsync("Server message updated.");
         }
 
         [Command("ReportChannel"), Summary("Sets report channel.")]
         public Task ReportChannelAsync(ITextChannel Channel)
         {
-            Context.BotConfig.ReportChannel = $"{Channel.Id}";
+            Context.ValerieConfig.ReportChannel = $"{Channel.Id}";
             return ReplyAsync("Report channel updated.");
         }
     }

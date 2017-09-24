@@ -26,10 +26,10 @@ namespace Valerie.Modules
 
             var Service = new CustomsearchService(new BaseClientService.Initializer
             {
-                ApiKey = Context.BotConfig.APIKeys.GoogleKey
+                ApiKey = Context.ValerieConfig.APIKeys.GoogleKey
             });
             var RequestList = Service.Cse.List(search);
-            RequestList.Cx = Context.BotConfig.APIKeys.SearchEngineID;
+            RequestList.Cx = Context.ValerieConfig.APIKeys.SearchEngineID;
 
             var items = RequestList.Execute().Items.Take(3);
             foreach (var result in items)
@@ -46,7 +46,7 @@ namespace Valerie.Modules
         {
             var rng = new Random();
             var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start=" +
-                $"{ rng.Next(1, 10) }&fields=items%2Flink&key={Context.BotConfig.APIKeys.GoogleKey}";
+                $"{ rng.Next(1, 10) }&fields=items%2Flink&key={Context.ValerieConfig.APIKeys.GoogleKey}";
             var obj = JObject.Parse(await new HttpClient().GetStringAsync(reqString));
             var items = obj["items"] as JArray;
             string image = items[0]["link"].ToString();
@@ -62,7 +62,7 @@ namespace Valerie.Modules
         {
             var Service = new YouTubeService(new BaseClientService.Initializer
             {
-                ApiKey = Context.BotConfig.APIKeys.GoogleKey
+                ApiKey = Context.ValerieConfig.APIKeys.GoogleKey
             });
             var SearchRequest = Service.Search.List("snippet");
             SearchRequest.Q = Search;

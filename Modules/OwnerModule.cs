@@ -22,22 +22,22 @@ namespace Valerie.Modules
     [RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
     public class OwnerModule : ValerieBase<ValerieContext>
     {
-        private MemoryStream GenerateStreamFromString(string value)
+        MemoryStream GenerateStreamFromString(string value)
         {
             return new MemoryStream(Encoding.Unicode.GetBytes(value ?? ""));
         }
-        public IEnumerable<Assembly> Assemblies => Misc.GetAssemblies();
-        public IEnumerable<string> Imports => Context.BotConfig.EvalImports;
+        IEnumerable<Assembly> Assemblies => Misc.GetAssemblies();
+        IEnumerable<string> Imports => Context.ValerieConfig.EvalImports;
 
         [Command("Blacklist"), Summary("Adds a user to Blacklist.")]
         public async Task BlaclistAsync(IGuildUser User, [Remainder] string Reason = "No reason provided.")
         {
-            if (Context.BotConfig.UsersBlacklist.ContainsKey(User.Id))
+            if (Context.ValerieConfig.UsersBlacklist.ContainsKey(User.Id))
             {
                 await ReplyAsync($"{User.Username} already exists in blacklist.");
                 return;
             }
-            Context.BotConfig.UsersBlacklist.TryAdd(User.Id, Reason);
+            Context.ValerieConfig.UsersBlacklist.TryAdd(User.Id, Reason);
             await ReplyAsync($"{User.Username} has been added to blacklist.");
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync($"You have been added to my Blacklist for the following reason: ```{Reason}```");
         }
@@ -45,11 +45,11 @@ namespace Valerie.Modules
         [Command("Whitelist"), Summary("Removes a user from Blacklist.")]
         public async Task WhitelistAsync(IGuildUser User)
         {
-            if (!Context.BotConfig.UsersBlacklist.ContainsKey(User.Id))
+            if (!Context.ValerieConfig.UsersBlacklist.ContainsKey(User.Id))
             {
                 await ReplyAsync($"{User.Username} doesn't exist in blacklist."); return;
             }
-            Context.BotConfig.UsersBlacklist.TryRemove(User.Id, out string Value);
+            Context.ValerieConfig.UsersBlacklist.TryRemove(User.Id, out string Value);
             await ReplyAsync($"{User.Username} has been removed from Blacklist.");
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync("You have been removed from my Blacklist! You may use my commands again.");
         }
@@ -103,36 +103,36 @@ namespace Valerie.Modules
         [Command("EvalAdd"), Alias("EA"), Summary("Adds namespaces to Eval's list.")]
         public async Task EvalAddAsync(string Namespace)
         {
-            if (Context.BotConfig.EvalImports.Contains(Namespace))
+            if (Context.ValerieConfig.EvalImports.Contains(Namespace))
             {
                 await ReplyAsync($"**{Namespace}** already exist in Eval Imports.");
                 return;
             }
-            Context.BotConfig.EvalImports.Add(Namespace);
+            Context.ValerieConfig.EvalImports.Add(Namespace);
             await ReplyAsync($"**{Namespace}** namespace has been added to Eval list.");
         }
 
         [Command("EvalRemove"), Alias("ER"), Summary("Removes a namespace from Eval's list.")]
         public async Task EvalRemoveAsync(string Namespace)
         {
-            if (!Context.BotConfig.EvalImports.Contains(Namespace))
+            if (!Context.ValerieConfig.EvalImports.Contains(Namespace))
             {
                 await ReplyAsync($"**{Namespace}** doesn't exist in Eval Imports.");
                 return;
             }
-            Context.BotConfig.EvalImports.Remove(Namespace);
+            Context.ValerieConfig.EvalImports.Remove(Namespace);
             await ReplyAsync($"**{Namespace}** namespace has been removed from Eval's list.");
         }
 
         [Command("Evallist"), Alias("EL"), Summary("Shows a list of all namespaces in Eval's list.")]
         public async Task EvalListAsync()
         {
-            if (Context.BotConfig.EvalImports.Count == 0)
+            if (Context.ValerieConfig.EvalImports.Count == 0)
             {
                 await ReplyAsync("Eval Imports list is empty.");
                 return;
             }
-            await ReplyAsync(string.Join(", ", Context.BotConfig.EvalImports.Select(x => x)));
+            await ReplyAsync(string.Join(", ", Context.ValerieConfig.EvalImports.Select(x => x)));
         }
 
         [Command("LeaveGuild"), Summary("Tells the bot to leave a certain guild")]
