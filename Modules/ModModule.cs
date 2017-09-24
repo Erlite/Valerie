@@ -11,7 +11,7 @@ namespace Valerie.Modules
 {
     [RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages)]
     public class ModModule : ValerieBase<ValerieContext>
-    { 
+    {
         [Command("Kick"), Summary("Kicks user from the guild."),
             RequireBotPermission(GuildPermission.KickMembers),
             RequireUserPermission(GuildPermission.KickMembers)]
@@ -196,16 +196,29 @@ namespace Valerie.Modules
 
             Context.Config.ModLog.Cases += 1;
             Context.Config.ModLog.Warnings.TryGetValue(User.Id, out int OldValue);
-            Context.Config.ModLog.Warnings.TryUpdate(User.Id, OldValue += 1, OldValue);
+            if (!Context.Config.ModLog.Warnings.TryUpdate(User.Id, OldValue += 1, OldValue))
+                Context.Config.ModLog.Warnings.TryUpdate(User.Id, OldValue += 1, OldValue);
 
             if (Context.Config.ModLog.Warnings[User.Id] == 3)
             {
-                await User.KickAsync($"**[Kicked from {Context.Guild}]** {Reason}");
+                await User.KickAsync($"{User} was Kicked due to reaching Max number of warnings.");
+                await ReplyAsync($"{User} was Kicked due to reaching Max number of warnings.");
                 return;
             }
 
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
             await ReplyAsync($"**{User} has been warned** :ok_hand:");
+        }
+
+        [Command("ResetWarns"), Summary("Reset's users warnings."), RequireUserPermission(GuildPermission.KickMembers)]
+        public Task ResetWarnsAsync(IGuildUser User)
+        {
+            if (!Context.Config.ModLog.Warnings.ContainsKey(User.Id))
+                return ReplyAsync($"{User} has never been warned before.");
+            Context.Config.ModLog.Warnings.TryGetValue(User.Id, out int UserWarnings);
+            if (!Context.Config.ModLog.Warnings.TryUpdate(User.Id, 0, UserWarnings))
+                Context.Config.ModLog.Warnings.TryUpdate(User.Id, 0, UserWarnings);
+            return ReplyAsync($"{User}'s warning has been reset.");
         }
     }
 }
