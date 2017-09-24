@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Handlers.Config;
 using Valerie.Services;
+using Valerie.Handlers.Config;
 
 namespace Valerie.Handlers
 {
@@ -39,10 +39,10 @@ namespace Valerie.Handlers
             var Context = new ValerieContext(Client, Msg as IUserMessage, Provider);
             Context.ValerieConfig.MessagesReceived++;
             if (!(Msg.HasStringPrefix(Context.ValerieConfig.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos)) ||
-                Msg.Source != MessageSource.User | Msg.Author.IsBot || Context.ValerieConfig.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
+                Msg.Source != MessageSource.User || Msg.Author.IsBot || Context.ValerieConfig.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             Context.ValerieConfig.CommandsUsed++;
-            _ = Config.SaveAsync(Context.ValerieConfig).ConfigureAwait(false);
+            _ = Config.SaveAsync(Context.ValerieConfig);
 
             switch (Result.Error)
             {
