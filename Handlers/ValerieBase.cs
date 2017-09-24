@@ -8,16 +8,19 @@ using Valerie.Handlers.Config;
 
 namespace Valerie.Handlers
 {
-    public class ValerieBase<T> : ModuleBase<ValerieContext> where T: ValerieContext
+    public class ValerieBase<T> : ModuleBase<ValerieContext> where T : ValerieContext
     {
-        public IServiceProvider Provider { get; set; }
+        public static IServiceProvider Provider { get; set; }
 
-        protected override Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        protected override async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
-            Provider.GetRequiredService<BotConfig>().SaveAsync(Context.BotConfig);
-            Context.Channel.TriggerTypingAsync();
-            return Context.Channel.SendMessageAsync(message, isTTS, embed, options);
+            _ = Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
+            _ = Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
+            await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
+            if (message != null || embed != null)
+                return await Context.Channel.SendMessageAsync(message, isTTS, embed, options);
+            else
+                return await Context.Channel.SendMessageAsync("Whoops, something went wrong.");
         }
     }
 }
