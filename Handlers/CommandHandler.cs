@@ -1,4 +1,6 @@
-﻿using System;
+﻿# pragma warning disable 4014, 1998
+
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -11,16 +13,16 @@ namespace Valerie.Handlers
 {
     class CommandHandler
     {
-        BotConfig BotConfig;
+        BotConfig Config;
         IServiceProvider Provider;
         DiscordSocketClient Client;
         CommandService CommandService;
 
-        public CommandHandler(DiscordSocketClient SocketClient, CommandService Commands, BotConfig Config)
+        public CommandHandler(DiscordSocketClient SocketClient, CommandService Commands, BotConfig BotConfig)
         {
+            Config = BotConfig;
             Client = SocketClient;
             CommandService = Commands;
-            BotConfig = Config;
             Client.MessageReceived += HandleMessagesAsync;
         }
 
@@ -33,15 +35,21 @@ namespace Valerie.Handlers
         async Task HandleMessagesAsync(SocketMessage Message)
         {
             if (!(Message is SocketUserMessage Msg)) return;
-            if (Msg.Source != MessageSource.User | Msg.Author.IsBot || BotConfig.Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
             int argPos = 0;
             var Context = new ValerieContext(Client, Msg as IUserMessage, Provider);
-            if (!(Msg.HasStringPrefix(BotConfig.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos))) return;
+            Context.ValerieConfig.MessagesReceived++;
+            if (!(Msg.HasStringPrefix(Context.ValerieConfig.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos)) ||
+                Msg.Source != MessageSource.User | Msg.Author.IsBot || Context.ValerieConfig.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
-            BotConfig.Config.CommandsUsed += 1;
-            BotConfig.SaveAsync(BotConfig.Config);
-            if (!Result.Error.HasValue && Result.Error.Value != CommandError.UnknownCommand)
-                Logger.Write(Logger.Status.ERR, Logger.Source.Client, $"{Result}");
+            Context.ValerieConfig.CommandsUsed++;
+            _ = Config.SaveAsync(Context.ValerieConfig).ConfigureAwait(false);
+
+            switch (Result.Error)
+            {
+                case CommandError.Exception: Logger.Write(Status.ERR, Source.Exception, Result.ErrorReason); break;
+                case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
+                case CommandError.Unsuccessful: Logger.Write(Status.ERR, Source.UnSuccesful, Result.ErrorReason); break;
+            }
         }
     }
 }
