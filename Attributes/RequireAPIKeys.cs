@@ -9,7 +9,7 @@ namespace Valerie.Attributes
     {
         public override Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
-            var Keys = (Context as ValerieContext).BotConfig.APIKeys;
+            var Keys = (Context as ValerieContext).ValerieConfig.APIKeys;
             string Msg = null;
             bool IsNull = false;
 
