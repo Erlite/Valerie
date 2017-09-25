@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Valerie.Handlers;
 using Valerie.Attributes;
 using Valerie.Enums;
+using Valerie.Extensions;
 
 namespace Valerie.Modules
 {
@@ -200,42 +202,25 @@ namespace Valerie.Modules
         [Command("Settings"), Summary("Shows Server Settings.")]
         public async Task SettingsAsync()
         {
-            string AutoRole = Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.AutoAssignRole)) != null ?
-                 Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.AutoAssignRole)).Name : "Unknown Role.";
-            string MuteRole = Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.MuteRole)) != null ?
-                 Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.MuteRole)).Name : "Unknown Role";
-            string ModChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel)) != null ?
-                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel))).Name : "Unknown Channel.";
-            string StarboardChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.Starboard.TextChannel)) != null ?
-                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.Starboard.TextChannel))).Name : "Unknown Channel.";
-            string ChatterChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ChatterChannel)) != null ?
-                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ChatterChannel))).Name : "Unknown Channel.";
-            string JoinChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.JoinChannel)) != null ?
-                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.JoinChannel))).Name : "Unknown Channel.";
-            string LeaveChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.JoinChannel)) != null ?
-                (await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.JoinChannel))).Name : "Unknown Channel.";
-
             string Description =
-                $"```diff\n" +
-                $"+ [{Context.Guild} SETTINGS]\n" +
-                $"- ======== [Main Information] ======== -\n" +
+                $"```diff\n- ======== [Main Information] ======== -\n" +
                 $"+ Server's Prefix    : {Context.Config.Prefix}\n" +
                 $"+ AFK Entries        : {Context.Config.AFKList.Count}\n" +
                 $"+ Todo Entries       : {Context.Config.ToDo.Count}\n" +
                 $"+ Tags Entries       : {Context.Config.TagsList.Count}\n" +
-                $"+ Join Channel       : {JoinChannel}\n" +
-                $"+ Leave Channel      : {LeaveChannel}\n" +
-                $"+ Chatter Channel    : {ChatterChannel}\n" +
-                $"+ Starboard Channel  : {StarboardChannel}\n" +
+                $"+ Join Channel       : {IsValidChannel(Context.Config.JoinChannel)}\n" +
+                $"+ Leave Channel      : {IsValidChannel(Context.Config.LeaveChannel)}\n" +
+                $"+ Chatter Channel    : {IsValidChannel(Context.Config.ChatterChannel)}\n" +
+                $"+ Starboard Channel  : {IsValidChannel(Context.Config.Starboard.TextChannel)}\n" +
                 $"+ Starred Messages   : {Context.Config.Starboard.StarboardMessages.Count}\n" +
                 $"+ Welcome Messages   : {Context.Config.WelcomeMessages.Count}\n" +
                 $"+ Leave Messages     : {Context.Config.LeaveMessages.Count}\n" +
                 $"\n- ======== [Mod  Information] ======== -\n" +
-                $"+ Auto Assign Role   : {AutoRole}\n" +
-                $"+ User Mute Role     : {MuteRole}\n" +
+                $"+ Auto Assign Role   : {IsValidRole(Context.Config.ModLog.AutoAssignRole)}\n" +
+                $"+ User Mute Role     : {IsValidRole(Context.Config.ModLog.MuteRole)}\n" +
                 $"+ Ban/Kick Cases     : {Context.Config.ModLog.Cases}\n" +
                 $"+ Auto Mod Enabled   : {Context.Config.ModLog.IsAutoModEnabled}\n" +
-                $"+ Mod Channel        : {ModChannel}\n" +
+                $"+ Mod Channel        : {IsValidChannel(Context.Config.ModLog.TextChannel)}\n" +
                 $"\n- ======== [Eridium  Information] ======== -\n" +
                 $"+ Blacklisted Roles  : {Context.Config.EridiumHandler.BlacklistedRoles.Count}\n" +
                 $"+ User LevelUp Roles : {Context.Config.EridiumHandler.LevelUpRoles.Count}\n" +
@@ -243,7 +228,7 @@ namespace Valerie.Modules
                 $"+ Level Up Message   : {Context.Config.EridiumHandler.LevelUpMessage ?? "No Level Up Message."}\n" +
                 $"+ Max LevelUp Level  : {Context.Config.EridiumHandler.MaxRoleLevel}\n" +
                 $"```";
-            await ReplyAsync(Description);
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Green, Title: $"SETTINGS | {Context.Guild}", Description: Description).Build());
         }
 
         [Command("Clear"),
@@ -367,6 +352,19 @@ namespace Valerie.Modules
                         break;
                 }
             }
+        }
+
+        string IsValidChannel(string TextChannel)
+        {
+            var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
+            var Channel = Client.GetChannel(Convert.ToUInt64(TextChannel)) as ITextChannel;
+            return ((Context.Guild as Discord.WebSocket.SocketGuild).TextChannels.Contains(Channel)) ? Channel.Name : "⚠️ Invalid Channel.";
+        }
+
+        string IsValidRole(string Role)
+        {
+            var GetRole = Context.Guild.GetRole(Convert.ToUInt64(Role));
+            return Context.Guild.Roles.Contains(GetRole) ? GetRole.Name : "⚠️ Invalid Role.";
         }
     }
 }
