@@ -68,7 +68,7 @@ namespace Valerie.Modules
         }
 
         [Command("AFK"), Summary("Adds Or Removes you from AFK list. Actions: Add/Remove/Modify")]
-        public async Task AFKAsync(CommandEnums Action, [Remainder] string AFKMessage = "I'm busy.")
+        public async Task AFKAsync(CommandEnums Action = CommandEnums.Add, [Remainder] string AFKMessage = "I'm busy.")
         {
             switch (Action)
             {
