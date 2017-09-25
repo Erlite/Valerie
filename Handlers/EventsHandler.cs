@@ -162,7 +162,7 @@ namespace Valerie.Handlers
         {
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return;
             if (Msg.Source != MessageSource.User | Msg.Author.IsBot || BotConfig.Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
-            _ = AFKHandlerAsync(Msg);
+            await AFKHandlerAsync(Msg).ConfigureAwait(false);
             _ = CleverbotHandlerAsync(Msg);
             _ = EridiumHandlerAsync(User, Msg.Content.Length);
             _ = AutoModAsync(Msg);
@@ -206,7 +206,7 @@ namespace Valerie.Handlers
             int OldLevel = IntExtension.GetLevel(Old);
             Config.EridiumHandler.UsersList.TryUpdate(User.Id, Old + EridiumToGive, Old);
             int NewLevel = IntExtension.GetLevel(Old + EridiumToGive);
-            ServerConfig.SaveAsync(Config, User.Guild.Id);
+            await ServerConfig.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
             await AssignRoleAsync(Config, BoolExtension.HasLeveledUp(OldLevel, NewLevel), User);
             if (Config.EridiumHandler.LevelUpMessage == null || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
             await (await User.GetOrCreateDMChannelAsync())
