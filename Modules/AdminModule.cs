@@ -221,6 +221,8 @@ namespace Valerie.Modules
                 $"+ Ban/Kick Cases     : {Context.Config.ModLog.Cases}\n" +
                 $"+ Auto Mod Enabled   : {Context.Config.ModLog.IsAutoModEnabled}\n" +
                 $"+ Mod Channel        : {IsValidChannel(Context.Config.ModLog.TextChannel)}\n" +
+                $"+ Max Warnings       : {Context.Config.ModLog.MaxWarnings}\n" +
+                $"+ Warnings           : {Context.Config.ModLog.Warnings.Count}" +
                 $"\n- ======== [Eridium  Information] ======== -\n" +
                 $"+ Blacklisted Roles  : {Context.Config.EridiumHandler.BlacklistedRoles.Count}\n" +
                 $"+ User LevelUp Roles : {Context.Config.EridiumHandler.LevelUpRoles.Count}\n" +
@@ -304,9 +306,36 @@ namespace Valerie.Modules
             await ReplyAsync(Description);
         }
 
+        [Command("Warnings"), Summary("Shows all of the current warnings.")]
+        public async Task WarningsAsync()
+        {
+            var SB = new System.Text.StringBuilder();
+            foreach (var Warning in Context.Config.ModLog.Warnings)
+            {
+                var User = await IsValidUserAsync(Warning.Key);
+                SB.AppendLine($"**{User}** | {Warning.Value}");
+            }
+            await ReplyAsync(SB.ToString());
+        }
+
+        [Command("Warnings"), Summary("Shows all of the current warnings for a user.")]
+        public  Task WarningsAsync(IGuildUser User)
+        {
+            if (!Context.Config.ModLog.Warnings.ContainsKey(User.Id))
+                return ReplyAsync($"{User} has no previous warnings.");
+            return ReplyAsync($"{User} has {Context.Config.ModLog.Warnings[User.Id]} warnings.");
+        }
+
         [Group("Set"), RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages), CustomUserPermission]
         public class SetModule : ValerieBase<ValerieContext>
         {
+            [Command("MaxWarns"), Summary("Set's Max number of Warnings.")]
+            public Task MaxWarnsAsync(int MaxWarns)
+            {
+                Context.Config.ModLog.MaxWarnings = MaxWarns;
+                return ReplyAsync($"Max Warnings has been set to **{MaxWarns}**.");
+            }
+
             [Command("Level"), Summary("Sets Max level for auto roles.")]
             public Task LevelAsync(int MaxLevel)
             {
@@ -365,6 +394,12 @@ namespace Valerie.Modules
         {
             var GetRole = Context.Guild.GetRole(Convert.ToUInt64(Role));
             return Context.Guild.Roles.Contains(GetRole) ? GetRole.Name : "⚠️ Invalid Role.";
+        }
+
+        async Task<string> IsValidUserAsync(ulong User)
+        {
+            var GetUser = await Context.Guild.GetUserAsync(User);
+            return GetUser != null ? GetUser.Username : "Unknown User.";
         }
     }
 }
