@@ -220,5 +220,36 @@ namespace Valerie.Modules
                 Context.Config.ModLog.Warnings.TryUpdate(User.Id, 0, UserWarnings);
             return ReplyAsync($"{User}'s warning has been reset.");
         }
+
+        [Command("Warnings"), Summary("Shows all of the current warnings."), RequireUserPermission(GuildPermission.KickMembers)]
+        public async Task WarningsAsync()
+        {
+            if (!Context.Config.ModLog.Warnings.Any())
+            {
+                await ReplyAsync("No warnings have been issued so far.");
+                return;
+            }
+            var SB = new System.Text.StringBuilder();
+            foreach (var Warning in Context.Config.ModLog.Warnings)
+            {
+                var User = await IsValidUserAsync(Warning.Key);
+                SB.AppendLine($"**{User}** | {Warning.Value}");
+            }
+            await ReplyAsync(SB.ToString());
+        }
+
+        [Command("Warnings"), Summary("Shows all of the current warnings for a user."), RequireUserPermission(GuildPermission.KickMembers)]
+        public Task WarningsAsync(IGuildUser User)
+        {
+            if (!Context.Config.ModLog.Warnings.ContainsKey(User.Id))
+                return ReplyAsync($"{User} has no previous warnings.");
+            return ReplyAsync($"{User} has {Context.Config.ModLog.Warnings[User.Id]} warnings.");
+        }
+
+        async Task<string> IsValidUserAsync(ulong User)
+        {
+            var GetUser = await Context.Guild.GetUserAsync(User);
+            return GetUser != null ? GetUser.Username : "Unknown User.";
+        }
     }
 }
