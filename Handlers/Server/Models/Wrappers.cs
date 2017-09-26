@@ -21,10 +21,10 @@ namespace Valerie.Handlers.Server.Models
 
     public class StarboardMessages
     {
-        public string MessageId { get; set; }
-        public string ChannelId { get; set; }
-        public string StarboardMessageId { get; set; }
         public int Stars { get; set; }
+        public string ChannelId { get; set; }
+        public string MessageId { get; set; }
+        public string StarboardMessageId { get; set; }
     }
 
     public class TagWrapper
@@ -39,6 +39,7 @@ namespace Valerie.Handlers.Server.Models
     public class ModWrapper
     {
         public int Cases { get; set; }
+        public int MaxWarnings { get; set; } = 3;
         public string MuteRole { get; set; }
         public string TextChannel { get; set; }
         public string AutoAssignRole { get; set; }
