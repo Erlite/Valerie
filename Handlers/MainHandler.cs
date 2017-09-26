@@ -1,12 +1,12 @@
 ﻿# pragma warning disable 4014, 1998
 using System;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
 using Discord.WebSocket;
 using Tweetinvi;
 using Tweetinvi.Exceptions;
 using Valerie.Services;
 using Valerie.Handlers.Config;
-using Raven.Client.Documents;
 
 namespace Valerie.Handlers
 {
