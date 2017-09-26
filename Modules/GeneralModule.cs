@@ -545,7 +545,7 @@ namespace Valerie.Modules
             return ReplyAsync("Task created successfully. :v:");
         }
 
-        [Command("Todo"), Summary("Shows all of your Todo's.")]
+        [Command("Todos"), Summary("Shows all of your Todo's.")]
         public Task TodoAsync()
         {
             Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
@@ -561,8 +561,8 @@ namespace Valerie.Modules
         public Task TodoAsync(int TaskNumber)
         {
             if (!Context.Config.ToDo.Any() || !Context.Config.ToDo.ContainsKey(Context.User.Id)
-                || !Context.Config.ToDo[Context.User.Id].Any())
-                return ReplyAsync("Woopsie, couldn't find any Todo's.");
+                || !Context.Config.ToDo[Context.User.Id].Any() || !Context.Config.ToDo[Context.User.Id].ContainsKey(TaskNumber))
+                return ReplyAsync($"Woopsie, couldn't find todo # {TaskNumber}.");
             Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> CurrentTasks);
             var NewTasks = new ConcurrentDictionary<int, string>(CurrentTasks);
             NewTasks.TryRemove(TaskNumber, out string NotNeededValue);
