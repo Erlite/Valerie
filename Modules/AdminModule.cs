@@ -222,7 +222,7 @@ namespace Valerie.Modules
                 $"+ Auto Mod Enabled   : {Context.Config.ModLog.IsAutoModEnabled}\n" +
                 $"+ Mod Channel        : {IsValidChannel(Context.Config.ModLog.TextChannel)}\n" +
                 $"+ Max Warnings       : {Context.Config.ModLog.MaxWarnings}\n" +
-                $"+ Warnings           : {Context.Config.ModLog.Warnings.Count}" +
+                $"+ Warnings           : {Context.Config.ModLog.Warnings.Count}\n" +
                 $"\n- ======== [Eridium  Information] ======== -\n" +
                 $"+ Blacklisted Roles  : {Context.Config.EridiumHandler.BlacklistedRoles.Count}\n" +
                 $"+ User LevelUp Roles : {Context.Config.EridiumHandler.LevelUpRoles.Count}\n" +
@@ -309,6 +309,11 @@ namespace Valerie.Modules
         [Command("Warnings"), Summary("Shows all of the current warnings.")]
         public async Task WarningsAsync()
         {
+            if (!Context.Config.ModLog.Warnings.Any())
+            {
+                await ReplyAsync("No warnings have been issued so far.");
+                return;
+            }
             var SB = new System.Text.StringBuilder();
             foreach (var Warning in Context.Config.ModLog.Warnings)
             {
