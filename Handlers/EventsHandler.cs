@@ -41,15 +41,12 @@ namespace Valerie.Handlers
         internal async Task UserJoined(SocketGuildUser User)
         {
             var Config = ServerConfig.LoadConfig(User.Guild.Id);
-            string WelcomeMessage = null;
-            string x = !Config.WelcomeMessages.Any() ? $"{User} just arrived. Seems OP - please nerf." :
+            string WelcomeMessage = !Config.WelcomeMessages.Any() ? $"{User} just arrived. Seems OP - please nerf." :
                 StringExtension.ReplaceWith(Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)], User.Mention, User.Guild.Name);
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
-            if (Channel != null)
-                await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
+            if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
             var Role = User.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole));
-            if (Role != null)
-                await User.AddRoleAsync(Role).ConfigureAwait(false);
+            if (Role != null) await User.AddRoleAsync(Role).ConfigureAwait(false);
         }
 
         internal async Task UserLeft(SocketGuildUser User)
@@ -58,7 +55,7 @@ namespace Valerie.Handlers
             var Config = ServerConfig.LoadConfig(User.Guild.Id);
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             string LeaveMessage = !Config.LeaveMessages.Any() ? $"{User} has left {User.Guild.Name} :wave:" :
-            StringExtension.ReplaceWith(Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)], User.Username, User.Guild.Name);
+                StringExtension.ReplaceWith(Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)], User.Username, User.Guild.Name);
             if (Channel != null) await Channel.SendMessageAsync(LeaveMessage);
         }
 
@@ -235,7 +232,7 @@ namespace Valerie.Handlers
                 return;
             }
             Config.ModLog.Warnings.TryGetValue(Message.Author.Id, out int PreviousWarns);
-            if (!(PreviousWarns >= 3))
+            if (!(PreviousWarns >= Config.ModLog.MaxWarnings))
                 Config.ModLog.Warnings.TryUpdate(Message.Author.Id, PreviousWarns += 1, PreviousWarns);
             else
             {
