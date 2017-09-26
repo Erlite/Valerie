@@ -19,7 +19,7 @@
     <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.29.1.138" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.29.1.991" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.2" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20170923-0850" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20170926-0400" />
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
   </ItemGroup>
 </Project>
