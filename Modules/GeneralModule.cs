@@ -17,6 +17,7 @@ using Valerie.Handlers;
 using Valerie.Extensions;
 using Valerie.Attributes;
 using Valerie.Services;
+using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Modules
 {
@@ -218,7 +219,7 @@ namespace Valerie.Modules
         public async Task FlipAsync(string Side, int Bet = 50)
         {
             int UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
- 
+
             if (int.TryParse(Side, out int res))
             {
                 await ReplyAsync("Pick either heads or tails.");
@@ -396,6 +397,8 @@ namespace Valerie.Modules
             var Client = Context.Client as DiscordSocketClient;
             var HClient = new HttpClient();
             string Changes = null;
+            int Cases = 0;
+
             HClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             using (var Response = await HClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
             {
@@ -414,6 +417,10 @@ namespace Valerie.Modules
             var embed = ValerieEmbed.Embed(EmbedColor.Snow, Client.CurrentUser.GetAvatarUrl(), $"{Client.CurrentUser.Username}'s Official Invite",
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: Changes, Title: "Latest Changes");
+
+            using (var Session = MainHandler.Store.OpenAsyncSession())
+                Cases = Session.Query<ServerModel>().Sum(x => x.ModLog.Cases);
+
             embed.AddField("Members",
                     $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
                     $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
@@ -425,16 +432,21 @@ namespace Valerie.Modules
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
             embed.AddField(":space_invader:",
                 $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\n" +
-                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}\n" +
+                $"Global Mod Action: {Cases}", true);
             embed.AddField(":hammer_pick:",
-                $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
-            embed.AddField(":beginner:", $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
+                $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
+                $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
         [Command("Fuck"), Summary("Gives a random fuck about your useless fucking command.")]
         public async Task FoaasAsync(IGuildUser User = null)
-            => await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : "Bob").ConfigureAwait(false));
+        {
+            var Guild = Context.Guild as SocketGuild;
+            string RandUser = Guild.Users.ToArray()[new Random(Guid.NewGuid().GetHashCode()).Next(0, Guild.Users.Count)].Username;
+            await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : RandUser).ConfigureAwait(false));
+        }
 
         [Command("Tweet"), Summary("Tweets from @Vuxey account!"), RequireSchmeckles(6)]
         public async Task TweetAsync([Remainder] string TweetMessage)
@@ -521,7 +533,7 @@ namespace Valerie.Modules
         {
             if (!Context.Config.EridiumHandler.UsersList.ContainsKey(Context.User.Id))
             {
-                return ReplyAsync("Woopsie. Couldn't find you Eridium leaderboards.");
+                return ReplyAsync("Woopsie. Couldn't find you in Eridium leaderboards.");
             }
             return ReplyAsync($"You have {IntExtension.ConvertToSchmeckles(Context.Config.EridiumHandler.UsersList[Context.User.Id])} Schmeckles.");
         }
@@ -577,7 +589,7 @@ namespace Valerie.Modules
         public async Task FeedbackAsync([Remainder]string Message)
         {
             if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
-            ITextChannel ReportChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.ValerieConfig.ReportChannel));
+            var ReportChannel = await Context.Client.GetChannelAsync(Convert.ToUInt64(Context.ValerieConfig.ReportChannel)) as ITextChannel;
             string Content =
                 $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
                 $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
