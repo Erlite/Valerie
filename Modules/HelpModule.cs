@@ -20,7 +20,7 @@ namespace Valerie.Modules
         public async Task HelpAsync()
         {
             var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands",
-                FooterText: $"For more information on command use {Context.ValerieConfig.Prefix}CommandName");
+                FooterText: $"For more information on command use {Context.ValerieConfig.Prefix}Help CommandName");
             string BotCommands = null;
             foreach (var Bot in CommandService.Modules.Where(x => x.Name == "Bot"))
                 BotCommands = string.Join(", ", Bot.Commands.Select(x => $"Bot {x.Name}"));
