@@ -19,21 +19,14 @@ namespace Valerie.Modules
         [Command("Cmds"), Summary("Shows a list of all commands."), Alias("Help")]
         public async Task HelpAsync()
         {
-            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands");
-            string AdminCommands = null;
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Context.Client.CurrentUser.GetAvatarUrl(), "HELP | Commands",
+                FooterText: $"For more information on command use {Context.ValerieConfig.Prefix}CommandName");
             string BotCommands = null;
-            foreach (var Admin in CommandService.Modules.Where(x => x.Name == "AdminModule"))
-                AdminCommands += string.Join(", ", Admin.Commands.Select(x => x.Name));
-            foreach (var Set in CommandService.Modules.Where(x => x.Name == "Set"))
-                AdminCommands += $", {string.Join(", ", Set.Commands.Select(x => $"Set {x.Name}"))}";
             foreach (var Bot in CommandService.Modules.Where(x => x.Name == "Bot"))
                 BotCommands = string.Join(", ", Bot.Commands.Select(x => $"Bot {x.Name}"));
-
-            embed.AddField("Admin Commands", AdminCommands);
             embed.AddField("Bot Commands", BotCommands);
 
-            foreach (var Module in CommandService.Modules.Where(x => x.Name != "AdminModule" && x.Name != "Set" && 
-            x.Name != "Tag" && x.Name != "Bot" && x.Name != "ValerieBase`1"))
+            foreach (var Module in CommandService.Modules.Where(x => x.Name != "Tag" && x.Name != "Bot" && x.Name != "ValerieBase`1"))
             {
                 string ModuleName = null;
                 ModuleName = Module.Name.EndsWith("Module") ? Module.Name.Remove(Module.Name.LastIndexOf("Module", StringComparison.Ordinal)) : Module.Name;
@@ -52,34 +45,20 @@ namespace Valerie.Modules
         [Command("Help"), Summary("Displays information about a specific command.")]
         public async Task HelpAsync(string CommandName)
         {
-            var result = CommandService.Search(Context, CommandName);
-
-            if (!result.IsSuccess)
+            var Search = CommandService.Search(Context, CommandName);
+            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, ThumbUrl: "https://png.icons8.com/question/dusk/256");
+            foreach (var MatchedCommand in Search.Commands)
             {
-                await ReplyAsync($"**Command Name:** {CommandName}\n**Error:** Not Found!\n**Reason:** Wubbalubbadubdub!");
-                return;
-            }
-
-            var embed = ValerieEmbed.Embed(EmbedColor.Pastel);
-
-            foreach (var match in result.Commands)
-            {
-                var cmd = match.Command;
-
-                string Aliases = null;
-                if (string.IsNullOrWhiteSpace(string.Join(", ", cmd.Aliases)))
-                    Aliases = "Command has no Aliases.";
-                else
-                    Aliases = string.Join(", ", cmd.Aliases);
-
-                string Parameters = null;
-                if (string.IsNullOrWhiteSpace(string.Join(", ", cmd.Parameters.Select(p => p.Name))))
-                    Parameters = "Command requires no parameters.";
-                else
-                    Parameters = string.Join(", ", cmd.Parameters.Select(p => p.Name));
-
-                embed.Title = $"COMMAND INFO | {cmd.Name}";
-                embed.Description = $"**Aliases:** {Aliases}\n**Parameters:** {Parameters}\n**Summary:** {cmd.Summary}";
+                var Command = MatchedCommand.Command;
+                string Aliases = !Command.Aliases.Any() ? "Command has no aliases." : string.Join(", ", Command.Aliases);
+                string Parameters = !Command.Parameters.Any() ? "Command has no parameters." : string.Join(", ", Command.Parameters);
+                string Permissions = !Command.Preconditions.Any() ? "Command requires no permissions." : string.Join(", ", Command.Preconditions);
+                embed.Title = $"COMMAND INFO | {Command.Name}";
+                embed.AddField("Aliases", Aliases, true);
+                embed.AddField("Arguments", Parameters, true);
+                embed.AddField("Permissions", Permissions, true);
+                embed.AddField("Usage", $"{Context.ValerieConfig.Prefix}{string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}", true);
+                embed.AddField("Summary", Command.Summary);
             }
             await ReplyAsync("", embed: embed.Build());
         }
