@@ -57,7 +57,7 @@ namespace Valerie.Modules
                 embed.AddField("Aliases", Aliases, true);
                 embed.AddField("Arguments", Parameters, true);
                 embed.AddField("Permissions", Permissions, true);
-                embed.AddField("Usage", $"{Context.ValerieConfig.Prefix}{string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}", true);
+                embed.AddField("Usage", $"{Context.ValerieConfig.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}", true);
                 embed.AddField("Summary", Command.Summary);
             }
             await ReplyAsync("", embed: embed.Build());
