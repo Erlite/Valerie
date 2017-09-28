@@ -22,5 +22,12 @@ namespace Valerie.Handlers
             else
                 return await Context.Channel.SendMessageAsync("Whoops, something went wrong.");
         }
+
+        public Task ReactAsync(string Emote)
+        {
+            _ = Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
+            _ = Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
+            return Context.Message.AddReactionAsync(new Emoji($":{Emote}:"));
+        }
     }
 }
