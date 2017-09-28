@@ -17,7 +17,7 @@ namespace Valerie.Modules
         public Task PrefixAsync(string NewPrefix)
         {
             Context.Config.Prefix = NewPrefix;
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("RoleAdd"), Summary("Adds a role to assignable role list.")]
@@ -26,7 +26,7 @@ namespace Valerie.Modules
             if (Context.Config.AssignableRoles.Contains($"{Role.Id}"))
                 return ReplyAsync($"{Role.Name} already exists in assignable roles list.");
             Context.Config.AssignableRoles.Add($"{Role.Id}");
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("RoleRemove"), Summary("Removes a role from assignable role list.")]
@@ -35,7 +35,7 @@ namespace Valerie.Modules
             if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
                 return ReplyAsync($"{Role.Name} doesn't exists in assignable roles list.");
             Context.Config.AssignableRoles.Remove($"{Role.Id}");
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("WelcomeAdd"),
@@ -47,7 +47,7 @@ namespace Valerie.Modules
             if (Context.Config.WelcomeMessages.Contains(WelcomeMessage))
                 return ReplyAsync("Welcome message already exists.");
             Context.Config.WelcomeMessages.Add(WelcomeMessage);
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("WelcomeRemove"), Summary("Removes a welcome message from welcome messages.")]
@@ -56,7 +56,7 @@ namespace Valerie.Modules
             if (!Context.Config.WelcomeMessages.Contains(WelcomeMessage))
                 return ReplyAsync("Welcome message doesn't exist.");
             Context.Config.WelcomeMessages.Remove(WelcomeMessage);
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("LeaveAdd"), Summary("Adds a leave message to leave messages. User `{user}` to mention user and `{guild}` for guild name.")]
@@ -67,7 +67,7 @@ namespace Valerie.Modules
             if (Context.Config.LeaveMessages.Contains(LeaveMessage))
                 return ReplyAsync("Leave message already exists.");
             Context.Config.LeaveMessages.Add(LeaveMessage);
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("LeaveRemove"), Summary("Removes a leave message from leave messages.")]
@@ -76,7 +76,7 @@ namespace Valerie.Modules
             if (!Context.Config.LeaveMessages.Contains(LeaveMessage))
                 return ReplyAsync("Leave message doesn't exist.");
             Context.Config.LeaveMessages.Remove(LeaveMessage);
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType: Eridium, AutoMod")]
@@ -169,7 +169,7 @@ namespace Valerie.Modules
         public Task LevelUpMessageAsync([Remainder]string Message)
         {
             Context.Config.EridiumHandler.LevelUpMessage = Message;
-            return ReactAsync("+1");
+            return ReactAsync("👌");
         }
 
         [Command("EridiumRemove"), Summary("Removes a user from Eridium leaderboards.")]
