@@ -14,93 +14,69 @@ namespace Valerie.Modules
     public class AdminModule : ValerieBase<ValerieContext>
     {
         [Command("Prefix"), Summary("Changes guild's prefix.")]
-        public async Task PrefixAsync(string NewPrefix)
+        public Task PrefixAsync(string NewPrefix)
         {
             Context.Config.Prefix = NewPrefix;
-            await ReplyAsync("Done.");
+            return ReactAsync("+1");
         }
 
         [Command("RoleAdd"), Summary("Adds a role to assignable role list.")]
-        public async Task RoleAddAsync(IRole Role)
+        public Task RoleAddAsync(IRole Role)
         {
             if (Context.Config.AssignableRoles.Contains($"{Role.Id}"))
-            {
-                await ReplyAsync($"{Role.Name} already exists in assignable roles list.");
-                return;
-            }
+                return ReplyAsync($"{Role.Name} already exists in assignable roles list.");
             Context.Config.AssignableRoles.Add($"{Role.Id}");
-            await ReplyAsync("Done.");
+            return ReactAsync("+1");
         }
 
         [Command("RoleRemove"), Summary("Removes a role from assignable role list.")]
-        public async Task RoleRemoveAsync(IRole Role)
+        public Task RoleRemoveAsync(IRole Role)
         {
             if (!Context.Config.AssignableRoles.Contains($"{Role.Id}"))
-            {
-                await ReplyAsync($"{Role.Name} doesn't exists in assignable roles list.");
-                return;
-            }
+                return ReplyAsync($"{Role.Name} doesn't exists in assignable roles list.");
             Context.Config.AssignableRoles.Remove($"{Role.Id}");
-            await ReplyAsync("Done.");
+            return ReactAsync("+1");
         }
 
         [Command("WelcomeAdd"),
             Summary("Adds a welcome message to welcome messages. User `{user}` to mention user and `{guild}` for guild name.")]
-        public async Task WelcomeAddAsync([Remainder] string WelcomeMessage)
+        public Task WelcomeAddAsync([Remainder] string WelcomeMessage)
         {
             if (Context.Config.WelcomeMessages.Count == 3)
-            {
-                await ReplyAsync("Can't have more than 3 Welcome Messages.");
-                return;
-            }
+                return ReplyAsync("Can't have more than 3 Welcome Messages.");
             if (Context.Config.WelcomeMessages.Contains(WelcomeMessage))
-            {
-                await ReplyAsync("Welcome message already exists.");
-                return;
-            }
+                return ReplyAsync("Welcome message already exists.");
             Context.Config.WelcomeMessages.Add(WelcomeMessage);
-            await ReplyAsync("Welcome Message has been added.");
+            return ReactAsync("+1");
         }
 
         [Command("WelcomeRemove"), Summary("Removes a welcome message from welcome messages.")]
-        public async Task WelcomeRemoveAsync([Remainder] string WelcomeMessage)
+        public Task WelcomeRemoveAsync([Remainder] string WelcomeMessage)
         {
             if (!Context.Config.WelcomeMessages.Contains(WelcomeMessage))
-            {
-                await ReplyAsync("Welcome message doesn't exist.");
-                return;
-            }
+                return ReplyAsync("Welcome message doesn't exist.");
             Context.Config.WelcomeMessages.Remove(WelcomeMessage);
-            await ReplyAsync("Welcome Message has been removed");
+            return ReactAsync("+1");
         }
 
         [Command("LeaveAdd"), Summary("Adds a leave message to leave messages. User `{user}` to mention user and `{guild}` for guild name.")]
-        public async Task LeaveAddAsync([Remainder] string LeaveMessage)
+        public Task LeaveAddAsync([Remainder] string LeaveMessage)
         {
             if (Context.Config.LeaveMessages.Count == 3)
-            {
-                await ReplyAsync("Can't have more than 3 Leave Messages.");
-                return;
-            }
+                return ReplyAsync("Can't have more than 3 leave messages.");
             if (Context.Config.LeaveMessages.Contains(LeaveMessage))
-            {
-                await ReplyAsync("Leave message already exists.");
-                return;
-            }
+                return ReplyAsync("Leave message already exists.");
             Context.Config.LeaveMessages.Add(LeaveMessage);
-            await ReplyAsync("Leave Message has been added.");
+            return ReactAsync("+1");
         }
 
         [Command("LeaveRemove"), Summary("Removes a leave message from leave messages.")]
-        public async Task LeaveRemoveAsync([Remainder] string LeaveMessage)
+        public Task LeaveRemoveAsync([Remainder] string LeaveMessage)
         {
             if (!Context.Config.LeaveMessages.Contains(LeaveMessage))
-            {
-                await ReplyAsync("Leave message doesn't exist.");
-                return;
-            }
+                return ReplyAsync("Leave message doesn't exist.");
             Context.Config.LeaveMessages.Remove(LeaveMessage);
-            await ReplyAsync("Leave Message has been removed.");
+            return ReactAsync("+1");
         }
 
         [Command("Toggle"), Summary("Enables/Disables various guild's actions. ValueType: Eridium, AutoMod")]
@@ -158,33 +134,42 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("LevelAdd"), Summary("Adds a level to level up list.")]
-        public Task LevelAddAsync(IRole Role, int Level)
+        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles."), Alias("EB")]
+        public Task BlacklistedRolesAsync()
         {
-            if (Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
-            {
-                return ReplyAsync($"{Role} already exists in level up roles.");
-            }
-            Context.Config.EridiumHandler.LevelUpRoles.TryAdd(Role.Id, Level);
-            return ReplyAsync($"{Role} has been added.");
+            if (!Context.Config.EridiumHandler.BlacklistedRoles.Any())
+                return ReplyAsync("Woops, there are no blacklisted roles.");
+            return ReplyAsync($"Blacklisted Eridium Roles: {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => IsValidRole(x)))}");
         }
 
-        [Command("LevelRemove"), Summary("Removes a role from level up roles.")]
-        public Task EridiumLevelAsync(IRole Role)
+        [Command("Level"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
+        public Task LevelAddAsync(Actions Action, IRole Role, int Level = 10)
         {
-            if (!Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
+            switch (Action)
             {
-                return ReplyAsync($"{Role} doesn't exists in level up roles.");
+                case Actions.Add:
+                    if (Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
+                    {
+                        return ReplyAsync($"{Role} already exists in level up roles.");
+                    }
+                    Context.Config.EridiumHandler.LevelUpRoles.TryAdd(Role.Id, Level);
+                    return ReplyAsync($"{Role} has been added.");
+                case Actions.Delete:
+                    if (!Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
+                    {
+                        return ReplyAsync($"{Role} doesn't exists in level up roles.");
+                    }
+                    Context.Config.EridiumHandler.LevelUpRoles.TryRemove(Role.Id, out Level);
+                    return ReplyAsync($"{Role} has been removed.");
             }
-            Context.Config.EridiumHandler.LevelUpRoles.TryRemove(Role.Id, out int Value);
-            return ReplyAsync($"{Role} has been removed.");
+            return Task.CompletedTask;
         }
 
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message for when a user level ups.")]
-        public async Task LevelUpMessageAsync([Remainder]string Message)
+        public Task LevelUpMessageAsync([Remainder]string Message)
         {
             Context.Config.EridiumHandler.LevelUpMessage = Message;
-            await ReplyAsync("Done.");
+            return ReactAsync("+1");
         }
 
         [Command("EridiumRemove"), Summary("Removes a user from Eridium leaderboards.")]
@@ -306,60 +291,56 @@ namespace Valerie.Modules
             await ReplyAsync(Description);
         }
 
-        [Group("Set"), RequireBotPermission(ChannelPermission.SendMessages | ChannelPermission.ManageMessages), CustomUserPermission]
-        public class SetModule : ValerieBase<ValerieContext>
+        [Command("MaxWarns"), Summary("Set's Max number of Warnings.")]
+        public Task MaxWarnsAsync(int MaxWarns)
         {
-            [Command("MaxWarns"), Summary("Set's Max number of Warnings.")]
-            public Task MaxWarnsAsync(int MaxWarns)
-            {
-                Context.Config.ModLog.MaxWarnings = MaxWarns;
-                return ReplyAsync($"Max Warnings has been set to **{MaxWarns}**.");
-            }
+            Context.Config.ModLog.MaxWarnings = MaxWarns;
+            return ReplyAsync($"Max Warnings has been set to **{MaxWarns}**.");
+        }
 
-            [Command("Level"), Summary("Sets Max level for auto roles.")]
-            public Task LevelAsync(int MaxLevel)
+        [Command("SetLevel"), Summary("Sets Max level for auto roles.")]
+        public Task LevelAsync(int MaxLevel)
+        {
+            if (MaxLevel < 10)
             {
-                if (MaxLevel < 10)
-                {
-                    return ReplyAsync("Max level can't be lower than 10");
-                }
-                Context.Config.EridiumHandler.MaxRoleLevel = MaxLevel;
-                return ReplyAsync($"Max level has been set to: {MaxLevel}");
+                return ReplyAsync("Max level can't be lower than 10");
             }
+            Context.Config.EridiumHandler.MaxRoleLevel = MaxLevel;
+            return ReplyAsync($"Max level has been set to: {MaxLevel}");
+        }
 
-            [Command("AutoRole"), Summary("Sets auto assign role for when user joins.")]
-            public Task AssignRoleAsync(IRole Role)
-            {
-                Context.Config.ModLog.AutoAssignRole = $"{Role.Id}";
-                return ReplyAsync($"**Auto assign role has been set to {Role}** :v:");
-            }
+        [Command("AutoRole"), Summary("Sets auto assign role for when user joins.")]
+        public Task AssignRoleAsync(IRole Role)
+        {
+            Context.Config.ModLog.AutoAssignRole = $"{Role.Id}";
+            return ReplyAsync($"**Auto assign role has been set to {Role}** :v:");
+        }
 
-            [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod.")]
-            public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
+        [Command("Channel"), Summary("Sets channel for varios guild's actions. ValueType include: CB, Join, Eridium, Leave, Starboard, Mod.")]
+        public async Task ChannelAsync(CommandEnums ValueType, ITextChannel Channel)
+        {
+            switch (ValueType)
             {
-                switch (ValueType)
-                {
-                    case CommandEnums.CB:
-                        Context.Config.ChatterChannel = $"{Channel.Id}";
-                        await ReplyAsync($"Chatterbot channel has been set to: {Channel.Mention}");
-                        break;
-                    case CommandEnums.Join:
-                        Context.Config.JoinChannel = $"{Channel.Id}";
-                        await ReplyAsync($"Join channel has been set to: {Channel.Mention}");
-                        break;
-                    case CommandEnums.Leave:
-                        Context.Config.LeaveChannel = $"{Channel.Id}";
-                        await ReplyAsync($"Leave channel has been set to: {Channel.Mention}");
-                        break;
-                    case CommandEnums.Starboard:
-                        Context.Config.Starboard.TextChannel = $"{Channel.Id}";
-                        await ReplyAsync($"Starboard channel has been set to: {Channel.Mention}");
-                        break;
-                    case CommandEnums.Mod:
-                        Context.Config.ModLog.TextChannel = $"{Channel.Id}";
-                        await ReplyAsync($"Mod channel has been set to: {Channel.Mention}");
-                        break;
-                }
+                case CommandEnums.CB:
+                    Context.Config.ChatterChannel = $"{Channel.Id}";
+                    await ReplyAsync($"Chatterbot channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Join:
+                    Context.Config.JoinChannel = $"{Channel.Id}";
+                    await ReplyAsync($"Join channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Leave:
+                    Context.Config.LeaveChannel = $"{Channel.Id}";
+                    await ReplyAsync($"Leave channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Starboard:
+                    Context.Config.Starboard.TextChannel = $"{Channel.Id}";
+                    await ReplyAsync($"Starboard channel has been set to: {Channel.Mention}");
+                    break;
+                case CommandEnums.Mod:
+                    Context.Config.ModLog.TextChannel = $"{Channel.Id}";
+                    await ReplyAsync($"Mod channel has been set to: {Channel.Mention}");
+                    break;
             }
         }
 
