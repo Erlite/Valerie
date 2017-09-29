@@ -397,7 +397,7 @@ namespace Valerie.Modules
             var Client = Context.Client as DiscordSocketClient;
             var HClient = new HttpClient();
             string Changes = null;
-            int Cases = 0;
+            int Eridium = 0;
 
             HClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             using (var Response = await HClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
@@ -418,8 +418,11 @@ namespace Valerie.Modules
                 $"https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591",
                 Description: Changes, Title: "Latest Changes");
 
-            using (var Session = MainHandler.Store.OpenAsyncSession())
-                Cases = Session.Query<ServerModel>().Sum(x => x.ModLog.Cases);
+            using (var Session = MainHandler.Store.OpenSession())
+            {
+                var Query = Session.Query<ServerModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
+                Eridium = Query.Sum(x => x.EridiumHandler.UsersList.Sum(y => y.Value));
+            }
 
             embed.AddField("Members",
                     $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
@@ -433,7 +436,7 @@ namespace Valerie.Modules
             embed.AddField(":space_invader:",
                 $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\n" +
                 $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}\n" +
-                $"Global Mod Action: {Cases}", true);
+                $"Eridium Given: {Eridium}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
                 $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);

@@ -7,7 +7,6 @@ namespace Valerie.Extensions
 {
     public static class HTTPExtension
     {
-
         public static async Task DownloadAsync(this HttpClient HttpClient, Uri requestUri, string filename)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))

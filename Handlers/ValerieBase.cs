@@ -25,8 +25,8 @@ namespace Valerie.Handlers
 
         public async Task ReactAsync(string GetEmoji)
         {
-            _ = Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
-            _ = Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
+            await Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
+            await Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
             await Context.Message.AddReactionAsync(new Emoji(GetEmoji));
         }
     }

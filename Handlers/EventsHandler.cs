@@ -14,7 +14,7 @@ using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Handlers
 {
-    class EventsHandler
+    public class EventsHandler
     {
         BotConfig BConfig;
         ServerConfig ServerConfig;
@@ -68,12 +68,13 @@ namespace Valerie.Handlers
 
         internal async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
+            if (Reaction.Emote.Name != "⭐") return;
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
             var Message = await Cache.GetOrDownloadAsync();
             var Config = ServerConfig.LoadConfig(Guild.Id);
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
 
-            if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null || Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
+            if (Message == null || StarboardChannel == null || Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
             var Embed = ValerieEmbed.Embed(EmbedColor.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
 
             if (!string.IsNullOrWhiteSpace(Message.Content))
@@ -111,12 +112,12 @@ namespace Valerie.Handlers
 
         internal async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
+            if (Reaction.Emote.Name != "⭐") return;
             SocketGuild Guild = (Reaction.Channel as SocketGuildChannel).Guild;
             var Message = await Cache.GetOrDownloadAsync();
             var Config = ServerConfig.LoadConfig(Guild.Id);
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
-            if (Reaction.Emote.Name != "⭐" || Message == null || StarboardChannel == null) return;
-
+            if (Message == null || StarboardChannel == null) return;
             var Embed = ValerieEmbed.Embed(EmbedColor.Gold, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
@@ -204,10 +205,10 @@ namespace Valerie.Handlers
             Config.EridiumHandler.UsersList.TryUpdate(User.Id, Old + EridiumToGive, Old);
             int NewLevel = IntExtension.GetLevel(Old + EridiumToGive);
             await ServerConfig.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
+            if (Config.EridiumHandler.LevelUpMessage != null)
+                await (await User.GetOrCreateDMChannelAsync())
+                    .SendMessageAsync(StringExtension.ReplaceWith(Config.EridiumHandler.LevelUpMessage, User.Mention, $"{NewLevel}"));
             await AssignRoleAsync(Config, BoolExtension.HasLeveledUp(OldLevel, NewLevel), User);
-            if (Config.EridiumHandler.LevelUpMessage == null || !BoolExtension.HasLeveledUp(OldLevel, NewLevel) || NewLevel == OldLevel) return;
-            await (await User.GetOrCreateDMChannelAsync())
-                .SendMessageAsync(StringExtension.ReplaceWith(Config.EridiumHandler.LevelUpMessage, User.Mention, $"{NewLevel}"));
         }
 
         Task AssignRoleAsync(ServerModel Config, bool CheckLevel, SocketGuildUser User)
@@ -229,6 +230,7 @@ namespace Valerie.Handlers
             if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
             {
                 Config.ModLog.Warnings.TryAdd(Message.Author.Id, 1);
+                await ServerConfig.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id).ConfigureAwait(false);
                 return;
             }
             Config.ModLog.Warnings.TryGetValue(Message.Author.Id, out int PreviousWarns);

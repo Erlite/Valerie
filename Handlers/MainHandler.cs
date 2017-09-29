@@ -10,7 +10,7 @@ using Valerie.Handlers.Config;
 
 namespace Valerie.Handlers
 {
-    class MainHandler
+    public class MainHandler
     {
         readonly BotConfig Config;
         readonly DiscordSocketClient Client;
