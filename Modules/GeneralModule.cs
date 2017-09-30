@@ -397,7 +397,7 @@ namespace Valerie.Modules
             var Client = Context.Client as DiscordSocketClient;
             var HClient = new HttpClient();
             string Changes = null;
-            int Eridium = 0;
+            int Eridium, Cases, Stars = 0;
 
             HClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             using (var Response = await HClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits"))
@@ -422,6 +422,9 @@ namespace Valerie.Modules
             {
                 var Query = Session.Query<ServerModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
                 Eridium = Query.Sum(x => x.EridiumHandler.UsersList.Sum(y => y.Value));
+                Cases = Query.Sum(x => x.ModLog.Cases);
+                Stars = Query.Sum(x => x.Starboard.StarboardMessages.Sum(y => y.Stars));
+                Session.Dispose();
             }
 
             embed.AddField("Members",
@@ -435,11 +438,12 @@ namespace Valerie.Modules
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
             embed.AddField(":space_invader:",
                 $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\n" +
-                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}\n" +
-                $"Eridium Given: {Eridium}", true);
+                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
                 $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
+            embed.AddField("Global Stats", $"Eridium Given: {Eridium}\n" +
+                $"Mod Cases: {Cases}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -600,5 +604,8 @@ namespace Valerie.Modules
             await ReportChannel.SendMessageAsync(Content);
             await ReplyAsync("Thank you for sumbitting your feedback. :v:");
         }
+
+        [Command("Invite"), Summary("Invite link for Valerie.")]
+        public Task InviteAsync() => ReplyAsync($"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591");
     }
 }
