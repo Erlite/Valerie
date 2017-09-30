@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Google.Apis.Services;
 using Google.Apis.Urlshortener.v1;
 using Valerie.Handlers.Config;
+using System.Linq;
 
 namespace Valerie.Extensions
 {
@@ -72,6 +73,25 @@ namespace Valerie.Extensions
                 return "💫";
             else
                 return "✨";
+        }
+
+        public static async Task<string> IsValidUserAsync(Handlers.ValerieContext Context, ulong User)
+        {
+            var GetUser = await Context.Guild.GetUserAsync(User);
+            return GetUser != null ? GetUser.Username : "Unknown User.";
+        }
+
+        public static string IsValidChannel(Handlers.ValerieContext Context,string TextChannel)
+        {
+            var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
+            var Channel = Client.GetChannel(Convert.ToUInt64(TextChannel)) as Discord.ITextChannel;
+            return ((Context.Guild as Discord.WebSocket.SocketGuild).TextChannels.Contains(Channel)) ? Channel.Name : "⚠️ Invalid Channel.";
+        }
+
+        public static string IsValidRole(Handlers.ValerieContext Context, string Role)
+        {
+            var GetRole = Context.Guild.GetRole(Convert.ToUInt64(Role));
+            return Context.Guild.Roles.Contains(GetRole) ? GetRole.Name : "⚠️ Invalid Role.";
         }
     }
 }

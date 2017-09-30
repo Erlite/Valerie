@@ -7,6 +7,7 @@ using Valerie.Handlers;
 using Valerie.Attributes;
 using Valerie.Enums;
 using Valerie.Extensions;
+using Discord.WebSocket;
 
 namespace Valerie.Modules
 {
@@ -139,7 +140,7 @@ namespace Valerie.Modules
         {
             if (!Context.Config.EridiumHandler.BlacklistedRoles.Any())
                 return ReplyAsync("Woops, there are no blacklisted roles.");
-            return ReplyAsync($"**Blacklisted Eridium Roles:** {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => IsValidRole(x)))}");
+            return ReplyAsync($"**Blacklisted Eridium Roles:** {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => StringExtension.IsValidRole(Context, x)))}");
         }
 
         [Command("Levels"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
@@ -168,7 +169,7 @@ namespace Valerie.Modules
         {
             if (!Context.Config.EridiumHandler.LevelUpRoles.Any())
                 return ReplyAsync("Woops, there are no level up roles.");
-            return ReplyAsync($"**Level up Roles:** {string.Join(", ", Context.Config.EridiumHandler.LevelUpRoles.Select(x => IsValidRole($"{x.Key}")))}");
+            return ReplyAsync($"**Level up Roles:** {string.Join(", ", Context.Config.EridiumHandler.LevelUpRoles.Select(x => StringExtension.IsValidRole(Context, $"{x.Key}")))}");
         }
 
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message for when a user level ups.")]
@@ -199,19 +200,19 @@ namespace Valerie.Modules
                 $"+ AFK Entries        : {Context.Config.AFKList.Count}\n" +
                 $"+ Todo Entries       : {Context.Config.ToDo.Count}\n" +
                 $"+ Tags Entries       : {Context.Config.TagsList.Count}\n" +
-                $"+ Join Channel       : {IsValidChannel(Context.Config.JoinChannel)}\n" +
-                $"+ Leave Channel      : {IsValidChannel(Context.Config.LeaveChannel)}\n" +
-                $"+ Chatter Channel    : {IsValidChannel(Context.Config.ChatterChannel)}\n" +
-                $"+ Starboard Channel  : {IsValidChannel(Context.Config.Starboard.TextChannel)}\n" +
+                $"+ Join Channel       : {StringExtension.IsValidChannel(Context, Context.Config.JoinChannel)}\n" +
+                $"+ Leave Channel      : {StringExtension.IsValidChannel(Context, Context.Config.LeaveChannel)}\n" +
+                $"+ Chatter Channel    : {StringExtension.IsValidChannel(Context, Context.Config.ChatterChannel)}\n" +
+                $"+ Starboard Channel  : {StringExtension.IsValidChannel(Context, Context.Config.Starboard.TextChannel)}\n" +
                 $"+ Starred Messages   : {Context.Config.Starboard.StarboardMessages.Count}\n" +
                 $"+ Welcome Messages   : {Context.Config.WelcomeMessages.Count}\n" +
                 $"+ Leave Messages     : {Context.Config.LeaveMessages.Count}\n" +
                 $"\n- ======== [Mod  Information] ======== -\n" +
-                $"+ Auto Assign Role   : {IsValidRole(Context.Config.ModLog.AutoAssignRole)}\n" +
-                $"+ User Mute Role     : {IsValidRole(Context.Config.ModLog.MuteRole)}\n" +
+                $"+ Auto Assign Role   : {StringExtension.IsValidRole(Context, Context.Config.ModLog.AutoAssignRole)}\n" +
+                $"+ User Mute Role     : {StringExtension.IsValidRole(Context, Context.Config.ModLog.MuteRole)}\n" +
                 $"+ Ban/Kick Cases     : {Context.Config.ModLog.Cases}\n" +
                 $"+ Auto Mod Enabled   : {Context.Config.ModLog.IsAutoModEnabled}\n" +
-                $"+ Mod Channel        : {IsValidChannel(Context.Config.ModLog.TextChannel)}\n" +
+                $"+ Mod Channel        : {StringExtension.IsValidChannel(Context, Context.Config.ModLog.TextChannel)}\n" +
                 $"+ Max Warnings       : {Context.Config.ModLog.MaxWarnings}\n" +
                 $"+ Warnings           : {Context.Config.ModLog.Warnings.Count}\n" +
                 $"\n- ======== [Eridium  Information] ======== -\n" +
@@ -321,17 +322,22 @@ namespace Valerie.Modules
             }
         }
 
-        string IsValidChannel(string TextChannel)
+        [Command("Setup"), Summary("Set ups Valerie for your Server.")]
+        public async Task SetupAsync()
         {
-            var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
-            var Channel = Client.GetChannel(Convert.ToUInt64(TextChannel)) as ITextChannel;
-            return ((Context.Guild as Discord.WebSocket.SocketGuild).TextChannels.Contains(Channel)) ? Channel.Name : "⚠️ Invalid Channel.";
-        }
-
-        string IsValidRole(string Role)
-        {
-            var GetRole = Context.Guild.GetRole(Convert.ToUInt64(Role));
-            return Context.Guild.Roles.Contains(GetRole) ? GetRole.Name : "⚠️ Invalid Role.";
+            var SetupMessage = await ReplyAsync($"Initializing *{Context.Guild}'s* config .... ");
+            OverwritePermissions Permissions = new OverwritePermissions(sendMessages: PermValue.Deny);
+            var Starboard = await Context.Guild.CreateTextChannelAsync("Starboard");
+            await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+            var Mod = await Context.Guild.CreateTextChannelAsync("Log");
+            await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+            Context.Config.ChatterChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Config.JoinChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Config.LeaveChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Config.Starboard.TextChannel = $"{Starboard.Id}";
+            Context.Config.ModLog.TextChannel = $"{Mod.Id}";
+            await SetupMessage.ModifyAsync(x => x.Content = $"*{Context.Guild}'s* configuration has been completed!");
+            await SettingsAsync();
         }
     }
 }

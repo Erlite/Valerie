@@ -438,14 +438,13 @@ namespace Valerie.Modules
                 $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
                 $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
-            embed.AddField(":space_invader:",
-                $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\n" +
+            embed.AddField(":fleur_de_lis: ",
+                $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\nBlacklisted Users: {Context.ValerieConfig.UsersBlacklist.Count}\n" +
                 $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+            embed.AddField(":space_invader:", $"Mod Cases: {Cases}\nStars Given: {Stars}\nEridium Given: {Eridium}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
                 $"Written by: [Yucked](https://github.com/Yucked)\nDiscord.Net {DiscordConfig.Version}", true);
-            embed.AddField("Global Stats", $"Eridium Given: {Eridium}\n" +
-                $"Mod Cases: {Cases}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -608,7 +607,7 @@ namespace Valerie.Modules
         }
 
         [Command("Invite"), Summary("Invite link for Valerie.")]
-        public Task InviteAsync() => 
+        public Task InviteAsync() =>
             ReplyAsync($"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591");
 
         [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
@@ -635,6 +634,28 @@ namespace Valerie.Modules
             }
             var Content = JsonConvert.DeserializeObject<POTD>(await Get.Content.ReadAsStringAsync());
             await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Cyan, Title: Content.Title, Description: Content.Explanation, ImageUrl: Content.Hdurl).Build());
+        }
+
+        [Command("Stars"), Summary("Shows stats about Starboard.")]
+        public async Task StarsAsync()
+        {
+            var Embed = ValerieEmbed.Embed(EmbedColor.Gold);
+            var GetStars = Context.Config.Starboard.StarboardMessages.OrderByDescending(x => x.Stars).Take(3).ToList();
+            Embed.AddField("Top Starred Posts",
+                $":first_place: {GetStars[0].MessageId} ({GetStars[0].Stars} Stars)\n" +
+                $":second_place: {GetStars[1].MessageId} ({GetStars[1].Stars} Stars)\n" +
+                $":third_place: {GetStars[2].MessageId} ({GetStars[2].Stars} Stars)");
+            Embed.AddField("Top Star Receivers",
+                $":first_place: {await GetUserAsync(GetStars[0].MessageId)} ({GetStars[0].Stars} Stars)\n" +
+                $":second_place:  {await GetUserAsync(GetStars[1].MessageId)} ({GetStars[1].Stars} Stars)\n" +
+                $":third_place:  {await GetUserAsync(GetStars[2].MessageId)} ({GetStars[2].Stars} Stars)");
+            await ReplyAsync("", embed: Embed.Build());
+        }
+
+        async Task<string> GetUserAsync(string Message)
+        {
+            var GetMessage = await Context.Channel.GetMessageAsync(Convert.ToUInt64(Message));
+            return await StringExtension.IsValidUserAsync(Context, GetMessage.Author.Id);
         }
     }
 }

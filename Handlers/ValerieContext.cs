@@ -2,7 +2,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Valerie.Handlers.Config;
 using Valerie.Handlers.Config.Models;
 using Valerie.Handlers.Server;
@@ -19,8 +18,7 @@ namespace Valerie.Handlers
         public IMessageChannel Channel { get; }
         public ServerModel Config { get; set; }
         public ConfigModel ValerieConfig { get; set; }
-
-        private IServiceProvider Provider;
+        private IServiceProvider Provider { get; }
 
         public ValerieContext(IDiscordClient DiscordClient, IUserMessage UserMessage, IServiceProvider ServiceProvider)
         {

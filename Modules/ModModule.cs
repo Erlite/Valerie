@@ -139,12 +139,9 @@ namespace Valerie.Modules
             {
                 var Role = await Context.Guild.CreateRoleAsync("Muted", GuildPermissions.None, Color.Default);
                 foreach (var Channel in (Context.Guild as SocketGuild).TextChannels)
-                {
                     if (!Channel.PermissionOverwrites.Select(x => x.Permissions).Contains(Permissions))
-                    {
                         await Channel.AddPermissionOverwriteAsync(Role, Permissions).ConfigureAwait(false);
-                    }
-                }
+
                 Context.Config.ModLog.MuteRole = $"{Role.Id}";
                 await User.AddRoleAsync(Role);
                 Context.Config.ModLog.Cases += 1;
@@ -232,7 +229,7 @@ namespace Valerie.Modules
             var SB = new System.Text.StringBuilder();
             foreach (var Warning in Context.Config.ModLog.Warnings)
             {
-                var User = await IsValidUserAsync(Warning.Key);
+                var User = await StringExtension.IsValidUserAsync(Context, Warning.Key);
                 SB.AppendLine($"**{User}** | {Warning.Value}");
             }
             await ReplyAsync(SB.ToString());
@@ -244,12 +241,6 @@ namespace Valerie.Modules
             if (!Context.Config.ModLog.Warnings.ContainsKey(User.Id))
                 return ReplyAsync($"{User} has no previous warnings.");
             return ReplyAsync($"{User} has {Context.Config.ModLog.Warnings[User.Id]} warnings.");
-        }
-
-        async Task<string> IsValidUserAsync(ulong User)
-        {
-            var GetUser = await Context.Guild.GetUserAsync(User);
-            return GetUser != null ? GetUser.Username : "Unknown User.";
         }
     }
 }
