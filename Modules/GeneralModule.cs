@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
@@ -13,10 +14,11 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Enums;
+using Valerie.Models;
+using Valerie.Services;
 using Valerie.Handlers;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using Valerie.Services;
 using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Modules
@@ -606,6 +608,33 @@ namespace Valerie.Modules
         }
 
         [Command("Invite"), Summary("Invite link for Valerie.")]
-        public Task InviteAsync() => ReplyAsync($"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591");
+        public Task InviteAsync() => 
+            ReplyAsync($"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id=261561347966238721&scope=bot&permissions=2146958591");
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
+        public async Task PotdAsync()
+        {
+            var Get = await HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTD>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Cyan, Title: Content.Title, Description: Content.Explanation, ImageUrl: Content.Hdurl).Build());
+        }
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
+        public async Task PotdAsync(int Year, int Month, int Day)
+        {
+            var Get = await HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date={Year}-{Month}-{Day}").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTD>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Cyan, Title: Content.Title, Description: Content.Explanation, ImageUrl: Content.Hdurl).Build());
+        }
     }
 }
