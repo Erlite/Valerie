@@ -134,35 +134,41 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("EridiumBlacklist"), Summary("Adds/removes a role to/from blacklisted roles."), Alias("EB")]
+        [Command("EridiumBlacklist"), Summary("Shows all Blacklisted roles for Eridium."), Alias("EB")]
         public Task BlacklistedRolesAsync()
         {
             if (!Context.Config.EridiumHandler.BlacklistedRoles.Any())
                 return ReplyAsync("Woops, there are no blacklisted roles.");
-            return ReplyAsync($"Blacklisted Eridium Roles: {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => IsValidRole(x)))}");
+            return ReplyAsync($"**Blacklisted Eridium Roles:** {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => IsValidRole(x)))}");
         }
 
-        [Command("Level"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
-        public Task LevelAddAsync(Actions Action, IRole Role, int Level = 10)
+        [Command("Levels"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
+        public Task LevelsAsync(Actions Action, IRole Role, int Level)
         {
             switch (Action)
             {
                 case Actions.Add:
                     if (Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
-                    {
                         return ReplyAsync($"{Role} already exists in level up roles.");
-                    }
+                    else if (Context.Config.EridiumHandler.LevelUpRoles.Count == 10)
+                        return ReplyAsync("You have hit max level up roles.");
                     Context.Config.EridiumHandler.LevelUpRoles.TryAdd(Role.Id, Level);
                     return ReplyAsync($"{Role} has been added.");
                 case Actions.Delete:
                     if (!Context.Config.EridiumHandler.LevelUpRoles.ContainsKey(Role.Id))
-                    {
                         return ReplyAsync($"{Role} doesn't exists in level up roles.");
-                    }
                     Context.Config.EridiumHandler.LevelUpRoles.TryRemove(Role.Id, out Level);
                     return ReplyAsync($"{Role} has been removed.");
             }
             return Task.CompletedTask;
+        }
+
+        [Command("Level"), Summary("Shows all the level up roles.")]
+        public Task LevelsAsync()
+        {
+            if (!Context.Config.EridiumHandler.LevelUpRoles.Any())
+                return ReplyAsync("Woops, there are no level up roles.");
+            return ReplyAsync($"**Level up Roles:** {string.Join(", ", Context.Config.EridiumHandler.LevelUpRoles.Select(x => IsValidRole($"{x.Key}")))}");
         }
 
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message for when a user level ups.")]
@@ -218,8 +224,7 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Green, Title: $"SETTINGS | {Context.Guild}", Description: Description).Build());
         }
 
-        [Command("Clear"),
-            Summary("Clears up blacklisted and levelup roles. ClearType: Blacklist, LevelUps, Join, Leave, Mod, CB, Starboard, EridiumLevel.")]
+        [Command("Clear"), Summary("Clears up blacklisted and levelup roles. ClearType: Blacklist, LevelUps, Join, Leave, Mod, CB, Starboard, EridiumLevel.")]
         public async Task ClearAsync(CommandEnums ClearType)
         {
             switch (ClearType)
@@ -342,6 +347,12 @@ namespace Valerie.Modules
                     await ReplyAsync($"Mod channel has been set to: {Channel.Mention}");
                     break;
             }
+        }
+
+        [Command("AutoSetup"), Summary("Automatically set ups your server and it's settings.")]
+        public async Task AutoSetupAsync()
+        {
+            var Guild = Context.Guild as Discord.WebSocket.SocketGuild;
         }
 
         string IsValidChannel(string TextChannel)
