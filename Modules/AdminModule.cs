@@ -321,12 +321,6 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("AutoSetup"), Summary("Automatically set ups your server and it's settings.")]
-        public async Task AutoSetupAsync()
-        {
-            var Guild = Context.Guild as Discord.WebSocket.SocketGuild;
-        }
-
         string IsValidChannel(string TextChannel)
         {
             var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
