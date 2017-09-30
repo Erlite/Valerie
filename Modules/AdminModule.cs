@@ -245,55 +245,27 @@ namespace Valerie.Modules
         [Command("Debug"), Summary("Takes a debug report for your server's Context.Config.")]
         public async Task DebugAsync()
         {
-            var Reply = await ReplyAsync($"Starting up {Context.Guild}'s diagonastic  ...");
-            int AFKErr = 0; int EriErr = 0; int Assignable = 0; int Blacklisted = 0; int Levelups = 0;
             foreach (var Item in Context.Config.AFKList)
-            {
                 if (await Context.Guild.GetUserAsync(Item.Key) == null)
-                {
-                    AFKErr += 1;
                     Context.Config.AFKList.TryRemove(Item.Key, out string UselessValue);
-                }
-            }
+
             foreach (var Item in Context.Config.EridiumHandler.UsersList)
-            {
                 if (await Context.Guild.GetUserAsync(Item.Key) == null)
-                {
-                    EriErr += 1;
                     Context.Config.EridiumHandler.UsersList.TryRemove(Item.Key, out int UselessValue);
-                }
-            }
+
             foreach (var Item in Context.Config.AssignableRoles)
-            {
                 if (Context.Guild.GetRole(Convert.ToUInt64(Item)) == null)
-                {
-                    Assignable += 1;
                     Context.Config.AssignableRoles.Remove(Item);
-                }
-            }
+
             foreach (var Item in Context.Config.EridiumHandler.BlacklistedRoles)
-            {
                 if (Context.Guild.GetRole(Convert.ToUInt64(Item)) == null)
-                {
-                    Blacklisted += 1;
                     Context.Config.EridiumHandler.BlacklistedRoles.Remove(Item);
-                }
-            }
+
             foreach (var Item in Context.Config.EridiumHandler.LevelUpRoles)
-            {
                 if (Context.Guild.GetRole(Item.Key) == null)
-                {
-                    Levelups += 1;
                     Context.Config.EridiumHandler.LevelUpRoles.TryRemove(Item.Key, out int UselessValue);
-                }
-            }
-            string Description = (AFKErr + EriErr + Assignable + Blacklisted + Levelups) != 0 ?
-                $"```TOTAL ERRORS      : {AFKErr + EriErr + Assignable + Blacklisted + Levelups}\n" +
-                $"ERIDIUM ERRORS    : {EriErr}\n" +
-                $"ROLES ERRORS      : {Blacklisted + Levelups + Assignable}\n" +
-                $"AFK ERRORS        : {AFKErr}```" : ":blush: No errors were found!";
-            await Reply.DeleteAsync();
-            await ReplyAsync(Description);
+
+            await ReplyAsync($"All errors have been cleared up.");
         }
 
         [Command("MaxWarns"), Summary("Set's Max number of Warnings.")]
