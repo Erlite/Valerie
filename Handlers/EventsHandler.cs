@@ -62,7 +62,7 @@ namespace Valerie.Handlers
         internal Task UserBanned(SocketUser User, SocketGuild Guild)
         {
             var Config = ServerConfig.LoadConfig(Guild.Id);
-            Config.ModLog.Cases++;
+            Config.ModLog.Cases += 1;
             return ServerConfig.SaveAsync(Config, Guild.Id);
         }
 
@@ -86,7 +86,6 @@ namespace Valerie.Handlers
             if (Config.Starboard.StarboardMessages.Contains(Exists))
             {
                 Exists.Stars += 1;
-
                 var SMsg = await StarboardChannel.GetMessageAsync(Convert.ToUInt64(Exists.StarboardMessageId), CacheMode.AllowDownload) as IUserMessage;
                 await SMsg.ModifyAsync(x =>
                 {
@@ -150,7 +149,6 @@ namespace Valerie.Handlers
 
         internal Task ReadyAsync(DiscordSocketClient Client)
         {
-
             string Game = BotConfig.Config.BotGames == null ? $"{BotConfig.Config.Prefix}Cmds" :
                 BotConfig.Config.BotGames[new Random().Next(BotConfig.Config.BotGames.Count)];
             return Client.SetGameAsync(Game);
@@ -235,7 +233,7 @@ namespace Valerie.Handlers
             }
             Config.ModLog.Warnings.TryGetValue(Message.Author.Id, out int PreviousWarns);
             if (!(PreviousWarns >= Config.ModLog.MaxWarnings))
-                Config.ModLog.Warnings.TryUpdate(Message.Author.Id, PreviousWarns += 1, PreviousWarns);
+                Config.ModLog.Warnings.TryUpdate(Message.Author.Id, PreviousWarns + 1, PreviousWarns);
             else
             {
                 await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");

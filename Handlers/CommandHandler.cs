@@ -37,11 +37,11 @@ namespace Valerie.Handlers
             if (!(Message is SocketUserMessage Msg)) return;
             int argPos = 0;
             var Context = new ValerieContext(Client, Msg as IUserMessage, Provider);
-            Context.ValerieConfig.MessagesReceived++;
+            ++Context.ValerieConfig.MessagesReceived;
             if (!(Msg.HasStringPrefix(Context.ValerieConfig.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos)) ||
                 Msg.Source != MessageSource.User || Msg.Author.IsBot || Context.ValerieConfig.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
-            Context.ValerieConfig.CommandsUsed++;
+            ++Context.ValerieConfig.CommandsUsed;
             _ = Config.SaveAsync(Context.ValerieConfig);
 
             switch (Result.Error)
