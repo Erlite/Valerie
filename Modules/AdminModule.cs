@@ -8,6 +8,7 @@ using Valerie.Attributes;
 using Valerie.Enums;
 using Valerie.Extensions;
 using Discord.WebSocket;
+using System.Text;
 
 namespace Valerie.Modules
 {
@@ -143,7 +144,7 @@ namespace Valerie.Modules
             return ReplyAsync($"**Blacklisted Eridium Roles:** {string.Join(", ", Context.Config.EridiumHandler.BlacklistedRoles.Select(x => StringExtension.IsValidRole(Context, x)))}");
         }
 
-        [Command("Levels"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
+        [Command("Level"), Summary("Adds or Removes a level from Eridium Level Ups. Actions: Add, Remove")]
         public Task LevelsAsync(Actions Action, IRole Role, int Level)
         {
             switch (Action)
@@ -169,7 +170,10 @@ namespace Valerie.Modules
         {
             if (!Context.Config.EridiumHandler.LevelUpRoles.Any())
                 return ReplyAsync("Woops, there are no level up roles.");
-            return ReplyAsync($"**Level up Roles:** {string.Join(", ", Context.Config.EridiumHandler.LevelUpRoles.Select(x => StringExtension.IsValidRole(Context, $"{x.Key}")))}");
+            var SB = new StringBuilder();
+            foreach (var Roles in Context.Config.EridiumHandler.LevelUpRoles)
+                SB.AppendLine($"{Roles.Value}                    {StringExtension.IsValidRole(Context, $"{Roles.Key}")}");
+            return ReplyAsync($"**Level**            **Role**\n---------------------\n{SB.ToString()}");
         }
 
         [Command("LevelUpMessage"), Alias("LUM"), Summary("Sets Level Up message for when a user level ups.")]
@@ -325,17 +329,32 @@ namespace Valerie.Modules
         [Command("Setup"), Summary("Set ups Valerie for your Server.")]
         public async Task SetupAsync()
         {
+            var Channels = await Context.Guild.GetTextChannelsAsync();
             var SetupMessage = await ReplyAsync($"Initializing *{Context.Guild}'s* config .... ");
             OverwritePermissions Permissions = new OverwritePermissions(sendMessages: PermValue.Deny);
-            var Starboard = await Context.Guild.CreateTextChannelAsync("Starboard");
-            await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
-            var Mod = await Context.Guild.CreateTextChannelAsync("Log");
-            await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+            var HasStarboard = Channels.FirstOrDefault(x => x.Name == "starboard");
+            var HasMod = Channels.FirstOrDefault(x => x.Name == "logs");
+            if (Channels.Contains(HasStarboard))
+                Context.Config.Starboard.TextChannel = $"{HasStarboard.Id}";
+            else
+            {
+                var Starboard = await Context.Guild.CreateTextChannelAsync("starboard");
+                await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                Context.Config.Starboard.TextChannel = $"{Starboard.Id}";
+            }
+            if (Channels.Contains(HasMod))
+                Context.Config.ModLog.TextChannel = $"{HasMod}";
+            else
+            {
+                var Mod = await Context.Guild.CreateTextChannelAsync("logs");
+                await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                Context.Config.ModLog.TextChannel = $"{Mod.Id}";
+            }
             Context.Config.ChatterChannel = $"{Context.Guild.DefaultChannelId}";
             Context.Config.JoinChannel = $"{Context.Guild.DefaultChannelId}";
             Context.Config.LeaveChannel = $"{Context.Guild.DefaultChannelId}";
-            Context.Config.Starboard.TextChannel = $"{Starboard.Id}";
-            Context.Config.ModLog.TextChannel = $"{Mod.Id}";
+            Context.Config.EridiumHandler.LevelUpMessage = "Congrats on hitting level **{rank}**! :beginner:";
+            Context.Config.EridiumHandler.IsEnabled = true;
             await SetupMessage.ModifyAsync(x => x.Content = $"*{Context.Guild}'s* configuration has been completed!");
             await SettingsAsync();
         }
