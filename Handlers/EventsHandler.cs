@@ -198,30 +198,35 @@ namespace Valerie.Handlers
                 await ServerConfig.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
                 return;
             }
-            Config.EridiumHandler.UsersList.TryGetValue(User.Id, out int Old);
-            int OldLevel = IntExtension.GetLevel(Old);
-            Config.EridiumHandler.UsersList.TryUpdate(User.Id, Old + EridiumToGive, Old);
-            int NewLevel = IntExtension.GetLevel(Old + EridiumToGive);
-            await ServerConfig.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
-            if (Config.EridiumHandler.LevelUpMessage != null)
-                await (await User.GetOrCreateDMChannelAsync())
-                    .SendMessageAsync(StringExtension.ReplaceWith(Config.EridiumHandler.LevelUpMessage, User.Mention, $"{NewLevel}"));
-            await AssignRoleAsync(Config, BoolExtension.HasLeveledUp(OldLevel, NewLevel), User);
+            int Old = Config.EridiumHandler.UsersList[User.Id];
+            Config.EridiumHandler.UsersList[User.Id] += EridiumToGive;
+            var New = Config.EridiumHandler.UsersList[User.Id];
+            await ServerConfig.SaveAsync(Config, User.Guild.Id);
+            _ = LevelUpAsync(User, Old, New);
         }
 
-        Task AssignRoleAsync(ServerModel Config, bool CheckLevel, SocketGuildUser User)
+        async Task LevelUpAsync(SocketGuildUser User, int OldEridium, int NewEridium)
         {
-            int GetLevel = IntExtension.GetLevel(Config.EridiumHandler.UsersList[User.Id]);
-            var GetRole = Config.EridiumHandler.LevelUpRoles.FirstOrDefault(x => x.Value == GetLevel).Key;
-            if (!CheckLevel || !Config.EridiumHandler.LevelUpRoles.Any() || User.Roles.Contains(User.Guild.GetRole(GetRole)) ||
-                IntExtension.GetLevel(Config.EridiumHandler.UsersList[User.Id]) > Config.EridiumHandler.MaxRoleLevel) return Task.CompletedTask;
-            return User.AddRoleAsync(User.Guild.GetRole(GetRole));
+            var Config = ServerConfig.LoadConfig(User.Guild.Id);
+            int OldLevel = IntExtension.GetLevel(OldEridium);
+            int NewLevel = IntExtension.GetLevel(NewEridium);
+            if (!(NewLevel > OldLevel) || NewLevel > Config.EridiumHandler.MaxRoleLevel || !Config.EridiumHandler.LevelUpRoles.Any()) return;
+            if (!string.IsNullOrWhiteSpace(Config.EridiumHandler.LevelUpMessage))
+                await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(StringExtension.ReplaceWith(Config.EridiumHandler.LevelUpMessage, User.Mention, $"{NewLevel}"));
+            var Role = User.Guild.GetRole(Config.EridiumHandler.LevelUpRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
+            if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
+            await User.AddRoleAsync(Role);
+            foreach (var lvlrole in Config.EridiumHandler.LevelUpRoles)
+                if (lvlrole.Value < NewLevel)
+                    if (!User.Roles.Contains(User.Guild.GetRole(lvlrole.Key)))
+                        await User.AddRoleAsync(User.Guild.GetRole(lvlrole.Key));
         }
 
         async Task AutoModAsync(SocketUserMessage Message)
         {
             var Config = ServerConfig.LoadConfig((Message.Channel as SocketGuildChannel).Guild.Id);
-            if (!Config.ModLog.IsAutoModEnabled || !BoolExtension.Advertisement(Message.Content)) return;
+            if (!Config.ModLog.IsAutoModEnabled || !BoolExtension.Advertisement(Message.Content) ||
+                Message.Author == (Message.Channel as SocketGuildChannel).Guild.Owner) return;
             await Message.DeleteAsync();
             await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
             Config.ModLog.Cases += 1;
@@ -243,8 +248,11 @@ namespace Valerie.Handlers
                 Embed.AddField("Responsible Moderator", "Auto Moderator", true);
                 Embed.AddField("Case No.", Config.ModLog.Cases, true);
                 Embed.AddField("Case Type", "Kick", true);
+                IUserMessage Msg = null;
                 if (Channel != null)
-                    await Channel.SendMessageAsync("", embed: Embed.Build());
+                    Msg = await Channel.SendMessageAsync("", embed: Embed.Build());
+                if (Msg == null)
+                    await (await (Message.Author as IGuildUser).Guild.GetDefaultChannelAsync()).SendMessageAsync($"*{Message.Author} was kicked by Auto Moderator.*  :cop:");
             }
             await ServerConfig.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id).ConfigureAwait(false);
         }
