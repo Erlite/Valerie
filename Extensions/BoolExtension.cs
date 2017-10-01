@@ -34,8 +34,6 @@ namespace Valerie.Extensions
             return (URLS.Any(x => Message.Contains(x) | Message.StartsWith(x)));
         }
 
-        public static bool HasLeveledUp(int Previous, int New) => New > Previous;
-
         public static bool IsNSFW(ITextChannel Channel) => Channel.Name.Contains("nsfw") || Channel.IsNsfw;
     }
 }

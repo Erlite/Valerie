@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using System.Linq;
 using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,7 +8,6 @@ using System.Text.RegularExpressions;
 using Google.Apis.Services;
 using Google.Apis.Urlshortener.v1;
 using Valerie.Handlers.Config;
-using System.Linq;
 
 namespace Valerie.Extensions
 {
