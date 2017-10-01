@@ -268,16 +268,16 @@ namespace Valerie.Modules
         public async Task NewsAsync()
         {
             var Get = await HttpClient.GetAsync($"https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey={Context.ValerieConfig.APIKeys.NewsKey}").ConfigureAwait(false);
+            var Embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: "Today's Headlines From BB");
             if (!Get.IsSuccessStatusCode)
             {
                 await ReplyAsync("Failed to get today's headlines.");
                 return;
             }
             var Content = JsonConvert.DeserializeObject<BBC>(await Get.Content.ReadAsStringAsync());
-            var Builder = new StringBuilder();
-            foreach (var x in Content.Articles.Take(5))
-                Builder.AppendLine($":small_orange_diamond: **[{x.Title}]({x.Url})**\n{x.Description}");
-            await ReplyAsync($"**Here are today's headlines**\n\n{Builder.ToString()}");
+            foreach (var Article in Content.Articles.Take(5))
+                Embed.AddField($"{Article.Title}", $"{Article.Description}\n**Link:**{Article.Url}");
+            await ReplyAsync("", embed: Embed.Build());
         }
 
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
