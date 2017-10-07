@@ -150,7 +150,7 @@ namespace Valerie.Handlers
         internal Task ReadyAsync(DiscordSocketClient Client)
         {
             string Game = BotConfig.Config.BotGames == null ? $"{BotConfig.Config.Prefix}Cmds" :
-                BotConfig.Config.BotGames[new Random().Next(BotConfig.Config.BotGames.Count)];
+                BotConfig.Config.BotGames[new Random(Guid.NewGuid().GetHashCode()).Next(BotConfig.Config.BotGames.Count)];
             return Client.SetGameAsync(Game);
         }
 
