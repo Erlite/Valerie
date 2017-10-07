@@ -18,7 +18,7 @@ namespace Valerie.Handlers
         public IMessageChannel Channel { get; }
         public ServerModel Config { get; set; }
         public ConfigModel ValerieConfig { get; set; }
-        private IServiceProvider Provider { get; }
+        public IServiceProvider Provider { get; }
 
         public ValerieContext(IDiscordClient DiscordClient, IUserMessage UserMessage, IServiceProvider ServiceProvider)
         {
