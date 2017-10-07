@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Concurrent;
 using Discord;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
@@ -16,18 +18,19 @@ namespace Valerie.Modules
     public class NSFWModule : ValerieBase<ValerieContext>
     {
         readonly HttpClient Client = new HttpClient();
+        readonly ConcurrentDictionary<ulong, Timer> AutoNSFW = new ConcurrentDictionary<ulong, Timer>();
 
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
-            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }").ConfigureAwait(false))[0];
+            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random(Guid.NewGuid().GetHashCode()).Next(0, 10229) }").ConfigureAwait(false))[0];
             await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
         }
 
         [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
-            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }").ConfigureAwait(false))[0];
+            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ new Random(Guid.NewGuid().GetHashCode()).Next(0, 4963) }").ConfigureAwait(false))[0];
             await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
         }
 
@@ -73,6 +76,36 @@ namespace Valerie.Modules
         {
             JToken Token = JToken.Parse(await Client.GetStringAsync("http://nekos.life/api/lewd/neko").ConfigureAwait(false));
             await ReplyAsync(Token["neko"].ToString());
+        }
+
+        [Command("AutoNSFW"), Summary("Toggles Auto NSFW for a specific channel."), CustomUserPermission]
+        public async Task AutoNSFWAsync(int TimePeriod)
+        {
+            Timer _Timer;
+            if (TimePeriod == 0)
+            {
+                if (!AutoNSFW.TryRemove(Context.Channel.Id, out _Timer)) return;
+                _Timer.Change(Timeout.Infinite, Timeout.Infinite);
+                return;
+            }
+            if (TimePeriod < 30) return;
+
+            _Timer = new Timer(async _ =>
+            {
+                var Rand = new Random(Guid.NewGuid().GetHashCode()).Next(0, 1);
+                switch (Rand)
+                {
+                    case 0: await BumsAsync(); break;
+                    case 1: await BoobsAsync(); break;
+                }
+            }, null, TimePeriod * 1000, TimePeriod * 1000);
+
+            AutoNSFW.AddOrUpdate(Context.Channel.Id, _Timer, (Key, Old) =>
+            {
+                Old.Change(Timeout.Infinite, Timeout.Infinite);
+                return _Timer;
+            });
+            await ReplyAsync($"Auto NSFW has been enabled for {(Context.Channel as ITextChannel).Mention}.");
         }
     }
 }
