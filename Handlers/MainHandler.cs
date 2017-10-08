@@ -39,11 +39,11 @@ namespace Valerie.Handlers
             ValerieBase<ValerieContext>.Provider = IServiceProvider;
             Logger.PrintInfo();
             await Config.LoadConfigAsync();
-
-            var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
             try
             {
+                var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
                 Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
+                Logger.Write(Status.KAY, Source.Database, $"Logged into twitter: {User.UserFactory.GetAuthenticatedUser().ScreenName}");
             }
             catch (TwitterInvalidCredentialsException E)
             {
