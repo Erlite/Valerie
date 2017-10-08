@@ -21,7 +21,7 @@ namespace Valerie.Attributes
             int ConvertedEridium = IntExtension.ConvertToEridium(Schmeckles);
 
             var GetOwner = await Context.Client.GetApplicationInfoAsync();
-            if (Context.User == GetOwner.Owner)
+            if (Context.User.Id == GetOwner.Owner.Id)
                 return await Task.FromResult(PreconditionResult.FromSuccess());
 
             if (Schmeckles > UserSchmeckles)
