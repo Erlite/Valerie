@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Handlers;
 using Valerie.Extensions;
+using Valerie.Handlers.Server.Models;
 
 namespace Valerie.Modules
 {
@@ -15,45 +16,80 @@ namespace Valerie.Modules
         [Command("Kick"), Summary("Kicks user from the guild."),
             RequireBotPermission(GuildPermission.KickMembers),
             RequireUserPermission(GuildPermission.KickMembers)]
-        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = "No reason provided by moderator.")
+        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             await User.KickAsync(Reason);
             Context.Config.ModLog.Cases += 1;
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
+            IUserMessage Message = null;
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.ValerieConfig.Prefix}Reason {Context.Config.ModLog.Cases} <Reason>`*";
+
             if (Channel != null)
+                Message = await SendMessageAsync(Channel, $"**Kick** | Case {Context.Config.ModLog.Cases}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {Context.User}");
+
+            Context.Config.ModLog.ModCases.Add(new CaseWrapper()
             {
-                var embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Kick Date: {DateTime.Now}");
-                embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
-                embed.AddField("Responsible Moderator", Context.User.Username, true);
-                embed.AddField("Case No.", Context.Config.ModLog.Cases, true);
-                embed.AddField("Case Type", "Kick", true);
-                embed.AddField("Reason", Reason, true);
-                await Channel.SendMessageAsync("", embed: embed.Build());
-            }
-            else
-                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+                CaseType = "Kick",
+                CaseNumber = Context.Config.ModLog.Cases,
+                Reason = Reason,
+                ResponsibleMod = $"{Context.User}",
+                UserId = $"{User.Id}",
+                User = $"{User}",
+                MessageId = $"{Message.Id}"
+            });
+
+            await ReplyAsync($"***{User} got kicked*** :ok_hand:");
         }
 
         [Command("Ban"), Summary("Bans user from the guild."),
             RequireBotPermission(GuildPermission.BanMembers),
             RequireUserPermission(GuildPermission.BanMembers)]
-        public async Task BanAsync(IGuildUser User, [Remainder] string Reason = "No reason provided by moderator.")
+        public async Task BanAsync(IGuildUser User, [Remainder] string Reason = null)
         {
             await Context.Guild.AddBanAsync(User, 7, Reason);
             Context.Config.ModLog.Cases += 1;
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
+            IUserMessage Message = null;
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.ValerieConfig.Prefix}Reason {Context.Config.ModLog.Cases} <Reason>`*";
+
             if (Channel != null)
+                Message = await SendMessageAsync(Channel, $"**Ban** | Case {Context.Config.ModLog.Cases}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {Context.User}");
+
+            Context.Config.ModLog.ModCases.Add(new CaseWrapper()
             {
-                var embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: User.GetAvatarUrl(), FooterText: $"Ban Date: {DateTime.Now}");
-                embed.AddField("User", $"{User.Username}#{User.Discriminator}\n{User.Id}", true);
-                embed.AddField("Responsible Moderator", Context.User.Username, true);
-                embed.AddField("Case No.", Context.Config.ModLog.Cases, true);
-                embed.AddField("Case Type", "Ban", true);
-                embed.AddField("Reason", Reason, true);
-                await Channel.SendMessageAsync("", embed: embed.Build());
+                CaseType = "Ban",
+                CaseNumber = Context.Config.ModLog.Cases,
+                Reason = Reason,
+                ResponsibleMod = $"{Context.User}",
+                UserId = $"{User.Id}",
+                User = $"{User}",
+                MessageId = $"{Message.Id}"
+            });
+
+            await ReplyAsync($"***{User} got bent*** :ok_hand:");
+        }
+
+        [Command("Reason"), Summary("Specifies reason for a moderator action."),
+            RequireUserPermission(GuildPermission.KickMembers)]
+        public async Task ReasonAsync(int Case, [Remainder] string Reason)
+        {
+            var GetCase = Context.Config.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == Case);
+            if (GetCase == null)
+            {
+                await ReplyAsync("Invalid case number.");
+                return;
             }
-            else
-                await ReplyAsync($"***{User.Username} got kicked*** :ok_hand:");
+            Context.Config.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == Case).Reason = Reason;
+            ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
+            var Message = await Channel.GetMessageAsync(Convert.ToUInt64(GetCase.MessageId)) as IUserMessage;
+            await Message.ModifyAsync(x =>
+            {
+                x.Content = $"**{GetCase.CaseType}** | Case {GetCase.CaseNumber}\n**User:** {GetCase.User} ({GetCase.UserId})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {GetCase.ResponsibleMod}";
+            });
+            await ReactAsync("👌");
         }
 
         [Command("Unban"), Summary("Unbans user from the guild"),
@@ -84,7 +120,7 @@ namespace Valerie.Modules
                 await Context.Channel.DeleteMessagesAsync(GetMessages);
             else if (Amount > 100)
                 foreach (var msg in GetMessages)
-                    await msg.DeleteAsync();
+                    await msg.DeleteAsync().ConfigureAwait(false);
         }
 
         [Command("Purge"), Summary("Deletes all messages from a channel."), Alias("Del"),
@@ -97,7 +133,7 @@ namespace Valerie.Modules
                 await Context.Channel.DeleteMessagesAsync(GetMessages);
             else if (Amount > 100)
                 foreach (var msg in GetMessages)
-                    await msg.DeleteAsync();
+                    await msg.DeleteAsync().ConfigureAwait(false);
         }
 
         [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role."),

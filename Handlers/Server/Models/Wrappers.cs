@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Valerie.Handlers.Server.Models
@@ -44,6 +45,18 @@ namespace Valerie.Handlers.Server.Models
         public string TextChannel { get; set; }
         public string AutoAssignRole { get; set; }
         public bool IsAutoModEnabled { get; set; }
+        public IList<CaseWrapper> ModCases { get; set; } = new List<CaseWrapper>();
         public ConcurrentDictionary<ulong, int> Warnings { get; set; } = new ConcurrentDictionary<ulong, int>();
+    }
+
+    public class CaseWrapper
+    {
+        public int CaseNumber { get; set; }
+        public string Reason { get; set; }
+        public string UserId { get; set; }
+        public string User { get; set; }
+        public string CaseType { get; set; }
+        public string MessageId { get; set; }
+        public string ResponsibleMod { get; set; }
     }
 }
