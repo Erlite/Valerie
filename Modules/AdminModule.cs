@@ -354,7 +354,7 @@ namespace Valerie.Modules
             Context.Config.LeaveChannel = $"{Context.Guild.DefaultChannelId}";
             Context.Config.EridiumHandler.LevelUpMessage = "Congrats on hitting level **{rank}**! :beginner:";
             Context.Config.EridiumHandler.IsEnabled = true;
-            await SetupMessage.ModifyAsync(x => x.Content = $"*{Context.Guild}'s* configuration has been completed!");
+            await ReplyAsync($"*{Context.Guild}'s* configuration has been completed!");
             await SettingsAsync();
         }
     }

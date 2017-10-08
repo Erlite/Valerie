@@ -10,7 +10,7 @@ namespace Valerie.Modules
 {
     [Group("Tag"), RequireBotPermission(Discord.ChannelPermission.SendMessages)]
     public class TagModule : ValerieBase<ValerieContext>
-    {    
+    {
         [Command, Summary("Executes a tag."), Priority(0)]
         public async Task Tag(string TagName)
         {
@@ -63,21 +63,15 @@ namespace Valerie.Modules
         }
 
         [Command("Modify"), Summary("Changes Tag's response"), Priority(1)]
-        public async Task ModifyAsync(string Name, [Remainder]string Response)
+        public Task ModifyAsync(string Name, [Remainder]string Response)
         {
             var Tag = Context.Config.TagsList.FirstOrDefault(x => x.Name == Name);
-            if (Tag == null)
-            {
-                await ReplyAsync($"**{Name}** doesn't exist.");
-                return;
-            }
+            if (Tag == null)            
+                return ReplyAsync($"**{Name}** doesn't exist.");            
             if (Convert.ToUInt64(Tag.Owner) != Context.User.Id)
-            {
-                await ReplyAsync($"You are not the owner of **{Name}**.");
-                return;
-            }
+                return ReplyAsync($"You are not the owner of **{Name}**.");            
             Context.Config.TagsList.FirstOrDefault(x => x.Name == Name).Response = Response;
-            await ReplyAsync($"**{Name}** has been updated.");
+            return ReplyAsync($"**{Name}** has been updated.");
         }
 
         [Command("Info"), Alias("About"), Summary("Shows information about a tag."), Priority(1)]

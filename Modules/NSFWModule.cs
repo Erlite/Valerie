@@ -23,15 +23,23 @@ namespace Valerie.Modules
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!"), Alias("Tits")]
         public async Task BoobsAsync()
         {
-            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random(Guid.NewGuid().GetHashCode()).Next(0, 10229) }").ConfigureAwait(false))[0];
-            await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
+            try
+            {
+                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }").ConfigureAwait(false))[0];
+                await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
+            }
+            catch { }
         }
 
         [Command("Ass"), Summary("I can't believe you need help with this command."), Alias("Butt")]
         public async Task BumsAsync()
         {
-            JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ new Random(Guid.NewGuid().GetHashCode()).Next(0, 4963) }").ConfigureAwait(false))[0];
-            await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
+            try
+            {
+                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }").ConfigureAwait(false))[0];
+                await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
+            }
+            catch { }
         }
 
         [Command("E621"), Summary("Never used this command. Don't ask me"), Remarks("E621 Kawaii")]
@@ -84,15 +92,19 @@ namespace Valerie.Modules
             Timer _Timer;
             if (TimePeriod == 0)
             {
-                if (!AutoNSFW.TryRemove(Context.Channel.Id, out _Timer)) return;
+                if (!AutoNSFW.TryRemove(Context.Channel.Id, out _Timer))
+                    if (!AutoNSFW.TryRemove(Context.Channel.Id, out _Timer))
+                        return;
                 _Timer.Change(Timeout.Infinite, Timeout.Infinite);
+                await ReplyAsync("AutoNSFW has been stopped.");
                 return;
             }
+
             if (TimePeriod < 30) return;
 
             _Timer = new Timer(async _ =>
             {
-                var Rand = new Random(Guid.NewGuid().GetHashCode()).Next(0, 1);
+                var Rand = new Random().Next(0, 1);
                 switch (Rand)
                 {
                     case 0: await BumsAsync(); break;
