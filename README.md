@@ -25,12 +25,12 @@ Features
 Valerie's Setup
 ---
 - On joining your server, Valerie will DM you your server prefix.
-- You can use the `Guide` command to get more information on certain topics such as Eridium, NSFW, Toggling stuff.
 - It's better if you don't deny Valerie any permissions.
+- Use the `Setup` command for quick server setup.
 
 Hosting Valerie
 ---
-- Make sure you have .Net Core 2.0 installed and RavenDB downloaded running.
+- Make sure you have .Net Core 2.0 installed and RavenDB downloaded and running.
 - Clone/Download this repo.
 - Open a new powershell or command prompt in the repo's directory and run `dotnet restore` to restore packages.
 - Run `dotnet build` and navigate to the output directory and type `dotnet Valerie.dll` to run your own instance of Valerie.
