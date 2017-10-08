@@ -81,11 +81,16 @@ namespace Valerie.Extensions
             return GetUser != null ? GetUser.Username : "Unknown User.";
         }
 
-        public static string IsValidChannel(Handlers.ValerieContext Context,string TextChannel)
+        public static string IsValidChannel(Handlers.ValerieContext Context, string TextChannel)
         {
-            var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
-            var Channel = Client.GetChannel(Convert.ToUInt64(TextChannel)) as Discord.ITextChannel;
-            return ((Context.Guild as Discord.WebSocket.SocketGuild).TextChannels.Contains(Channel)) ? Channel.Name : "⚠️ Invalid Channel.";
+            if (!string.IsNullOrWhiteSpace(TextChannel) && UInt64.TryParse(TextChannel.Trim(), out ulong ChannelId))
+            {
+                var Client = Context.Client as Discord.WebSocket.DiscordSocketClient;
+                var Channel = Client.GetChannel(ChannelId) as Discord.ITextChannel;
+                return ((Context.Guild as Discord.WebSocket.SocketGuild).TextChannels.Contains(Channel)) ? Channel.Name : "⚠️ Invalid Channel.";
+            }
+            else
+                return TextChannel;
         }
 
         public static string IsValidRole(Handlers.ValerieContext Context, string Role)
