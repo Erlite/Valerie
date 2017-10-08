@@ -14,6 +14,8 @@
         Remove,
         Modify,
         Blacklist,
-        LevelUps
+        LevelUps,
+        Major,
+        All
     }
 }

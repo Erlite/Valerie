@@ -18,5 +18,6 @@ namespace Valerie.Handlers.Config.Models
         public IList<string> EvalImports { get; set; }
         public IList<string> BotGames { get; set; }
         public ConcurrentDictionary<ulong, string> UsersBlacklist { get; set; } = new ConcurrentDictionary<ulong, string>();
+        public ConcurrentDictionary<ulong, Enums.CommandEnums> UpdatesList { get; set; } = new ConcurrentDictionary<ulong, Enums.CommandEnums>();
     }
 }

@@ -526,14 +526,16 @@ namespace Valerie.Modules
         }
 
         [Command("DeleteTweet"), Summary("Deletes a specified tweet!"), RequireSchmeckles(1)]
-        public async Task DeleteTweetAsync(long ID)
+        public Task DeleteTweetAsync(long ID)
         {
             var GetTweet = Tweet.GetTweet(ID);
             if (GetTweet.IsTweetPublished)
-            {
-                var Success = Tweet.DestroyTweet(GetTweet);
-                await ReplyAsync($"Tweet with {ID} ID has been deleted!");
-            }
+                if (!Tweet.DestroyTweet(GetTweet))
+                    return ReplyAsync("Failed to delete Tweet.");
+                else
+                    return ReplyAsync($"Tweet with *{ID}* ID has been deleted!");
+            else
+                return ReplyAsync("Invalid Tweet ID.");
         }
 
         [Command("Schmeckles"), Summary("Shows how many Schmeckles you have.")]
@@ -650,6 +652,25 @@ namespace Valerie.Modules
                 $":second_place:  {await GetUserAsync(GetStars[1].MessageId)} ({GetStars[1].Stars} Stars)\n" +
                 $":third_place:  {await GetUserAsync(GetStars[2].MessageId)} ({GetStars[2].Stars} Stars)");
             await ReplyAsync("", embed: Embed.Build());
+        }
+
+        [Command("Sub"), Summary("Subs to Valerie's updates. Update types are: Major/All/Remove.")]
+        public Task SubAsync(CommandEnums SubType)
+        {
+            switch (SubType)
+            {
+                case CommandEnums.Remove:
+                    if (!Context.ValerieConfig.UpdatesList.Remove(Context.User.Id, out SubType))
+                        Context.ValerieConfig.UpdatesList.Remove(Context.User.Id, out SubType);
+                    return ReplyAsync("You will no longer receive Valerie updates.");
+                case CommandEnums.Major:
+                    Context.ValerieConfig.UpdatesList.AddOrUpdate(Context.User.Id, CommandEnums.Major, (Key, Value) => { return SubType; });
+                    return ReplyAsync("You will receive all major updates regarding Valerie.");
+                case CommandEnums.All:
+                    Context.ValerieConfig.UpdatesList.AddOrUpdate(Context.User.Id, CommandEnums.All, (Key, Value) => { return SubType; });
+                    return ReplyAsync("You have been subbed to all updates.");
+            }
+            return Task.CompletedTask;
         }
 
         async Task<string> GetUserAsync(string Message)
