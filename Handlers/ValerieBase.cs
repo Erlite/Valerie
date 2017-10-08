@@ -25,9 +25,17 @@ namespace Valerie.Handlers
 
         public async Task ReactAsync(string GetEmoji)
         {
-            await Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
-            await Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
-            await Context.Message.AddReactionAsync(new Emoji(GetEmoji));
+            await Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id).ConfigureAwait(false);
+            await Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig).ConfigureAwait(false);
+            await Context.Message.AddReactionAsync(new Emoji(GetEmoji)).ConfigureAwait(false);
+        }
+
+        public async Task<IUserMessage> SendMessageAsync(ITextChannel Channel, string Message)
+        {
+            _ = Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
+            _ = Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
+            await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
+            return await Channel.SendMessageAsync(Message).ConfigureAwait(false);
         }
     }
 }
