@@ -243,16 +243,23 @@ namespace Valerie.Handlers
             {
                 await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
                 ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
-                var Embed = ValerieEmbed.Embed(EmbedColor.Red, ThumbUrl: Message.Author.GetAvatarUrl(), FooterText: $"Kick on {DateTime.Now}");
-                Embed.AddField("User", $"{Message.Author}\n{Message.Author.Id}", true);
-                Embed.AddField("Responsible Moderator", "Auto Moderator", true);
-                Embed.AddField("Case No.", Config.ModLog.Cases, true);
-                Embed.AddField("Case Type", "Kick", true);
                 IUserMessage Msg = null;
                 if (Channel != null)
-                    Msg = await Channel.SendMessageAsync("", embed: Embed.Build());
+                    Msg = await Channel.SendMessageAsync($"**Kick** | Case {Config.ModLog.Cases}\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Maxed out warnings.\n" +
+                    $"**Responsible Moderator:** Action Taken by Auto Moderator.");
                 if (Msg == null)
                     await (await (Message.Author as IGuildUser).Guild.GetDefaultChannelAsync()).SendMessageAsync($"*{Message.Author} was kicked by Auto Moderator.*  :cop:");
+
+                Config.ModLog.ModCases.Add(new CaseWrapper()
+                {
+                    CaseType = "Kick",
+                    CaseNumber = Config.ModLog.Cases,
+                    Reason = "Maxed out warnings.",
+                    ResponsibleMod = $"Auto Moderator",
+                    UserId = $"{Message.Author.Id}",
+                    User = $"{Message.Author}",
+                    MessageId = $"{Msg.Id}"
+                });
             }
             await ServerConfig.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id).ConfigureAwait(false);
         }
