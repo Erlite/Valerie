@@ -13,7 +13,7 @@ namespace Valerie.Modules
         [Command("Prefix"), Summary("Changes bot's prefix.")]
         public Task PrefixAsync(string NewPrefix)
         {
-            Context.ValerieConfig.Prefix = NewPrefix; return ReplyAsync("Prefix Updates.");
+            Context.ValerieConfig.Prefix = NewPrefix; return ReplyAsync("Prefix Updated.");
         }
 
         [Command("Avatar"), Summary("Changes Bot's avatar.")]
