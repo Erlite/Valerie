@@ -1,10 +1,8 @@
-﻿# pragma warning disable 4014, 1998
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Discord.WebSocket;
 using Tweetinvi;
-using Tweetinvi.Exceptions;
 using Valerie.Services;
 using Valerie.Handlers.Config;
 
@@ -43,11 +41,11 @@ namespace Valerie.Handlers
             {
                 var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
                 Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
-                Logger.Write(Status.KAY, Source.Database, $"Logged into twitter: {User.UserFactory.GetAuthenticatedUser().ScreenName}");
+                Logger.Write(Status.KAY, Source.Database, $"Logged into twitter: {User.UserFactory.GetAuthenticatedUser()?.ScreenName ?? "Not Logged In."}");
             }
-            catch (TwitterInvalidCredentialsException E)
+            catch (Exception E)
             {
-                Logger.Write(Status.ERR, Source.Config, E.Message);
+                Logger.Write(Status.ERR, Source.Config, E.StackTrace);
             }
 
             Client.Log += EventsHandler.Log;
@@ -61,7 +59,7 @@ namespace Valerie.Handlers
             Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
             Client.LatencyUpdated += (Older, Newer) => EventsHandler.LatencyUpdated(Client, Older, Newer);
-            Client.Ready += async () => EventsHandler.ReadyAsync(Client);
+            Client.Ready +=  () => EventsHandler.ReadyAsync(Client);
 
             await Client.LoginAsync(Discord.TokenType.Bot, BotConfig.Config.Token);
             await Client.StartAsync();
