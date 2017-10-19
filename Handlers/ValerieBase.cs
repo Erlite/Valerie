@@ -5,22 +5,37 @@ using Discord;
 using Discord.Commands;
 using Valerie.Handlers.Server;
 using Valerie.Handlers.Config;
+using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers
 {
     public class ValerieBase<T> : ModuleBase<ValerieContext> where T : ValerieContext
     {
         public static IServiceProvider Provider { get; set; }
+        IDocumentSession Session { get; set; }
+
+        protected override void BeforeExecute(CommandInfo command)
+        {
+            Session = MainHandler.Store.OpenSession();
+            base.BeforeExecute(command);
+        }
+
+        protected override void AfterExecute(CommandInfo command)
+        {
+            if (Session != null)
+            {
+                Session.Store(Context.Config, id: $"{Context.Guild.Id}");
+                Session.Store(Context.ValerieConfig, id: "Config");
+                Session.SaveChanges();
+            }
+            Session.Dispose();
+            base.AfterExecute(command);
+        }
 
         protected override async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            _ = Provider.GetRequiredService<ServerConfig>().SaveAsync(Context.Config, Context.Guild.Id);
-            _ = Provider.GetRequiredService<BotConfig>().SaveAsync(Context.ValerieConfig);
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
-            if (!string.IsNullOrWhiteSpace(message) || embed != null)
-                return await Context.Channel.SendMessageAsync(message, isTTS, embed, options);
-            else
-                return await Context.Channel.SendMessageAsync("Whoops, something went wrong.");
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
 
         public async Task ReactAsync(string GetEmoji)
