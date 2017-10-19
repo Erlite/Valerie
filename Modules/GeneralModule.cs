@@ -50,7 +50,7 @@ namespace Valerie.Modules
         [Command("Top"), Summary("Shows top 10 users in the Eridium list.")]
         public async Task EridiumAsync()
         {
-            if (Context.Config.EridiumHandler.UsersList.Count == 0)
+            if (!Context.Config.EridiumHandler.UsersList.Any())
             {
                 await ReplyAsync("There are no top users for this guild.");
                 return;
@@ -58,15 +58,7 @@ namespace Valerie.Modules
             var embed = ValerieEmbed.Embed(EmbedColor.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
             var Eridiumlist = Context.Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Eridiumlist)
-            {
-                var User = await Context.Guild.GetUserAsync(Value.Key) as IGuildUser;
-                string Username = null;
-                if (User == null)
-                    Username = "Unknown User";
-                else
-                    Username = User.Username;
-                embed.AddField(Username, $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}", true);
-            }
+               embed.AddField(await StringExtension.IsValidUserAsync(Context, Value.Key), $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -567,7 +559,7 @@ namespace Valerie.Modules
             return ReplyAsync("Task created successfully. :v:");
         }
 
-        [Command("Todos"), Summary("Shows all of your Todo's.")]
+        [Command("Todo"), Summary("Shows all of your Todo's.")]
         public Task TodoAsync()
         {
             Context.Config.ToDo.TryGetValue(Context.User.Id, out ConcurrentDictionary<int, string> TodoList);
@@ -579,7 +571,7 @@ namespace Valerie.Modules
             return ReplyAsync($"**Here are your current tasks:**\n{Sb.ToString()}");
         }
 
-        [Command("TodoRemove"), Summary("Removes a task from your todo list."), Alias("TDR")]
+        [Command("TodoRemove"), Summary("Removes a task from your todo list."), Alias("TodoR")]
         public Task TodoAsync(int TaskNumber)
         {
             if (!Context.Config.ToDo.Any() || !Context.Config.ToDo.ContainsKey(Context.User.Id)
@@ -652,25 +644,6 @@ namespace Valerie.Modules
                 $":second_place:  {await GetUserAsync(GetStars[1].MessageId)} ({GetStars[1].Stars} Stars)\n" +
                 $":third_place:  {await GetUserAsync(GetStars[2].MessageId)} ({GetStars[2].Stars} Stars)");
             await ReplyAsync("", embed: Embed.Build());
-        }
-
-        [Command("Sub"), Summary("Subs to Valerie's updates. Update types are: Major/All/Remove.")]
-        public Task SubAsync(CommandEnums SubType)
-        {
-            switch (SubType)
-            {
-                case CommandEnums.Remove:
-                    if (!Context.ValerieConfig.UpdatesList.Remove(Context.User.Id, out SubType))
-                        Context.ValerieConfig.UpdatesList.Remove(Context.User.Id, out SubType);
-                    return ReplyAsync("You will no longer receive Valerie updates.");
-                case CommandEnums.Major:
-                    Context.ValerieConfig.UpdatesList.AddOrUpdate(Context.User.Id, CommandEnums.Major, (Key, Value) => { return SubType; });
-                    return ReplyAsync("You will receive all major updates regarding Valerie.");
-                case CommandEnums.All:
-                    Context.ValerieConfig.UpdatesList.AddOrUpdate(Context.User.Id, CommandEnums.All, (Key, Value) => { return SubType; });
-                    return ReplyAsync("You have been subbed to all updates.");
-            }
-            return Task.CompletedTask;
         }
 
         async Task<string> GetUserAsync(string Message)

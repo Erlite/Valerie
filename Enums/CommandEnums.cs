@@ -15,7 +15,5 @@
         Modify,
         Blacklist,
         LevelUps,
-        Major,
-        All
     }
 }

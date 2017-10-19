@@ -16,7 +16,6 @@ using Valerie.Models;
 using Valerie.Services;
 using Valerie.Extensions;
 using Valerie.Handlers.Server.Models;
-using Valerie.Enums;
 
 namespace Valerie.Modules
 {
@@ -197,31 +196,6 @@ namespace Valerie.Modules
         [Command("SendMsg"), Summary("Sends messages to a guild")]
         public async Task SendMsgAsync(ulong ID, [Remainder] string Message)
             => await (await (await Context.Client.GetGuildAsync(ID)).GetDefaultChannelAsync()).SendMessageAsync($"{Format.Bold("From Bot Owner: ")} {Message}");
-
-        [Command("Announce"), Summary("Announces Valerie  Updates.")]
-        public async Task AnnounceAsync(CommandEnums UpdateType, [Remainder]string Message)
-        {
-            switch (UpdateType)
-            {
-                case CommandEnums.All:
-                    foreach (var Sub in Context.ValerieConfig.UpdatesList.Where(x => x.Value == CommandEnums.All))
-                    {
-                        var User = await Context.Client.GetUserAsync(Sub.Key).ConfigureAwait(false);
-                        if (User != null)
-                            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(Message);
-                    }
-                    break;
-
-                case CommandEnums.Major:
-                    foreach (var Sub in Context.ValerieConfig.UpdatesList.Where(x => x.Value == CommandEnums.Major))
-                    {
-                        var MajorUser = await Context.Client.GetUserAsync(Sub.Key).ConfigureAwait(false);
-                        if (MajorUser != null)
-                            await (await MajorUser.GetOrCreateDMChannelAsync()).SendMessageAsync(Message);
-                    }
-                    break;
-            }
-        }
     }
 
     public class Globals
