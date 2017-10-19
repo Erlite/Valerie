@@ -275,7 +275,7 @@ namespace Valerie.Modules
                 return;
             }
             var Content = JsonConvert.DeserializeObject<BBC>(await Get.Content.ReadAsStringAsync());
-            foreach (var Article in Content.Articles.Take(5))
+            foreach (var Article in Content.Articles.Take(10))
                 Embed.AddField($"{Article.Title}", $"{Article.Description}\n**Link:**{Article.Url}");
             await ReplyAsync("", embed: Embed.Build());
         }
@@ -293,7 +293,7 @@ namespace Valerie.Modules
             var RequestList = Service.Cse.List(search);
             RequestList.Cx = Context.ValerieConfig.APIKeys.SearchEngineID;
 
-            var items = RequestList.Execute().Items.Take(3);
+            var items = RequestList.Execute().Items.Take(5);
             foreach (var result in items)
             {
                 Str.AppendLine($"• **{result.Title}**\n{result.Snippet}\n{StringExtension.ShortenUrl(result.Link)}\n");
