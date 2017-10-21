@@ -17,8 +17,8 @@
     <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00829" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.29.2.896" />
     <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.29.2.138" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.29.2.991" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.3.2" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.29.2.1006" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.4.0" />
     <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171001-0400" />
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
   </ItemGroup>
