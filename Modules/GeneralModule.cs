@@ -58,7 +58,7 @@ namespace Valerie.Modules
             var embed = ValerieEmbed.Embed(EmbedColor.Gold, Title: $"{Context.Guild.Name.ToUpper()} | Top 10 Users");
             var Eridiumlist = Context.Config.EridiumHandler.UsersList.OrderByDescending(x => x.Value).Take(10);
             foreach (var Value in Eridiumlist)
-               embed.AddField(await StringExtension.IsValidUserAsync(Context, Value.Key), $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}", true);
+                embed.AddField(await StringExtension.IsValidUserAsync(Context, Value.Key), $"Eridium: {Value.Value}\nLevel: {IntExtension.GetLevel(Value.Value)}", true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -196,13 +196,13 @@ namespace Valerie.Modules
 
             if (win == 0)
             {
-                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium - Bet, UserEridium);
-                embed.Description = $"You lost {Bet} Eridium. Better luck next time! :weary: ";
+                Context.Config.EridiumHandler.UsersList[Context.User.Id] -= Bet;
+                embed.Description = $"You lost {Bet} Eridium. Your current Eridium is: {UserEridium - Bet}. Better luck next time! :weary: ";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
-                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium += Bet, UserEridium);
+                Context.Config.EridiumHandler.UsersList[Context.User.Id] += Bet;
                 embed.Description = $"You won {Bet} Eridium :tada: Your current Eridium is: {UserEridium + Bet}";
                 embed.Color = new Color(0x93ff89);
             }
@@ -210,7 +210,7 @@ namespace Valerie.Modules
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!")]
-        public async Task FlipAsync(string Side, int Bet = 50)
+        public async Task FlipAsync(string Side, int Bet = 100)
         {
             int UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
 
@@ -238,13 +238,13 @@ namespace Valerie.Modules
 
             if (Side.ToLower() == GetSide.ToLower())
             {
-                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium += Bet, UserEridium);
-                await ReplyAsync($"Congratulations! You won {Bet} Eridium!");
+                Context.Config.EridiumHandler.UsersList[Context.User.Id] += Bet;
+                await ReplyAsync($"Congratulations! You won {Bet} Eridium! You have {UserEridium + Bet} Eridium.");
             }
             else
             {
-                Context.Config.EridiumHandler.UsersList.TryUpdate(Context.User.Id, UserEridium -= Bet, UserEridium);
-                await ReplyAsync($"You lost {Bet} Eridium! :frowning:");
+                Context.Config.EridiumHandler.UsersList[Context.User.Id] -= Bet;
+                await ReplyAsync($"You lost {Bet} Eridium! Your have {UserEridium - Bet} Eridium left. :frowning:");
             }
         }
 
@@ -644,6 +644,22 @@ namespace Valerie.Modules
                 $":second_place:  {await GetUserAsync(GetStars[1].MessageId)} ({GetStars[1].Stars} Stars)\n" +
                 $":third_place:  {await GetUserAsync(GetStars[2].MessageId)} ({GetStars[2].Stars} Stars)");
             await ReplyAsync("", embed: Embed.Build());
+        }
+
+        [Command("Case"), Summary("Shows information about a specific case.")]
+        public Task CaseAsync(int CaseNumber = 0)
+        {
+            if (CaseNumber == 0) CaseNumber = Context.Config.ModLog.ModCases.LastOrDefault().CaseNumber;
+            var Case = Context.Config.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == CaseNumber);
+            if (Case == null || !Context.Config.ModLog.ModCases.Any())
+                return ReplyAsync($"Case #{CaseNumber} doesn't exist.");
+
+            return ReplyAsync(
+                $"**Case Number:** {Case.CaseNumber}\n" +
+                $"**Case Type:** {Case.CaseType}\n" +
+                $"**User:** {Case.User} ({Case.UserId})\n" +
+                $"**Responsible Mod:** {Case.ResponsibleMod}\n" +
+                $"**Reason:** {Case.Reason}");
         }
 
         async Task<string> GetUserAsync(string Message)
