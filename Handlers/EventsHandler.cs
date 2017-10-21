@@ -191,7 +191,7 @@ namespace Valerie.Handlers
             var BlacklistedRoles = new List<ulong>(Config.EridiumHandler.BlacklistedRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (!Config.EridiumHandler.IsEnabled || HasRole || BotConfig.Config.UsersBlacklist.ContainsKey(User.Id)) return;
-            var EridiumToGive = IntExtension.GiveEridium(Eridium, User.Guild.Users.Count);
+            var EridiumToGive = IntExtension.GiveEridium(Eridium);
             if (!Config.EridiumHandler.UsersList.ContainsKey(User.Id))
             {
                 Config.EridiumHandler.UsersList.TryAdd(User.Id, EridiumToGive);
