@@ -11,7 +11,6 @@ using Valerie.Handlers;
 using Valerie.Models;
 using Valerie.Extensions;
 using Valerie.Attributes;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie.Modules
 {
@@ -90,6 +89,37 @@ namespace Valerie.Modules
         [Command("AutoNSFW"), Summary("Toggles Auto NSFW for a specific channel."), CustomUserPermission]
         public async Task AutoNSFWAsync(int TimePeriod)
         {
+            Timer _Timer;
+            bool IsRunning = false;
+            if (TimePeriod == 0)
+            {
+                AutoNSFW.TryRemove(Context.Channel.Id, out _Timer);
+                if (_Timer != null)
+                    _Timer.Change(Timeout.Infinite, Timeout.Infinite);
+                else
+                    IsRunning = false;
+                await ReplyAsync("AutoNSFW has been stopped.");
+                return;
+            }
+            if (TimePeriod < 30 || IsRunning == false) return;
+
+            _Timer = new Timer(async _ =>
+            {
+                var Rand = new Random().Next(0, 1);
+                switch (Rand)
+                {
+                    case 0: await BumsAsync(); break;
+                    case 1: await BoobsAsync(); break;
+                }
+            }, null, TimePeriod * 1000, TimePeriod * 1000);
+
+            AutoNSFW.AddOrUpdate(Context.Channel.Id, _Timer, (Key, Old) =>
+            {
+                Old.Change(Timeout.Infinite, Timeout.Infinite);
+                return _Timer;
+            });
+            IsRunning = true;
+            await ReplyAsync($"Auto NSFW has been enabled for {(Context.Channel as ITextChannel).Mention}.");
         }
     }
 }
