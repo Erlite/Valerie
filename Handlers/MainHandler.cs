@@ -41,7 +41,7 @@ namespace Valerie.Handlers
             {
                 var TwitterConfig = BotConfig.Config.APIKeys.TwitterKeys;
                 Auth.SetUserCredentials(TwitterConfig.ConsumerKey, TwitterConfig.ConsumerSecret, TwitterConfig.AccessToken, TwitterConfig.AccessTokenSecret);
-                Logger.Write(Status.KAY, Source.Database, $"Logged into twitter: {User.UserFactory.GetAuthenticatedUser()?.ScreenName ?? "Not Logged In."}");
+                Logger.Write(Status.KAY, Source.Database, $"Twitter Info: {User.UserFactory.GetAuthenticatedUser()?.ScreenName ?? "Not Logged In."}");
             }
             catch (Exception E)
             {
