@@ -431,8 +431,7 @@ namespace Valerie.Modules
                 $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
             embed.AddField("Guilds", $"{Client.Guilds.Count}\n[Support Guild](https://discord.gg/nzYTzxD)", true);
             embed.AddField(":fleur_de_lis: ",
-                $"Commands Ran: {Context.ValerieConfig.CommandsUsed}\nBlacklisted Users: {Context.ValerieConfig.UsersBlacklist.Count}\n" +
-                $"Messages Received: {Context.ValerieConfig.MessagesReceived.ToString("#,##0,,M", CultureInfo.InvariantCulture)}", true);
+                $"Commands Ran: {Context.ValerieConfig.CommandUsed}\nBlacklisted Users: {Context.ValerieConfig.UsersBlacklist.Count}", true);
             embed.AddField(":space_invader:", $"Mod Cases: {Cases}\nStars Given: {Stars}\nEridium Given: {Eridium}", true);
             embed.AddField(":hammer_pick:",
                 $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB\n" +
