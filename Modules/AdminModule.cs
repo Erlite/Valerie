@@ -331,6 +331,7 @@ namespace Valerie.Modules
             var Channels = await Context.Guild.GetTextChannelsAsync();
             var SetupMessage = await ReplyAsync($"Initializing *{Context.Guild}'s* config .... ");
             OverwritePermissions Permissions = new OverwritePermissions(sendMessages: PermValue.Deny);
+            OverwritePermissions VPermissions = new OverwritePermissions(sendMessages: PermValue.Allow);
             var HasStarboard = Channels.FirstOrDefault(x => x.Name == "starboard");
             var HasMod = Channels.FirstOrDefault(x => x.Name == "logs");
             if (Channels.Contains(HasStarboard))
@@ -339,6 +340,7 @@ namespace Valerie.Modules
             {
                 var Starboard = await Context.Guild.CreateTextChannelAsync("starboard");
                 await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Starboard.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
                 Context.Config.Starboard.TextChannel = $"{Starboard.Id}";
             }
             if (Channels.Contains(HasMod))
@@ -347,6 +349,7 @@ namespace Valerie.Modules
             {
                 var Mod = await Context.Guild.CreateTextChannelAsync("logs");
                 await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Mod.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
                 Context.Config.ModLog.TextChannel = $"{Mod.Id}";
             }
             Context.Config.ChatterChannel = $"{Context.Guild.DefaultChannelId}";
