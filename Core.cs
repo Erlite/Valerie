@@ -27,7 +27,6 @@ namespace Valerie
                 {
                     DefaultRunMode = RunMode.Async
                 }))
-                .AddSingleton<CommandHandler>()
                 .AddSingleton<BotConfig>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<ServerConfig>()
@@ -35,7 +34,6 @@ namespace Valerie
 
             var Provider = Services.BuildServiceProvider();
             Provider.GetRequiredService<MainHandler>().StartAsync(Provider);
-            Provider.GetRequiredService<CommandHandler>().InitializeAsync(Provider);
 
             await Task.Delay(-1);
         }
