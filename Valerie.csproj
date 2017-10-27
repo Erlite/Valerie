@@ -15,11 +15,11 @@
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="Cookie" Version="2.0.1" />
     <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00829" />
-    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.29.2.896" />
-    <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.29.2.138" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.29.2.1006" />
+    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.30.0.896" />
+    <PackageReference Include="Google.Apis.Urlshortener.v1" Version="1.30.0.138" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.30.0.1006" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.4.0" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171001-0400" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171027-0400" />
     <PackageReference Include="TweetinviAPI" Version="2.0.0" />
   </ItemGroup>
 </Project>
