@@ -90,18 +90,15 @@ namespace Valerie.Modules
         public async Task AutoNSFWAsync(int TimePeriod)
         {
             Timer _Timer;
-            bool IsRunning = false;
             if (TimePeriod == 0)
             {
                 AutoNSFW.TryRemove(Context.Channel.Id, out _Timer);
                 if (_Timer != null)
                     _Timer.Change(Timeout.Infinite, Timeout.Infinite);
-                else
-                    IsRunning = false;
                 await ReplyAsync("AutoNSFW has been stopped.");
                 return;
             }
-            if (TimePeriod < 30 || IsRunning == false) return;
+            if (TimePeriod < 30) return;
 
             _Timer = new Timer(async _ =>
             {
@@ -118,7 +115,6 @@ namespace Valerie.Modules
                 Old.Change(Timeout.Infinite, Timeout.Infinite);
                 return _Timer;
             });
-            IsRunning = true;
             await ReplyAsync($"Auto NSFW has been enabled for {(Context.Channel as ITextChannel).Mention}.");
         }
     }
