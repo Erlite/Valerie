@@ -19,6 +19,7 @@ namespace Valerie.Handlers
         public ServerModel Config { get; set; }
         public ConfigModel ValerieConfig { get; set; }
         public IServiceProvider Provider { get; }
+        public Random Random { get; set; }
 
         public ValerieContext(IDiscordClient DiscordClient, IUserMessage UserMessage, IServiceProvider ServiceProvider)
         {
@@ -30,6 +31,7 @@ namespace Valerie.Handlers
             Channel = UserMessage.Channel;
             Config = Provider.GetRequiredService<ServerConfig>().LoadConfig(Guild.Id);
             ValerieConfig = BotConfig.Config;
+            Random = new Random(Guid.NewGuid().GetHashCode());
         }
     }
 }

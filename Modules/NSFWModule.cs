@@ -25,7 +25,7 @@ namespace Valerie.Modules
         {
             try
             {
-                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ new Random().Next(0, 10229) }").ConfigureAwait(false))[0];
+                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.oboobs.ru/boobs/{ Context.Random.Next(0, 10229) }").ConfigureAwait(false))[0];
                 await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
             }
             catch { }
@@ -36,7 +36,7 @@ namespace Valerie.Modules
         {
             try
             {
-                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ new Random().Next(0, 4963) }").ConfigureAwait(false))[0];
+                JToken Token = JArray.Parse(await Client.GetStringAsync($"http://api.obutts.ru/butts/{ Context.Random.Next(0, 4963) }").ConfigureAwait(false))[0];
                 await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
             }
             catch { }
@@ -71,7 +71,7 @@ namespace Valerie.Modules
                 await ReplyAsync("No results found!");
                 return;
             }
-            var Getvid = ConvertJson.VideoModel[new Random().Next(0, 20)];
+            var Getvid = ConvertJson.VideoModel[Context.Random.Next(0, ConvertJson.Count)];
             var embed = ValerieEmbed.Embed(EmbedColor.Snow, Getvid.VideoThumb, Getvid.VideoTitle, Description: Getvid.VideoUrl, ThumbUrl: Getvid.VideoThumb,
                 FooterText: $"Total Results: {ConvertJson.Count}");
             embed.AddField("Video Length", Getvid.duration, true);
@@ -102,7 +102,7 @@ namespace Valerie.Modules
 
             _Timer = new Timer(async _ =>
             {
-                var Rand = new Random().Next(0, 1);
+                var Rand = Context.Random.Next(0, 2);
                 switch (Rand)
                 {
                     case 0: await BumsAsync(); break;

@@ -42,7 +42,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"Couldn't find anything related to *{SearchTerm}*.");
                 return;
             }
-            var TermInfo = Data.List[new Random().Next(0, Data.List.Count)];
+            var TermInfo = Data.List[Context.Random.Next(0, Data.List.Count)];
             var embed = ValerieEmbed.Embed(EmbedColor.Gold, FooterText: $"Related Terms: {string.Join(", ", Data.Tags)}" ?? "No related terms.");
             embed.AddField($"Definition of {TermInfo.Word}", TermInfo.Definition, false);
             embed.AddField("Example", TermInfo.Example, false);
@@ -62,7 +62,7 @@ namespace Valerie.Modules
             var elems = document.QuerySelectorAll("a.image-list-link").ToList();
             if (!elems.Any())
                 return;
-            var img = (elems.ElementAtOrDefault(new Random().Next(0, elems.Count))?.Children?.FirstOrDefault() as IHtmlImageElement);
+            var img = (elems.ElementAtOrDefault(Context.Random.Next(0, elems.Count))?.Children?.FirstOrDefault() as IHtmlImageElement);
             if (img?.Source == null)
                 return;
             var source = img.Source.Replace("b.", ".");
@@ -73,7 +73,7 @@ namespace Valerie.Modules
         public async Task RobohashAsync(string name)
         {
             string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
-            var GetRandom = Sets[new Random().Next(0, Sets.Length)];
+            var GetRandom = Sets[Context.Random.Next(0, Sets.Length)];
             string URL = $"https://robohash.org/{name}{GetRandom}";
             await ReplyAsync(URL);
         }
@@ -170,7 +170,7 @@ namespace Valerie.Modules
                 await ReplyAsync("No results found.");
                 return;
             }
-            var RandomNum = new Random().Next(1, 50);
+            var RandomNum = Context.Random.Next(1, 50);
             JObject image = (JObject)arr[RandomNum];
             var embed = ValerieEmbed.Embed(EmbedColor.Black, ImageUrl: (string)image["contentUrl"]);
             await ReplyAsync("", embed: embed.Build());
@@ -246,12 +246,12 @@ namespace Valerie.Modules
             if (!string.IsNullOrWhiteSpace(SearchTerms))
             {
                 var GetGif = await Client.SearchAsync(SearchTerms);
-                Response = GetGif.Datum[new Random().Next(0, GetGif.Pagination.Count)].EmbedURL;
+                Response = GetGif.Datum[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
             }
             else
             {
                 var gif = await Client.TrendingAsync();
-                var Random = new Random().Next(0, gif.Pagination.Count);
+                var Random = Context.Random.Next(0, gif.Pagination.Count);
                 Response = gif.Datum[Random].EmbedURL;
             }
             await ReplyAsync(Response);
@@ -306,7 +306,7 @@ namespace Valerie.Modules
         [Command("GImage"), Summary("Searches google for your image and returns a random image from 50 results.")]
         public async Task GImageAsync([Remainder] string search)
         {
-            var rng = new Random();
+            var rng = Context.Random;
             var reqString = $"https://www.googleapis.com/customsearch/v1?q={Uri.EscapeDataString(search)}&cx=018084019232060951019%3Ahs5piey28-e&num=1&searchType=image&start=" +
                 $"{ rng.Next(1, 10) }&fields=items%2Flink&key={Context.ValerieConfig.APIKeys.GoogleKey}";
             var obj = JObject.Parse(await new HttpClient().GetStringAsync(reqString));

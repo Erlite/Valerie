@@ -18,6 +18,7 @@ namespace Valerie.Handlers
     {
         BotConfig BConfig;
         ServerConfig ServerConfig;
+        Random Random = new Random(Guid.NewGuid().GetHashCode());
         public EventsHandler(ServerConfig Config, BotConfig _BotConfig)
         {
             ServerConfig = Config;
@@ -42,7 +43,7 @@ namespace Valerie.Handlers
         {
             var Config = ServerConfig.LoadConfig(User.Guild.Id);
             string WelcomeMessage = !Config.WelcomeMessages.Any() ? $"{User} just arrived. Seems OP - please nerf." :
-                StringExtension.ReplaceWith(Config.WelcomeMessages[new Random().Next(0, Config.WelcomeMessages.Count)], User.Mention, User.Guild.Name);
+                StringExtension.ReplaceWith(Config.WelcomeMessages[Random.Next(0, Config.WelcomeMessages.Count)], User.Mention, User.Guild.Name);
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
             if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
             var Role = User.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole));
@@ -55,7 +56,7 @@ namespace Valerie.Handlers
             var Config = ServerConfig.LoadConfig(User.Guild.Id);
             ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             string LeaveMessage = !Config.LeaveMessages.Any() ? $"{User} has left {User.Guild.Name} :wave:" :
-                StringExtension.ReplaceWith(Config.LeaveMessages[new Random().Next(0, Config.LeaveMessages.Count)], User.Username, User.Guild.Name);
+                StringExtension.ReplaceWith(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Username, User.Guild.Name);
             if (Channel != null) await Channel.SendMessageAsync(LeaveMessage);
         }
 
@@ -150,7 +151,7 @@ namespace Valerie.Handlers
         internal Task ReadyAsync(DiscordSocketClient Client)
         {
             string Game = BotConfig.Config.BotGames == null ? $"{BotConfig.Config.Prefix}Cmds" :
-                BotConfig.Config.BotGames[new Random(Guid.NewGuid().GetHashCode()).Next(BotConfig.Config.BotGames.Count)];
+                BotConfig.Config.BotGames[Random.Next(BotConfig.Config.BotGames.Count)];
             return Client.SetGameAsync(Game);
         }
 

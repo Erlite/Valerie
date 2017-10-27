@@ -146,7 +146,6 @@ namespace Valerie.Modules
                 ":peach:",
                 ":pizza:"
             };
-            var Rand = new Random(DateTime.Now.Millisecond);
             var UserEridium = Context.Config.EridiumHandler.UsersList[Context.User.Id];
 
             if (UserEridium <= 0 || UserEridium < Bet)
@@ -165,9 +164,9 @@ namespace Valerie.Modules
 
             int[] s = new int[]
             {
-                Rand.Next(0, Slots.Length),
-                Rand.Next(0, Slots.Length),
-                Rand.Next(0, Slots.Length)
+                Context.Random.Next(0, Slots.Length),
+                Context.Random.Next(0, Slots.Length),
+                Context.Random.Next(0, Slots.Length)
             };
             embed.AddField(x =>
             {
@@ -234,7 +233,7 @@ namespace Valerie.Modules
 
 
             string[] Sides = { "Heads", "Tails" };
-            var GetSide = Sides[new Random().Next(0, Sides.Length)];
+            var GetSide = Sides[Context.Random.Next(0, Sides.Length)];
 
             if (Side.ToLower() == GetSide.ToLower())
             {
@@ -310,7 +309,7 @@ namespace Valerie.Modules
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
         public async Task RateAsync([Remainder] string ThingToRate)
-            => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a {new Random().Next(11)}/10");
+            => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a {Context.Random.Next(11)}/10");
 
         [Command("Translate"), Summary("Translates a sentence into the specified language.")]
         public async Task TranslateAsync(string Language, [Remainder] string Text)
@@ -443,7 +442,7 @@ namespace Valerie.Modules
         public async Task FoaasAsync(IGuildUser User = null)
         {
             var Guild = Context.Guild as SocketGuild;
-            string RandUser = Guild.Users.ToArray()[new Random(Guid.NewGuid().GetHashCode()).Next(0, Guild.Users.Count)].Username;
+            string RandUser = Guild.Users.ToArray()[Context.Random.Next(0, Guild.Users.Count)].Username;
             await ReplyAsync(await FOAAS.RandomAsync(From: Context.User.Username, Name: User != null ? User.Username : RandUser).ConfigureAwait(false));
         }
 
