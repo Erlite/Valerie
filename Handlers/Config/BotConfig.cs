@@ -1,53 +1,55 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Valerie.Services;
 using Valerie.Handlers.Config.Models;
-using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers.Config
 {
     public class BotConfig
     {
-        public static ConfigModel Config
+        public static ConfigModel Config => GetConfig();
+
+        static ConfigModel GetConfig()
         {
-            get
+            ConfigModel model;
+            using (var session = MainHandler.Store.OpenSession())
             {
-                using (IDocumentSession Session = MainHandler.Store.OpenSession())
-                    return Session.Load<ConfigModel>("Config");
+                model = session.Load<ConfigModel>("Config");
+                session.Dispose();
+                return model;
             }
         }
 
-        public async Task LoadConfigAsync()
+        public void LoadConfig()
         {
-            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
+            Logger.PrintInfo();
+            using (var Session = MainHandler.Store.OpenSession())
             {
-                if (await Session.LoadAsync<ConfigModel>("Config") == null)
+                if (Session.Load<ConfigModel>("Config") == null)
                 {
                     Logger.Write(Status.ERR, Source.Config, "No config found! Creating one ...");
                     Logger.Write(Status.WRN, Source.Config, "Input Token: ");
                     string Token = Console.ReadLine();
                     Logger.Write(Status.WRN, Source.Config, "Input Prefix: ");
                     string Prefix = Console.ReadLine();
-                    await Session.StoreAsync(new ConfigModel
+                    Session.Store(new ConfigModel
                     {
                         Id = "Config",
                         Token = Token,
                         Prefix = Prefix
-                    }).ConfigureAwait(false);
-                    await Session.SaveChangesAsync().ConfigureAwait(false);
+                    });
+                    Session.SaveChanges();
                     Session.Dispose();
                 }
-                else
-                    Logger.Write(Status.KAY, Source.Config, "Config has been locked and loaded!");
+                else Logger.Write(Status.KAY, Source.Config, "Config has been locked and loaded!");
             }
         }
 
-        public async Task SaveAsync(ConfigModel GetConfig)
+        public void Save(ConfigModel GetConfig)
         {
-            using (IAsyncDocumentSession Session = MainHandler.Store.OpenAsyncSession())
+            using (var Session = MainHandler.Store.OpenSession())
             {
-                await Session.StoreAsync(GetConfig, id: "Config").ConfigureAwait(false);
-                await Session.SaveChangesAsync().ConfigureAwait(false);
+                Session.Store(GetConfig, "Config");
+                Session.SaveChanges();
                 Session.Dispose();
             }
         }
