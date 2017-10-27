@@ -43,8 +43,7 @@ namespace Valerie.Modules
         }
 
         [Command("Ban"), Summary("Bans user from the guild."),
-            RequireBotPermission(GuildPermission.BanMembers),
-            RequireUserPermission(GuildPermission.BanMembers)]
+            RequireBotPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(IGuildUser User, [Remainder] string Reason = null)
         {
             await Context.Guild.AddBanAsync(User, 7, Reason);
@@ -71,8 +70,36 @@ namespace Valerie.Modules
             await ReplyAsync($"***{User} got bent*** :ok_hand:");
         }
 
-        [Command("Reason"), Summary("Specifies reason for a moderator action."),
-            RequireUserPermission(GuildPermission.KickMembers)]
+        [Command("SoftBan"), Summary("Bans user from the guild then unbans the user."),
+            RequireBotPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task SoftBanAsync(IGuildUser User, [Remainder] string Reason = null)
+        {
+            await Context.Guild.AddBanAsync(User, 7, Reason);
+            Context.Config.ModLog.Cases += 1;
+            ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Config.ModLog.TextChannel));
+            IUserMessage Message = null;
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.ValerieConfig.Prefix}Reason {Context.Config.ModLog.Cases} <Reason>`*";
+
+            if (Channel != null)
+                Message = await SendMessageAsync(Channel, $"**Soft Ban** | Case {Context.Config.ModLog.Cases}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {Context.User}");
+
+            Context.Config.ModLog.ModCases.Add(new CaseWrapper()
+            {
+                CaseType = "Ban",
+                CaseNumber = Context.Config.ModLog.Cases,
+                Reason = Reason,
+                ResponsibleMod = $"{Context.User}",
+                UserId = $"{User.Id}",
+                User = $"{User}",
+                MessageId = $"{Message.Id}"
+            });
+
+            await Context.Guild.RemoveBanAsync(User);
+            await ReplyAsync($"***{User} got softly bent*** :ok_hand:");
+        }
+
+        [Command("Reason"), Summary("Specifies reason for a moderator action."), RequireUserPermission(GuildPermission.KickMembers)]
         public async Task ReasonAsync(int Case, [Remainder] string Reason)
         {
             var GetCase = Context.Config.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == Case);
@@ -93,8 +120,7 @@ namespace Valerie.Modules
         }
 
         [Command("Unban"), Summary("Unbans user from the guild"),
-            RequireBotPermission(GuildPermission.BanMembers),
-            RequireUserPermission(GuildPermission.BanMembers)]
+            RequireBotPermission(GuildPermission.BanMembers), RequireUserPermission(GuildPermission.BanMembers)]
         public async Task UnBanAsync(IGuildUser User)
         {
             await Context.Guild.RemoveBanAsync(User);
@@ -102,8 +128,7 @@ namespace Valerie.Modules
         }
 
         [Command("PurgeChannel"), Summary("Purges 500 messages from a channel."), Alias("PC"),
-            RequireBotPermission(ChannelPermission.ManageMessages),
-            RequireUserPermission(ChannelPermission.ManageMessages)]
+            RequireBotPermission(ChannelPermission.ManageMessages), RequireUserPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeChannelAsync(ITextChannel Channel)
         {
             var Messages = await Channel.GetMessagesAsync(500).Flatten();
@@ -111,8 +136,7 @@ namespace Valerie.Modules
         }
 
         [Command("PurgeUser"), Summary("Purges User messages from current channel."), Alias("PU"),
-            RequireBotPermission(ChannelPermission.ManageMessages),
-            RequireUserPermission(ChannelPermission.ManageMessages)]
+            RequireBotPermission(ChannelPermission.ManageMessages), RequireUserPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeUserAsync(int Amount, IGuildUser User)
         {
             var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).Flatten()).Where(x => x.Author.Id == User.Id);
@@ -124,8 +148,7 @@ namespace Valerie.Modules
         }
 
         [Command("Purge"), Summary("Deletes all messages from a channel."), Alias("Del"),
-            RequireBotPermission(ChannelPermission.ManageMessages),
-            RequireUserPermission(ChannelPermission.ManageMessages)]
+            RequireBotPermission(ChannelPermission.ManageMessages), RequireUserPermission(ChannelPermission.ManageMessages)]
         public async Task Purge(int Amount)
         {
             var GetMessages = await Context.Channel.GetMessagesAsync(Amount).Flatten();
@@ -137,8 +160,7 @@ namespace Valerie.Modules
         }
 
         [Command("Addrole"), Alias("Arole"), Summary("Adds user to the specified role."),
-            RequireBotPermission(GuildPermission.ManageRoles),
-            RequireUserPermission(GuildPermission.ManageRoles)]
+            RequireBotPermission(GuildPermission.ManageRoles), RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task AddroleAsync(IGuildUser User, IRole Role)
         {
             await User.AddRoleAsync(Role);
@@ -146,16 +168,14 @@ namespace Valerie.Modules
         }
 
         [Command("Removerole"), Alias("Rrole"), Summary("Removes user from the specified role."),
-            RequireBotPermission(GuildPermission.ManageRoles),
-            RequireUserPermission(GuildPermission.ManageRoles)]
+            RequireBotPermission(GuildPermission.ManageRoles), RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleAsync(IGuildUser User, IRole Role)
         {
             await User.RemoveRoleAsync(Role);
             await ReplyAsync($"**{User} has been removed from {Role.Name}.** :v:");
         }
 
-        [Command("Mute"), Summary("Mutes a user."),
-            RequireUserPermission(GuildPermission.MuteMembers)]
+        [Command("Mute"), Summary("Mutes a user."), RequireUserPermission(GuildPermission.MuteMembers)]
         public async Task MuteAsync(IGuildUser User)
         {
             if (User.RoleIds.Contains(Convert.ToUInt64(Context.Config.ModLog.MuteRole)))
@@ -193,8 +213,7 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Unmute"), Summary("Umutes a user."),
-            RequireUserPermission(GuildPermission.MuteMembers)]
+        [Command("Unmute"), Summary("Umutes a user."), RequireUserPermission(GuildPermission.MuteMembers)]
         public async Task UnMuteAsync(SocketGuildUser User)
         {
             IRole Role = Context.Guild.GetRole(Convert.ToUInt64(Context.Config.ModLog.MuteRole));
@@ -213,8 +232,7 @@ namespace Valerie.Modules
         }
 
         [Command("Warn"), Summary("Warns a user with a specified reason."),
-            RequireBotPermission(GuildPermission.KickMembers),
-            RequireUserPermission(GuildPermission.KickMembers)]
+            RequireBotPermission(GuildPermission.KickMembers), RequireUserPermission(GuildPermission.KickMembers)]
         public async Task WarnAysnc(IGuildUser User, [Remainder]string Reason)
         {
             string WarnMessage = $"**[Warned in {Context.Guild}]** {Reason}";
