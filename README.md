@@ -33,6 +33,6 @@ Hosting Valerie
 - Make sure you have .Net Core 2.0 installed and RavenDB downloaded and running.
 - Clone/Download this repo.
 - Open a new powershell or command prompt in the repo's directory and run `dotnet restore` to restore packages.
-- Run `dotnet build` and navigate to the output directory and type `dotnet Valerie.dll` to run your own instance of Valerie.
+- Run `dotnet publish -c Release -f netcoreapp2.0 -r win8-x64`. If you have windows 10 `-r win10-x64`.
 
 *FYI: no support will be provided for custom instances of Valerie.*
