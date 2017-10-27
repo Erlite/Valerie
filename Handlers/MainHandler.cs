@@ -29,7 +29,7 @@ namespace Valerie.Handlers
 
         static Lazy<IDocumentStore> DocumentStore = new Lazy<IDocumentStore>(new DocumentStore()
         {
-            Database = "Test",
+            Database = "Valerie",
             Urls = new string[] { "http://localhost:8080" }
         }.Initialize());
 
@@ -38,7 +38,6 @@ namespace Valerie.Handlers
         public async Task StartAsync(IServiceProvider IServiceProvider)
         {
             Provider = IServiceProvider;
-            //ValerieBase<ValerieContext>.Provider = IServiceProvider;
             Config.LoadConfig();
             Auth.SetUserCredentials(BotConfig.Config.APIKeys.TwitterKeys.ConsumerKey, BotConfig.Config.APIKeys.TwitterKeys.ConsumerSecret,
                 BotConfig.Config.APIKeys.TwitterKeys.AccessToken, BotConfig.Config.APIKeys.TwitterKeys.AccessTokenSecret);
@@ -58,7 +57,7 @@ namespace Valerie.Handlers
             Client.LatencyUpdated += (Older, Newer) => EventsHandler.LatencyUpdated(Client, Older, Newer);
             Client.Ready += () => EventsHandler.ReadyAsync(Client);
 
-            await Client.LoginAsync(Discord.TokenType.Bot, BotConfig.Config.Token);
+            await Client.LoginAsync(TokenType.Bot, BotConfig.Config.Token);
             await Client.StartAsync();
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
         }
