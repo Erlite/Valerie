@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Raven.Client.Documents.Session;
@@ -8,7 +7,6 @@ namespace Valerie.Handlers
 {
     public class ValerieBase<T> : ModuleBase<ValerieContext> where T : ValerieContext
     {
-        public static IServiceProvider Provider { get; set; }
         IDocumentSession Session { get; set; }
 
         protected override void BeforeExecute(CommandInfo command)
@@ -35,8 +33,7 @@ namespace Valerie.Handlers
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
 
-        public async Task ReactAsync(string GetEmoji)
-            => await Context.Message.AddReactionAsync(new Emoji(GetEmoji)).ConfigureAwait(false);
+        public async Task ReactAsync(string GetEmoji) => await Context.Message.AddReactionAsync(new Emoji(GetEmoji)).ConfigureAwait(false);
 
         public async Task<IUserMessage> SendMessageAsync(ITextChannel Channel, string Message)
         {
