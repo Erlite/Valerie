@@ -17,6 +17,6 @@ namespace Valerie.Handlers.Config.Models
         public List<string> EvalImports { get; set; } = new List<string>();
         public List<string> BotGames { get; set; } = new List<string>();
         public ConcurrentDictionary<ulong, string> UsersBlacklist { get; set; } = new ConcurrentDictionary<ulong, string>();
-        public List<ulong> PokeServers = new List<ulong>();
+        public List<ulong> PokeServers { get; set; } = new List<ulong>();
     }
 }
