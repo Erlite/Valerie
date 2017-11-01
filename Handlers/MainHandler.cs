@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
+using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Tweetinvi;
+using Cookie.Pokedex;
 using Valerie.Services;
 using Valerie.Handlers.Config;
-using Discord.Commands;
-using System.Reflection;
-using Discord;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie.Handlers
 {
@@ -59,7 +61,10 @@ namespace Valerie.Handlers
 
             await Client.LoginAsync(TokenType.Bot, BotConfig.Config.Token);
             await Client.StartAsync();
+
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
+
+            Provider.GetRequiredService<PokedexService>().Initialize(Client, Provider);
         }
 
         internal async Task HandleCommandsAsync(SocketMessage Message)
