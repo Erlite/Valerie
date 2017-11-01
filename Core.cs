@@ -30,6 +30,7 @@ namespace Valerie
                 .AddSingleton<BotConfig>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<ServerConfig>()
+                .AddSingleton<Services.PokedexService>()
                 .AddSingleton<EventsHandler>();
 
             var Provider = Services.BuildServiceProvider();
