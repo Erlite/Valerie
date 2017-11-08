@@ -1,89 +1,55 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Raven.Client.Documents;
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Tweetinvi;
-using Cookie.Pokedex;
 using Valerie.Services;
-using Valerie.Handlers.Config;
-using Microsoft.Extensions.DependencyInjection;
+using Valerie.Services.RestService;
 
 namespace Valerie.Handlers
 {
     public class MainHandler
     {
-        IServiceProvider Provider;
-        readonly BotConfig Config;
-        readonly DiscordSocketClient Client;
+        public static string ConfigId { get; set; } = "Config";
+        public static RestConfig RestConfig { get; set; }
+        public static RestServer RestServer { get; set; }
+        readonly HttpClient HttpClient;
         readonly EventsHandler EventsHandler;
-        readonly CommandService CommandService;
+        readonly DiscordSocketClient Client;
+        readonly ConfigHandler ConfigHandler;
 
-        public MainHandler(DiscordSocketClient SocketClient, BotConfig BotConfig, EventsHandler Events, CommandService CmdService)
+        public MainHandler(HttpClient HttpParam, DiscordSocketClient DiscordParam, ConfigHandler ConfigParam, EventsHandler EventParam)
         {
-            Client = SocketClient;
-            Config = BotConfig;
-            EventsHandler = Events;
-            CommandService = CmdService;
+            Client = DiscordParam;
+            HttpClient = HttpParam;
+            EventsHandler = EventParam;
+            ConfigHandler = ConfigParam;
         }
 
-        static Lazy<IDocumentStore> DocumentStore = new Lazy<IDocumentStore>(new DocumentStore()
+        public async Task StartAsync()
         {
-            Database = "Valerie",
-            Urls = new string[] { "http://localhost:8080" }
-        }.Initialize());
+            RestConfig = new RestConfig("http://localhost:51117/api/config/", HttpClient);
+            RestServer = new RestServer("http://localhost:51117/api/server/", HttpClient);
+            LogClient.AppInfo();
 
-        public static IDocumentStore Store => DocumentStore.Value;
-
-        public async Task StartAsync(IServiceProvider IServiceProvider)
-        {
-            Provider = IServiceProvider;
-            Config.LoadConfig();
-            Auth.SetUserCredentials(BotConfig.Config.APIKeys.TwitterKeys.ConsumerKey, BotConfig.Config.APIKeys.TwitterKeys.ConsumerSecret,
-                BotConfig.Config.APIKeys.TwitterKeys.AccessToken, BotConfig.Config.APIKeys.TwitterKeys.AccessTokenSecret);
-            Logger.Write(Status.KAY, Source.Database, $"Twitter Info: {User.UserFactory.GetAuthenticatedUser()?.ScreenName ?? "Not Logged In."}");
-
-            Client.Log += EventsHandler.Log;
-            Client.JoinedGuild += EventsHandler.JoinedGuild;
-            Client.LeftGuild += EventsHandler.LeftGuild;
-            Client.GuildAvailable += EventsHandler.GuildAvailable;
-            Client.UserJoined += EventsHandler.UserJoined;
-            Client.UserLeft += EventsHandler.UserLeft;
-            Client.UserBanned += EventsHandler.UserBanned;
-            Client.MessageReceived += EventsHandler.MessageReceivedAsync;
-            Client.MessageReceived += HandleCommandsAsync;
+            Client.Log += EventsHandler.LogAsync;
+            Client.Ready += EventsHandler.ReadyAsync;
+            Client.UserLeft += EventsHandler.UserLeftAsync;
+            Client.LeftGuild += EventsHandler.LeftGuildAsync;
+            Client.UserJoined += EventsHandler.UserJoinedAsync;
+            Client.JoinedGuild += EventsHandler.JoinedGuildAsync;
+            Client.UserBanned += EventsHandler.UserBannedAsync;
+            Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
             Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
+            Client.LatencyUpdated += EventsHandler.LatencyUpdatedAsync;
+            Client.MessageReceived += EventsHandler.HandleMessageAsync;
+            Client.MessageReceived += EventsHandler.HandleCommandAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
-            Client.LatencyUpdated += (Older, Newer) => EventsHandler.LatencyUpdated(Client, Older, Newer);
-            Client.Ready += () => EventsHandler.ReadyAsync(Client);
 
-            await Client.LoginAsync(TokenType.Bot, BotConfig.Config.Token);
+            await ConfigHandler.ConfigCheckAsync();
+            var Config = await ConfigHandler.GetConfigAsync();
+
+            await Client.LoginAsync(TokenType.Bot, Config.Token);
             await Client.StartAsync();
-
-            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
-
-            Provider.GetRequiredService<PokedexService>().Initialize(Client, Provider);
-        }
-
-        internal async Task HandleCommandsAsync(SocketMessage Message)
-        {
-            if (!(Message is SocketUserMessage Msg)) return;
-            int argPos = 0;
-            var Context = new ValerieContext(Client, Msg as IUserMessage, Provider);
-            if (!(Msg.HasStringPrefix(Context.ValerieConfig.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Config.Prefix, ref argPos)) ||
-                Msg.Source != MessageSource.User || Msg.Author.IsBot || Context.ValerieConfig.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
-            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
-            Context.ValerieConfig.CommandUsed++;
-            Config.Save(Context.ValerieConfig);
-
-            switch (Result.Error)
-            {
-                case CommandError.Exception: Logger.Write(Status.ERR, Source.Exception, Result.ErrorReason); break;
-                case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
-                case CommandError.Unsuccessful: Logger.Write(Status.ERR, Source.UnSuccesful, Result.ErrorReason); break;
-            }
         }
     }
 }
