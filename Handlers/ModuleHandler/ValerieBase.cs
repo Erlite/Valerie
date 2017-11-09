@@ -15,7 +15,7 @@ namespace Valerie.Handlers.ModuleHandler
         public async Task<IUserMessage> SaveAsync(string Message = null)
         {
             var check = await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
-            if (check == true) return await ReplyAsync(Message ?? "✔️ - Done.");
+            if (check == true) return await ReplyAsync(Message ?? "✅ - Done.");
             return await ReplyAsync(Message ?? "✖️ - There was an error.");
         }
     }
