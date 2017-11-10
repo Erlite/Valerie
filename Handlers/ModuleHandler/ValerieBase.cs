@@ -8,6 +8,7 @@ namespace Valerie.Handlers.ModuleHandler
     {
         public async Task<IUserMessage> ReplyAsync(string Message, Embed GetEmbed = null)
         {
+            await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
             await Context.Channel.TriggerTypingAsync();
             return await base.ReplyAsync(Message, false, GetEmbed, null);
         }
