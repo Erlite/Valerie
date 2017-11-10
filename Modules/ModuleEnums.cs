@@ -2,9 +2,10 @@
 {
     public enum ModuleEnums
     {
-        Prefix,
+        Mod,
         Join,
         Leave,
-        Chatter
+        Chatter,
+        Starboard
     }
 }
