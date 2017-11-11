@@ -5,6 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Handlers;
+using System;
 
 namespace Valerie
 {
@@ -27,10 +28,11 @@ namespace Valerie
                     DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<MainHandler>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton(new HttpClient())
                 .AddSingleton<ServerHandler>()
-                .AddSingleton<ConfigHandler>();
+                .AddSingleton(new HttpClient())
+                .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
             await Provider.GetRequiredService<MainHandler>().StartAsync();
