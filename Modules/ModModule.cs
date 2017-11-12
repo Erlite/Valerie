@@ -13,7 +13,7 @@ namespace Valerie.Modules
     [RequireAccess(AccessLevel.AdminsNMods)]
     public class ModModule : ValerieBase
     {
-        [Command("Kick"), Summary("Kick's a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("Kick"), Summary("Kicks a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             await User.KickAsync(Reason);
@@ -21,7 +21,7 @@ namespace Valerie.Modules
             await LogAsync(User, CaseType.Kick, Reason);
         }
 
-        [Command("MassKick"), Summary("Kick's multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("MassKick"), Summary("Kicks multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickAsync(params IGuildUser[] Users)
         {
             foreach (var User in Users)
@@ -32,7 +32,7 @@ namespace Valerie.Modules
             await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got kicked. :ok_hand:");
         }
 
-        [Command("Ban"), Summary("Ban's a user from the server."), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("Ban"), Summary("Bans a user from the server."), RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             await Context.Guild.AddBanAsync(User, 7, Reason);
@@ -40,7 +40,7 @@ namespace Valerie.Modules
             await LogAsync(User, CaseType.Ban, Reason);
         }
 
-        [Command("MassBan"), Summary("Ban's multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("MassBan"), Summary("Bans multiple users at once."), RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(params IGuildUser[] Users)
         {
             foreach (var User in Users)
@@ -49,6 +49,13 @@ namespace Valerie.Modules
                 await LogAsync(User, CaseType.Ban, "Mass Ban");
             }
             await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got bent. :ok_hand:");
+        }
+
+        [Command("Ban"), Summary("Bans a user form the server even if they are not in the server."), RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task BanAsync(ulong UserId, [Remainder] string Reason = null)
+        {
+            await Context.Guild.AddBanAsync(UserId, 7, Reason ?? "Secert Ban.");
+            await ReplyAsync($"***{UserId} got bent.*** :ok_hand:");
         }
 
         [Command("Reason"), Summary("Specifies reason for a user case.")]
@@ -196,11 +203,12 @@ namespace Valerie.Modules
             {
                 case ModuleEnums.Add:
                     if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} is already blacklisted.");
-                    else if (Context.Server.BlacklistedUsers.Count == 50) return ReplyAsync("Blacklist can't have more than 50 users.");
+                    else if (Context.Server.BlacklistedUsers.Count == Context.Server.BlacklistedUsers.Capacity)
+                        return ReplyAsync("Blacklist can't have more than 50 users.");
                     Context.Server.BlacklistedUsers.Add(User.Id);
                     return SaveAsync();
                 case ModuleEnums.Remove:
-                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} isn't already blacklisted.");
+                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} isn't  blacklisted.");
                     Context.Server.BlacklistedUsers.Remove(User.Id);
                     return SaveAsync();
             }
