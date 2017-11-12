@@ -24,7 +24,7 @@ namespace Valerie.Attributes
             else if (GetAccessLevel == AccessLevel.AdminsNMods && (AdminPerms || ModPerms))
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError($"{Command.Name} requires {typeof(AccessLevel).Name} access."));
+                return Task.FromResult(PreconditionResult.FromError($"{Command.Name} requires {typeof(AccessLevel)} access."));
         }
     }
 
