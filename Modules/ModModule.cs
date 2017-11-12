@@ -14,7 +14,7 @@ namespace Valerie.Modules
     public class ModModule : ValerieBase
     {
         [Command("Kick"), Summary("Kick's a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
-        public async Task KickAsync(IGuildUser User, [Remainder]string Reason)
+        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             await User.KickAsync(Reason);
             await ReplyAsync($"***{User} got kicked.*** :ok_hand:");
@@ -33,7 +33,7 @@ namespace Valerie.Modules
         }
 
         [Command("Ban"), Summary("Ban's a user from the server."), RequireBotPermission(GuildPermission.KickMembers)]
-        public async Task BanAsync(IGuildUser User, [Remainder]string Reason)
+        public async Task BanAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             await Context.Guild.AddBanAsync(User, 7, Reason);
             await ReplyAsync($"***{User} got bent.*** :ok_hand:");
@@ -91,7 +91,7 @@ namespace Valerie.Modules
         }
 
         [Command("Purge"), Alias("Delete", "Del"), Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
-        public async Task Purge(int Amount)
+        public async Task Purge(int Amount = 10)
         {
             var GetMessages = await Context.Channel.GetMessagesAsync(Amount).Flatten();
             if (Amount <= 100) await (Context.Channel as ITextChannel).DeleteMessagesAsync(GetMessages);
@@ -180,15 +180,6 @@ namespace Valerie.Modules
             await ReplyAsync($"**{User} has been warned** :ok_hand:");
         }
 
-        [Command("Warnings"), Summary("Shows current number of warnings for specified user..")]
-        public Task WarningsAsync(IGuildUser User = null)
-        {
-            User = Context.User as IGuildUser ?? User;
-            if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
-                return ReplyAsync($"{User} has no previous warnings.");
-            return ReplyAsync($"{User} has been warned {Context.Server.ModLog.Warnings[User.Id]} times.");
-        }
-
         [Command("ResetWarns"), Summary("Resets users warnings.")]
         public Task ResetWarnsAsync(IGuildUser User)
         {
@@ -196,6 +187,24 @@ namespace Valerie.Modules
                 return ReplyAsync($"{User} has no warnings.");
             Context.Server.ModLog.Warnings[User.Id] = 0;
             return SaveAsync();
+        }
+
+        [Command("Blacklist"), Summary("Add's a user to server's blacklist. This prevents user from running Valerie's commands.")]
+        public Task BlacklistAsync(ModuleEnums Action, IGuildUser User)
+        {
+            switch (Action)
+            {
+                case ModuleEnums.Add:
+                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} is already blacklisted.");
+                    else if (Context.Server.BlacklistedUsers.Count == 50) return ReplyAsync("Blacklist can't have more than 50 users.");
+                    Context.Server.BlacklistedUsers.Add(User.Id);
+                    return SaveAsync();
+                case ModuleEnums.Remove:
+                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} isn't already blacklisted.");
+                    Context.Server.BlacklistedUsers.Remove(User.Id);
+                    return SaveAsync();
+            }
+            return Task.CompletedTask;
         }
     }
 }
