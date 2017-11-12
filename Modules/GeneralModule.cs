@@ -176,5 +176,14 @@ namespace Valerie.Modules
         [Command("Rate"), Summary("Rates something for you out of 10.")]
         public async Task RateAsync([Remainder] string ThingToRate) 
             => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a solid {Context.Random.Next(11)}/10");
+
+        [Command("Warnings"), Summary("Shows current number of warnings for specified user..")]
+        public Task WarningsAsync(IGuildUser User = null)
+        {
+            User = Context.User as IGuildUser ?? User;
+            if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
+                return ReplyAsync($"{User} has no previous warnings.");
+            return ReplyAsync($"{User} has been warned {Context.Server.ModLog.Warnings[User.Id]} times.");
+        }
     }
 }
