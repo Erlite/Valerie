@@ -58,6 +58,7 @@ namespace Valerie.Modules
             var Getvid = Json.Result[Context.Random.Next(Json.Result.Count())];
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Description: $"[{Getvid.Title}]({Getvid.Url})\nTotal Views: {Getvid.Views}", ThumbUrl: Getvid.Thumb);
             await SendEmbedAsync(Embed.Build());
+            Response.Dispose();
         }
 
         [Command("Lewd"), Summary("Weeb heaven.")]
