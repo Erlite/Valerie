@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
-using Valerie.Attributes;
-using Valerie.Handlers.ModuleHandler;
 using Discord.WebSocket;
-using System.Diagnostics;
-using System.Linq;
+using Valerie.Extensions;
+using Valerie.JsonModels;
+using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
@@ -16,6 +19,9 @@ namespace Valerie.Modules
         [Command("Ping"), Summary("Pings discord gateway.")]
         public Task PingAsync() => ReplyAsync($"{(Context.Client as DiscordSocketClient).Latency} ms.");
 
+        [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
+        public Task UserAvatarAsync(IGuildUser User = null) => ReplyAsync((User ?? Context.User).GetAvatarUrl(size: 2048));
+
         [Command("Updoot"), Summary("Gives an updoot to a specified user.")]
         public Task UpdootAsync(IGuildUser User)
         {
@@ -23,15 +29,15 @@ namespace Valerie.Modules
                 Context.Server.Updoots.Add(User.Id, 1);
             else
                 Context.Server.Updoots[User.Id]++;
-            return SaveAsync($"Updooted {User}.");
+            return SaveAsync($"Thanks for updooting {User}. ☺");
         }
 
         [Command("Updoot"), Summary("Shows your updoots in this server.")]
         public Task UpdootAsync()
         {
             if (!Context.Server.Updoots.ContainsKey(Context.User.Id))
-                return ReplyAsync("No-one updooted you. 😶");
-            return ReplyAsync($"You have {Context.Server.Updoots[Context.User.Id]} updoots.");
+                return ReplyAsync("No-one gave you updoots. 😶");
+            return ReplyAsync($"You have {Context.Server.Updoots[Context.User.Id]} updoots. ☺");
         }
 
         [Command("AFK"), Summary("Adds Or Removes you from AFK list. Actions: Add/Remove/Modify")]
@@ -174,16 +180,197 @@ namespace Valerie.Modules
         }
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
-        public async Task RateAsync([Remainder] string ThingToRate) 
+        public async Task RateAsync([Remainder] string ThingToRate)
             => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a solid {Context.Random.Next(11)}/10");
 
-        [Command("Warnings"), Summary("Shows current number of warnings for specified user..")]
+        [Command("Iam"), Summary("Adds you to one of the roles from assignable roles list.")]
+        public Task IAmAsync(IRole Role)
+        {
+            var User = Context.User as SocketGuildUser;
+            if (Role == Context.Guild.EveryoneRole) return Task.CompletedTask;
+            if (!Context.Server.AssignableRoles.Contains(Role.Id))
+                return ReplyAsync($"{Role.Name} isn't an assignable role.");
+            else if (User.Roles.Contains(Role))
+                return ReplyAsync($"You already have **{Role.Name}** role.");
+            return User.AddRoleAsync(Role);
+        }
+
+        [Command("IamNot"), Summary("Removes you from the specified role.")]
+        public Task IAmNotAsync(IRole Role)
+        {
+            var User = Context.User as SocketGuildUser;
+            if (Role == Context.Guild.EveryoneRole) return Task.CompletedTask;
+            if (User.Roles.Contains(Role)) return ReplyAsync($"You already have **{Role.Name}** role.");
+            return User.AddRoleAsync(Role);
+        }
+
+        [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
+        public async Task TrumpAsync()
+        {
+            var Get = await Context.HttpClient.GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("Using TrumpDump API was the worse trade deal, maybe ever.");
+                return;
+            }
+            await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
+            Get.Dispose();
+        }
+
+        [Command("Yomama"), Summary("Gets a random Yomma Joke")]
+        public async Task YommaAsync()
+        {
+            var Get = await Context.HttpClient.GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("Yo mama so fat she crashed Yomomma's API.");
+                return;
+            }
+            await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false))["joke"].ToString());
+            Get.Dispose();
+        }
+
+        [Command("Discrim"), Summary("Gets all users who match a certain user's discriminator.")]
+        public async Task DiscrimAsync(IGuildUser User)
+        {
+            var MatchList = new Dictionary<ulong, string>();
+            foreach (var Guilds in (Context.Client as DiscordSocketClient).Guilds)
+            {
+                var Get = Guilds.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
+                foreach (var user in Get)
+                    if (!MatchList.ContainsKey(User.Id))
+                        MatchList.Add(User.Id, User.Username);
+            }
+            string Msg = !MatchList.Any() ? $"Couldn't find any user's matching {User} discriminator.!"
+                : $"**Users Matching {User}'s Discriminator:** {string.Join(", ", MatchList.Values)}";
+            await ReplyAsync(Msg);
+        }
+
+        [Command("Show Warnings"), Alias("Sw"), Summary("Shows current number of warnings for specified user.")]
         public Task WarningsAsync(IGuildUser User = null)
         {
             User = Context.User as IGuildUser ?? User;
             if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
                 return ReplyAsync($"{User} has no previous warnings.");
             return ReplyAsync($"{User} has been warned {Context.Server.ModLog.Warnings[User.Id]} times.");
+        }
+
+        [Command("Show selfroles"), Alias("Ssr"), Summary("Shows a list of all assignable roles for this server.")]
+        public Task ShowSelfRolesAsync()
+        {
+            if (!Context.Server.AssignableRoles.Any()) return ReplyAsync($"{Context.Guild} has no self roles.");
+            return ReplyAsync($"**Self Assignable Roles**\n{string.Join(", ", Context.Server.AssignableRoles.Select(x => StringExt.CheckRole(Context, x)))}");
+        }
+
+        [Command("Show Case"), Summary("Shows information about a specific case.")]
+        public Task CaseAsync(int CaseNumber = 0)
+        {
+            if (CaseNumber == 0) CaseNumber = Context.Server.ModLog.ModCases.LastOrDefault().CaseNumber;
+            var Case = Context.Server.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == CaseNumber);
+            if (Case == null || !Context.Server.ModLog.ModCases.Any())
+                return ReplyAsync($"Case #{CaseNumber} doesn't exist.");
+
+            return ReplyAsync(
+                $"**Case Number:** {Case.CaseNumber} | **Case Type:** {Case.CaseType}\n" +
+                $"**User:** {Case.UserInfo}\n" +
+                $"**Responsible Mod:** {Case.ResponsibleMod}\n" +
+                $"**Reason:** {Case.Reason}");
+        }
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
+        public async Task PotdAsync()
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+            Get.Dispose();
+        }
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
+        public async Task PotdAsync(int Year, int Month, int Day)
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date={Year}-{Month}-{Day}").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+            Get.Dispose();
+        }
+
+        [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
+        public async Task FeedbackAsync([Remainder]string Message)
+        {
+            if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
+            var ReportChannel = await Context.Client.GetChannelAsync(Convert.ToUInt64(Context.Config.ReportChannel)) as ITextChannel;
+            string Content =
+                $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
+                $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
+                $"**Feedback:** {Message}";
+            await ReportChannel.SendMessageAsync(Content);
+            await ReplyAsync("Thank you for sumbitting your feedback. 😊");
+        }
+
+        [Command("Show Stats"), Summary("Shows certain Valerie's stats.")]
+        public async Task StatsAsync()
+        {
+            var Client = Context.Client as DiscordSocketClient;
+            var Servers = await Context.ServerHandler.ServerListAsync();
+            var Commits = await GitStatsAsync();
+            string Description = null;
+            if (!Commits.Any()) Description = "Error fetching commits.";
+            foreach (var Commit in Commits.Take(3))
+                Description += $"`[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})` {Commit.Message}\n";
+
+            var Embed = ValerieEmbed.Embed(EmbedColor.Red, Context.Client.CurrentUser.GetAvatarUrl(), $"{Context.Client.CurrentUser.Username} Statistics 🔰",
+                Description: Description);
+            Embed.AddField("Channels",
+                $"Text: {Client.Guilds.Sum(x => x.TextChannels.Count)}\n" +
+                $"Voice: {Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" +
+                $"Total: {Client.Guilds.Sum(x => x.Channels.Count)}", true);
+            Embed.AddField("Members",
+                $"Bot: {Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == true).Count())}\n" +
+                $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
+                $"Total: {Client.Guilds.Sum(x => x.Users.Count)}", true);
+            Embed.AddField("Database",
+                $"Cases: {Servers.Select(x => x.ModLog.ModCases.Count)}\n" +
+                $"Tags: {Servers.Select(x => x.Tags.Count)}\n" +
+                $"Updoots: {Servers.Select(x => x.Updoots.Count)}", true);
+            Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
+            Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
+            Embed.AddField("Programmer", $"[Yucked](https://github.com/Yucked)", true);
+            await ReplyAsync("", embed: Embed.Build());
+        }
+
+        [Command("Show Updates"), Summary("Shows the most recent changes made to Valerie. FYI: Some changes may not make sense.")]
+        public async Task ShowUpdatesAsync()
+        {
+            var Commits = await GitStatsAsync();
+            string Msg = null;
+            if (!Commits.Any()) Msg = "No recent updates were found.";
+            foreach (var Commit in Commits.Take(10))
+                Msg += $"`[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})` {Commit.Message}\n";
+            await ReplyAsync(Msg);
+        }
+
+        async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
+        {
+            var httpClient = Context.HttpClient;
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+            var Request = await httpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits");
+            var Content = JsonConvert.DeserializeObject<IReadOnlyCollection<GitModel>>(await Request.Content.ReadAsStringAsync());
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.Dispose();
+            return Content;
         }
     }
 }
