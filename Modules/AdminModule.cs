@@ -249,13 +249,13 @@ namespace Valerie.Modules
             string Admins = null;
             foreach (var Id in Context.Server.Admins)
                 Admins += $"\n-> {Id} | {await StringExt.CheckUserAsync(Context, Id)}";
-            await ReplyAsync($"**{Context.Server} Admins**\n{Admins}");
+            await ReplyAsync($"**{Context.Guild} Admins**\n{Admins}");
         }
 
         [Command("Show Forbidden"), Alias("Showfb"), Summary("Shows all the forbidden roles for this server.")]
         public Task ShowForbiddenAsync()
         {
-            if (!Context.Server.ChatXP.ForbiddenRoles.Any()) return ReplyAsync($"{Context.Server} has no forbidden roles.");
+            if (!Context.Server.ChatXP.ForbiddenRoles.Any()) return ReplyAsync($"{Context.Guild} has no forbidden roles.");
             string Roles = null;
             foreach (var Id in Context.Server.ChatXP.ForbiddenRoles)
                 Roles += $"-> {Id} | {StringExt.CheckRole(Context, Id)}";
@@ -265,7 +265,7 @@ namespace Valerie.Modules
         [Command("Show Levels"), Alias("Showlvls"), Summary("Shows all the level up roles for this server.")]
         public Task ShowLevelsAsync()
         {
-            if (!Context.Server.ChatXP.LevelRoles.Any()) return ReplyAsync($"{Context.Server} has no level-up roles.");
+            if (!Context.Server.ChatXP.LevelRoles.Any()) return ReplyAsync($"{Context.Guild} has no level-up roles.");
             string Roles = null;
             foreach (var Id in Context.Server.ChatXP.LevelRoles.Keys)
                 Roles += $"-> {Id} | {StringExt.CheckRole(Context, Id)}";
