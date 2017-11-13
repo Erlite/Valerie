@@ -1,9 +1,9 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
-using Models;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Discord;
+using Discord.Commands;
+using Models;
 
 namespace Valerie.Handlers.ModuleHandler
 {
