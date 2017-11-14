@@ -25,6 +25,7 @@ namespace Valerie.Modules
         [Command("Updoot"), Summary("Gives an updoot to a specified user.")]
         public Task UpdootAsync(IGuildUser User)
         {
+            if (Context.User.Id == User.Id || User.IsBot) return ReplyAsync("Abahaha, nice try babes.");
             if (!Context.Server.Updoots.Any(x => x.Key == User.Id))
                 Context.Server.Updoots.Add(User.Id, 1);
             else
@@ -360,6 +361,27 @@ namespace Valerie.Modules
             foreach (var Commit in Commits.Take(10))
                 Msg += $"`[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})` {Commit.Message}\n";
             await ReplyAsync(Msg);
+        }
+
+        [Command("Show XpLeaderboards"), Alias("Showxpl", "ShowXpTop"), Summary("Shows top 10 users with the highest XP for this server.")]
+        public async Task ShowXpTopAsync()
+        {
+            if (!Context.Server.ChatXP.Rankings.Any())
+            {
+                await ReplyAsync($"{Context.Guild} leadboards is empty.");
+                return;
+            }
+            var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"Leaderboards For {Context.Guild}");
+            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Take(5))
+                Embed.AddField(await StringExt.CheckUserAsync(Context, Rank.Key), Rank.Value, true);
+            await ReplyAsync("", embed: Embed.Build());
+        }
+
+        [Command("Rank"), Summary("Shows your or a specified user's rank.")]
+        public Task RankAsync(IGuildUser User = null)
+        {
+            User = User ?? Context.User as IGuildUser;
+            return Task.CompletedTask;
         }
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
