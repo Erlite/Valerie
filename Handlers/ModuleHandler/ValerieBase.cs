@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Models;
 using Discord;
 using Discord.Commands;
-using Models;
+using Valerie.Modules.Addons;
+using System.Threading.Tasks;
 
 namespace Valerie.Handlers.ModuleHandler
 {
@@ -14,10 +15,19 @@ namespace Valerie.Handlers.ModuleHandler
             return await base.ReplyAsync(Message, false, null, null);
         }
 
-        public async Task<IUserMessage> SaveAsync(string Message = null)
+        public async Task<IUserMessage> SaveAsync(ModuleEnums Action, string Message = null)
         {
-            var check = await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
-            if (check == true) return await ReplyAsync(Message ?? "✅ - Done.");
+            bool Check = false;
+            switch (Action)
+            {
+                case ModuleEnums.Server:
+                    Check = await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
+                    break;
+                case ModuleEnums.Config:
+                    Check = await Context.ConfigHandler.UpdateConfigAsync(Context.Config).ConfigureAwait(false);
+                    break;
+            }
+            if (Check == true) return await ReplyAsync(Message ?? "✅ - Done.");
             return await ReplyAsync(Message ?? "✖️ - There was an error.");
         }
 
