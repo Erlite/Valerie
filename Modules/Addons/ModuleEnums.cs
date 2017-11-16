@@ -1,4 +1,4 @@
-﻿namespace Valerie.Modules
+﻿namespace Valerie.Modules.Addons
 {
     public enum ModuleEnums
     {
@@ -11,6 +11,8 @@
         Chatter,
         Remove,
         AutoMod,
-        Starboard
+        Starboard,
+        Server,
+        Config
     }
 }
