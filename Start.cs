@@ -1,11 +1,11 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System;
 using Discord;
+using Valerie.Handlers;
+using System.Net.Http;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Handlers;
-using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie
 {
