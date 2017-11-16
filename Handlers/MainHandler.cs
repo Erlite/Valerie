@@ -4,6 +4,7 @@ using Discord;
 using Discord.WebSocket;
 using Valerie.Services;
 using Valerie.Services.RestService;
+using Cookie;
 
 namespace Valerie.Handlers
 {
@@ -12,6 +13,7 @@ namespace Valerie.Handlers
         public static string ConfigId { get; set; } = "Config";
         public static RestConfig RestConfig { get; set; }
         public static RestServer RestServer { get; set; }
+        public static CookieClient Cookie { get; set; }
         readonly HttpClient HttpClient;
         readonly EventsHandler EventsHandler;
         readonly DiscordSocketClient Client;
@@ -27,9 +29,20 @@ namespace Valerie.Handlers
 
         public async Task StartAsync()
         {
+            LogClient.AppInfo();
+
             RestConfig = new RestConfig("http://localhost:51117/api/config/", HttpClient);
             RestServer = new RestServer("http://localhost:51117/api/server/", HttpClient);
-            LogClient.AppInfo();
+
+            await ConfigHandler.ConfigCheckAsync();
+            var Config = await ConfigHandler.GetConfigAsync();
+
+            Cookie = new CookieClient(new CookieConfig
+            {
+                GiphyKey = Config.ApplicationKeys.GiphyKey,
+                SteamKey = Config.ApplicationKeys.SteamKey,
+                CleverbotKey = Config.ApplicationKeys.CleverBotKey
+            });
 
             Client.Log += EventsHandler.LogAsync;
             Client.Ready += EventsHandler.ReadyAsync;
@@ -44,9 +57,6 @@ namespace Valerie.Handlers
             Client.MessageReceived += EventsHandler.HandleMessageAsync;
             Client.MessageReceived += EventsHandler.HandleCommandAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
-
-            await ConfigHandler.ConfigCheckAsync();
-            var Config = await ConfigHandler.GetConfigAsync();
 
             await Client.LoginAsync(TokenType.Bot, Config.Token);
             await Client.StartAsync();
