@@ -11,7 +11,7 @@ namespace Valerie.Attributes
         AccessLevel GetAccessLevel;
         public RequireAccess(AccessLevel Level) => GetAccessLevel = Level;
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo Command, IServiceProvider Services)
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo Command, IServiceProvider Services)
         {
             var Context = (context as IContext);
             var User = Context.User as IGuildUser;

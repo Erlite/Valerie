@@ -6,7 +6,7 @@ namespace Valerie.Attributes
 {
     public class RequireNsfw : PreconditionAttribute
     {
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
             var Chn = Context.Channel as Discord.ITextChannel;
             if (Chn.IsNsfw || Chn.Name.Contains("nsfw"))
