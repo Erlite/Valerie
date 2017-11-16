@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Valerie.Handlers.ModuleHandler;
 using Models;
+using Discord;
+using System.Linq;
+using Discord.Commands;
+using Valerie.Modules.Addons;
+using System.Threading.Tasks;
+using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
@@ -17,7 +18,7 @@ namespace Valerie.Modules
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
             if (!NotExists(TagName)) return Task.CompletedTask;
             Context.Server.Tags.FirstOrDefault(x => x.Name == TagName).Uses++;
-            return SaveAsync(Tag.Response);
+            return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
         [Command("Create"), Alias("Make", "New", "Add"), Summary("Creates a new tag for this server."), Priority(1)]
@@ -32,7 +33,7 @@ namespace Valerie.Modules
                 Response = Response,
                 Uses = 1
             });
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Modify"), Alias("Change", "Update"), Summary("Updates an existing tag"), Priority(1)]
@@ -43,7 +44,7 @@ namespace Valerie.Modules
             if (Convert.ToUInt64(Tag.Owner) != Context.User.Id)
                 return ReplyAsync($"You are not the owner of tag `{Name}`.");
             Context.Server.Tags.FirstOrDefault(x => x.Name == Name).Response = Response;
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Delete"), Alias("Remove"), Summary("Deletes a tag."), Priority(1)]
@@ -54,7 +55,7 @@ namespace Valerie.Modules
             if (Convert.ToUInt64(Tag.Owner) != Context.User.Id || Context.Server.Admins.Contains(Context.User.Id))
                 return ReplyAsync($"You are not the owner of tag `{Name}`.");
             Context.Server.Tags.Remove(Tag);
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("User"), Summary("Shows all tags owned by you or a given user."), Priority(1)]
