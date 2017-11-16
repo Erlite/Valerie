@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Valerie.Attributes;
-using Valerie.Handlers.ModuleHandler;
-using Models;
-using Discord.WebSocket;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Valerie.Attributes;
+using Discord.Commands;
 using Valerie.JsonModels;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
@@ -58,7 +55,6 @@ namespace Valerie.Modules
             var Getvid = Json.Result[Context.Random.Next(Json.Result.Count())];
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Description: $"[{Getvid.Title}]({Getvid.Url})\nTotal Views: {Getvid.Views}", ThumbUrl: Getvid.Thumb);
             await SendEmbedAsync(Embed.Build());
-            Response.Dispose();
         }
 
         [Command("Lewd"), Summary("Weeb heaven.")]

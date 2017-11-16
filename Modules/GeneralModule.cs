@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Linq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Valerie.Extensions;
 using Valerie.JsonModels;
+using Discord.WebSocket;
+using Newtonsoft.Json.Linq;
+using Valerie.Modules.Addons;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
@@ -30,7 +31,7 @@ namespace Valerie.Modules
                 Context.Server.Updoots.Add(User.Id, 1);
             else
                 Context.Server.Updoots[User.Id]++;
-            return SaveAsync($"Thanks for updooting {User}. ☺");
+            return SaveAsync(ModuleEnums.Server, $"Thanks for updooting {User}. ☺");
         }
 
         [Command("Updoot"), Summary("Shows your updoots in this server.")]
@@ -50,17 +51,17 @@ namespace Valerie.Modules
                     if (Context.Server.AFKUsers.ContainsKey(Context.User.Id))
                         return ReplyAsync("Whoops, it seems you are already AFK.");
                     Context.Server.AFKUsers.Add(Context.User.Id, AFKMessage);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.AFKUsers.ContainsKey(Context.User.Id))
                         return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.AFKUsers.Remove(Context.User.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Modify:
                     if (!Context.Server.AFKUsers.ContainsKey(Context.User.Id))
                         return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.AFKUsers[Context.User.Id] = AFKMessage;
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -215,7 +216,7 @@ namespace Valerie.Modules
                 return;
             }
             await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
-            Get.Dispose();
+            
         }
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
@@ -228,7 +229,7 @@ namespace Valerie.Modules
                 return;
             }
             await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false))["joke"].ToString());
-            Get.Dispose();
+            
         }
 
         [Command("Discrim"), Summary("Gets all users who match a certain user's discriminator.")]
@@ -289,8 +290,7 @@ namespace Valerie.Modules
             }
             var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
             await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
-                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
-            Get.Dispose();
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());            
         }
 
         [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
@@ -305,7 +305,7 @@ namespace Valerie.Modules
             var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
             await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
                 Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
-            Get.Dispose();
+            
         }
 
         [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
@@ -330,7 +330,7 @@ namespace Valerie.Modules
             string Description = null;
             if (!Commits.Any()) Description = "Error fetching commits.";
             foreach (var Commit in Commits.Take(3))
-                Description += $"`[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})` {Commit.Message}\n";
+                Description += $"[[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})] {Commit.Commit.Message}\n";
 
             var Embed = ValerieEmbed.Embed(EmbedColor.Red, Context.Client.CurrentUser.GetAvatarUrl(), $"{Context.Client.CurrentUser.Username} Statistics 🔰",
                 Description: Description);
@@ -343,9 +343,9 @@ namespace Valerie.Modules
                 $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
                 $"Total: {Client.Guilds.Sum(x => x.Users.Count)}", true);
             Embed.AddField("Database",
-                $"Cases: {Servers.Select(x => x.ModLog.ModCases.Count)}\n" +
-                $"Tags: {Servers.Select(x => x.Tags.Count)}\n" +
-                $"Updoots: {Servers.Select(x => x.Updoots.Count)}", true);
+                $"Cases: {Servers.Sum(x => x.ModLog.ModCases.Count)}\n" +
+                $"Tags: {Servers.Sum(x => x.Tags.Count)}\n" +
+                $"Updoots: {Servers.Sum(x => x.Updoots.Count)}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
             Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
             Embed.AddField("Programmer", $"[Yucked](https://github.com/Yucked)", true);
@@ -356,11 +356,10 @@ namespace Valerie.Modules
         public async Task ShowUpdatesAsync()
         {
             var Commits = await GitStatsAsync();
-            string Msg = null;
-            if (!Commits.Any()) Msg = "No recent updates were found.";
+            var Embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: "Latest Valerie Updates");
             foreach (var Commit in Commits.Take(10))
-                Msg += $"`[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})` {Commit.Message}\n";
-            await ReplyAsync(Msg);
+                Embed.AddField(Commit.Sha.Substring(0, 6), $"{Commit.Commit.Message}\n{Commit.HtmlUrl}");
+            await ReplyAsync("", embed: Embed.Build());
         }
 
         [Command("Show XpLeaderboards"), Alias("Showxpl", "ShowXpTop"), Summary("Shows top 10 users with the highest XP for this server.")]
@@ -372,7 +371,7 @@ namespace Valerie.Modules
                 return;
             }
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"Leaderboards For {Context.Guild}");
-            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Take(5))
+            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Take(10))
                 Embed.AddField(await StringExt.CheckUserAsync(Context, Rank.Key), Rank.Value, true);
             await ReplyAsync("", embed: Embed.Build());
         }
@@ -391,7 +390,6 @@ namespace Valerie.Modules
             var Request = await httpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits");
             var Content = JsonConvert.DeserializeObject<IReadOnlyCollection<GitModel>>(await Request.Content.ReadAsStringAsync());
             httpClient.DefaultRequestHeaders.Clear();
-            httpClient.Dispose();
             return Content;
         }
     }

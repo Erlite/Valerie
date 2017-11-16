@@ -1,21 +1,22 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
+using System.Linq;
 using Discord.Commands;
 using Valerie.Attributes;
 using Valerie.Extensions;
+using Valerie.Modules.Addons;
+using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [RequireAccess(AccessLevel.Admins)]
+    [Name("Admin/Server Owner Commands."), RequireAccess(AccessLevel.Admins)]
     public class AdminModule : ValerieBase
     {
         [Command("Update Prefix"), Summary("Updates current server's prefix.")]
         public Task PrefixAsync(string Prefix)
         {
             Context.Server.Prefix = Prefix;
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatterbot. To remove channel, don't provide channel name.")]
@@ -29,28 +30,28 @@ namespace Valerie.Modules
                 case ModuleEnums.Mod: Context.Server.ModLog.TextChannel = $"{Channel.Id}"; break;
                 case ModuleEnums.Starboard: Context.Server.Starboard.TextChannel = $"{Channel.Id}"; break;
             }
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Set MaxWarns"), Summary("Sets how many warning a user can get before getting kicked by automod. -1 to disable it.")]
         public Task SetMaxWarnsAsync(int MaxWarnings)
         {
             Context.Server.ModLog.MaxWarnings = MaxWarnings;
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Set AutoRole"), Summary("Sets auto role for this server.")]
         public Task SetAutoRoleAsync(IRole Role)
         {
             Context.Server.ModLog.AutoAssignRole = $"{Role.Id}";
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Set LvlUpMsg"), Summary("Sets level up message for when a user level ups. To remove message,  don't provide any level up message.")]
         public Task SetLevelUpMessageAsync([Remainder]string Message = null)
         {
             Context.Server.ChatXP.LevelMessage = Message;
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("SelfRoles"), Alias("SlfR"), Summary("Adds/Removes role to/from self assingable roles. Action: Add, Remove")]
@@ -63,11 +64,11 @@ namespace Valerie.Modules
                     else if (Context.Server.AssignableRoles.Count == Context.Server.AssignableRoles.Capacity)
                         return ReplyAsync($"It seems you have reached max number of assignable roles.");
                     Context.Server.AssignableRoles.Add(Role.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"I couldn't find  {Role.Name} role.");
                     Context.Server.AssignableRoles.Remove(Role.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -82,11 +83,11 @@ namespace Valerie.Modules
                     if (Context.Server.JoinMessages.Count == Context.Server.JoinMessages.Capacity) return ReplyAsync("You have reached max number of join messages.");
                     else if (Context.Server.JoinMessages.Contains(Message)) return ReplyAsync("Join message already exists. Try something different?");
                     Context.Server.JoinMessages.Add(Message);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.JoinMessages.Contains(Message)) return ReplyAsync("I couldn't find the specified join message.");
                     Context.Server.JoinMessages.Remove(Message);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -101,11 +102,11 @@ namespace Valerie.Modules
                     if (Context.Server.LeaveMessages.Count == Context.Server.LeaveMessages.Capacity) return ReplyAsync("You have reached max number of leave messages.");
                     else if (Context.Server.LeaveMessages.Contains(Message)) return ReplyAsync("Leave message already exists. Try something different?");
                     Context.Server.LeaveMessages.Add(Message);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.LeaveMessages.Contains(Message)) return ReplyAsync("I couldn't find the specified leave message.");
                     Context.Server.LeaveMessages.Remove(Message);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -118,11 +119,11 @@ namespace Valerie.Modules
                 case ModuleEnums.XP:
                     Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
                     string XpState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled";
-                    return SaveAsync($"{Action} has been {XpState}");
+                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {XpState}");
                 case ModuleEnums.AutoMod:
                     Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
                     string ModState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled";
-                    return SaveAsync($"{Action} has been {ModState}");
+                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {ModState}");
             }
             return Task.CompletedTask;
         }
@@ -136,11 +137,11 @@ namespace Valerie.Modules
                     if (Context.Server.Admins.Contains(User.Id)) return ReplyAsync($"{User} is already an Admin.");
                     else if (Context.Server.Admins.Count == Context.Server.Admins.Capacity) return ReplyAsync($"It seems you have reached max number of admins.");
                     Context.Server.Admins.Add(User.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.Admins.Contains(User.Id)) return ReplyAsync($"{User} isn't an Admin.");
                     Context.Server.Admins.Remove(User.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -155,11 +156,11 @@ namespace Valerie.Modules
                     else if (Context.Server.ChatXP.ForbiddenRoles.Count == Context.Server.ChatXP.ForbiddenRoles.Capacity)
                         return ReplyAsync("It seems you have reached max number of forbidden roles.");
                     Context.Server.ChatXP.ForbiddenRoles.Add(Role.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.ChatXP.ForbiddenRoles.Contains(Role.Id)) return ReplyAsync($"{Role} isn't forbidden from gaining XP.");
                     Context.Server.ChatXP.ForbiddenRoles.Remove(Role.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -173,15 +174,15 @@ namespace Valerie.Modules
                     if (Context.Server.ChatXP.LevelRoles.Count == 15) return ReplyAsync("You have reached max number of level up roles.");
                     else if (Context.Server.ChatXP.LevelRoles.ContainsKey(Role.Id)) return ReplyAsync($"{Role} is already a level-up role.");
                     Context.Server.ChatXP.LevelRoles.Add(Role.Id, Level);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.ChatXP.LevelRoles.ContainsKey(Role.Id)) return ReplyAsync($"{Role} isn't a level-up role.");
                     Context.Server.ChatXP.LevelRoles.Remove(Role.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Modify:
                     if (!Context.Server.ChatXP.LevelRoles.ContainsKey(Role.Id)) return ReplyAsync($"{Role} isn't a level-up role.");
                     Context.Server.ChatXP.LevelRoles[Role.Id] = Level;
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -196,11 +197,11 @@ namespace Valerie.Modules
                         return ReplyAsync("You have reached max number of bad words.");
                     else if (Context.Server.ModLog.BadWords.Contains(Badword)) return ReplyAsync($"{Badword} already exists.");
                     Context.Server.ModLog.BadWords.Add(Badword);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.ModLog.BadWords.Contains(Badword)) return ReplyAsync($"{Badword} doesn't exists.");
                     Context.Server.ModLog.BadWords.Remove(Badword);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
@@ -215,11 +216,11 @@ namespace Valerie.Modules
                     if (!Check.Item1) return ReplyAsync($"{Url} isn't a valid Url.");
                     else if (Context.Server.ModLog.BlockedUrls.Contains(Check.Item2)) return ReplyAsync($"{Url} already is blocked.");
                     Context.Server.ModLog.BlockedUrls.Add(Check.Item2);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (!Context.Server.ModLog.BlockedUrls.Contains(Check.Item2)) return ReplyAsync($"{Url} isn't blocked.");
                     Context.Server.ModLog.BlockedUrls.Remove(Check.Item2);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }

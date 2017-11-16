@@ -1,16 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Models;
+using System;
 using Discord;
+using System.Linq;
 using Discord.Commands;
-using Discord.WebSocket;
 using Valerie.Attributes;
+using Discord.WebSocket;
+using Valerie.Modules.Addons;
+using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
-using Models;
 
 namespace Valerie.Modules
 {
-    [RequireAccess(AccessLevel.AdminsNMods)]
+    [Name("Admin & Moderater Commands"), RequireAccess(AccessLevel.AdminsNMods)]
     public class ModModule : ValerieBase
     {
         [Command("Kick"), Summary("Kicks a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
@@ -75,7 +76,7 @@ namespace Valerie.Modules
                     x.Content = $"**{GetCase.CaseType}** | Case {GetCase.CaseNumber}\n**User:** {GetCase.UserInfo}\n**Reason:** {Reason}\n" +
                         $"**Responsible Moderator:** {GetCase.ResponsibleMod}";
                 });
-            await SaveAsync();
+            await SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Purge Channel"), Summary("Purges 100 messages from a channel."), Alias("PC"), RequireBotPermission(ChannelPermission.ManageMessages)]
@@ -131,7 +132,7 @@ namespace Valerie.Modules
             {
                 Context.Server.ModLog.MuteRole = $"{ Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted").Id}";
                 await User.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted"));
-                await SaveAsync($"**{User} has been muted** :zipper_mouth:");
+                await SaveAsync(ModuleEnums.Server, $"**{User} has been muted** :zipper_mouth:");
                 return;
             }
             OverwritePermissions Permissions = new OverwritePermissions(addReactions: PermValue.Deny, sendMessages: PermValue.Deny, attachFiles: PermValue.Deny, useExternalEmojis: PermValue.Deny);
@@ -144,7 +145,7 @@ namespace Valerie.Modules
 
                 Context.Server.ModLog.MuteRole = $"{Role.Id}";
                 await User.AddRoleAsync(Role);
-                await SaveAsync($"**{User} has been muted** :zipper_mouth:");
+                await SaveAsync(ModuleEnums.Server, $"**{User} has been muted** :zipper_mouth:");
                 return;
             }
 
@@ -170,7 +171,7 @@ namespace Valerie.Modules
             {
                 Context.Server.ModLog.Warnings.Add(User.Id, 1);
                 await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
-                await SaveAsync($"**{User} has been warned** :ok_hand:");
+                await SaveAsync(ModuleEnums.Server, $"**{User} has been warned** :ok_hand:");
                 return;
             }
 
@@ -193,7 +194,7 @@ namespace Valerie.Modules
             if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
                 return ReplyAsync($"{User} has no warnings.");
             Context.Server.ModLog.Warnings[User.Id] = 0;
-            return SaveAsync();
+            return SaveAsync(ModuleEnums.Server);
         }
 
         [Command("Blacklist"), Summary("Add's a user to server's blacklist. This prevents user from running Valerie's commands.")]
@@ -206,11 +207,11 @@ namespace Valerie.Modules
                     else if (Context.Server.BlacklistedUsers.Count == Context.Server.BlacklistedUsers.Capacity)
                         return ReplyAsync("Blacklist can't have more than 50 users.");
                     Context.Server.BlacklistedUsers.Add(User.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
                     if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} isn't  blacklisted.");
                     Context.Server.BlacklistedUsers.Remove(User.Id);
-                    return SaveAsync();
+                    return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
         }
