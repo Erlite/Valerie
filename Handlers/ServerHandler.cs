@@ -27,7 +27,11 @@ namespace Valerie.Handlers
         public async Task<bool> UpdateServerAsync(ulong Id, ServerModel Server)
         {
             var TryUpdate = await MainHandler.RestServer.UpdateServerAsync(Id, Server).ConfigureAwait(false);
-            if (!TryUpdate.IsSuccessStatusCode) LogClient.Write(Source.REST, $"Failed to update server: {Id}");
+            if (!TryUpdate.IsSuccessStatusCode)
+            {
+                LogClient.Write(Source.REST, $"Failed to update server: {Id}");
+                return false;
+            }
             return true;
         }
 

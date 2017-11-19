@@ -43,7 +43,7 @@ namespace Valerie.Handlers
             var TryUpdate = await MainHandler.RestConfig.UpdateConfigAsync(MainHandler.ConfigId, Update).ConfigureAwait(false);
             if (!TryUpdate.IsSuccessStatusCode)
             {
-                LogClient.Write(Source.REST, "Failed tp update config.");
+                LogClient.Write(Source.REST, "Failed to update config.");
                 return false;
             }
             return true;
