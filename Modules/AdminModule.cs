@@ -9,7 +9,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("Admin/Server Owner Commands."), RequireAccess(AccessLevel.Admins)]
+    [Name("Admin/Server Owner Commands"), RequireAccess(AccessLevel.Admins)]
     public class AdminModule : ValerieBase
     {
         [Command("Update Prefix"), Summary("Updates current server's prefix.")]
@@ -22,13 +22,14 @@ namespace Valerie.Modules
         [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatterbot. To remove channel, don't provide channel name.")]
         public Task SetChannelAsync(ModuleEnums ChannelType, ITextChannel Channel = null)
         {
+            string ChannelId = $"{Channel?.Id}" ?? null;
             switch (ChannelType)
             {
-                case ModuleEnums.Chatter: Context.Server.ChatterChannel = $"{Channel.Id}"; break;
-                case ModuleEnums.Join: Context.Server.JoinChannel = $"{Channel.Id}"; break;
-                case ModuleEnums.Leave: Context.Server.LeaveChannel = $"{Channel.Id}"; break;
-                case ModuleEnums.Mod: Context.Server.ModLog.TextChannel = $"{Channel.Id}"; break;
-                case ModuleEnums.Starboard: Context.Server.Starboard.TextChannel = $"{Channel.Id}"; break;
+                case ModuleEnums.Chatter: Context.Server.ChatterChannel = ChannelId; break;
+                case ModuleEnums.Join: Context.Server.JoinChannel = ChannelId; break;
+                case ModuleEnums.Leave: Context.Server.LeaveChannel = ChannelId; break;
+                case ModuleEnums.Mod: Context.Server.ModLog.TextChannel = ChannelId; break;
+                case ModuleEnums.Starboard: Context.Server.Starboard.TextChannel = ChannelId; break;
             }
             return SaveAsync(ModuleEnums.Server);
         }
@@ -119,10 +120,10 @@ namespace Valerie.Modules
                 case ModuleEnums.XP:
                     Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
                     string XpState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled";
-                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {XpState}");
+                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {XpState}.");
                 case ModuleEnums.AutoMod:
                     Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
-                    string ModState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled";
+                    string ModState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled.";
                     return SaveAsync(ModuleEnums.Server, $"{Action} has been {ModState}");
             }
             return Task.CompletedTask;
