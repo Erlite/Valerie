@@ -39,7 +39,7 @@ namespace Valerie.Handlers
 
         internal Task LogAsync(LogMessage Log) => Task.Run(() => LogClient.Write(Source.DISCORD, Log.Message ?? Log.Exception.Message));
 
-        internal async Task GuildAvailableAsync(SocketGuild Guild) => await ServerHandler.AddServerAsync(new ServerModel { Id = $"{Guild.Id}", Prefix = "." }).ConfigureAwait(false);
+        internal async Task GuildAvailableAsync(SocketGuild Guild) => await ServerHandler.AddServerAsync(new ServerModel { Id = $"{Guild.Id}", Prefix = "?" }).ConfigureAwait(false);
 
         internal async Task LeftGuildAsync(SocketGuild Guild) => await ServerHandler.DeleteServerAsync(Guild.Id).ConfigureAwait(false);
 
@@ -202,8 +202,7 @@ namespace Valerie.Handlers
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
             string Reason = null;
             var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFKUsers.TryGetValue(u.Id, out Reason));
-            if (User != null)
-                await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
+            if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
         }
 
         async Task XpHandlerAsync(SocketGuildUser User, int Xp)
@@ -248,12 +247,12 @@ namespace Valerie.Handlers
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
             var Badwords = Config.ModLog.BadWords.Where(x => x.Contains(Message.Content));
             var BlockedUrls = Config.ModLog.BlockedUrls.Where(x => x.Contains(Message.Content));
-            if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id ) return;
+            if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id) return;
             await Message.DeleteAsync();
-            await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
+            await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post i");
             if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
             {
-                Config.ModLog.Warnings.TryAdd(Message.Author.Id, 1);
+                Config.ModLog.Warnings.Add(Message.Author.Id, 1);
                 await ServerHandler.UpdateServerAsync((Message.Channel as SocketGuildChannel).Guild.Id, Config).ConfigureAwait(false);
                 return;
             }
@@ -287,10 +286,9 @@ namespace Valerie.Handlers
         async Task CleverbotHandlerAsync(SocketMessage Message)
         {
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
-            ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
-            int ArgPos = 0;
-            if (Message.Author.IsBot || Channel == null || !(Message as SocketUserMessage).HasMentionPrefix(Client.CurrentUser, ref ArgPos) || Message.Channel != Channel) return;
-            string UserMsg = Message.Content.Replace($"<@{Client.CurrentUser.Id}>", string.Empty);
+            var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
+            if ( Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("v")) return;
+            string UserMsg = Message.Content.Replace("v",  string.Empty);
             var Clever = await MainHandler.Cookie.Cleverbot.TalkAsync(UserMsg);
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
         }
