@@ -52,7 +52,7 @@ namespace Valerie.Modules
                 return;
             }
             var Json = JsonConvert.DeserializeObject<PornModel>(await Response.Content.ReadAsStringAsync());
-            var Getvid = Json.Result[Context.Random.Next(Json.Result.Count())];
+            var Getvid = Json.Result[Context.Random.Next(Json.Count)];
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Description: $"[{Getvid.Title}]({Getvid.Url})\nTotal Views: {Getvid.Views}", ThumbUrl: Getvid.Thumb);
             await SendEmbedAsync(Embed.Build());
         }
