@@ -65,11 +65,11 @@ namespace Valerie.Modules
             try
             {
                 var Eval = await CSharpScript.EvaluateAsync(Code, Options, Globals, typeof(Globals));
-                await Message.ModifyAsync(x => x.Content = $"{Eval}");
+                await Message.ModifyAsync(x => x.Content = $"{Eval ?? "No Result Produced."}");
             }
             catch (Exception Ex)
             {
-                await Message.ModifyAsync(x => x.Content = Ex.Message);
+                await Message.ModifyAsync(x => x.Content = Ex.Message ?? Ex.StackTrace);
             }
         }
 
