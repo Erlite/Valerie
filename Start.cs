@@ -19,7 +19,7 @@ namespace Valerie
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = true,
-                    LogLevel = LogSeverity.Info
+                    LogLevel = LogSeverity.Critical
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
