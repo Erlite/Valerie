@@ -2,10 +2,10 @@
 
 namespace Valerie.JsonModels
 {
-    public class GitModel
+    public partial class GitModel
     {
         [JsonProperty("commit")]
-        public Commit Commit { get; set; }
+        public GitModel Commit { get; set; }
 
         [JsonProperty("html_url")]
         public string HtmlUrl { get; set; }
@@ -14,7 +14,7 @@ namespace Valerie.JsonModels
         public string Sha { get; set; }
     }
 
-    public class Commit
+    public partial class GitModel
     {
         [JsonProperty("message")]
         public string Message { get; set; }
