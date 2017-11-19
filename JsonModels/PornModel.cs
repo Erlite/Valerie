@@ -1,14 +1,17 @@
 ﻿using Newtonsoft.Json;
-using System;
+
 namespace Valerie.JsonModels
 {
-    public class PornModel
+    public partial class PornModel
     {
+        [JsonProperty("count")]
+        public int Count { get; set; }
+
         [JsonProperty("result")]
-        public Result[] Result { get; set; }
+        public PornModel[] Result { get; set; }
     }
 
-    public class Result
+    public partial class PornModel
     {
         [JsonProperty("thumb")]
         public string Thumb { get; set; }
