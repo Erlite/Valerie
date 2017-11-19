@@ -9,10 +9,10 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Group("Tag"), Name("Tag Commands")]
+    [Name("Tag Commands")]
     public class TagModule : ValerieBase
     {
-        [Command, Summary("Shows a tag with the given name."), Priority(0)]
+        [Command("Tag"), Summary("Shows a tag with the given name."), Priority(0)]
         public Task TagAsync(string TagName)
         {
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
@@ -21,7 +21,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
-        [Command("Create"), Alias("Make", "New", "Add"), Summary("Creates a new tag for this server."), Priority(1)]
+        [Command("Tag Create"), Alias("Make", "New", "Add"), Summary("Creates a new tag for this server."), Priority(1)]
         public Task CreateAsync(string Name, string Response)
         {
             if (Exists(Name)) return Task.CompletedTask;
@@ -36,7 +36,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Modify"), Alias("Change", "Update"), Summary("Updates an existing tag"), Priority(1)]
+        [Command("Tag Modify"), Alias("Change", "Update"), Summary("Updates an existing tag"), Priority(1)]
         public Task ModifyAsync(string Name, string Response)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -47,7 +47,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Delete"), Alias("Remove"), Summary("Deletes a tag."), Priority(1)]
+        [Command("Tag Delete"), Alias("Remove"), Summary("Deletes a tag."), Priority(1)]
         public Task DeleteAsync(string Name)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -58,7 +58,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("User"), Summary("Shows all tags owned by you or a given user."), Priority(1)]
+        [Command("Tag User"), Summary("Shows all tags owned by you or a given user."), Priority(1)]
         public Task UserAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
@@ -67,7 +67,7 @@ namespace Valerie.Modules
             return ReplyAsync($"{User} owns {UserTag.Count()} tags.\n```{string.Join(", ", UserTag.Select(x => x.Name))}```");
         }
 
-        [Command("Info"), Alias("About"), Summary("Displays information about a given tag."), Priority(1)]
+        [Command("Tag Info"), Alias("About"), Summary("Displays information about a given tag."), Priority(1)]
         public async Task InfoAsync(string Name)
         {
             if (NotExists(Name)) return;
