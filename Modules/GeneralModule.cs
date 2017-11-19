@@ -14,7 +14,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("General & Fun Commands."), RequireBotPermission(ChannelPermission.SendMessages)]
+    [Name("General & Fun Commands"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class GeneralModule : ValerieBase
     {
         [Command("Ping"), Summary("Pings discord gateway.")]
@@ -128,7 +128,7 @@ namespace Valerie.Modules
         [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
-            var embed = ValerieEmbed.Embed(EmbedColor.Pastel, Title: $"INFORMATION | {Context.Guild.Name}",
+            var embed = ValerieEmbed.Embed(EmbedColor.Random, Title: $"INFORMATION | {Context.Guild.Name}",
                 ThumbUrl: Context.Guild.IconUrl ?? "https://png.icons8.com/discord/dusk/256");
 
             embed.AddField("ID", Context.Guild.Id, true);
@@ -136,11 +136,11 @@ namespace Valerie.Modules
             embed.AddField("Default Channel", await Context.Guild.GetDefaultChannelAsync(), true);
             embed.AddField("Voice Region", Context.Guild.VoiceRegionId, true);
             embed.AddField("Created At", Context.Guild.CreatedAt, true);
-            embed.AddField("Roles", $"{Context.Guild.Roles.Count }\n{string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position))}", true);
             embed.AddField("Users", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == false), true);
             embed.AddField("Bots", (await Context.Guild.GetUsersAsync()).Count(x => x.IsBot == true), true);
             embed.AddField("Text Channels", (Context.Guild as SocketGuild).TextChannels.Count, true);
             embed.AddField("Voice Channels", (Context.Guild as SocketGuild).VoiceChannels.Count, true);
+            embed.AddField($"Roles - {Context.Guild.Roles.Count}", string.Join(", ", Context.Guild.Roles.OrderByDescending(x => x.Position)), true);
             await ReplyAsync("", false, embed.Build());
         }
 
@@ -177,7 +177,7 @@ namespace Valerie.Modules
             embed.AddField("Join Date", User.JoinedAt, true);
             embed.AddField("Status", User.Status, true);
             embed.AddField("Permissions", string.Join(", ", User.GuildPermissions.ToList()), true);
-            embed.AddField("Roles", Roles, true);
+            embed.AddField("Roles", string.Join(", ", (User as SocketGuildUser).Roles.OrderBy(x => x.Position).Select(x => x.Name)), true);
             await ReplyAsync("", embed: embed.Build());
         }
 
@@ -216,7 +216,7 @@ namespace Valerie.Modules
                 return;
             }
             await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
-            
+
         }
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
@@ -229,7 +229,7 @@ namespace Valerie.Modules
                 return;
             }
             await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false))["joke"].ToString());
-            
+
         }
 
         [Command("Discrim"), Summary("Gets all users who match a certain user's discriminator.")]
@@ -248,6 +248,48 @@ namespace Valerie.Modules
             await ReplyAsync(Msg);
         }
 
+        [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
+        public async Task PotdAsync()
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+        }
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
+        public async Task PotdAsync(int Year, int Month, int Day)
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date={Year}-{Month}-{Day}").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+
+        }
+
+        [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
+        public async Task FeedbackAsync([Remainder]string Message)
+        {
+            if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
+            var ReportChannel = await Context.Client.GetChannelAsync(Convert.ToUInt64(Context.Config.ReportChannel)) as ITextChannel;
+            string Content =
+                $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
+                $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
+                $"**Feedback:** {Message}";
+            await ReportChannel.SendMessageAsync(Content);
+            await ReplyAsync("Thank you for sumbitting your feedback. 😊");
+        }
+
         [Command("Show Warnings"), Alias("Sw"), Summary("Shows current number of warnings for specified user.")]
         public Task WarningsAsync(IGuildUser User = null)
         {
@@ -257,7 +299,7 @@ namespace Valerie.Modules
             return ReplyAsync($"{User} has been warned {Context.Server.ModLog.Warnings[User.Id]} times.");
         }
 
-        [Command("Show selfroles"), Alias("Ssr"), Summary("Shows a list of all assignable roles for this server.")]
+        [Command("Show Selfroles"), Alias("Ssr"), Summary("Shows a list of all assignable roles for this server.")]
         public Task ShowSelfRolesAsync()
         {
             if (!Context.Server.AssignableRoles.Any()) return ReplyAsync($"{Context.Guild} has no self roles.");
@@ -277,48 +319,6 @@ namespace Valerie.Modules
                 $"**User:** {Case.UserInfo}\n" +
                 $"**Responsible Mod:** {Case.ResponsibleMod}\n" +
                 $"**Reason:** {Case.Reason}");
-        }
-
-        [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
-        public async Task PotdAsync()
-        {
-            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY").ConfigureAwait(false);
-            if (!Get.IsSuccessStatusCode)
-            {
-                await ReplyAsync("There was an error getting picture of the day from NASA.");
-                return;
-            }
-            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
-            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
-                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());            
-        }
-
-        [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
-        public async Task PotdAsync(int Year, int Month, int Day)
-        {
-            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date={Year}-{Month}-{Day}").ConfigureAwait(false);
-            if (!Get.IsSuccessStatusCode)
-            {
-                await ReplyAsync("There was an error getting picture of the day from NASA.");
-                return;
-            }
-            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
-            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
-                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
-            
-        }
-
-        [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
-        public async Task FeedbackAsync([Remainder]string Message)
-        {
-            if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
-            var ReportChannel = await Context.Client.GetChannelAsync(Convert.ToUInt64(Context.Config.ReportChannel)) as ITextChannel;
-            string Content =
-                $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
-                $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
-                $"**Feedback:** {Message}";
-            await ReportChannel.SendMessageAsync(Content);
-            await ReplyAsync("Thank you for sumbitting your feedback. 😊");
         }
 
         [Command("Show Stats"), Summary("Shows certain Valerie's stats.")]
@@ -380,8 +380,32 @@ namespace Valerie.Modules
         public Task RankAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            return Task.CompletedTask;
+            if (!Context.Server.ChatXP.Rankings.ContainsKey(User.Id))
+                return ReplyAsync($"**{User}** isn't ranked yet. 🙄");
+            var UserRank = Context.Server.ChatXP.Rankings[User.Id];
+            return ReplyAsync($"**{User} Stats 🔰**\nLevel: *{IntExt.GetLevel(UserRank)}* | *Total XP: **{UserRank} | " +
+                $"*Next Level: *{IntExt.GetXpForNextLevel(IntExt.GetLevel(UserRank))}");
         }
+
+        [Command("Robohash"), Summary("Generates a random robot images for a specified user.")]
+        public async Task RobohashAsync(IGuildUser User = null)
+        {
+            string[] Sets = { "?set=set1", "?set=set2", "?set=set3" };
+            var GetRandom = Sets[Context.Random.Next(0, Sets.Length)];
+            await ReplyAsync($"https://robohash.org/{(User ?? Context.User).Username}{GetRandom}");
+        }
+
+        [Command("AdorableAvatar"), Summary("Generates an avatar for a specified user.")]
+        public async Task AdorableAvatarAsync(IGuildUser User = null)
+            => await ReplyAsync($"https://api.adorable.io/avatars/500/{(User ?? Context.User).Username}.png");
+
+        [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
+        public async Task NekoAsync()
+            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false))["neko"]}");
+
+        [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
+        public Task LmgtfyAsync([Remainder] string Search = "How to use Lmgtfy")
+            => ReplyAsync($"http://lmgtfy.com/?q={ Uri.EscapeUriString(Search) }");
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
