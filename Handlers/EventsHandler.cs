@@ -60,8 +60,9 @@ namespace Valerie.Handlers
             await ServerHandler.AddServerAsync(new ServerModel
             {
                 Id = $"{Guild.Id}",
-                Prefix = "."
+                Prefix = "?"
             }).ConfigureAwait(false);
+            await Guild.DefaultChannel.SendMessageAsync("Thank you for inviting me to your server! Guild prefix is `?`. Type `?Cmds` for commands.");
         }
 
         internal async Task HandleCommandAsync(SocketMessage Message)
@@ -71,7 +72,7 @@ namespace Valerie.Handlers
             var Context = new IContext(Client, Msg, Provider);
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot ||
-                Context.Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
+                Context.Config.UsersBlacklist.ContainsKey(Msg.Author.Id) || Context.Server.BlacklistedUsers.Contains(Message.Author.Id)) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, null, MultiMatchHandling.Best);
             switch (Result.Error)
             {
@@ -83,11 +84,15 @@ namespace Valerie.Handlers
 
         internal async Task HandleMessageAsync(SocketMessage Message)
         {
-            var Config = await ConfigHandler.GetConfigAsync();
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return;
-            if (Msg.Source != MessageSource.User | Msg.Author.IsBot || Config.UsersBlacklist.ContainsKey(Msg.Author.Id)) return;
+            if (Msg.Source != MessageSource.User || Msg.Author.IsBot ||
+                (await ConfigHandler.GetConfigAsync()).UsersBlacklist.ContainsKey(User.Id) ||
+                (await ServerHandler.GetServerAsync(User.Guild.Id)).BlacklistedUsers.Contains(User.Id)) return;
+
+            _ = AutoModAsync(Msg);
             _ = AFKHandlerAsync(Msg);
             _ = CleverbotHandlerAsync(Msg);
+            _ = XpHandlerAsync(User, Msg.Content.Length);
         }
 
         internal async Task UserJoinedAsync(SocketGuildUser User)
@@ -201,6 +206,84 @@ namespace Valerie.Handlers
                 await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
         }
 
+        async Task XpHandlerAsync(SocketGuildUser User, int Xp)
+        {
+            var Config = await ServerHandler.GetServerAsync(User.Guild.Id);
+            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
+            var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
+            if (!Config.ChatXP.IsEnabled || HasRole) return;
+            var RandomXP = IntExt.GiveXp(Xp);
+            if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
+            {
+                Config.ChatXP.Rankings.Add(User.Id, RandomXP);
+                await ServerHandler.UpdateServerAsync(User.Guild.Id, Config);
+                return;
+            }
+            int Old = Config.ChatXP.Rankings[User.Id];
+            Config.ChatXP.Rankings[User.Id] += RandomXP;
+            var New = Config.ChatXP.Rankings[User.Id];
+            await ServerHandler.UpdateServerAsync(User.Guild.Id, Config);
+            _ = LevelUpAsync(User, Old, New);
+        }
+
+        async Task LevelUpAsync(SocketGuildUser User, int OldXp, int NewXp)
+        {
+            var Config = await ServerHandler.GetServerAsync(User.Guild.Id);
+            int OldLevel = IntExt.GetLevel(OldXp);
+            int NewLevel = IntExt.GetLevel(NewXp);
+            if (!(NewLevel > OldLevel) || !Config.ChatXP.LevelRoles.Any()) return;
+            if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
+                await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User.Mention, $"{NewLevel}"));
+            var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
+            if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
+            await User.AddRoleAsync(Role);
+            foreach (var lvlrole in Config.ChatXP.LevelRoles)
+                if (lvlrole.Value < NewLevel)
+                    if (!User.Roles.Contains(User.Guild.GetRole(lvlrole.Key)))
+                        await User.AddRoleAsync(User.Guild.GetRole(lvlrole.Key));
+        }
+
+        async Task AutoModAsync(SocketUserMessage Message)
+        {
+            var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
+            var Badwords = Config.ModLog.BadWords.Where(x => x.Contains(Message.Content));
+            var BlockedUrls = Config.ModLog.BlockedUrls.Where(x => x.Contains(Message.Content));
+            if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id ) return;
+            await Message.DeleteAsync();
+            await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post invite links.");
+            if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
+            {
+                Config.ModLog.Warnings.TryAdd(Message.Author.Id, 1);
+                await ServerHandler.UpdateServerAsync((Message.Channel as SocketGuildChannel).Guild.Id, Config).ConfigureAwait(false);
+                return;
+            }
+
+            if (!(Config.ModLog.Warnings[Message.Author.Id] >= Config.ModLog.MaxWarnings))
+                Config.ModLog.Warnings[Message.Author.Id]++;
+            else
+            {
+                await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
+                ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
+                IUserMessage Msg = null;
+                if (Channel != null)
+                    Msg = await Channel.SendMessageAsync($"**Kick** | Case {Config.ModLog.ModCases.Count + 1 }\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Maxed out warnings.\n" +
+                    $"**Responsible Moderator:** Action Taken by Auto Moderator.");
+                if (Msg == null)
+                    await (await (Message.Author as IGuildUser).Guild.GetDefaultChannelAsync()).SendMessageAsync($"*{Message.Author} was kicked by Auto Moderator.*  :cop:");
+
+                Config.ModLog.ModCases.Add(new CaseWrapper
+                {
+                    MessageId = $"{Msg.Id}",
+                    CaseType = CaseType.AutoMod,
+                    Reason = "Maxed out warnings.",
+                    ResponsibleMod = $"Auto Moderator",
+                    CaseNumber = Config.ModLog.ModCases.Count + 1,
+                    UserInfo = $"{Message.Author} ({Message.Author.Id})"
+                });
+            }
+            await ServerHandler.UpdateServerAsync((Message.Channel as SocketGuildChannel).Guild.Id, Config).ConfigureAwait(false);
+        }
+
         async Task CleverbotHandlerAsync(SocketMessage Message)
         {
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
@@ -210,13 +293,6 @@ namespace Valerie.Handlers
             string UserMsg = Message.Content.Replace($"<@{Client.CurrentUser.Id}>", string.Empty);
             var Clever = await MainHandler.Cookie.Cleverbot.TalkAsync(UserMsg);
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
-        }
-
-        async Task AutoRespondAsync(SocketMessage Message)
-        {
-            var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
-            var Reply = Config.AutoResponds.FirstOrDefault(x => Message.Content.StartsWith(x.Key));
-            await Message.Channel.SendMessageAsync(Reply.Value);
         }
 
         async Task CleanupAsync(SocketGuildUser User)
