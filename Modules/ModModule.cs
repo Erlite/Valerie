@@ -106,18 +106,15 @@ namespace Valerie.Modules
             else if (Amount > 100) foreach (var msg in GetMessages) await msg.DeleteAsync().ConfigureAwait(false);
         }
 
-        [Command("Addrole"), Alias("AR", "Arole"), Summary("Gives user the specified role."), RequireBotPermission(GuildPermission.ManageRoles)]
-        public async Task AddroleAsync(IGuildUser User, IRole Role)
+        [Command("Removerole"), Summary("Adds/Removes a role from a user."), RequireBotPermission(GuildPermission.ManageRoles)]
+        public Task ManageRoleAsync(ModuleEnums Action, IGuildUser User, IRole Role)
         {
-            await User.AddRoleAsync(Role);
-            await ReplyAsync($"**{User} has been added to {Role.Name}.** :v:");
-        }
-
-        [Command("Removerole"), Alias("RR", "Rrole"), Summary("Removes user from the specified role."), RequireBotPermission(GuildPermission.ManageRoles)]
-        public async Task RemoveRoleAsync(IGuildUser User, IRole Role)
-        {
-            await User.RemoveRoleAsync(Role);
-            await ReplyAsync($"**{User} has been removed from {Role.Name}.** :v:");
+            switch (Action)
+            {
+                case ModuleEnums.Add: return User.AddRoleAsync(Role);
+                case ModuleEnums.Remove: return User.RemoveRoleAsync(Role);
+            }
+            return ReplyAsync($"Done.");
         }
 
         [Command("Mute"), Summary("Mutes a user."), RequireUserPermission(GuildPermission.MuteMembers)]
