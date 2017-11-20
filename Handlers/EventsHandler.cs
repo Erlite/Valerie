@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
 using Models;
-using Valerie.Handlers.ModuleHandler;
-using Valerie.Services;
-using Discord.Commands;
-using System.Reflection;
 using System.Linq;
+using Valerie.Services;
+using System.Reflection;
 using Valerie.Extensions;
+using Discord.Commands;
+using Discord.WebSocket;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Handlers
 {
@@ -39,7 +38,7 @@ namespace Valerie.Handlers
 
         internal Task LogAsync(LogMessage Log) => Task.Run(() => LogClient.Write(Source.DISCORD, Log.Message ?? Log.Exception.Message));
 
-        internal async Task GuildAvailableAsync(SocketGuild Guild) => await ServerHandler.AddServerAsync(new ServerModel { Id = $"{Guild.Id}", Prefix = "?" }).ConfigureAwait(false);
+        internal async Task GuildAvailableAsync(SocketGuild Guild) => await ServerHandler.AddServerAsync(new ServerModel { Id = $"{Guild.Id}", Prefix = "?"}).ConfigureAwait(false);
 
         internal async Task LeftGuildAsync(SocketGuild Guild) => await ServerHandler.DeleteServerAsync(Guild.Id).ConfigureAwait(false);
 
@@ -245,11 +244,9 @@ namespace Valerie.Handlers
         async Task AutoModAsync(SocketUserMessage Message)
         {
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
-            var Badwords = Config.ModLog.BadWords.Where(x => x.Contains(Message.Content));
-            var BlockedUrls = Config.ModLog.BlockedUrls.Where(x => x.Contains(Message.Content));
-            if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id) return;
-            await Message.DeleteAsync();
-            await Message.Channel.SendMessageAsync($"{Message.Author.Mention}, please don't post i");
+            if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id || Config.ModLog.MaxWarnings == 0) return;
+            _ = WarnAsync(BoolExt.IsMatch(Config.ModLog.BadWords, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a banned word."), Message);
+            _ = WarnAsync(BoolExt.IsMatch(Config.ModLog.BlockedUrls, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a blocked url."), Message);
             if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
             {
                 Config.ModLog.Warnings.Add(Message.Author.Id, 1);
@@ -287,8 +284,8 @@ namespace Valerie.Handlers
         {
             var Config = await ServerHandler.GetServerAsync((Message.Channel as SocketGuildChannel).Guild.Id);
             var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
-            if ( Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("v")) return;
-            string UserMsg = Message.Content.Replace("v",  string.Empty);
+            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("v")) return;
+            string UserMsg = Message.Content.Replace("v", string.Empty);
             var Clever = await MainHandler.Cookie.Cleverbot.TalkAsync(UserMsg);
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
         }
@@ -301,6 +298,15 @@ namespace Valerie.Handlers
             Config.ChatXP.Rankings.Remove(User.Id);
             Config.Tags.RemoveAll(x => x.Owner == $"{User.Id}");
             await ServerHandler.UpdateServerAsync(User.Guild.Id, Config);
+        }
+
+        async Task WarnAsync((bool, string) TupleParam, SocketMessage Message)
+        {
+            if (TupleParam.Item1)
+            {
+                await Message.DeleteAsync();
+                await Message.Channel.SendMessageAsync(TupleParam.Item2);
+            }
         }
     }
 }
