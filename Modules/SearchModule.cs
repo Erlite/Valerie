@@ -1,18 +1,18 @@
 ﻿using Discord;
 using System;
+using AngleSharp;
 using System.Linq;
+using Valerie.Handlers;
 using Newtonsoft.Json;
 using Discord.Commands;
-using Valerie.Extensions;
 using Valerie.JsonModels;
-using Discord.WebSocket;
-using Newtonsoft.Json.Linq;
-using Valerie.Modules.Addons;
+using Google.Apis.Services;
+using AngleSharp.Dom.Html;
+using Google.Apis.YouTube.v3;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Google.Apis.Customsearch.v1;
 using Valerie.Handlers.ModuleHandler;
-using AngleSharp;
-using AngleSharp.Dom.Html;
 
 namespace Valerie.Modules
 {
@@ -88,5 +88,90 @@ namespace Valerie.Modules
             if (Image?.Source == null) return;
             await ReplyAsync(Image.Source.Replace("b", "."));
         }
+
+        [Command("Crypto"), Summary("Shows information about a crypto currency.")]
+        public async Task CryptoAsync(string Currency = "Bitcoin")
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/{Currency}").ConfigureAwait(false);
+            var Content = JsonConvert.DeserializeObject<CryptoModel[]>(await Get.Content.ReadAsStringAsync())[0];
+            if (string.IsNullOrWhiteSpace(Content.Id)) { return; }
+            await ReplyAsync(
+                $"**Name:** {Content.Name}\n**Rank:** {Content.Rank}\n**Last Updated:** {UnixDT(Convert.ToDouble(Content.LastUpdated))}\n" +
+                $"**USD Price:** {Content.PriceUsd}\n**Bitcoin Price:** {Content.PriceBtc}\n" +
+                $"**USD Market Cap:** {Content.MarketCapUsd}\n**USD 24H Volume:** {Content.The24hVolumeUsd}\n" +
+                $"**1H Percent Change:** {Content.PercentChange1h}\n**24H Percent Change:** {Content.PercentChange24h}\n**7D Percent Change:** {Content.PercentChange7d}\n" +
+                $"**Available Supply:** {Content.AvailableSupply}\n**Total Supply:** {Content.TotalSupply}\n**Max Supply:** {Content.MaxSupply}");
+        }
+
+        [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
+        public async Task GoogleAsync([Remainder] string Search)
+        {
+            var Service = new CustomsearchService(new BaseClientService.Initializer { ApiKey = Context.Config.ApplicationKeys.GoogleKey });
+            var RequestList = Service.Cse.List(Search);
+            RequestList.Cx = Context.Config.ApplicationKeys.SearchEngineID;
+            var Query = RequestList.Execute().Items.Take(3).ToList();
+            await ReplyAsync($"{Query[0].DisplayLink}\n\n**Related Searches**\n{Query[1].DisplayLink}\n{Query[2].DisplayLink}");
+        }
+
+        [Command("Youtube"), Alias("Yt"), Summary("Searches a youtube for your video.")]
+        public Task YoutubeAsync([Remainder] string Search)
+        {
+            var Service = new YouTubeService(new BaseClientService.Initializer { ApiKey = Context.Config.ApplicationKeys.GoogleKey });
+            var SearchRequest = Service.Search.List("snippet");
+            SearchRequest.Q = Search;
+            SearchRequest.MaxResults = 1;
+            SearchRequest.Type = "video";
+            return ReplyAsync("https://www.youtube.com/watch?v=" + SearchRequest.Execute().Items.Select(x => x.Id.VideoId).FirstOrDefault());
+        }
+
+        [Command("Giphy"), Alias("Gif"), Summary("Searches Giphy for your Gifs??")]
+        public async Task Giphy([Remainder] string SearchTerms = null)
+        {
+            string Response = null;
+            if (!string.IsNullOrWhiteSpace(SearchTerms))
+            {
+                var GetGif = await MainHandler.Cookie.Giphy.SearchAsync(SearchTerms);
+                Response = GetGif.Datum[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
+            }
+            else
+            {
+                var gif = await MainHandler.Cookie.Giphy.TrendingAsync();
+                var Random = Context.Random.Next(gif.Pagination.Count);
+                Response = gif.Datum[Random].EmbedURL;
+            }
+            await ReplyAsync(Response);
+        }
+
+        [Command("SteamUser"), Summary("Shows info about a steam user.")]
+        public async Task UserAsync(string UserId)
+        {
+            var UserInfo = await MainHandler.Cookie.Steam.GetUsersInfoAsync(new List<string> { UserId });
+            var UserGames = await MainHandler.Cookie.Steam.OwnedGamesAsync(UserId);
+            var UserRecent = await MainHandler.Cookie.Steam.RecentGamesAsync(UserId);
+            var Info = UserInfo.PlayersInfo.Players.FirstOrDefault();
+            string State;
+            if (Info.ProfileState == 0) State = "Offline";
+            else if (Info.ProfileState == 1) State = "Online";
+            else if (Info.ProfileState == 2) State = "Busy";
+            else if (Info.ProfileState == 3) State = "Away";
+            else if (Info.ProfileState == 4) State = "Snooze";
+            else if (Info.ProfileState == 5) State = "Looking to trade";
+            else State = "Looking to play";
+
+            var embed = ValerieEmbed.Embed(EmbedColor.Random, Info.AvatarFullUrl, Info.RealName, Info.ProfileLink,
+                FooterText: string.Join(", ", UserRecent.RecentGames.GamesList.Select(x => x.Name)));
+            embed.AddField("Display Name", $"{Info.Name}", true);
+            embed.AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true);
+            embed.AddField("Person State", State, true);
+            embed.AddField("Profile Created", UnixDT(Info.TimeCreated), true);
+            embed.AddField("Last Online", UnixDT(Info.LastLogOff), true);
+            embed.AddField("Primary Clan ID", Info.PrimaryClanId, true);
+            embed.AddField("Owned Games", UserGames.OwnedGames.GamesCount, true);
+            embed.AddField("Recently Played Games", UserRecent.RecentGames.TotalCount, true);
+            await ReplyAsync("", embed: embed.Build());
+        }
+
+        DateTime UnixDT(double Unix)
+            => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
     }
 }
