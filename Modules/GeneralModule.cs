@@ -383,8 +383,8 @@ namespace Valerie.Modules
             if (!Context.Server.ChatXP.Rankings.ContainsKey(User.Id))
                 return ReplyAsync($"**{User}** isn't ranked yet. 🙄");
             var UserRank = Context.Server.ChatXP.Rankings[User.Id];
-            return ReplyAsync($"**{User} Stats 🔰**\nLevel: *{IntExt.GetLevel(UserRank)}* | *Total XP: **{UserRank} | " +
-                $"*Next Level: *{IntExt.GetXpForNextLevel(IntExt.GetLevel(UserRank))}");
+            return ReplyAsync($"**{User} Stats 🔰**\n*Level:* {IntExt.GetLevel(UserRank)} | *Total XP:* {UserRank} | " +
+                $"*Next Level:* {IntExt.GetXpForNextLevel(IntExt.GetLevel(UserRank))}");
         }
 
         [Command("Robohash"), Summary("Generates a random robot images for a specified user.")]
