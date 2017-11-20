@@ -16,6 +16,8 @@
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="Cookie" Version="2.7.2" />
     <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00848" />
+    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.30.0.896" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.30.0.1035" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.4.0" />
   </ItemGroup>
 
