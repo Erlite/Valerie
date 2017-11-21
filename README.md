@@ -7,4 +7,18 @@
         <a href="https://www.codefactor.io/repository/github/yucked/valerie" ><img src="https://img.shields.io/badge/Codefactor-A-7289DA.svg?style=flat-square"> </a>
     </p></p>
 
+Features
+---
 
+- Tags
+- Starboard
+- Updooting
+- Chatterbot
+- Server AFK
+- Valerie Admins
+- Assignable Roles
+- Join & Leave Messages
+- Auto Assign Role On User Join
+- Mod Warnings, Logging, Muting
+- Server Blacklisted Users (Prevents User from all bot features)
+- Chat XP - Auto Assign Role On Level Up, Forbid Role From Leveling Up, Custom Levei Up Message
