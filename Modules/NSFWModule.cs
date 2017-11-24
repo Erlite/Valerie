@@ -54,7 +54,7 @@ namespace Valerie.Modules
             var Json = JsonConvert.DeserializeObject<PornModel>(await Response.Content.ReadAsStringAsync());
             var Getvid = Json.Result[Context.Random.Next(Json.Count)];
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Description: $"[{Getvid.Title}]({Getvid.Url})\nTotal Views: {Getvid.Views}", ThumbUrl: Getvid.Thumb);
-            await SendEmbedAsync(Embed.Build());
+            await ReplyAsync(string.Empty, embed: Embed.Build());
         }
 
         [Command("Lewd"), Summary("Weeb heaven.")]
