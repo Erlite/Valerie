@@ -4,6 +4,8 @@ using Discord;
 using Discord.Commands;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers.ModuleHandler
 {
@@ -21,14 +23,16 @@ namespace Valerie.Handlers.ModuleHandler
             switch (Action)
             {
                 case ModuleEnums.Server:
-                    Check = await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
+                    await Context.ServerHandler.SaveAsync(Context.Server, Context.Guild.Id).ConfigureAwait(false);
+                    Check = !Context.Session.Advanced.HasChanges;
                     break;
                 case ModuleEnums.Config:
-                    Check = await Context.ConfigHandler.UpdateConfigAsync(Context.Config).ConfigureAwait(false);
+                    Context.ConfigHandler.Save(Context.Config);
+                    Check = !Context.Session.Advanced.HasChanges;
                     break;
             }
             if (Check == true) return await ReplyAsync(Message ?? "✅ - Done.");
-            return await ReplyAsync(Message ?? "✖️ - There was an error.");
+            return await ReplyAsync(Message ?? "❌ - There was an error.");
         }
 
         public async Task LogAsync(IGuildUser User, CaseType CaseType, string Reason)
@@ -47,13 +51,7 @@ namespace Valerie.Handlers.ModuleHandler
                 UserInfo = $"{User.Username} ({User.Id})",
                 CaseNumber = Context.Server.ModLog.ModCases.Count + 1
             });
-            await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
-        }
-
-        public async Task<IUserMessage> SendEmbedAsync(Embed Embed)
-        {
-            await Context.ServerHandler.UpdateServerAsync(Context.Guild.Id, Context.Server).ConfigureAwait(false);
-            return await base.ReplyAsync(null, false, Embed);
+            await Context.ServerHandler.SaveAsync(Context.Server, Context.Guild.Id).ConfigureAwait(false);
         }
     }
 }
