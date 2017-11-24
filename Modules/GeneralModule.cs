@@ -101,7 +101,7 @@ namespace Valerie.Modules
                 embed.Description = $"You won {Bet} XP :tada: Your current XP is: {UserXP + Bet}";
                 embed.Color = new Color(0x93ff89);
             }
-            return SendEmbedAsync(embed.Build());
+            return ReplyAsync(string.Empty, embed: embed.Build());
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!")]
@@ -325,7 +325,7 @@ namespace Valerie.Modules
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
-            var Servers = await Context.ServerHandler.ServerListAsync();
+            var Servers = Context.Session.Query<Models.ServerModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
             var Commits = await GitStatsAsync();
             string Description = null;
             if (!Commits.Any()) Description = "Error fetching commits.";
