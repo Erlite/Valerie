@@ -15,15 +15,16 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
     <PackageReference Include="Cookie" Version="2.7.2" />
-    <PackageReference Include="Discord.Net" Version="2.0.0-alpha-build-00848" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta-00854" />
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.30.0.896" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.30.0.1035" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.6.0-beta3" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171123-0501" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Models">
-      <HintPath>..\ValerieCore\Models\bin\Debug\netstandard2.0\Models.dll</HintPath>
+      <HintPath>..\Github projects\ValerieCore\Models\bin\Debug\netstandard2.0\Models.dll</HintPath>
     </Reference>
   </ItemGroup>
 
