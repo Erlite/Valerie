@@ -1,28 +1,22 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿using Cookie;
 using Discord;
-using Discord.WebSocket;
 using Valerie.Services;
-using Valerie.Services.RestService;
-using Cookie;
+using System.Net.Http;
+using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace Valerie.Handlers
 {
     public class MainHandler
     {
-        public static string ConfigId { get; set; } = "Config";
-        public static RestConfig RestConfig { get; set; }
-        public static RestServer RestServer { get; set; }
         public static CookieClient Cookie { get; set; }
-        readonly HttpClient HttpClient;
-        readonly EventsHandler EventsHandler;
         readonly DiscordSocketClient Client;
         readonly ConfigHandler ConfigHandler;
+        readonly EventsHandler EventsHandler;
 
-        public MainHandler(HttpClient HttpParam, DiscordSocketClient DiscordParam, ConfigHandler ConfigParam, EventsHandler EventParam)
+        public MainHandler(DiscordSocketClient DiscordParam, ConfigHandler ConfigParam, EventsHandler EventParam)
         {
             Client = DiscordParam;
-            HttpClient = HttpParam;
             EventsHandler = EventParam;
             ConfigHandler = ConfigParam;
         }
@@ -30,18 +24,13 @@ namespace Valerie.Handlers
         public async Task StartAsync()
         {
             LogClient.AppInfo();
-
-            RestConfig = new RestConfig("http://localhost:51117/api/config/", HttpClient);
-            RestServer = new RestServer("http://localhost:51117/api/server/", HttpClient);
-
-            await ConfigHandler.ConfigCheckAsync();
-            var Config = await ConfigHandler.GetConfigAsync();
+            ConfigHandler.LoadConfig();
 
             Cookie = new CookieClient(new CookieConfig
             {
-                GiphyKey = Config.ApplicationKeys.GiphyKey,
-                SteamKey = Config.ApplicationKeys.SteamKey,
-                CleverbotKey = Config.ApplicationKeys.CleverBotKey
+                GiphyKey = ConfigHandler.Config.ApplicationKeys.GiphyKey,
+                SteamKey = ConfigHandler.Config.ApplicationKeys.SteamKey,
+                CleverbotKey = ConfigHandler.Config.ApplicationKeys.CleverBotKey
             });
 
             Client.Log += EventsHandler.LogAsync;
@@ -58,7 +47,7 @@ namespace Valerie.Handlers
             Client.MessageReceived += EventsHandler.HandleCommandAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
 
-            await Client.LoginAsync(TokenType.Bot, Config.Token);
+            await Client.LoginAsync(TokenType.Bot, ConfigHandler.Config.Token);
             await Client.StartAsync();
         }
     }
