@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 
 namespace Valerie.Services
 {
@@ -14,12 +13,13 @@ namespace Valerie.Services
         public static void Write(Source Source, string Text)
         {
             Console.Write(Environment.NewLine);
+            Append($"{DateTime.Now}\n", ConsoleColor.Gray);
             switch (Source)
             {
-                case Source.CONFIG: Append($"[{Source}]", ConsoleColor.DarkYellow); break;
-                case Source.DISCORD: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
-                case Source.REST: Append($"[{Source}]", ConsoleColor.DarkGreen); break;
-                case Source.SERVER: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
+                case Source.CONFIG: Append($"  => [{Source}]", ConsoleColor.DarkYellow); break;
+                case Source.DISCORD: Append($"  => [{Source}]", ConsoleColor.DarkCyan); break;
+                case Source.REST: Append($"  => [{Source}]", ConsoleColor.DarkGreen); break;
+                case Source.SERVER: Append($"  => [{Source}]", ConsoleColor.DarkMagenta); break;
             }
             Append($" {Text}", ConsoleColor.White);
         }
@@ -48,44 +48,8 @@ namespace Valerie.Services
             }
             Append("-> Application Information\n", ConsoleColor.Magenta);
             Append($"   Author: Yucked\n   Github: https://github.com/Yucked/Valerie\n   Discord.Net Version: {Discord.DiscordConfig.Version}\n", ConsoleColor.Gray);
-            Append("\n-> API Endpoint Status Check", ConsoleColor.Magenta);
-            Check("\n   Config Endpoint: ", ApiResponse("http://localhost:51117/api/config/"));
-            Check("\n   Server Endpoint: ", ApiResponse("http://localhost:51117/api/server/"));
             Console.WriteLine(Environment.NewLine);
-        }
-
-        static bool ApiResponse(string Url)
-        {
-            bool Result;
-            try
-            {
-                var Endpoint = WebRequest.Create(Url);
-                using (HttpWebResponse Response = (HttpWebResponse)Endpoint.GetResponse())
-                {
-                    Result = Response.StatusCode == HttpStatusCode.OK ? true : false;
-                    Response.Close();
-                }
-            }
-            catch
-            {
-                Result = false;
-            }
-            return Result;
-        }
-
-        static void Check(string EPN, bool IsWorking)
-        {
-            if (IsWorking)
-            {
-                Append(EPN, ConsoleColor.White);
-                Append("OK", ConsoleColor.Green);
-            }
-            else
-            {
-                Append(EPN, ConsoleColor.White);
-                Append("DOWN", ConsoleColor.Red);
-            }
-        }
+        }        
     }
 
     public enum Source
