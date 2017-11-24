@@ -1,52 +1,48 @@
-﻿using System;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Models;
+﻿using Models;
+using System;
 using Valerie.Services;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers
 {
     public class ConfigHandler
     {
-        public async Task ConfigCheckAsync()
+        IDocumentSession Session { get; }
+        public ConfigHandler(IDocumentStore DocumentStore)
         {
-            var Get = await MainHandler.RestConfig.ConfigAsync(MainHandler.ConfigId).ConfigureAwait(false);
-            if (Get.ReasonPhrase.Contains("No Content"))
+            Session = DocumentStore.OpenSession();
+        }
+
+        public ConfigModel Config
+        {
+            get
             {
-                LogClient.Write(Source.REST, "Config wasn't found. Initializing One ...");
-                LogClient.Write(Source.CONFIG, "Enter Default Prefix: ");
-                string Prefix = Console.ReadLine();
-                LogClient.Write(Source.CONFIG, "Enter Token: ");
-                string Token = Console.ReadLine();
-                var NewConfig = await MainHandler.RestConfig.AddConfigAsync(new ConfigModel
-                {
-                    Id = MainHandler.ConfigId,
-                    Prefix = Prefix,
-                    Token = Token
-                }).ConfigureAwait(false);
-                if (!NewConfig.IsSuccessStatusCode)
-                    LogClient.Write(Source.REST, "Failed to create new config.");
-                else
-                    LogClient.Write(Source.REST, "Config Created Succesfully.");
+                return Session.Load<ConfigModel>("Config");
             }
         }
 
-        public async Task<ConfigModel> GetConfigAsync()
+        public void LoadConfig()
         {
-            var Get = await MainHandler.RestConfig.ConfigAsync(MainHandler.ConfigId).ConfigureAwait(false);
-            var Content = await Get.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<ConfigModel>(Content);
+            if (Session.Advanced.Exists("Config")) return;
+
+            LogClient.Write(Source.CONFIG, "Enter Token: ");
+            string Token = Console.ReadLine();
+            LogClient.Write(Source.CONFIG, "Enter Prefix: ");
+            string Prefix = Console.ReadLine();
+            Session.Store(new ConfigModel
+            {
+                Id = "Config",
+                Token = Token,
+                Prefix = Prefix
+            });
+            Session.SaveChanges();
         }
 
-        public async Task<bool> UpdateConfigAsync(ConfigModel Update)
+        public void Save(ConfigModel Config)
         {
-            var TryUpdate = await MainHandler.RestConfig.UpdateConfigAsync(MainHandler.ConfigId, Update).ConfigureAwait(false);
-            if (!TryUpdate.IsSuccessStatusCode)
-            {
-                LogClient.Write(Source.REST, "Failed to update config.");
-                return false;
-            }
-            return true;
+            Session.Store(Config, "Config");
+            Session.SaveChanges();
         }
     }
 }
