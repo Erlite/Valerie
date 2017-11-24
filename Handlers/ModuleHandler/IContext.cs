@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Net.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Discord;
-using Discord.Commands;
 using Models;
+using Discord;
+using System.Net.Http;
+using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using Raven.Client.Documents.Session;
+using Raven.Client.Documents;
 
 namespace Valerie.Handlers.ModuleHandler
 {
@@ -18,6 +20,7 @@ namespace Valerie.Handlers.ModuleHandler
         public HttpClient HttpClient { get; }
         public IUserMessage Message { get; }
         public IMessageChannel Channel { get; }
+        public IDocumentSession Session { get; }
         public ConfigHandler ConfigHandler { get; }
         public ServerHandler ServerHandler { get; }
 
@@ -30,10 +33,11 @@ namespace Valerie.Handlers.ModuleHandler
             Guild = (MessageParam.Channel as IGuildChannel).Guild;
             Random = ServiceProvider.GetRequiredService<Random>();
             HttpClient = ServiceProvider.GetRequiredService<HttpClient>();
+            Config = ServiceProvider.GetRequiredService<ConfigHandler>().Config;
             ConfigHandler = ServiceProvider.GetRequiredService<ConfigHandler>();
             ServerHandler = ServiceProvider.GetRequiredService<ServerHandler>();
-            Config = ServiceProvider.GetRequiredService<ConfigHandler>().GetConfigAsync().GetAwaiter().GetResult();
-            Server = ServiceProvider.GetRequiredService<ServerHandler>().GetServerAsync(Guild.Id).GetAwaiter().GetResult();
+            Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
+            Server = ServiceProvider.GetRequiredService<ServerHandler>().GetServer(Guild.Id);
         }
     }
 }
