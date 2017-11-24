@@ -23,6 +23,7 @@ namespace Valerie.Extensions
             StringBuilder Builder = new StringBuilder(Message);
             Builder.Replace("{guild}", Param1);
             Builder.Replace("{user}", Param2);
+            Builder.Replace("{rank}", Param1);
             return Builder.ToString();
         }
 
