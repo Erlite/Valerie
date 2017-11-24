@@ -4,6 +4,7 @@ using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
 using Discord.WebSocket;
+using Raven.Client.Documents;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,7 +20,7 @@ namespace Valerie
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = true,
-                    LogLevel = LogSeverity.Critical
+                    LogLevel = LogSeverity.Info
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
@@ -27,6 +28,11 @@ namespace Valerie
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
+                .AddSingleton(new DocumentStore
+                {
+                    Database = "Valerie",
+                    Urls = new[] { "http://localhost:8000" }
+                }.Initialize())
                 .AddSingleton<MainHandler>()
                 .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
