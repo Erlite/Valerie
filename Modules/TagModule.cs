@@ -27,11 +27,11 @@ namespace Valerie.Modules
             if (Exists(Name)) return Task.CompletedTask;
             Context.Server.Tags.Add(new TagWrapper
             {
-                CreationDate = DateTime.Now,
+                Uses = 1,
                 Name = Name,
-                Owner = $"{Context.User.Id}",
                 Response = Response,
-                Uses = 1
+                Owner = $"{Context.User.Id}",
+                CreationDate = $"{DateTime.Now}"
             });
             return SaveAsync(ModuleEnums.Server);
         }
