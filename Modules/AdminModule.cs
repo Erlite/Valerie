@@ -6,6 +6,7 @@ using Valerie.Extensions;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
+using System;
 
 namespace Valerie.Modules
 {
@@ -286,6 +287,39 @@ namespace Valerie.Modules
         {
             if (!Context.Server.ModLog.BlockedUrls.Any()) return ReplyAsync($"{Context.Guild} has no blocked urls.");
             return ReplyAsync($"**Blocked Links**\n{string.Join(", ", Context.Server.ModLog.BlockedUrls)}");
+        }
+
+        [Command("Setup"), Summary("Set ups Valerie for your Server.")]
+        public async Task SetupAsync()
+        {
+            var Channels = await Context.Guild.GetTextChannelsAsync();
+            var SetupMessage = await ReplyAsync($"Initializing *{Context.Guild}'s* config .... ");
+            OverwritePermissions Permissions = new OverwritePermissions(sendMessages: PermValue.Deny);
+            OverwritePermissions VPermissions = new OverwritePermissions(sendMessages: PermValue.Allow);
+            var HasStarboard = Channels.FirstOrDefault(x => x.Name == "starboard");
+            var HasMod = Channels.FirstOrDefault(x => x.Name == "logs");
+            if (Channels.Contains(HasStarboard)) Context.Server.Starboard.TextChannel = $"{HasStarboard.Id}";
+            else
+            {
+                var Starboard = await Context.Guild.CreateTextChannelAsync("starboard");
+                await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Starboard.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
+                Context.Server.Starboard.TextChannel = $"{Starboard.Id}";
+            }
+            if (Channels.Contains(HasMod)) Context.Server.ModLog.TextChannel = $"{HasMod}";
+            else
+            {
+                var Mod = await Context.Guild.CreateTextChannelAsync("logs");
+                await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Mod.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
+                Context.Server.ModLog.TextChannel = $"{Mod.Id}";
+            }
+            Context.Server.ChatterChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Server.JoinChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Server.LeaveChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Server.ChatXP.LevelMessage = "Congrats on hitting level **{rank}**! :beginner:";
+            Context.Server.ChatXP.IsEnabled = true;
+            await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
     }
 }
