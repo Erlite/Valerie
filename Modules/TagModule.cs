@@ -1,8 +1,8 @@
 ﻿using System;
-using Models;
 using Discord;
 using System.Linq;
 using Discord.Commands;
+using Valerie.JsonModels;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
@@ -12,7 +12,7 @@ namespace Valerie.Modules
     [Name("Tag Commands")]
     public class TagModule : ValerieBase
     {
-        [Command("Tag"), Summary("Shows a tag with the given name."), Priority(0)]
+        [Command("Tag"), Summary("Shows a tag with the given name.")]
         public Task TagAsync(string TagName)
         {
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
@@ -21,7 +21,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
-        [Command("Tag Create"), Alias("Make", "New", "Add"), Summary("Creates a new tag for this server."), Priority(1)]
+        [Command("Tag Create"), Alias("Tag Make", "Tag New", "Tag Add"), Summary("Creates a new tag for this server.")]
         public Task CreateAsync(string Name, string Response)
         {
             if (Exists(Name)) return Task.CompletedTask;
@@ -31,12 +31,12 @@ namespace Valerie.Modules
                 Name = Name,
                 Response = Response,
                 Owner = $"{Context.User.Id}",
-                CreationDate = $"{DateTime.Now}"
+                CreationDate = DateTime.Now
             });
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Tag Modify"), Alias("Change", "Update"), Summary("Updates an existing tag"), Priority(1)]
+        [Command("Tag Modify"), Alias("Tag Change", "Tag Update"), Summary("Updates an existing tag")]
         public Task ModifyAsync(string Name, string Response)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -47,7 +47,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Tag Delete"), Alias("Remove"), Summary("Deletes a tag."), Priority(1)]
+        [Command("Tag Delete"), Alias("Tag Remove"), Summary("Deletes a tag.")]
         public Task DeleteAsync(string Name)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -58,7 +58,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Tag User"), Summary("Shows all tags owned by you or a given user."), Priority(1)]
+        [Command("Tag User"), Summary("Shows all tags owned by you or a given user.")]
         public Task UserAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
@@ -67,17 +67,17 @@ namespace Valerie.Modules
             return ReplyAsync($"{User} owns {UserTag.Count()} tags.\n```{string.Join(", ", UserTag.Select(x => x.Name))}```");
         }
 
-        [Command("Tag Info"), Alias("About"), Summary("Displays information about a given tag."), Priority(1)]
+        [Command("Tag Info"), Alias("Tag About"), Summary("Displays information about a given tag.")]
         public async Task InfoAsync(string Name)
         {
-            if (NotExists(Name)) return;
+            if (!NotExists(Name)) return;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
             await ReplyAsync($"```" +
-                $"Name     :  {Tag.Name}\n" +
-                $"Owner   :   {(await Context.Guild.GetUserAsync(Convert.ToUInt64(Tag.Owner))).Username ?? "Unkown User."}\n" +
-                $"Uses      :  {Tag.Uses}\n" +
-                $"Created At   :   {Tag.CreationDate}\n" +
-                $"Response    :   {Tag.Response}\n```");
+                $"Name       :  {Tag.Name}\n" +
+                $"Owner      :  {(await Context.Guild.GetUserAsync(Convert.ToUInt64(Tag.Owner))).Username ?? "Unkown User."}\n" +
+                $"Uses       :  {Tag.Uses}\n" +
+                $"Created At :  {Tag.CreationDate}\n" +
+                $"Response   :  {Tag.Response}\n```");
         }
 
         bool Exists(string Name)
