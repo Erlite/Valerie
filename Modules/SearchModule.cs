@@ -2,6 +2,7 @@
 using System;
 using AngleSharp;
 using System.Linq;
+using AngleSharp.Dom;
 using Valerie.Handlers;
 using Newtonsoft.Json;
 using Discord.Commands;
@@ -11,7 +12,6 @@ using AngleSharp.Dom.Html;
 using Google.Apis.YouTube.v3;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Google.Apis.Customsearch.v1;
 using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
@@ -81,7 +81,7 @@ namespace Valerie.Modules
         [Command("Imgur"), Summary("Searches imgure for your image")]
         public async Task ImgurAsync([Remainder] string Search)
         {
-            var Document = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync("http://imgur.com/search?q={Search.Replace(' ', '+')}");
+            var Document = await DocumentAsync("http://imgur.com/search?q={Search.Replace(' ', '+')}");
             var Elements = Document.QuerySelectorAll("a.image-list-link").ToList();
             if (Elements.Any()) return;
             var Image = (Elements.ElementAtOrDefault(Context.Random.Next(Elements.Count))?.Children.FirstOrDefault() as IHtmlImageElement);
@@ -106,11 +106,15 @@ namespace Valerie.Modules
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
         public async Task GoogleAsync([Remainder] string Search)
         {
-            var Service = new CustomsearchService(new BaseClientService.Initializer { ApiKey = Context.Config.ApplicationKeys.GoogleKey });
-            var RequestList = Service.Cse.List(Search);
-            RequestList.Cx = Context.Config.ApplicationKeys.SearchEngineID;
-            var Query = RequestList.Execute().Items.Take(3).ToList();
-            await ReplyAsync($"{Query[0].DisplayLink}\n\n**Related Searches**\n{Query[1].DisplayLink}\n{Query[2].DisplayLink}");
+            var Document = await DocumentAsync($"https://www.google.com/search?q={Search}");
+            var Elements = Document.QuerySelectorAll("div.g");
+            if (!Elements.Any()) return;
+            foreach(var Element in Elements.Take(3))
+            {
+                var Tag = Element.Children.FirstOrDefault()?.Children.FirstOrDefault() as IHtmlAnchorElement;
+                if (Tag.Href == null || Tag.TextContent == null) return;
+                var Txt = Element.QuerySelectorAll(".st").FirstOrDefault().TextContent;
+            }
         }
 
         [Command("Youtube"), Alias("Yt"), Summary("Searches a youtube for your video.")]
@@ -173,5 +177,7 @@ namespace Valerie.Modules
 
         DateTime UnixDT(double Unix)
             => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
+
+        Task<IDocument> DocumentAsync(string Url) => BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(Url);
     }
 }
