@@ -1,11 +1,9 @@
 ﻿using System;
-using Models;
 using Discord;
 using Discord.Commands;
+using Valerie.JsonModels;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers.ModuleHandler
 {
@@ -23,7 +21,7 @@ namespace Valerie.Handlers.ModuleHandler
             switch (Action)
             {
                 case ModuleEnums.Server:
-                    await Context.ServerHandler.SaveAsync(Context.Server, Context.Guild.Id).ConfigureAwait(false);
+                    Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
                     Check = !Context.Session.Advanced.HasChanges;
                     break;
                 case ModuleEnums.Config:
@@ -51,7 +49,7 @@ namespace Valerie.Handlers.ModuleHandler
                 UserInfo = $"{User.Username} ({User.Id})",
                 CaseNumber = Context.Server.ModLog.ModCases.Count + 1
             });
-            await Context.ServerHandler.SaveAsync(Context.Server, Context.Guild.Id).ConfigureAwait(false);
+            Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
         }
     }
 }
