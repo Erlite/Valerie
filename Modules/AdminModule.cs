@@ -306,7 +306,7 @@ namespace Valerie.Modules
                 await Starboard.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
                 Context.Server.Starboard.TextChannel = $"{Starboard.Id}";
             }
-            if (Channels.Contains(HasMod)) Context.Server.ModLog.TextChannel = $"{HasMod}";
+            if (Channels.Contains(HasMod)) Context.Server.ModLog.TextChannel = $"{HasMod.Id}";
             else
             {
                 var Mod = await Context.Guild.CreateTextChannelAsync("logs");
