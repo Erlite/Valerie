@@ -1,11 +1,11 @@
 ﻿using System;
-using Models;
 using Discord;
 using System.Net.Http;
 using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
-using Raven.Client.Documents.Session;
+using Valerie.JsonModels;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie.Handlers.ModuleHandler
 {
