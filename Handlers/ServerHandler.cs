@@ -1,40 +1,41 @@
-﻿using Models;
+﻿using System;
+using Valerie.JsonModels;
 using Raven.Client.Documents;
-using System.Threading.Tasks;
 using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers
 {
     public class ServerHandler
     {
+        IDocumentStore Store { get; }
         IDocumentSession Session { get; }
-        IAsyncDocumentSession AsyncSession { get; }
-        public ServerHandler(IDocumentStore DocumentStore)
+
+        public ServerHandler(IDocumentStore GetStore, IDocumentSession GetSession)
         {
-            Session = DocumentStore.OpenSession();
-            AsyncSession = DocumentStore.OpenAsyncSession();
+            Store = GetStore;
+            Session = GetSession;
         }
 
         public ServerModel GetServer(ulong Id) => Session.Load<ServerModel>($"{Id}");
 
-        public async Task AddServerAsync(ulong Id)
+        public void Remove(ulong Id) => Session.Delete($"{Id}");
+
+        public void AddServer(ulong Id)
         {
-            if (await AsyncSession.ExistsAsync($"{Id}")) return;
-            await AsyncSession.StoreAsync(new ServerModel
+            if (Session.Advanced.Exists($"{Id}")) return;
+            Session.Store(new ServerModel
             {
                 Id = $"{Id}",
                 Prefix = "!!"
             });
-            await AsyncSession.SaveChangesAsync().ConfigureAwait(false);
+            Session.SaveChanges();
         }
 
-        public void Remove(ulong Id) => Session.Delete($"{Id}");
-
-        public async Task SaveAsync(ServerModel Server, ulong Id)
+        public void Save(ServerModel Server, ulong Id)
         {
-            await AsyncSession.StoreAsync(Server, Server.Id).ConfigureAwait(false);
-            await AsyncSession.SaveChangesAsync().ConfigureAwait(false);
+            if (Server == null) return;
+            Session.Store(Server, Server.Id);
+            Session.SaveChanges();
         }
-        
     }
 }

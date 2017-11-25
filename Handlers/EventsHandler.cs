@@ -1,11 +1,11 @@
 ﻿using System;
 using Discord;
-using Models;
 using System.Linq;
 using Valerie.Services;
 using System.Reflection;
 using Valerie.Extensions;
 using Discord.Commands;
+using Valerie.JsonModels;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -38,7 +38,7 @@ namespace Valerie.Handlers
 
         internal Task LogAsync(LogMessage Log) => Task.Run(() => LogClient.Write(Source.DISCORD, Log.Message ?? Log.Exception.Message));
 
-        internal Task GuildAvailableAsync(SocketGuild Guild) => ServerHandler.AddServerAsync(Guild.Id);
+        internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id));
 
         internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.Remove(Guild.Id));
 
@@ -52,7 +52,7 @@ namespace Valerie.Handlers
 
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
-            await ServerHandler.AddServerAsync(Guild.Id).ConfigureAwait(false);
+            ServerHandler.AddServer(Guild.Id);
             await Guild.DefaultChannel.SendMessageAsync("Thank you for inviting me to your server! Guild prefix is `!!`. Type `!!Cmds` for commands.");
         }
 
@@ -75,6 +75,8 @@ namespace Valerie.Handlers
 
         internal Task HandleMessageAsync(SocketMessage Message)
         {
+            ConfigHandler.Config.EventsTracker.MessageReceived++;
+            ConfigHandler.Save();
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
             if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.UsersBlacklist.ContainsKey(User.Id) ||
                 ServerHandler.GetServer((Message.Channel as SocketGuildChannel).Guild.Id).BlacklistedUsers.Contains(User.Id)) return Task.CompletedTask;
@@ -152,7 +154,7 @@ namespace Valerie.Handlers
                     Stars = 1
                 });
             }
-            await ServerHandler.SaveAsync(Config, Guild.Id);
+            ServerHandler.Save(Config, Guild.Id);
         }
 
         internal async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
@@ -185,7 +187,7 @@ namespace Valerie.Handlers
                 Config.Starboard.StarboardMessages.Remove(Exists);
                 await SMsg.DeleteAsync();
             }
-            await ServerHandler.SaveAsync(Config, Guild.Id);
+            ServerHandler.Save(Config, Guild.Id);
         }
 
         async Task AFKHandlerAsync(SocketMessage Message, ServerModel Config)
@@ -196,23 +198,23 @@ namespace Valerie.Handlers
             if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
         }
 
-        async Task XpHandlerAsync(SocketGuildUser User, ServerModel Config, int Xp)
+        Task XpHandlerAsync(SocketGuildUser User, ServerModel Config, int Xp)
         {
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (!Config.ChatXP.IsEnabled || HasRole) return;
+            if (!Config.ChatXP.IsEnabled || HasRole) return Task.CompletedTask;
             var RandomXP = IntExt.GiveXp(Xp);
             if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
             {
                 Config.ChatXP.Rankings.Add(User.Id, RandomXP);
-                await ServerHandler.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
-                return;
+                ServerHandler.Save(Config, User.Guild.Id);
+                return Task.CompletedTask;
             }
             int Old = Config.ChatXP.Rankings[User.Id];
             Config.ChatXP.Rankings[User.Id] += RandomXP;
             var New = Config.ChatXP.Rankings[User.Id];
-            await ServerHandler.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
-            _ = LevelUpAsync(User, Config, Old, New);
+            ServerHandler.Save(Config, User.Guild.Id);
+            return LevelUpAsync(User, Config, Old, New);
         }
 
         async Task LevelUpAsync(SocketGuildUser User, ServerModel Config, int OldXp, int NewXp)
@@ -234,12 +236,15 @@ namespace Valerie.Handlers
         async Task AutoModAsync(SocketUserMessage Message, ServerModel Config)
         {
             if (!Config.ModLog.IsAutoModEnabled || Message.Author.Id == (Message.Channel as SocketGuildChannel).Guild.Owner.Id || Config.ModLog.MaxWarnings == 0) return;
-            _ = WarnAsync(BoolExt.IsMatch(Config.ModLog.BadWords, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a banned word."), Message);
-            _ = WarnAsync(BoolExt.IsMatch(Config.ModLog.BlockedUrls, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a blocked url."), Message);
+            var BadWords = BoolExt.IsMatch(Config.ModLog.BadWords, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a banned word.");
+            var BadUrls = BoolExt.IsMatch(Config.ModLog.BlockedUrls, Message.Content, $"{Message.Author.Mention}, your message has been removed for containing a blocked url.");
+            if (!BadWords.Item1 || !BadUrls.Item1) return;
+            _ = WarnAsync(BadWords, Message);
+            _ = WarnAsync(BadUrls, Message);
             if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
             {
                 Config.ModLog.Warnings.Add(Message.Author.Id, 1);
-                await ServerHandler.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id).ConfigureAwait(false);
+                ServerHandler.Save(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
                 return;
             }
 
@@ -266,7 +271,7 @@ namespace Valerie.Handlers
                     UserInfo = $"{Message.Author} ({Message.Author.Id})"
                 });
             }
-            await ServerHandler.SaveAsync(Config, (Message.Channel as SocketGuildChannel).Guild.Id).ConfigureAwait(false);
+            ServerHandler.Save(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
         }
 
         async Task CleverbotHandlerAsync(SocketMessage Message, ServerModel Config)
@@ -277,19 +282,19 @@ namespace Valerie.Handlers
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
         }
 
-        async Task CleanupAsync(SocketGuildUser User)
+        Task CleanupAsync(SocketGuildUser User)
         {
             var Config = ServerHandler.GetServer(User.Guild.Id);
-            if (!(Config.AFKUsers.ContainsKey(User.Id) || Config.ChatXP.Rankings.ContainsKey(User.Id))) return;
+            if (!(Config.AFKUsers.ContainsKey(User.Id) || Config.ChatXP.Rankings.ContainsKey(User.Id))) return Task.CompletedTask;
             Config.AFKUsers.Remove(User.Id);
             Config.ChatXP.Rankings.Remove(User.Id);
             Config.Tags.RemoveAll(x => x.Owner == $"{User.Id}");
-            await ServerHandler.SaveAsync(Config, User.Guild.Id).ConfigureAwait(false);
+            ServerHandler.Save(Config, User.Guild.Id);
+            return Task.CompletedTask;
         }
 
         async Task WarnAsync((bool, string) TupleParam, SocketMessage Message)
         {
-            if (!TupleParam.Item1) return;
             await Message.DeleteAsync();
             await Message.Channel.SendMessageAsync(TupleParam.Item2);
         }

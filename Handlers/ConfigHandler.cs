@@ -1,31 +1,30 @@
-﻿using Models;
-using System;
+﻿using System;
 using Valerie.Services;
-using Raven.Client.Documents;
+using Valerie.JsonModels;
 using Raven.Client.Documents.Session;
+using Raven.Client.Documents;
 
 namespace Valerie.Handlers
 {
     public class ConfigHandler
     {
+        IDocumentStore Store { get; }
         IDocumentSession Session { get; }
-        public ConfigHandler(IDocumentStore DocumentStore)
+
+        public ConfigHandler(IDocumentStore GetStore, IDocumentSession GetSession)
         {
-            Session = DocumentStore.OpenSession();
+            Store = GetStore;
+            Session = GetSession;
         }
 
         public ConfigModel Config
         {
-            get
-            {
-                return Session.Load<ConfigModel>("Config");
-            }
+            get => Session.Load<ConfigModel>("Config");
         }
 
         public void LoadConfig()
         {
             if (Session.Advanced.Exists("Config")) return;
-
             LogClient.Write(Source.CONFIG, "Enter Token: ");
             string Token = Console.ReadLine();
             LogClient.Write(Source.CONFIG, "Enter Prefix: ");
@@ -39,9 +38,10 @@ namespace Valerie.Handlers
             Session.SaveChanges();
         }
 
-        public void Save(ConfigModel Config)
+        public void Save(ConfigModel GetConfig = null)
         {
-            Session.Store(Config, "Config");
+            GetConfig = GetConfig ?? Config;
+            Session.Store(GetConfig, "Config");
             Session.SaveChanges();
         }
     }
