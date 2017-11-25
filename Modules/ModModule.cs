@@ -1,9 +1,9 @@
-﻿using Models;
-using System;
+﻿using System;
 using Discord;
 using System.Linq;
 using Discord.Commands;
 using Valerie.Attributes;
+using Valerie.JsonModels;
 using Discord.WebSocket;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
