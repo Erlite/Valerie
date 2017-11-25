@@ -7,40 +7,29 @@ using Valerie.JsonModels;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
+using AngleSharp;
+using AngleSharp.Dom.Html;
+using AngleSharp.Parser.Html;
+using Valerie.Services;
 
 namespace Valerie.Modules
 {
     [Name("NSFW Commands"), @RequireNsfw]
     public class NSFWModule : ValerieBase
     {
+        NsfwService NsfwService { get; }
+        public NSFWModule(NsfwService GetService)
+        {
+            NsfwService = GetService;
+        }
+
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!")]
         public async Task BoobsAsync()
-        {
-            try
-            {
-                JToken Token = JArray.Parse(await Context.HttpClient.GetStringAsync($"http://api.oboobs.ru/boobs/{ Context.Random.Next(0, 10229) }").ConfigureAwait(false))[0];
-                await ReplyAsync($"http://media.oboobs.ru/{ Token["preview"].ToString() }");
-            }
-            catch { }
-        }
+            => await ReplyAsync(await NsfwService.RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272));
 
         [Command("Ass"), Summary("I can't believe you need help with this command.")]
         public async Task BumsAsync()
-        {
-            try
-            {
-                JToken Token = JArray.Parse(await Context.HttpClient.GetStringAsync($"http://api.obutts.ru/butts/{ Context.Random.Next(0, 4963) }").ConfigureAwait(false))[0];
-                await ReplyAsync($"http://media.obutts.ru/{ Token["preview"].ToString() }");
-            }
-            catch { }
-        }
-
-        [Command("E621"), Summary("Never used this command. Don't ask me")]
-        public async Task E621Async(string Search)
-        {
-            //string Results = await StringExtension.GetE621ImageLinkAsync(Search).ConfigureAwait(false);
-            //if (Results == null) await ReplyAsync(Context.User.Mention + " No results found! Try another term?");
-        }
+            => await ReplyAsync(await NsfwService.RuNsfwAsync("http://api.obutts.ru/butts/", 5265));
 
         [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
         public async Task PornAsync([Remainder] string Search)
