@@ -325,7 +325,7 @@ namespace Valerie.Modules
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
-            var Servers = Context.Session.Query<Models.ServerModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
+            var Servers = Context.Session.Query<ServerModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
             var Commits = await GitStatsAsync();
             string Description = null;
             if (!Commits.Any()) Description = "Error fetching commits.";
