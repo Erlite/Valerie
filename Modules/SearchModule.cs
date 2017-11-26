@@ -172,6 +172,35 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: embed.Build());
         }
 
+        [Command("Potd"), Summary("Retrives picture of the day from NASA.")]
+        public async Task PotdAsync()
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+        }
+
+        [Command("Potd"), Summary("Retrives picture of the day from NASA with a specific date.")]
+        public async Task PotdAsync(int Year, int Month, int Day)
+        {
+            var Get = await Context.HttpClient.GetAsync($"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date={Year}-{Month}-{Day}").ConfigureAwait(false);
+            if (!Get.IsSuccessStatusCode)
+            {
+                await ReplyAsync("There was an error getting picture of the day from NASA.");
+                return;
+            }
+            var Content = JsonConvert.DeserializeObject<POTDModel>(await Get.Content.ReadAsStringAsync());
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Title} | {Content.Date}", AuthorUrl: Content.Url,
+                Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
+
+        }
+
         DateTime UnixDT(double Unix)
             => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
 
