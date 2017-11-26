@@ -9,7 +9,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("Admin/Server Owner Commands"), RequireAccess(AccessLevel.Admins)]
+    [Name("Admin/Server Owner Commands"), RequireAccess(AccessLevel.Admins), RequireBotPermission(ChannelPermission.SendMessages)]
     public class AdminModule : ValerieBase
     {
         [Command("Update Prefix"), Summary("Updates current server's prefix.")]
@@ -112,21 +112,12 @@ namespace Valerie.Modules
             return Task.CompletedTask;
         }
 
-        [Command("Toggle"), Summary("Enables/Disables various guild's actions. Action: XP, AutoMod")]
-        public Task ToggleAsync(ModuleEnums Action)
+        [Command("Toggle AutoMod"), Summary("Enables/Disables AutoMod.")]
+        public Task ToggleAsync()
         {
-            switch (Action)
-            {
-                case ModuleEnums.XP:
-                    Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
-                    string XpState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled";
-                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {XpState}.");
-                case ModuleEnums.AutoMod:
-                    Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
-                    string ModState = Context.Server.ChatXP.IsEnabled ? "Enabled" : "Disabled.";
-                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {ModState}");
-            }
-            return Task.CompletedTask;
+            Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
+            string ModState = Context.Server.ModLog.IsAutoModEnabled ? "Enabled" : "Disabled.";
+            return SaveAsync(ModuleEnums.Server, $"AutoMod has been {ModState}");
         }
 
         [Command("Admins"), Summary("Adds/Removes users from server's admins. Action: Add, Remove. Admins are able to change bot's server configuration.")]
@@ -317,10 +308,9 @@ namespace Valerie.Modules
             Context.Server.JoinChannel = $"{DefaultChannel.Id}";
             Context.Server.LeaveChannel = $"{DefaultChannel.Id}";
             Context.Server.ChatXP.LevelMessage = "Congrats on hitting level **{rank}**! :beginner:";
-            Context.Server.ChatXP.IsEnabled = true;
             await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
-
+        
         ITextChannel DefaultChannel => Task.Run(async () =>
              (await Context.Guild.GetTextChannelsAsync()).FirstOrDefault(x => x.Name.Contains("general") || x.Name.Contains("lobby") || x.Id == Context.Guild.Id)
              ?? await Context.Guild.GetDefaultChannelAsync()).Result;
