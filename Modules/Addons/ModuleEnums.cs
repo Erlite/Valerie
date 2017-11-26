@@ -2,7 +2,6 @@
 {
     public enum ModuleEnums
     {
-        XP,
         Add,
         Mod,
         Join,
@@ -10,7 +9,6 @@
         Modify,
         Chatter,
         Remove,
-        AutoMod,
         Starboard,
         Server,
         Config
