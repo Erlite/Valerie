@@ -73,17 +73,4 @@ namespace Valerie.JsonModels
         public string SteamKey { get; set; }
         public string CleverBotKey { get; set; }
     }
-
-    public class EventsTracker
-    {
-        public int UserLeft { get; set; }
-        public int LeftGuild { get; set; }
-        public int UserJoined { get; set; }
-        public int JoinedGuild { get; set; }
-        public int UserBanned { get; set; }
-        public int GuildAvailable { get; set; }
-        public int ReactionAdded { get; set; }
-        public int ReactionRemoved { get; set; }
-        public int MessageReceived { get; set; }
-    }
 }

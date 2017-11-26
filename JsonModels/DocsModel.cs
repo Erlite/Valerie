@@ -20,34 +20,12 @@ namespace Valerie.JsonModels
         public string URL { get; set; }
 
         [JsonProperty("itemType")]
-        public DType Type { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty("itemKind")]
-        public DKind Kind { get; set; }
+        public string Kind { get; set; }
 
         [JsonProperty("description")]
         public string Snippet { get; set; }
-    }
-
-    public enum DType
-    {
-        Type,
-        Namespace,
-        Member,
-    }
-
-    public enum DKind
-    {
-        Namespace,
-        Class,
-        Enumeration,
-        Method,
-        Structure,
-        Property,
-        Constructor,
-        Field,
-        Event,
-        Interface,
-        Delegate
     }
 }
