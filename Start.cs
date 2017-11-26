@@ -7,7 +7,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Raven.Client.Documents;
 using System.Threading.Tasks;
-using Raven.Client.Documents.Session;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie
@@ -35,18 +34,13 @@ namespace Valerie
                     Database = "Val",
                     Urls = new[] { "http://127.0.0.1:8000" }
                 }.Initialize())
-                .AddSingleton<HttpClient>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<NsfwService>()
                 .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<ServerHandler>()
-                .AddSingleton(new Random(Guid.NewGuid().GetHashCode()))
-                .AddTransient<IDocumentSession>(x =>
-                {
-                    using (var Session = x.GetRequiredService<IDocumentStore>().OpenSession())
-                        return Session;
-                });
+                .AddSingleton(new HttpClient())
+                .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
             await Provider.GetRequiredService<MainHandler>().StartAsync();
