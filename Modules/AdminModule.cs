@@ -6,7 +6,6 @@ using Valerie.Extensions;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
-using System;
 
 namespace Valerie.Modules
 {
@@ -314,12 +313,16 @@ namespace Valerie.Modules
                 await Mod.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
                 Context.Server.ModLog.TextChannel = $"{Mod.Id}";
             }
-            Context.Server.ChatterChannel = $"{Context.Guild.DefaultChannelId}";
-            Context.Server.JoinChannel = $"{Context.Guild.DefaultChannelId}";
-            Context.Server.LeaveChannel = $"{Context.Guild.DefaultChannelId}";
+            Context.Server.ChatterChannel = $"{DefaultChannel.Id}";
+            Context.Server.JoinChannel = $"{DefaultChannel.Id}";
+            Context.Server.LeaveChannel = $"{DefaultChannel.Id}";
             Context.Server.ChatXP.LevelMessage = "Congrats on hitting level **{rank}**! :beginner:";
             Context.Server.ChatXP.IsEnabled = true;
             await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
+
+        ITextChannel DefaultChannel => Task.Run(async () =>
+             (await Context.Guild.GetTextChannelsAsync()).FirstOrDefault(x => x.Name.Contains("general") || x.Name.Contains("lobby") || x.Id == Context.Guild.Id)
+             ?? await Context.Guild.GetDefaultChannelAsync()).Result;
     }
 }
