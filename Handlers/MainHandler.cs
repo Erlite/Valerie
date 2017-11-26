@@ -1,7 +1,6 @@
 ﻿using Cookie;
 using Discord;
 using Valerie.Services;
-using System.Net.Http;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 
