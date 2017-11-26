@@ -1,4 +1,5 @@
 ﻿using System;
+using Discord;
 using System.Linq;
 using Discord.Commands;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("Help Commands For Command Help"), RequireBotPermission(Discord.ChannelPermission.SendMessages)]
+    [Name("Help Commands For Command Help"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class HelpModule : ValerieBase
     {
         IServiceProvider Provider { get; }

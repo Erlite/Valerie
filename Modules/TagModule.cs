@@ -9,7 +9,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("Tag Commands")]
+    [Name("Tag Commands"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class TagModule : ValerieBase
     {
         [Command("Tag"), Summary("Shows a tag with the given name.")]
@@ -17,7 +17,7 @@ namespace Valerie.Modules
         {
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
             if (!NotExists(TagName)) return Task.CompletedTask;
-            Context.Server.Tags.FirstOrDefault(x => x.Name == TagName).Uses++;
+            Tag.Uses++;
             return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
