@@ -31,11 +31,10 @@ namespace Valerie
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore
                 {
-                    Database = "Val",
+                    Database = "Valerie",
                     Urls = new[] { "http://127.0.0.1:8000" }
                 }.Initialize())
                 .AddSingleton<MainHandler>()
-                .AddSingleton<NsfwService>()
                 .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<ServerHandler>()
