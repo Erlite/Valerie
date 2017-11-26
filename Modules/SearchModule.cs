@@ -42,7 +42,7 @@ namespace Valerie.Modules
         {
             var GetResult = await Context.HttpClient.GetAsync($"https://en.wikipedia.org/w/api.php?action=opensearch&search={Search}");
             dynamic Content = JsonConvert.DeserializeObject(await GetResult.Content.ReadAsStringAsync());
-            string Result = string.IsNullOrWhiteSpace(Content[2][0]) ? $"No results found for {Search}."
+            string Result = string.IsNullOrWhiteSpace($"{Content[2][0]}") ? $"No results found for {Search}."
                 : $"**{Content[1][0]}**\n{Content[2][0]}";
             await ReplyAsync(Result);
         }
@@ -63,7 +63,7 @@ namespace Valerie.Modules
         [Command("Docs"), Summary("Searches Microsoft docs for programming related terms.")]
         public async Task DocsAsync([Remainder] string Search)
         {
-            var Response = await Context.HttpClient.GetAsync($"https://docs.microsoft.com/api/apibrowser/dotnet/search?search={Search}");
+            var Response = await Context.HttpClient.GetAsync($"https://docsapibrowser.azurewebsites.net/api/apibrowser/dotnet/search?search={Search}&$skip=25&$top=25");
             if (!Response.IsSuccessStatusCode) return;
             var ConvertedJson = JsonConvert.DeserializeObject<DocsModel>(await Response.Content.ReadAsStringAsync());
             if (!ConvertedJson.Results.Any())
@@ -72,21 +72,10 @@ namespace Valerie.Modules
                 return;
             }
             string Results = null;
-            foreach (var Result in ConvertedJson.Results.Take(4).OrderBy(x => x.Name))
+            foreach (var Result in ConvertedJson.Results.Take(5).OrderBy(x => x.Name))
                 Results += $"[{Result.Name}]({Result.URL})\n" +
-                    $"Kind: {Result.Kind} | Type: {Result.Type}\n{Result.Snippet}\n";
-            await ReplyAsync(Results);
-        }
-
-        [Command("Imgur"), Summary("Searches imgure for your image")]
-        public async Task ImgurAsync([Remainder] string Search)
-        {
-            var Document = await DocumentAsync("http://imgur.com/search?q={Search.Replace(' ', '+')}");
-            var Elements = Document.QuerySelectorAll("a.image-list-link").ToList();
-            if (Elements.Any()) return;
-            var Image = (Elements.ElementAtOrDefault(Context.Random.Next(Elements.Count))?.Children.FirstOrDefault() as IHtmlImageElement);
-            if (Image?.Source == null) return;
-            await ReplyAsync(Image.Source.Replace("b", "."));
+                    $"Kind: {Result.Kind} | Type: {Result.Type}\n{Result.Snippet}\n\n";
+            await ReplyAsync("", embed: ValerieEmbed.Embed(EmbedColor.Random, Description: Results).Build());
         }
 
         [Command("Crypto"), Summary("Shows information about a crypto currency.")]
@@ -109,12 +98,20 @@ namespace Valerie.Modules
             var Document = await DocumentAsync($"https://www.google.com/search?q={Search}");
             var Elements = Document.QuerySelectorAll("div.g");
             if (!Elements.Any()) return;
-            foreach(var Element in Elements.Take(3))
+            var Query = Elements.Take(10).Select(x =>
             {
-                var Tag = Element.Children.FirstOrDefault()?.Children.FirstOrDefault() as IHtmlAnchorElement;
-                if (Tag.Href == null || Tag.TextContent == null) return;
-                var Txt = Element.QuerySelectorAll(".st").FirstOrDefault().TextContent;
-            }
+                var Tag = x.Children.FirstOrDefault()?.Children.FirstOrDefault() as IHtmlAnchorElement;
+                if (Tag?.Href == null || Tag?.TextContent == null) return (null, null, null);
+                var Desc = x.QuerySelectorAll(".st").FirstOrDefault()?.TextContent;
+                return SearchResult(Tag.TextContent, Tag.Href, Desc);
+            });
+
+            if (!Query.Any()) await ReplyAsync($"No results found for **{Search}**.");
+            string Description = null;
+            foreach (var Result in Query.Where(x => x.Item1 != null).Take(3))
+                Description += $"-> [{Result.Item1}]({Result.Item2})\n{Result.Item3}\n\n";
+            var Embed = ValerieEmbed.Embed(EmbedColor.Random, Title: $"Search Results For: {Search}", Description: Description);
+            await ReplyAsync(string.Empty, embed: Embed.Build());
         }
 
         [Command("Youtube"), Alias("Yt"), Summary("Searches a youtube for your video.")]
@@ -179,5 +176,7 @@ namespace Valerie.Modules
             => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
 
         Task<IDocument> DocumentAsync(string Url) => BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(Url);
+
+        (string, string, string) SearchResult(string Name, string Url, string Desc) => (Name, Url, Desc);
     }
 }
