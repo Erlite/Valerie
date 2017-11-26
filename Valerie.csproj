@@ -19,7 +19,7 @@
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.30.0.896" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.30.0.1035" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.6.0-beta3" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171124-1318" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171126-0501" />
   </ItemGroup>
 
 </Project>
