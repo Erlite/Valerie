@@ -44,17 +44,17 @@ namespace Valerie.Handlers.ModuleHandler
         {
             var ModChannel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Server.ModLog.TextChannel));
             if (ModChannel == null) return;
-            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.ModLog.ModCases.Count + 1} <Reason>`*";
-            var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.ModLog.ModCases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.ModLog.Cases.Count + 1} <Reason>`*";
+            var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.ModLog.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
                     $"**Responsible Moderator:** {Context.User}");
-            Context.Server.ModLog.ModCases.Add(new CaseWrapper()
+            Context.Server.ModLog.Cases.Add(new CaseWrapper()
             {
                 Reason = Reason,
                 CaseType = CaseType,
                 MessageId = $"{Message.Id}",
                 ResponsibleMod = $"{Context.User}",
                 UserInfo = $"{User.Username} ({User.Id})",
-                CaseNumber = Context.Server.ModLog.ModCases.Count + 1
+                CaseNumber = Context.Server.ModLog.Cases.Count + 1
             });
             Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
         }

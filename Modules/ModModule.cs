@@ -11,7 +11,7 @@ using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
 {
-    [Name("Admin & Moderater Commands"), RequireAccess(AccessLevel.AdminsNMods)]
+    [Name("Admin & Moderater Commands"), RequireAccess(AccessLevel.AdminsNMods), RequireBotPermission(ChannelPermission.SendMessages)]
     public class ModModule : ValerieBase
     {
         [Command("Kick"), Summary("Kicks a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
@@ -62,13 +62,13 @@ namespace Valerie.Modules
         [Command("Reason"), Summary("Specifies reason for a user case.")]
         public async Task ReasonAsync(int Case, [Remainder] string Reason)
         {
-            var GetCase = Context.Server.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == Case);
+            var GetCase = Context.Server.ModLog.Cases.FirstOrDefault(x => x.CaseNumber == Case);
             if (GetCase == null)
             {
                 await ReplyAsync("Invalid case number.");
                 return;
             }
-            Context.Server.ModLog.ModCases.FirstOrDefault(x => x.CaseNumber == Case).Reason = Reason;
+            Context.Server.ModLog.Cases.FirstOrDefault(x => x.CaseNumber == Case).Reason = Reason;
             ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Server.ModLog.TextChannel));
             if (await Channel.GetMessageAsync(Convert.ToUInt64(GetCase.MessageId)) is IUserMessage Message)
                 await Message.ModifyAsync(x =>

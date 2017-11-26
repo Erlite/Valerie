@@ -5,7 +5,6 @@ namespace Valerie.JsonModels
 {
     public class XPWrapper
     {
-        public bool IsEnabled { get; set; }
         public string LevelMessage { get; set; }
         public List<ulong> ForbiddenRoles { get; set; } = new List<ulong>(20);
         public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>(20);
@@ -28,6 +27,7 @@ namespace Valerie.JsonModels
 
     public enum Memory
     {
+        Byte,
         Kilobyte,
         Megabyte,
         Gigabyte,
@@ -65,7 +65,7 @@ namespace Valerie.JsonModels
         public bool IsAutoModEnabled { get; set; }
         public List<string> BadWords { get; set; } = new List<string>(50);
         public List<string> BlockedUrls { get; set; } = new List<string>(50);
-        public List<CaseWrapper> ModCases { get; set; } = new List<CaseWrapper>();
+        public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         public Dictionary<ulong, int> Warnings { get; set; } = new Dictionary<ulong, int>();
     }
 
@@ -88,7 +88,6 @@ namespace Valerie.JsonModels
 
     public class ApplicationKeys
     {
-        public string BingKey { get; set; }
         public string GiphyKey { get; set; } = "dc6zaTOxFJmzC";
         public string GoogleKey { get; set; }
         public string SteamKey { get; set; }
