@@ -15,6 +15,13 @@ namespace Valerie.Handlers.ModuleHandler
             return await base.ReplyAsync(Message, false, null, null);
         }
 
+        public async Task<IUserMessage> SendEmbedAsync(Embed Embed)
+        {
+            await Context.Channel.TriggerTypingAsync();
+            Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
+            return await base.ReplyAsync(string.Empty, false, Embed, null);
+        }
+
         public async Task<IUserMessage> SaveAsync(ModuleEnums Action, string Message = null)
         {
             bool Check = false;
