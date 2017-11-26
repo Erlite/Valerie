@@ -23,25 +23,6 @@ namespace Valerie.Modules
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public Task UserAvatarAsync(IGuildUser User = null) => ReplyAsync((User ?? Context.User).GetAvatarUrl(size: 2048));
 
-        [Command("Updoot"), Summary("Gives an updoot to a specified user.")]
-        public Task UpdootAsync(IGuildUser User)
-        {
-            if (Context.User.Id == User.Id || User.IsBot) return ReplyAsync("Abahaha, nice try babes.");
-            if (!Context.Server.Updoots.Any(x => x.Key == User.Id))
-                Context.Server.Updoots.Add(User.Id, 1);
-            else
-                Context.Server.Updoots[User.Id]++;
-            return SaveAsync(ModuleEnums.Server, $"Thanks for updooting {User}. ☺");
-        }
-
-        [Command("Updoot"), Summary("Shows your updoots in this server.")]
-        public Task UpdootAsync()
-        {
-            if (!Context.Server.Updoots.ContainsKey(Context.User.Id))
-                return ReplyAsync("No-one gave you updoots. 😶");
-            return ReplyAsync($"You have {Context.Server.Updoots[Context.User.Id]} updoots. ☺");
-        }
-
         [Command("AFK"), Summary("Adds Or Removes you from AFK list. Actions: Add/Remove/Modify")]
         public Task AFKAsync(ModuleEnums Action = ModuleEnums.Add, [Remainder] string AFKMessage = "I'm busy.")
         {
@@ -66,13 +47,13 @@ namespace Valerie.Modules
             return Task.CompletedTask;
         }
 
-        [Command("Slotmachine"), Summary("Want to earn quick XP? That's how you earn some.")]
+        [Command("Slotmachine"), Summary("Want to earn quick bytes? That's how you earn some.")]
         public Task SlotMachineAsync(int Bet = 100)
         {
             string[] Slots = new string[] { ":heart:", ":eggplant:", ":poo:", ":eyes:", ":star2:", ":peach:", ":pizza:" };
-            var UserXP = Context.Server.ChatXP.Rankings[Context.User.Id];
-            if (UserXP < Bet) return ReplyAsync("You don't have enough XP for slot machine!");
-            if (Bet <= 0) return ReplyAsync("Bet is too low. :-1:");
+            var UserByte = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (UserByte.Byte < Bet || UserByte == null) return ReplyAsync("You don't have enough bytes for slot machine!");
+            if (Bet <= 0) return ReplyAsync("Your bet is too low. :-1:");
 
             var embed = new EmbedBuilder();
             int[] s = new int[]
@@ -91,37 +72,37 @@ namespace Valerie.Modules
 
             if (win == 0)
             {
-                Context.Server.ChatXP.Rankings[Context.User.Id] -= Bet;
-                embed.Description = $"You lost {Bet} XP. Your current XP is: {UserXP - Bet}. Better luck next time! :weary: ";
+                UserByte.Byte -= Bet;
+                embed.Description = $"You lost {Bet} bytes. Your have {UserByte.Byte} bytes. Better luck next time! :weary: ";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
-                Context.Server.ChatXP.Rankings[Context.User.Id] += Bet;
-                embed.Description = $"You won {Bet} XP :tada: Your current XP is: {UserXP + Bet}";
+                UserByte.Byte += Bet;
+                embed.Description = $"You won {Bet} bytes :tada: Your have {UserByte.Byte} bytes.";
                 embed.Color = new Color(0x93ff89);
             }
-            return ReplyAsync(string.Empty, embed: embed.Build());
+            return SendEmbedAsync(embed.Build());
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!")]
         public Task FlipAsync(string Side, int Bet = 100)
         {
             if (int.TryParse(Side, out int res)) return ReplyAsync("Side can either be Heads Or Tails.");
-            int UserXP = Context.Server.ChatXP.Rankings[Context.User.Id];
-            if (UserXP < Bet || UserXP <= 0) return ReplyAsync("You don't have enough XP!");
+            var UserBytes = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (UserBytes.Byte < Bet || UserBytes == null) return ReplyAsync("You don't have enough bytes.");
             if (Bet <= 0) return ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
             string[] Sides = { "Heads", "Tails" };
             var GetSide = Sides[Context.Random.Next(0, Sides.Length)];
             if (Side.ToLower() == GetSide.ToLower())
             {
-                Context.Server.ChatXP.Rankings[Context.User.Id] += Bet;
-                return ReplyAsync($"Congratulations! You won {Bet} XP! You have {UserXP + Bet} XP.");
+                UserBytes.Byte += Bet;
+                return SaveAsync(ModuleEnums.Server, $"Congratulations! You won {Bet} bytes! You have {UserBytes.Byte} bytes. 👌");
             }
             else
             {
-                Context.Server.ChatXP.Rankings[Context.User.Id] -= Bet;
-                return ReplyAsync($"You lost {Bet} XP! Your have {UserXP - Bet} XP left. :frowning:");
+                UserBytes.Byte -= Bet;
+                return SaveAsync(ModuleEnums.Server, $"You lost {Bet} bytes! Your have {UserBytes.Byte} byte. :frowning:");
             }
         }
 
@@ -343,9 +324,9 @@ namespace Valerie.Modules
                 $"Human: { Client.Guilds.Sum(x => x.Users.Where(z => z.IsBot == false).Count())}\n" +
                 $"Total: {Client.Guilds.Sum(x => x.Users.Count)}", true);
             Embed.AddField("Database",
-                $"Cases: {Servers.Sum(x => x.ModLog.ModCases.Count)}\n" +
                 $"Tags: {Servers.Sum(x => x.Tags.Count)}\n" +
-                $"Updoots: {Servers.Sum(x => x.Updoots.Count)}", true);
+                $"Cases: {Servers.Sum(x => x.ModLog.ModCases.Count)}\n" +
+                $"Bytes: {Servers.Sum(x => x.Memory.Sum(y => y.Byte))}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
             Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
             Embed.AddField("Programmer", $"[Yucked](https://github.com/Yucked)", true);
@@ -406,6 +387,39 @@ namespace Valerie.Modules
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
         public Task LmgtfyAsync([Remainder] string Search = "How to use Lmgtfy")
             => ReplyAsync($"http://lmgtfy.com/?q={ Uri.EscapeUriString(Search) }");
+
+        [Command("Daily"), Summary("Get your daily dose of bytes.")]
+        public Task DailyAsync()
+        {
+            var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (User == null)
+            {
+                Context.Server.Memory.Add(new MemoryWrapper
+                {
+                    Id = $"{Context.User.Id}",
+                    Memory = Memory.Kilobyte,
+                    DailyReward = DateTime.Now,
+                    Byte = Context.Random.Next(100)
+                });
+                return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺.");
+            }
+            var PassedTime = DateTime.Now.Subtract(User.DailyReward);
+            var TimeLeft = User.DailyReward.Subtract(PassedTime);
+            if (Math.Abs(PassedTime.TotalHours) < 24)
+                return ReplyAsync($"You need to wait {TimeLeft.Hour} Hours, {TimeLeft.Minute} Minutes, {TimeLeft.Second} Seconds for your next daily reward.");
+            User.Byte += 100;
+            return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺.");
+        }
+
+        [Command("Bytes"), Summary("Shows how many bytes a user have.")]
+        public Task BytesAsync(IGuildUser User = null)
+        {
+            User = User ?? Context.User as IGuildUser;
+            var GetUser = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{User.Id}");
+            if (GetUser is null) return ReplyAsync($"**{User}** has no bytes 😶.");
+            var UserByte = IntExt.GetMemory(GetUser.Byte);
+            return ReplyAsync($"**{User}** has {UserByte.Item2} {UserByte.Item1}s ⚜.");
+        }
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
