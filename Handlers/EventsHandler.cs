@@ -82,7 +82,7 @@ namespace Valerie.Handlers
             _ = AutoModAsync(Msg, Config);
             _ = AFKHandlerAsync(Msg, Config);
             _ = CleverbotHandlerAsync(Msg, Config);
-            _ = XpHandlerAsync(User, Config, Msg.Content.Length);
+            _ = XpHandlerAsync(Message, Config);
             return Task.CompletedTask;
         }
 
@@ -196,12 +196,13 @@ namespace Valerie.Handlers
             if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
         }
 
-        Task XpHandlerAsync(SocketGuildUser User, ServerModel Config, int Xp)
+        Task XpHandlerAsync(SocketMessage Message, ServerModel Config)
         {
+            var User = Message.Author as IGuildUser;
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (!Config.ChatXP.IsEnabled || HasRole) return Task.CompletedTask;
-            var RandomXP = IntExt.GiveXp(Xp);
+            if (HasRole) return Task.CompletedTask;
+            var RandomXP = IntExt.GiveXp(Message.Content.Length == 0 ? 1 : Message.Content.Length);
             if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
             {
                 Config.ChatXP.Rankings.Add(User.Id, RandomXP);
@@ -212,16 +213,17 @@ namespace Valerie.Handlers
             Config.ChatXP.Rankings[User.Id] += RandomXP;
             var New = Config.ChatXP.Rankings[User.Id];
             ServerHandler.Save(Config, User.Guild.Id);
-            return LevelUpAsync(User, Config, Old, New);
+            return LevelUpAsync(Message, Config, Old, New);
         }
 
-        async Task LevelUpAsync(SocketGuildUser User, ServerModel Config, int OldXp, int NewXp)
+        async Task LevelUpAsync(SocketMessage Message, ServerModel Config, int OldXp, int NewXp)
         {
+            var User = Message.Author as SocketGuildUser;
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel) || !Config.ChatXP.LevelRoles.Any()) return;
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User.Mention, $"{NewLevel}"));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User.Mention, $"{NewLevel}"));
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
             await User.AddRoleAsync(Role);
@@ -254,18 +256,18 @@ namespace Valerie.Handlers
                 ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
                 IUserMessage Msg = null;
                 if (Channel != null)
-                    Msg = await Channel.SendMessageAsync($"**Kick** | Case {Config.ModLog.ModCases.Count + 1 }\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Maxed out warnings.\n" +
+                    Msg = await Channel.SendMessageAsync($"**Kick** | Case {Config.ModLog.Cases.Count + 1 }\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Maxed out warnings.\n" +
                     $"**Responsible Moderator:** Action Taken by Auto Moderator.");
                 if (Msg == null)
                     await (await (Message.Author as IGuildUser).Guild.GetDefaultChannelAsync()).SendMessageAsync($"*{Message.Author} was kicked by Auto Moderator.*  :cop:");
 
-                Config.ModLog.ModCases.Add(new CaseWrapper
+                Config.ModLog.Cases.Add(new CaseWrapper
                 {
                     MessageId = $"{Msg.Id}",
                     CaseType = CaseType.AutoMod,
                     Reason = "Maxed out warnings.",
                     ResponsibleMod = $"Auto Moderator",
-                    CaseNumber = Config.ModLog.ModCases.Count + 1,
+                    CaseNumber = Config.ModLog.Cases.Count + 1,
                     UserInfo = $"{Message.Author} ({Message.Author.Id})"
                 });
             }
