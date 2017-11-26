@@ -75,8 +75,6 @@ namespace Valerie.Handlers
 
         internal Task HandleMessageAsync(SocketMessage Message)
         {
-            ConfigHandler.Config.EventsTracker.MessageReceived++;
-            ConfigHandler.Save();
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
             if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.UsersBlacklist.ContainsKey(User.Id) ||
                 ServerHandler.GetServer((Message.Channel as SocketGuildChannel).Guild.Id).BlacklistedUsers.Contains(User.Id)) return Task.CompletedTask;
