@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Valerie.Modules
 {
-    [Name("Valerie's Owner Commands"), RequireOwner]
+    [Name("Valerie's Owner Commands"), RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
     public class OwnerModule : ValerieBase
     {
         MemoryStream GenerateStreamFromString(string Value) => new MemoryStream(Encoding.Unicode.GetBytes(Value ?? string.Empty));
@@ -175,14 +175,14 @@ namespace Valerie.Modules
         public Task GuildJoinMessageAsync([Remainder] string ServerMessage)
         {
             Context.Config.ServerMessage = ServerMessage;
-            return ReplyAsync("Server message updated.");
+            return SaveAsync(ModuleEnums.Config);
         }
 
         [Command("ReportChannel"), Summary("Sets report channel.")]
         public Task ReportChannelAsync(ITextChannel Channel)
         {
             Context.Config.ReportChannel = $"{Channel.Id}";
-            return ReplyAsync("Report channel updated.");
+            return SaveAsync(ModuleEnums.Config);
         }
 
         IEnumerable<Assembly> GetAssemblies()
