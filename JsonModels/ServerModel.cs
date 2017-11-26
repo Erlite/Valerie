@@ -18,7 +18,7 @@ namespace Valerie.JsonModels
         public ModWrapper ModLog { get; set; } = new ModWrapper();
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
-        public Dictionary<ulong, int> Updoots { get; set; } = new Dictionary<ulong, int>();
+        public List<MemoryWrapper> Memory { get; set; } = new List<MemoryWrapper>();
         public Dictionary<ulong, string> AFKUsers { get; set; } = new Dictionary<ulong, string>();
     }
 }
