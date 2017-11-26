@@ -18,6 +18,27 @@ namespace Valerie.JsonModels
         public List<StarboardMessages> StarboardMessages { get; set; } = new List<StarboardMessages>();
     }
 
+    public class MemoryWrapper
+    {
+        public string Id { get; set; }
+        public double Byte { get; set; }
+        public Memory Memory { get; set; }
+        public DateTime DailyReward { get; set; }
+    }
+
+    public enum Memory
+    {
+        Kilobyte,
+        Megabyte,
+        Gigabyte,
+        Terabyte,
+        Petabyte,
+        Exabyte,
+        Zettabyte,
+        Yottabyte,
+        Hellabyte
+    }
+
     public class StarboardMessages
     {
         public int Stars { get; set; }
