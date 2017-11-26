@@ -18,7 +18,6 @@ namespace Valerie.Services
             {
                 case Source.CONFIG: Append($"  => [{Source}]", ConsoleColor.DarkYellow); break;
                 case Source.DISCORD: Append($"  => [{Source}]", ConsoleColor.DarkCyan); break;
-                case Source.REST: Append($"  => [{Source}]", ConsoleColor.DarkGreen); break;
                 case Source.SERVER: Append($"  => [{Source}]", ConsoleColor.DarkMagenta); break;
             }
             Append($" {Text}", ConsoleColor.White);
@@ -54,7 +53,6 @@ namespace Valerie.Services
 
     public enum Source
     {
-        REST,
         CONFIG,
         SERVER,
         DISCORD
