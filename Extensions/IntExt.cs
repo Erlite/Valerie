@@ -13,7 +13,8 @@ namespace Valerie.Extensions
 
         public static (Memory, double) GetMemory(double Byte)
         {
-            if (Byte / 1024 <= 1024) return (Memory.Kilobyte, Byte / 1024);
+            if (Byte < 1000) return (Memory.Byte, Byte);
+            else if (Byte / 1024 <= 1024) return (Memory.Kilobyte, Byte / 1024);
             else if (Byte / Math.Pow(1024, 2) <= Math.Pow(1024, 2)) return (Memory.Megabyte, Byte / Math.Pow(1024, 2));
             else if (Byte / Math.Pow(1024, 3) <= Math.Pow(1024, 3)) return (Memory.Gigabyte, Byte / Math.Pow(1024, 3));
             else if (Byte / Math.Pow(1024, 4) <= Math.Pow(1024, 4)) return (Memory.Terabyte, Byte / Math.Pow(1024, 4));
