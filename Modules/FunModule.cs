@@ -187,9 +187,6 @@ namespace Valerie.Modules
 
         [Command("Expand"), Summary("Converts text to full width.")]
         public Task ExpandAsync([Remainder] string Text)
-        {
-            var NormalCheck = Text.Select(x => Normal.Contains(x) ? x : ' ');
-            return ReplyAsync(string.Join("", NormalCheck.Select(x => FullWidth[Normal.IndexOf(x)])));
-        }
+            => ReplyAsync(string.Join("", Text.Select(x => Normal.Contains(x) ? x : ' ').Select(x => FullWidth[Normal.IndexOf(x)])));
     }
 }
