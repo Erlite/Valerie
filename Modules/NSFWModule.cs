@@ -18,11 +18,11 @@ namespace Valerie.Modules
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!")]
         public async Task BoobsAsync()
-            => await ReplyAsync(await RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272));
+            => await NsfwEmbedAsync($"http://media.oboobs.ru/{ await RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272)}");
 
         [Command("Ass"), Summary("I can't believe you need help with this command.")]
         public async Task BumsAsync()
-            => await ReplyAsync(await RuNsfwAsync("http://api.obutts.ru/butts/", 5265));
+            => await NsfwEmbedAsync($"http://media.obutts.ru/{ await RuNsfwAsync("http://api.obutts.ru/butts/", 5265)}");
 
         [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
         public async Task PornAsync([Remainder] string Search)
@@ -39,7 +39,7 @@ namespace Valerie.Modules
             await ReplyAsync(string.Empty, embed: Embed.Build());
         }
 
-        [Command("Lewd"), Summary("Weeb heaven.")]
+        [Command("Lewd"), Summary("Replies back with some newd stuff.")]
         public async Task LewdAsync()
         {
             try
@@ -50,22 +50,40 @@ namespace Valerie.Modules
             catch { }
         }
 
+        [Command("Rule34"), Summary("Searches rule34 for your tags.")]
+        public async Task Rule34Async(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Rule34, Tags.ToList()));
+
+        [Command("Yandere"), Summary("Searches yandere for your tags.")]
+        public async Task Yanderesync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Yandere, Tags.ToList()));
+
+        [Command("Gelbooru"), Summary("Searches gelbooru for your tags.")]
+        public async Task GelbooruAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Gelbooru, Tags.ToList()));
+
+        [Command("Danbooru"), Summary("Searches danbooru for your tags.")]
+        public async Task DanbooruAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Danbooru, Tags.ToList()));
+
+        [Command("Cureninja"), Summary("Searches cureninja for your tags.")]
+        public async Task CureninjaAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Cureninja, Tags.ToList()));
+
+        [Command("Konachan"), Summary("Searches konachan for your tags.")]
+        public async Task KonachanAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Konachan, Tags.ToList()));
+
         async Task<string> RuNsfwAsync(string Url, int Max)
         {
             try
             {
                 var Parse = JArray.Parse(await Context.HttpClient.GetStringAsync($"{Url}{Context.Random.Next(Max)}").ConfigureAwait(false))[0];
-                return ($"{Url}{Parse["preview"]}");
+                return ($"{Parse["preview"]}");
             }
             catch { return null; }
         }
 
-        async Task<string> WeebAsync(Weeb Weeb, string Link, List<string> Tags)
+        async Task<string> WeebAsync(Weeb Weeb, List<string> Tags)
         {
             string Url = null;
             string Result = null;
             MatchCollection Matches = null;
-
+            Tags = !Tags.Any() ? new[] { "boobs", "tits", "ass", "sexy", "neko" }.ToList() : Tags;
             switch (Weeb)
             {
                 case Weeb.Danbooru: Url = $"http://danbooru.donmai.us/posts?page={Context.Random.Next(0, 15)}{string.Join("+", Tags.Select(x => x.Replace(" ", "_")))}"; break;
@@ -92,11 +110,13 @@ namespace Valerie.Modules
                 case Weeb.Konachan:
                 case Weeb.Gelbooru: Result = $"http:{Matches[Context.Random.Next(Matches.Count)].Groups[1].Value}"; break;
                 case Weeb.Yandere:
-                case Weeb.Rule34: Result = Matches[Context.Random.Next(Matches.Count)].Groups[1].Value; break;
+                case Weeb.Rule34: Result = $"http:{Matches[Context.Random.Next(Matches.Count)].Groups[1].Value}"; break;
                 case Weeb.Cureninja: Result = Matches[Context.Random.Next(Matches.Count)].Groups[1].Value.Replace("\\/", "/"); break;
             }
             return Result;
         }
+
+        Task NsfwEmbedAsync(string Url) => ReplyAsync(string.Empty, embed: ValerieEmbed.Embed(EmbedColor.Random, ImageUrl: Url).Build());
 
         public enum Weeb
         {
