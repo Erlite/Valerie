@@ -18,11 +18,11 @@ namespace Valerie.Modules
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!")]
         public async Task BoobsAsync()
-            => await NsfwEmbedAsync($"http://media.oboobs.ru/{ await RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272)}");
+            => await ReplyAsync($"http://media.oboobs.ru/{ await RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272)}");
 
         [Command("Ass"), Summary("I can't believe you need help with this command.")]
         public async Task BumsAsync()
-            => await NsfwEmbedAsync($"http://media.obutts.ru/{ await RuNsfwAsync("http://api.obutts.ru/butts/", 5265)}");
+            => await ReplyAsync($"http://media.obutts.ru/{ await RuNsfwAsync("http://api.obutts.ru/butts/", 5265)}");
 
         [Command("Porn"), Summary("Uses Porn.com API to fetch videos.")]
         public async Task PornAsync([Remainder] string Search)
@@ -51,22 +51,22 @@ namespace Valerie.Modules
         }
 
         [Command("Rule34"), Summary("Searches rule34 for your tags.")]
-        public async Task Rule34Async(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Rule34, Tags.ToList()));
+        public async Task Rule34Async(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Rule34, Tags.ToList()));
 
         [Command("Yandere"), Summary("Searches yandere for your tags.")]
-        public async Task Yanderesync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Yandere, Tags.ToList()));
+        public async Task Yanderesync(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Yandere, Tags.ToList()));
 
         [Command("Gelbooru"), Summary("Searches gelbooru for your tags.")]
-        public async Task GelbooruAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Gelbooru, Tags.ToList()));
+        public async Task GelbooruAsync(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Gelbooru, Tags.ToList()));
 
         [Command("Danbooru"), Summary("Searches danbooru for your tags.")]
-        public async Task DanbooruAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Danbooru, Tags.ToList()));
+        public async Task DanbooruAsync(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Danbooru, Tags.ToList()));
 
         [Command("Cureninja"), Summary("Searches cureninja for your tags.")]
-        public async Task CureninjaAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Cureninja, Tags.ToList()));
+        public async Task CureninjaAsync(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Cureninja, Tags.ToList()));
 
         [Command("Konachan"), Summary("Searches konachan for your tags.")]
-        public async Task KonachanAsync(params string[] Tags) => await NsfwEmbedAsync(await WeebAsync(Weeb.Konachan, Tags.ToList()));
+        public async Task KonachanAsync(params string[] Tags) => await ReplyAsync(await WeebAsync(Weeb.Konachan, Tags.ToList()));
 
         async Task<string> RuNsfwAsync(string Url, int Max)
         {
@@ -115,8 +115,6 @@ namespace Valerie.Modules
             }
             return Result;
         }
-
-        Task NsfwEmbedAsync(string Url) => ReplyAsync(string.Empty, embed: ValerieEmbed.Embed(EmbedColor.Random, ImageUrl: Url).Build());
 
         public enum Weeb
         {
