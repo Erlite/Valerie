@@ -46,8 +46,7 @@ namespace Valerie.Services
                 Console.WriteLine(Line);
             }
             Append("-> Application Information\n", ConsoleColor.Magenta);
-            Append($"   Author: Yucked\n   Github: https://github.com/Yucked/Valerie\n   Discord.Net Version: {Discord.DiscordConfig.Version}\n", ConsoleColor.Gray);
-            Console.WriteLine(Environment.NewLine);
+            Append($"   Author: Yucked\n   Github: https://github.com/Yucked/Valerie\n   Discord.Net Version: {Discord.DiscordConfig.Version}", ConsoleColor.Gray);
         }        
     }
 
