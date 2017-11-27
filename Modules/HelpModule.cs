@@ -24,7 +24,7 @@ namespace Valerie.Modules
         {
             var Embed = ValerieEmbed.Embed(EmbedColor.Red, Title: "List Of All Commands",
                 FooterText: $"For More Information On A Command's Usage: {Context.Config.Prefix}Detail CommandName");
-            var Module = (await CheckPermsAsync()).GroupBy(x => x.Module.Name).OrderBy(y => y.Key);
+            var Module = CommandService.Commands.GroupBy(x => x.Module.Name).OrderBy(y => y.Key);
             foreach (var Commands in Module)
                 Embed.AddField(Commands.Key, string.Join(", ", Commands.Select(x => x.Name).Distinct()));
             await ReplyAsync(string.Empty, embed: Embed.Build());
@@ -44,15 +44,6 @@ namespace Valerie.Modules
                     $"**Usage: ** {Context.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters.Select(x => $"`<{x.Name}>`"))}\n\n";
             }
             await ReplyAsync(Description);
-        }
-
-        async Task<IEnumerable<CommandInfo>> CheckPermsAsync()
-        {
-            var CanRun = new List<CommandInfo>();
-            foreach (var Command in CommandService.Commands)
-                if ((await Command.CheckPreconditionsAsync(Context, Provider)).IsSuccess)
-                    CanRun.Add(Command);
-            return CanRun;
         }
     }
 }
