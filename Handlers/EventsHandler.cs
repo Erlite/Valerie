@@ -40,7 +40,7 @@ namespace Valerie.Handlers
 
         internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id));
 
-        internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.Remove(Guild.Id));
+        internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id));
 
         internal Task ReadyAsync() => Client.SetGameAsync(!ConfigHandler.Config.Games.Any() ?
                 $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}");
@@ -221,9 +221,10 @@ namespace Valerie.Handlers
             var User = Message.Author as SocketGuildUser;
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
-            if (!(NewLevel > OldLevel) || !Config.ChatXP.LevelRoles.Any()) return;
+            if (!(NewLevel > OldLevel)) return;
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
                 await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User.Mention, $"{NewLevel}"));
+            if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
             await User.AddRoleAsync(Role);
