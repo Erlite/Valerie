@@ -1,6 +1,6 @@
-﻿using Valerie.JsonModels;
+﻿using Valerie.Services;
+using Valerie.JsonModels;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
 
 namespace Valerie.Handlers
 {
@@ -19,14 +19,16 @@ namespace Valerie.Handlers
                 return Session.Load<ServerModel>($"{Id}");
         }
 
-        public void Remove(ulong Id)
+        public void RemoveServer(ulong Id)
         {
             using (var Session = Store.OpenSession())
                 Session.Delete($"{Id}");
+            LogClient.Write(Source.SERVER, $"Removed Server With Id: {Id}");
         }
 
         public void AddServer(ulong Id)
-        {using (var Session = Store.OpenSession())
+        {
+            using (var Session = Store.OpenSession())
             {
                 if (Session.Advanced.Exists($"{Id}")) return;
                 Session.Store(new ServerModel
@@ -36,6 +38,7 @@ namespace Valerie.Handlers
                 });
                 Session.SaveChanges();
             }
+            LogClient.Write(Source.SERVER, $"Added Server With Id: {Id}");
         }
 
         public void Save(ServerModel Server, ulong Id)
