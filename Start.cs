@@ -1,6 +1,5 @@
 ﻿using System;
 using Discord;
-using Valerie.Services;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
@@ -21,7 +20,7 @@ namespace Valerie
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = true,
-                    LogLevel = LogSeverity.Info
+                    LogLevel = LogSeverity.Warning
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
