@@ -227,7 +227,10 @@ namespace Valerie.Modules
         [Command("Invite"), Summary("Gives an invite link for Valerie.")]
         public Task InviteAsync() => ReplyAsync(
             $"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591\n" +
-                $"Feel free to join my server: https://discord.gg/nzYTzxD");        
+                $"Feel free to join my server: https://discord.gg/nzYTzxD");
+
+        [Command("About"), Summary("Shows information about Valerie.")]
+        public Task AboutAsync() => ReplyAsync($"Hello! I'm Valerie written by Yucked#1195.");
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
