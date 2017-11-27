@@ -223,7 +223,7 @@ namespace Valerie.Handlers
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User.Mention, $"{NewLevel}"));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, $"{NewLevel}", User.Username));
             if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
