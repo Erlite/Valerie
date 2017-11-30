@@ -202,15 +202,14 @@ namespace Valerie.Handlers
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (HasRole) return Task.CompletedTask;
-            var RandomXP = IntExt.GiveXp(Message.Content.Length == 0 ? 1 : Message.Content.Length);
             if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
             {
-                Config.ChatXP.Rankings.Add(User.Id, RandomXP);
+                Config.ChatXP.Rankings.Add(User.Id, Random.Next(Message.Content.Length));
                 ServerHandler.Save(Config, User.Guild.Id);
                 return Task.CompletedTask;
             }
             int Old = Config.ChatXP.Rankings[User.Id];
-            Config.ChatXP.Rankings[User.Id] += RandomXP;
+            Config.ChatXP.Rankings[User.Id] += Random.Next(Message.Content.Length);
             var New = Config.ChatXP.Rankings[User.Id];
             ServerHandler.Save(Config, User.Guild.Id);
             return LevelUpAsync(Message, Config, Old, New);
