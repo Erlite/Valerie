@@ -168,7 +168,7 @@ namespace Valerie.Modules
             return ReplyAsync($"**Self Assignable Roles**\n{string.Join(", ", Context.Server.AssignableRoles.Select(x => StringExt.CheckRole(Context, x)))}");
         }
 
-        [Command("Show Case"), Summary("Shows information about a specific case.")]
+        [Command("Case"), Summary("Shows information about a specific case.")]
         public Task CaseAsync(int CaseNumber = 0)
         {
             if (CaseNumber == 0) CaseNumber = Context.Server.ModLog.Cases.LastOrDefault().CaseNumber;
@@ -183,7 +183,7 @@ namespace Valerie.Modules
                 $"**Reason:** {Case.Reason}");
         }
 
-        [Command("Show Stats"), Summary("Shows certain Valerie's stats.")]
+        [Command("Stats"), Summary("Shows certain Valerie's stats.")]
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
@@ -214,7 +214,7 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: Embed.Build());
         }
 
-        [Command("Show Updates"), Summary("Shows the most recent changes made to Valerie. FYI: Some changes may not make sense.")]
+        [Command("Updates"), Summary("Shows the most recent changes made to Valerie. FYI: Some changes may not make sense.")]
         public async Task ShowUpdatesAsync()
         {
             var Commits = await GitStatsAsync();
