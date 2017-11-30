@@ -1,10 +1,14 @@
 ﻿using Discord;
 using System;
+using System.IO;
 using System.Linq;
+using SixLabors.Fonts;
 using Discord.Commands;
 using Valerie.Extensions;
 using Valerie.JsonModels;
+using SixLabors.Primitives;
 using Newtonsoft.Json.Linq;
+using SixLabors.ImageSharp;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
@@ -50,7 +54,7 @@ namespace Valerie.Modules
             else
             {
                 UserByte.Byte += Bet;
-                embed.Description = $"You won {Bet} bytes :tada: Your have {UserByte.Byte} bytes.";
+                embed.Description = $"You won {Bet} bytes :tada: You have {UserByte.Byte} bytes.";
                 embed.Color = new Color(0x93ff89);
             }
             return SendEmbedAsync(embed.Build());
@@ -73,7 +77,7 @@ namespace Valerie.Modules
             else
             {
                 UserBytes.Byte -= Bet;
-                return SaveAsync(ModuleEnums.Server, $"You lost {Bet} bytes! Your have {UserBytes.Byte} byte. :frowning:");
+                return SaveAsync(ModuleEnums.Server, $"You lost {Bet} bytes! You have {UserBytes.Byte} byte. :frowning:");
             }
         }
 
@@ -116,7 +120,7 @@ namespace Valerie.Modules
                 return;
             }
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"Leaderboards For {Context.Guild}");
-            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Take(10))
+            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Where(y => y.Value != 0).Take(10))
                 Embed.AddField(await StringExt.CheckUserAsync(Context, Rank.Key), Rank.Value, true);
             await ReplyAsync("", embed: Embed.Build());
         }
@@ -146,7 +150,7 @@ namespace Valerie.Modules
 
         [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
         public async Task NekoAsync()
-    => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false))["neko"]}");
+            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false))["neko"]}");
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
         public Task LmgtfyAsync([Remainder] string Search = "How to use Lmgtfy")
@@ -160,19 +164,19 @@ namespace Valerie.Modules
             {
                 Context.Server.Memory.Add(new MemoryWrapper
                 {
+                    Byte = 100,
                     Id = $"{Context.User.Id}",
                     Memory = Memory.Kilobyte,
-                    DailyReward = DateTime.Now,
-                    Byte = Context.Random.Next(100)
+                    DailyReward = DateTime.Now
                 });
-                return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺.");
+                return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
             }
             var PassedTime = DateTime.Now.Subtract(User.DailyReward);
             var TimeLeft = User.DailyReward.Subtract(PassedTime);
             if (Math.Abs(PassedTime.TotalHours) < 24)
                 return ReplyAsync($"You need to wait {TimeLeft.Hour} Hours, {TimeLeft.Minute} Minutes, {TimeLeft.Second} Seconds for your next daily reward.");
             User.Byte += 100;
-            return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺.");
+            return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
         }
 
         [Command("Bytes"), Summary("Shows how many bytes a user have.")]
@@ -188,5 +192,71 @@ namespace Valerie.Modules
         [Command("Expand"), Summary("Converts text to full width.")]
         public Task ExpandAsync([Remainder] string Text)
             => ReplyAsync(string.Join("", Text.Select(x => Normal.Contains(x) ? x : ' ').Select(x => FullWidth[Normal.IndexOf(x)])));
+
+        [Command("Guess"), Summary("Guess the right number to win bytes.")]
+        public async Task GuessAsync()
+        {
+            int MinNum = Context.Random.Next(0, 50);
+            int MaxNum = Context.Random.Next(50, 101);
+            int RandomNum = Context.Random.Next(MinNum, MaxNum);
+            await ReplyAsync($"Guess a number between {MinNum} and {MaxNum}. You have 10 seconds. GO!!!");
+            var UserGuess = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(10));
+            if (RandomNum != int.Parse(UserGuess.Content))
+            {
+                await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: {RandomNum}.");
+                return;
+            }
+            MemoryUpdate(Context.User, Math.Pow(RandomNum, 3));
+            await SaveAsync(ModuleEnums.Server, $"BRAVOO! You guessed it right!! ");
+        }
+
+        [Command("Typefast"), Summary("Check how fast you can type given snippet within 15 seconds to win bytes!")]
+        public async Task TypefastAsync(int Limit = 10)
+        {
+            var Word = new Char[Limit];
+            for (int i = 0; i < Limit; i++)
+                Word[i] = Normal[Context.Random.Next(Normal.Length - 1)];
+            var Snippet = string.Join("", Word).Replace("\\", "");
+            await Context.Channel.SendFileAsync(TextBitmap(Snippet));
+            var Check = await ResponseWaitAsync(false);
+            if (Check == null || Check.Content != Snippet)
+            {
+                await ReplyAsync($"No one able to type that out?? Do I need to call the keyboard warriors?");
+                return;
+            }
+            if (Check.Content == Snippet)
+            {
+                MemoryUpdate(Context.User, Math.Pow(Word.Length, 2));
+                await ReplyAsync($"**{Context.User}, THE MAD MAN DID IT!!**");
+            }
+        }
+
+        string TextBitmap(string Text)
+        {
+            using (var Image = new Image<Rgba32>(500, 50))
+            {
+                var SavePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+                var Font = new FontCollection().Install($"{SavePath}/Clone.ttf");
+                Image.Mutate(x => x.DrawText(Text, Font.CreateFont(32), Rgba32.Plum, new PointF(10, 10)));
+                Image.Save($"{SavePath}/image.png");
+                return $"{SavePath}/image.png";
+            }
+        }
+
+        void MemoryUpdate(IUser User, double Bytes)
+        {
+            var MemUser = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (MemUser == null)
+                Context.Server.Memory.Add(new MemoryWrapper
+                {
+                    Byte = Bytes,
+                    Id = $"{Context.User.Id}",
+                    Memory = Memory.Kilobyte,
+                    DailyReward = DateTime.Now
+                });
+            else
+                MemUser.Byte += Bytes;
+            Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
+        }
     }
 }
