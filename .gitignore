@@ -294,3 +294,5 @@ config.codekit3
 *.vs/
 bin/
 obj/
+
+Resources/
