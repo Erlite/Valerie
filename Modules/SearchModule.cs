@@ -84,12 +84,13 @@ namespace Valerie.Modules
             var Get = await Context.HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/{Currency}").ConfigureAwait(false);
             var Content = JsonConvert.DeserializeObject<CryptoModel[]>(await Get.Content.ReadAsStringAsync())[0];
             if (string.IsNullOrWhiteSpace(Content.Id)) { return; }
-            await ReplyAsync(
-                $"**Name:** {Content.Name}\n**Rank:** {Content.Rank}\n**Last Updated:** {UnixDT(Convert.ToDouble(Content.LastUpdated))}\n" +
-                $"**USD Price:** {Content.PriceUsd}\n**Bitcoin Price:** {Content.PriceBtc}\n" +
-                $"**USD Market Cap:** {Content.MarketCapUsd}\n**USD 24H Volume:** {Content.The24hVolumeUsd}\n" +
-                $"**1H Percent Change:** {Content.PercentChange1h}\n**24H Percent Change:** {Content.PercentChange24h}\n**7D Percent Change:** {Content.PercentChange7d}\n" +
-                $"**Available Supply:** {Content.AvailableSupply}\n**Total Supply:** {Content.TotalSupply}\n**Max Supply:** {Content.MaxSupply}");
+            var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Rank} | {Content.Name}", ThumbUrl: "https://i.imgur.com/Gn60URV.png",
+                FooterText: $"Last Updated: {UnixDT(Convert.ToDouble(Content.LastUpdated))}");
+            Embed.AddField("Prices", $"**USD:** {Content.PriceUsd}\n**Bitcoin:** {Content.PriceBtc}", true);
+            Embed.AddField("Market", $"**Cap:** {Content.MarketCapUsd}\n**24 Hour Volume:** {Content.The24hVolumeUsd}", true);
+            Embed.AddField("Changes", $"**1 Hour:** {Content.PercentChange1h}\n**24 Hours:** {Content.PercentChange24h}\n**7 Days:** {Content.PercentChange7d}", true);
+            Embed.AddField("Supply", $"**Max:** {Content.MaxSupply}\n**Total:** {Content.TotalSupply}\n**Available:** {Content.AvailableSupply}", true);
+            await ReplyAsync(string.Empty, embed: Embed.Build());
         }
 
         [Command("Google"), Alias("G"), Summary("Searches google for your search terms.")]
