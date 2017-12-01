@@ -18,6 +18,7 @@ namespace Valerie.Modules
     [Name("Fun Commands"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class FunModule : ValerieBase
     {
+        string SavePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
         string Normal = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,-./:;<=>?@[\\]^_`{|}~ ";
         string FullWidth = "０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯ" +
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
@@ -81,38 +82,32 @@ namespace Valerie.Modules
             }
         }
 
-        [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
-        public async Task TrumpAsync()
-        {
-            var Get = await Context.HttpClient.GetAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false);
-            if (!Get.IsSuccessStatusCode)
-            {
-                await ReplyAsync("Using TrumpDump API was the worse trade deal, maybe ever.");
-                return;
-            }
-            await ReplyAsync((JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false)))["value"].ToString());
+        [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
+        public async Task NekoAsync()
+            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false))["neko"]}");
 
-        }
+        [Command("Trump"), Summary("Fetches random Quotes/Tweets said by Donald Trump.")]
+        public async Task TrumpAsync() =>
+            await ReplyAsync($"{JObject.Parse(await Context.HttpClient.GetStringAsync("https://api.tronalddump.io/random/quote").ConfigureAwait(false))["value"]}");
 
         [Command("Yomama"), Summary("Gets a random Yomma Joke")]
-        public async Task YommaAsync()
-        {
-            var Get = await Context.HttpClient.GetAsync("http://api.yomomma.info/").ConfigureAwait(false);
-            if (!Get.IsSuccessStatusCode)
-            {
-                await ReplyAsync("Yo mama so fat she crashed Yomomma's API.");
-                return;
-            }
-            await ReplyAsync(JObject.Parse(await Get.Content.ReadAsStringAsync().ConfigureAwait(false))["joke"].ToString());
+        public async Task YommaAsync() =>
+            await ReplyAsync($"{JObject.Parse(await Context.HttpClient.GetStringAsync("http://api.yomomma.info/").ConfigureAwait(false))["joke"]}");
 
-        }
+        [Command("Dog"), Summary("Get some woof fluff good boye.")]
+        public async Task DogAsync() =>
+            await ReplyAsync($"https://random.dog/{await Context.HttpClient.GetStringAsync("https://random.dog/woof").ConfigureAwait(false)}");
+
+        [Command("Cat"), Summary("MEOW! Moew meow, meoooow. Meow Meow?")]
+        public async Task CatAsync() =>
+            await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://random.cat/meow").ConfigureAwait(false))["file"]}");
 
         [Command("Rate"), Summary("Rates something for you out of 10.")]
         public async Task RateAsync([Remainder] string ThingToRate)
             => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a solid {Context.Random.Next(11)}/10");
 
-        [Command("Show XpLeaderboards"), Alias("Showxpl", "ShowXpTop"), Summary("Shows top 10 users with the highest XP for this server.")]
-        public async Task ShowXpTopAsync()
+        [Command("XpLeaderboards"), Alias("XPL", "XpTop"), Summary("Shows top 10 users with the highest XP for this server.")]
+        public async Task XpLeaderboardAsync()
         {
             if (!Context.Server.ChatXP.Rankings.Any())
             {
@@ -147,10 +142,6 @@ namespace Valerie.Modules
         [Command("AdorableAvatar"), Summary("Generates an avatar for a specified user.")]
         public async Task AdorableAvatarAsync(IGuildUser User = null)
             => await ReplyAsync($"https://api.adorable.io/avatars/500/{(User ?? Context.User).Username}.png");
-
-        [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
-        public async Task NekoAsync()
-            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://nekos.life/api/neko").ConfigureAwait(false))["neko"]}");
 
         [Command("Lmgtfy"), Summary("Googles something for that special person who is crippled")]
         public Task LmgtfyAsync([Remainder] string Search = "How to use Lmgtfy")
@@ -231,11 +222,52 @@ namespace Valerie.Modules
             }
         }
 
+        [Command("Rip"), Summary("RIp? Ripping rip ripped a user? RIP.")]
+        public async Task RipAsync(IGuildUser User) => await Context.Channel.SendFileAsync(await GraveAsync(User));
+
+        [Command("Hangman"), Summary("Let's play a hangman game.")]
+        public async Task HangmanAsync()
+        {
+            int Guesses = 0;
+            string Word = "Hangman";
+            var Replace = Word.Replace(Word[Context.Random.Next(Word.Length)], '_').Replace(Word[Context.Random.Next(Word.Length)], '_');
+            await ReplyAsync($"Word to guess is: {Replace}");
+            while (Guesses < Word.Length + 1)
+                for (int i = 0; i < Word.Length; i++)
+                {
+                    var Message = await ReplyAsync($"Please give your {i} guess.");
+                    var Response = await ResponseWaitAsync();
+                    var Compare = Word.CompareTo(Replace);
+                }
+        }
+
+        async Task<string> GraveAsync(IGuildUser User)
+        {
+            var Get = await Context.HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
+            using (var UserImage = File.Create($"{SavePath}/user.png"))
+                await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
+
+            using (var Grave = SixLabors.ImageSharp.Image.Load<Rgba32>($"{SavePath}/grave.png"))
+            {
+                var UserImage = SixLabors.ImageSharp.Image.Load<Rgba32>($"{SavePath}/user.png");
+                UserImage.Mutate(x => x.Grayscale());
+                Grave.Mutate(x =>
+                {
+                    var Font = new FontCollection().Install($"{SavePath}/Clone.ttf");
+                    x.DrawImage(UserImage, 1, new Size(170, 170), new Point(150, 180));
+                    x.DrawText($"{User.JoinedAt.Value.Date.Year} - {DateTime.Now.Year}", Font.CreateFont(25), Rgba32.Black, new PointF(150, 350));
+                    x.DrawText($"Type F to pay respect.", Font.CreateFont(25), Rgba32.Black, new PointF(80, 380));
+                });
+                Grave.Save($"{SavePath}/user.png");
+            }
+
+            return $"{SavePath}/user.png";
+        }
+
         string TextBitmap(string Text)
         {
             using (var Image = new Image<Rgba32>(500, 50))
             {
-                var SavePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
                 var Font = new FontCollection().Install($"{SavePath}/Clone.ttf");
                 Image.Mutate(x => x.DrawText(Text, Font.CreateFont(32), Rgba32.Plum, new PointF(10, 10)));
                 Image.Save($"{SavePath}/image.png");
