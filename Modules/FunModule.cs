@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
@@ -49,7 +50,7 @@ namespace Valerie.Modules
             if (win == 0)
             {
                 UserByte.Byte -= Bet;
-                embed.Description = $"You lost {Bet} bytes. Your have {UserByte.Byte} bytes. Better luck next time! :weary: ";
+                embed.Description = $"You lost {Bet} bytes. You have {UserByte.Byte} bytes. Better luck next time! :weary: ";
                 embed.Color = new Color(0xff0000);
             }
             else
@@ -197,7 +198,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: {RandomNum}.");
                 return;
             }
-            MemoryUpdate(Context.User, Math.Pow(RandomNum, 3));
+            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, Math.Pow(RandomNum, 3));
             await SaveAsync(ModuleEnums.Server, $"BRAVOO! You guessed it right!! ");
         }
 
@@ -217,29 +218,13 @@ namespace Valerie.Modules
             }
             if (Check.Content == Snippet)
             {
-                MemoryUpdate(Context.User, Math.Pow(Word.Length, 2));
+                Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, Math.Pow(Word.Length, 2));
                 await ReplyAsync($"**{Context.User}, THE MAD MAN DID IT!!**");
             }
         }
 
-        [Command("Rip"), Summary("RIp? Ripping rip ripped a user? RIP.")]
+        [Command("Rip"), Summary("Rip? Ripping rip ripped a user? RIP.")]
         public async Task RipAsync(IGuildUser User) => await Context.Channel.SendFileAsync(await GraveAsync(User));
-
-        [Command("Hangman"), Summary("Let's play a hangman game.")]
-        public async Task HangmanAsync()
-        {
-            int Guesses = 0;
-            string Word = "Hangman";
-            var Replace = Word.Replace(Word[Context.Random.Next(Word.Length)], '_').Replace(Word[Context.Random.Next(Word.Length)], '_');
-            await ReplyAsync($"Word to guess is: {Replace}");
-            while (Guesses < Word.Length + 1)
-                for (int i = 0; i < Word.Length; i++)
-                {
-                    var Message = await ReplyAsync($"Please give your {i} guess.");
-                    var Response = await ResponseWaitAsync();
-                    var Compare = Word.CompareTo(Replace);
-                }
-        }
 
         async Task<string> GraveAsync(IGuildUser User)
         {
@@ -273,22 +258,6 @@ namespace Valerie.Modules
                 Image.Save($"{SavePath}/image.png");
                 return $"{SavePath}/image.png";
             }
-        }
-
-        void MemoryUpdate(IUser User, double Bytes)
-        {
-            var MemUser = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (MemUser == null)
-                Context.Server.Memory.Add(new MemoryWrapper
-                {
-                    Byte = Bytes,
-                    Id = $"{Context.User.Id}",
-                    Memory = Memory.Kilobyte,
-                    DailyReward = DateTime.Now
-                });
-            else
-                MemUser.Byte += Bytes;
-            Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
         }
     }
 }
