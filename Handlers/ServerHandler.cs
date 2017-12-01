@@ -1,6 +1,8 @@
 ﻿using Valerie.Services;
 using Valerie.JsonModels;
 using Raven.Client.Documents;
+using System.Linq;
+using System;
 
 namespace Valerie.Handlers
 {
@@ -49,6 +51,22 @@ namespace Valerie.Handlers
                 Session.Store(Server, Server.Id);
                 Session.SaveChanges();
             }
+        }
+
+        public void MemoryUpdate(ulong GuildId, ulong UserId, double Bytes)
+        {
+            var Server = GetServer(GuildId);
+            var MemUser = Server.Memory.FirstOrDefault(x => x.Id == $"{UserId}");
+            if (MemUser == null)
+                Server.Memory.Add(new MemoryWrapper
+                {
+                    Byte = Bytes,
+                    Id = $"{UserId}",
+                    Memory = Memory.Kilobyte,
+                    DailyReward = DateTime.Now
+                });
+            else MemUser.Byte += Bytes;
+            Save(Server, GuildId);
         }
     }
 }
