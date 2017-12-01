@@ -125,7 +125,7 @@ namespace Valerie.Handlers
 
             if (!string.IsNullOrWhiteSpace(Message.Content))
                 Embed.WithDescription(Message.Content);
-            else if (Message.Attachments.FirstOrDefault() != null)
+            if (Message.Attachments.FirstOrDefault() != null)
                 Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
 
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == $"{Message.Id}");
@@ -164,22 +164,19 @@ namespace Valerie.Handlers
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
             if (Message == null || StarboardChannel == null) return;
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
-            if (!string.IsNullOrWhiteSpace(Message.Content))
-                Embed.WithDescription(Message.Content);
-            else if (Message.Attachments.FirstOrDefault() != null)
-                Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+            if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
+            if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
 
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == $"{Message.Id}");
             if (!Config.Starboard.StarboardMessages.Contains(Exists)) return;
-            Exists.Stars -= 1;
+            Exists.Stars--;
             var SMsg = await StarboardChannel.GetMessageAsync(Convert.ToUInt64(Exists.StarboardMessageId), CacheMode.AllowDownload) as IUserMessage;
-            if (Message.Reactions.Count > 0)
-                await SMsg.ModifyAsync(x =>
-                {
-                    x.Content =
-                    $"{StringExt.StarType(Exists.Stars)}{Exists.Stars} {(Reaction.Channel as ITextChannel).Mention} ID: {Exists.StarboardMessageId}";
-                    x.Embed = Embed.Build();
-                });
+            if (Message.Reactions.Count > 0) await SMsg.ModifyAsync(x =>
+                 {
+                     x.Content =
+                     $"{StringExt.StarType(Exists.Stars)}{Exists.Stars} {(Reaction.Channel as ITextChannel).Mention} ID: {Exists.StarboardMessageId}";
+                     x.Embed = Embed.Build();
+                 });
             else
             {
                 Config.Starboard.StarboardMessages.Remove(Exists);
