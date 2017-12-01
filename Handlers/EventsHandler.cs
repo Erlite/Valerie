@@ -119,19 +119,15 @@ namespace Valerie.Handlers
             var Message = await Cache.GetOrDownloadAsync();
             var Config = ServerHandler.GetServer(Guild.Id);
             ITextChannel StarboardChannel = Guild.GetTextChannel(Convert.ToUInt64(Config.Starboard.TextChannel));
-
             if (Message == null || StarboardChannel == null || Reaction.Channel.Id == Convert.ToUInt64(Config.Starboard.TextChannel)) return;
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Message.Author.GetAvatarUrl(), Message.Author.Username, FooterText: Message.Timestamp.ToString("F"));
-
-            if (!string.IsNullOrWhiteSpace(Message.Content))
-                Embed.WithDescription(Message.Content);
-            if (Message.Attachments.FirstOrDefault() != null)
-                Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
+            if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
+            if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
 
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == $"{Message.Id}");
             if (Config.Starboard.StarboardMessages.Contains(Exists))
             {
-                Exists.Stars += 1;
+                Exists.Stars++;
                 var SMsg = await StarboardChannel.GetMessageAsync(Convert.ToUInt64(Exists.StarboardMessageId), CacheMode.AllowDownload) as IUserMessage;
                 await SMsg.ModifyAsync(x =>
                 {
@@ -218,6 +214,7 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, Math.Sqrt(DateTime.Now.Second));
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
                 await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, $"{NewLevel}", User.Username));
             if (!Config.ChatXP.LevelRoles.Any()) return;
