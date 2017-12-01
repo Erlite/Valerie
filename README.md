@@ -23,6 +23,6 @@ Features
 - Mod Warnings, Logging, Muting
 - Anti URL & Bad Words AKA Auto Mod System
 - Server Blacklisted Users (Prevents User from all bot features)
-- Chat XP - Auto Assign Role On Level Up, Forbid Role From Leveling Up, Custom Levei Up Message
+- Chat XP - Auto Assign Role On Level Up, Forbid Role From Leveling Up, Custom Level Up Message
 - Searches: Google, Giphy, Steam, Microsoft Docs, Etc.
 - NSFW: Ranging from Humanly to Waifu material.
