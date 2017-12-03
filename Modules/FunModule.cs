@@ -167,11 +167,12 @@ namespace Valerie.Modules
                 });
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
             }
-            var PassedTime = DateTime.Now.Subtract(User.DailyReward);
-            var TimeLeft = User.DailyReward.Subtract(PassedTime);
-            if (Math.Abs(PassedTime.TotalHours) < 24)
-                return ReplyAsync($"You need to wait {TimeLeft.Hour} Hours, {TimeLeft.Minute} Minutes, {TimeLeft.Second} Seconds for your next daily reward.");
+            var Passed = DateTime.UtcNow - User.DailyReward;
+            var Wait = User.DailyReward - Passed;
+            if (Passed.Hours < 24 || Passed.Days < 1)
+                return ReplyAsync($"You need to wait **{Wait.Hour}** hour(s), **{Wait.Minute}** minute(s) for your next reward.");
             User.Byte += 100;
+            User.DailyReward = DateTime.Now;
             return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
         }
 
@@ -206,18 +207,17 @@ namespace Valerie.Modules
             await SaveAsync(ModuleEnums.Server, $"BRAVOO! You guessed it right!! ");
         }
 
-        [Command("Typefast"), Summary("Check how fast you can type given snippet within 15 seconds to win bytes!")]
+        [Command("Typefast"), Summary("Check how fast you can type given snippet within 7 seconds to win bytes!")]
         public async Task TypefastAsync(int Limit = 10)
         {
             var Word = new Char[Limit];
-            for (int i = 0; i < Limit; i++)
-                Word[i] = Normal[Context.Random.Next(Normal.Length - 1)];
+            for (int i = 0; i < Limit; i++) Word[i] = Normal[Context.Random.Next(Normal.Length - 1)];
             var Snippet = string.Join("", Word).Replace("\\", "");
             await Context.Channel.SendFileAsync(TextBitmap(Snippet));
-            var Check = await ResponseWaitAsync(false);
+            var Check = await ResponseWaitAsync(false, Timeout: TimeSpan.FromSeconds(7));
             if (Check == null || Check.Content != Snippet)
             {
-                await ReplyAsync($"No one able to type that out?? Do I need to call the keyboard warriors?");
+                await ReplyAsync($"💢 How hard is it to type **{Snippet}** out?");
                 return;
             }
             if (Check.Content == Snippet)
@@ -258,7 +258,7 @@ namespace Valerie.Modules
             using (var Image = new Image<Rgba32>(500, 50))
             {
                 var Font = new FontCollection().Install($"{SavePath}/Clone.ttf");
-                Image.Mutate(x => x.DrawText(Text, Font.CreateFont(32), Rgba32.Plum, new PointF(10, 10)));
+                Image.Mutate(x => x.DrawText(Text, Font.CreateFont(28), Rgba32.Plum, new PointF(10, 10)));
                 Image.Save($"{SavePath}/image.png");
                 return $"{SavePath}/image.png";
             }
