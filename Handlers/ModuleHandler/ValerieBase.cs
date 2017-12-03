@@ -39,7 +39,7 @@ namespace Valerie.Handlers.ModuleHandler
                     break;
             }
             if (Check == true) return await ReplyAsync(Message ?? "✅ - Done.");
-            return await ReplyAsync(Message ?? "❌ - There was an error.");
+            return await ReplyAsync("❌ - BEEP BOOP! SOMETHING IS WRONG! USE FEEDBACK COMMAND TO REPORT THIS ERROR!");
         }
 
         public async Task LogAsync(IGuildUser User, CaseType CaseType, string Reason)
