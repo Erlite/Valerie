@@ -140,15 +140,18 @@ namespace Valerie.Modules
         }
 
         [Command("Feedback"), Summary("Give Feedback on Valerie's Performance.")]
-        public async Task FeedbackAsync([Remainder]string Message)
+        public async Task FeedbackAsync()
         {
-            if (Message.Length < 20) { await ReplyAsync("Please enter a detailed feedback."); return; }
             var ReportChannel = await Context.Client.GetChannelAsync(Convert.ToUInt64(Context.Config.ReportChannel)) as ITextChannel;
-            string Content =
-                $"**User:** {Context.User.Username} ({Context.User.Id})\n" +
-                $"**Server:** {Context.Guild} ({Context.Guild.Id})\n" +
-                $"**Feedback:** {Message}";
-            await ReportChannel.SendMessageAsync(Content);
+            await ReplyAsync($"*Please provide your response in 2-3 sentences.*");
+            var Response = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(30));
+            if (Response == null)
+            {
+                await ReplyAndDeleteAsync($"Hmm, I can't submit a blank feedback. Try again maybe?");
+                return;
+            }
+            await ReportChannel.SendMessageAsync($"**New Feedback From {Context.Guild}**\n\n**User:** {Context.User} ({Context.User.Id})\n" +
+                $"**Response:** {Response}");
             await ReplyAsync("Thank you for sumbitting your feedback. 😊");
         }
 
