@@ -19,7 +19,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatterbot. To remove channel, don't provide channel name.")]
+        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatter. To remove channel, don't provide channel name.")]
         public Task SetChannelAsync(ModuleEnums ChannelType, ITextChannel Channel = null)
         {
             string ChannelId = $"{Channel?.Id}" ?? null;
