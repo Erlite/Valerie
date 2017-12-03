@@ -11,7 +11,6 @@ using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Valerie.Handlers.ModuleHandler;
 
 namespace Valerie.Modules
@@ -25,62 +24,59 @@ namespace Valerie.Modules
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
 
         [Command("Slotmachine"), Summary("Want to earn quick bytes? That's how you earn some.")]
-        public Task SlotMachineAsync(int Bet = 100)
+        public Task SlotMachineAsync(double Bet = 15.5)
         {
-            string[] Slots = new string[] { ":heart:", ":eggplant:", ":poo:", ":eyes:", ":star2:", ":peach:", ":pizza:" };
+            var Slots = new string[] { "☄", "🔥", "👾", "🔆", "👀", "👅", "🍑" };
             var UserByte = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (UserByte.Byte < Bet || UserByte == null) return ReplyAsync("You don't have enough bytes for slot machine!");
-            if (Bet <= 0) return ReplyAsync("Your bet is too low. :-1:");
-
+            if (UserByte.Byte < Bet || UserByte == null) return ReplyAsync("You do not have enough bytes.");
             var embed = new EmbedBuilder();
-            int[] s = new int[]
+            int[] GetSlot = new int[]
             {
                 Context.Random.Next(0, Slots.Length),
                 Context.Random.Next(0, Slots.Length),
                 Context.Random.Next(0, Slots.Length)
             };
-            embed.AddField("Slot 1", Slots[s[0]], true);
-            embed.AddField("Slot 2", Slots[s[1]], true);
-            embed.AddField("Slot 3", Slots[s[2]], true);
+            embed.AddField("Slot 1", Slots[GetSlot[0]], true);
+            embed.AddField("Slot 2", Slots[GetSlot[1]], true);
+            embed.AddField("Slot 3", Slots[GetSlot[2]], true);
 
             int win = 0;
-            if (s[0] == s[1] & s[0] == s[2]) win = 10;
-            else if (s[0] == s[1] || s[0] == s[2] || s[1] == s[2]) win = 2;
+            if (GetSlot[0] == GetSlot[1] & GetSlot[0] == GetSlot[2]) win = 10;
+            else if (GetSlot[0] == GetSlot[1] || GetSlot[0] == GetSlot[2] || GetSlot[1] == GetSlot[2]) win = 2;
 
             if (win == 0)
             {
                 UserByte.Byte -= Bet;
-                embed.Description = $"You lost {Bet} bytes. You have {UserByte.Byte} bytes. Better luck next time! :weary: ";
+                embed.Description = $"*Aww..* it seems you lost **{Bet}** bytes. 😞";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
                 UserByte.Byte += Bet;
-                embed.Description = $"You won {Bet} bytes :tada: You have {UserByte.Byte} bytes.";
+                embed.Description = $"**CONGRATS!** You won **{Bet}** bytes. 🎉";
                 embed.Color = new Color(0x93ff89);
             }
             return SendEmbedAsync(embed.Build());
         }
 
-        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET MONEY!")]
-        public Task FlipAsync(string Side, int Bet = 100)
+        [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET BYTES!")]
+        public Task FlipAsync(char Side, double Bet = 15.5)
         {
-            if (int.TryParse(Side, out int res)) return ReplyAsync("Side can either be Heads Or Tails.");
-            var UserBytes = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (UserBytes.Byte < Bet || UserBytes == null) return ReplyAsync("You don't have enough bytes.");
-            if (Bet <= 0) return ReplyAsync("Bet can't be lower than 0! Default bet is set to 50!");
-            string[] Sides = { "Heads", "Tails" };
-            var GetSide = Sides[Context.Random.Next(0, Sides.Length)];
-            if (Side.ToLower() == GetSide.ToLower())
+            var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (User == null || User.Byte < Bet) return ReplyAsync($"You do not have enough bytes.");
+            Side = Char.ToLower(Side);
+            bool Heads = Context.Random.Next(0, 101) < 50 ? true : false;
+            if ((Side == 'h' && Heads) || (Side == 't' && !Heads))
             {
-                UserBytes.Byte += Bet;
-                return SaveAsync(ModuleEnums.Server, $"Congratulations! You won {Bet} bytes! You have {UserBytes.Byte} bytes. 👌");
+                User.Byte += Bet;
+                return SaveAsync(ModuleEnums.Server, $"**CONGRATS!** You won **{Bet}** bytes. 🎉");
             }
-            else
+            else if ((Side == 'h' && !Heads) || (Side == 't' && Heads))
             {
-                UserBytes.Byte -= Bet;
-                return SaveAsync(ModuleEnums.Server, $"You lost {Bet} bytes! You have {UserBytes.Byte} byte. :frowning:");
+                User.Byte -= Bet;
+                return SaveAsync(ModuleEnums.Server, $"*Aww..* it seems you lost **{Bet}** bytes. 😞");
             }
+            else return ReplyAsync($"Side can either be `h` or `t`.");
         }
 
         [Command("Neko"), Summary("Eh, Get yourself some Neko?")]
@@ -115,9 +111,17 @@ namespace Valerie.Modules
                 await ReplyAsync($"{Context.Guild} leadboards is empty.");
                 return;
             }
-            var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"Leaderboards For {Context.Guild}");
-            foreach (var Rank in Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Where(y => y.Value != 0).Take(10))
-                Embed.AddField(await StringExt.CheckUserAsync(Context, Rank.Key), Rank.Value, true);
+            var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"XP Leaderboards For {Context.Guild}");
+
+            var Ordered = Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Where(y => y.Value != 0).Take(10).ToList();
+            if (Ordered.Count > 3)
+            {
+                Embed.AddField($"🥇: {await StringExt.CheckUserAsync(Context, Ordered[0].Key)}", $"**Total XP:** {Ordered[0].Value}", true);
+                Embed.AddField($"🥈: {await StringExt.CheckUserAsync(Context, Ordered[1].Key)}", $"**Total XP:** {Ordered[1].Value}", true);
+                Embed.AddField($"🥉: {await StringExt.CheckUserAsync(Context, Ordered[2].Key)}", $"**Total XP:** {Ordered[2].Value}", true);
+                foreach (var Rank in Ordered.Skip(3)) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value}", true);
+            }
+            else foreach (var Rank in Ordered) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value}", true);
             await ReplyAsync("", embed: Embed.Build());
         }
 
@@ -176,9 +180,9 @@ namespace Valerie.Modules
         {
             User = User ?? Context.User as IGuildUser;
             var GetUser = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{User.Id}");
-            if (GetUser is null) return ReplyAsync($"**{User}** has no bytes 😶.");
+            if (GetUser is null) return ReplyAsync($"**{User}** has no bytes 😶");
             var UserByte = IntExt.GetMemory(GetUser.Byte);
-            return ReplyAsync($"**{User}** has {UserByte.Item2} {UserByte.Item1}s ⚜.");
+            return ReplyAsync($"**{User}** has {UserByte.Item2} {UserByte.Item1}s ⚜");
         }
 
         [Command("Expand"), Summary("Converts text to full width.")]
