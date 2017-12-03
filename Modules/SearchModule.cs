@@ -63,7 +63,7 @@ namespace Valerie.Modules
         [Command("Docs"), Summary("Searches Microsoft docs for programming related terms.")]
         public async Task DocsAsync([Remainder] string Search)
         {
-            var Response = await Context.HttpClient.GetAsync($"https://docsapibrowser.azurewebsites.net/api/apibrowser/dotnet/search?search={Search}&$skip=25&$top=25");
+            var Response = await Context.HttpClient.GetAsync($"https://docsapibrowser.azurewebsites.net/api/apibrowser/dotnet/search?search={Search}&$top=10");
             if (!Response.IsSuccessStatusCode) return;
             var ConvertedJson = JsonConvert.DeserializeObject<DocsModel>(await Response.Content.ReadAsStringAsync());
             if (!ConvertedJson.Results.Any())
