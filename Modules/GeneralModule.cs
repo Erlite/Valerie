@@ -46,7 +46,7 @@ namespace Valerie.Modules
             return Task.CompletedTask;
         }
 
-        [Command("GuildInfo"), Alias("GI"), Summary("Displays information about guild.")]
+        [Command("GuildInfo"), Alias("GI", "Serverinfo"), Summary("Displays information about guild.")]
         public async Task GuildInfoAsync()
         {
             var embed = ValerieEmbed.Embed(EmbedColor.Random, Title: $"INFORMATION | {Context.Guild.Name}",
@@ -171,11 +171,10 @@ namespace Valerie.Modules
         [Command("Case"), Summary("Shows information about a specific case.")]
         public Task CaseAsync(int CaseNumber = 0)
         {
-            if (CaseNumber == 0) CaseNumber = Context.Server.ModLog.Cases.LastOrDefault().CaseNumber;
+            if (CaseNumber == 0 && Context.Server.ModLog.Cases.Any())
+                CaseNumber = Context.Server.ModLog.Cases.LastOrDefault().CaseNumber;
             var Case = Context.Server.ModLog.Cases.FirstOrDefault(x => x.CaseNumber == CaseNumber);
-            if (Case == null || !Context.Server.ModLog.Cases.Any())
-                return ReplyAsync($"Case #{CaseNumber} doesn't exist.");
-
+            if (Case == null) return ReplyAsync($"Case #{CaseNumber} doesn't exist.");
             return ReplyAsync(
                 $"**Case Number:** {Case.CaseNumber} | **Case Type:** {Case.CaseType}\n" +
                 $"**User:** {Case.UserInfo}\n" +
