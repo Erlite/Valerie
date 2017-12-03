@@ -21,7 +21,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
-        [Command("Tag Create"), Alias("Tag Make", "Tag New", "Tag Add"), Summary("Creates a new tag for this server.")]
+        [Command("Tag Create"), Alias("Tag New", "Tag Add"), Summary("Creates a new tag for this server.")]
         public Task CreateAsync(string Name, string Response)
         {
             if (Exists(Name)) return Task.CompletedTask;
@@ -34,6 +34,26 @@ namespace Valerie.Modules
                 CreationDate = DateTime.Now
             });
             return SaveAsync(ModuleEnums.Server);
+        }
+
+        [Command("TagMake"), Summary("Interactive tag creation wizard.")]
+        public async Task MakeAsync()
+        {
+            await ReplyAsync($"**Welcome to Tag Creation Wizard!**\nWhat will be the name of your tag?");
+            var GetName = await ResponseWaitAsync();
+            if (GetName == null || Exists(GetName.Content)) return;
+            await ReplyAsync($"What is going to be the response for *{GetName.Content}*?");
+            var GetContent = await ResponseWaitAsync();
+            if (GetContent == null) return;
+            Context.Server.Tags.Add(new TagWrapper
+            {
+                Uses = 1,
+                Name = GetName.Content,
+                Response = GetContent.Content,
+                Owner = $"{Context.User.Id}",
+                CreationDate = DateTime.Now
+            });
+            await SaveAsync(ModuleEnums.Server, $"**{GetName.Content}** tag has been created!");
         }
 
         [Command("Tag Modify"), Alias("Tag Change", "Tag Update"), Summary("Updates an existing tag")]
@@ -78,6 +98,19 @@ namespace Valerie.Modules
                 $"Uses       :  {Tag.Uses}\n" +
                 $"Created At :  {Tag.CreationDate}\n" +
                 $"Response   :  {Tag.Response}\n```");
+        }
+
+        [Command("Tags"), Summary("Shows all tags for this server.")]
+        public async Task TagsAsync()
+        {
+            string Tags = string.Join(", ", Context.Server.Tags.Select(x => x.Name));
+            if (Tags.Length > 1995)
+            {
+                var ListTags = Tags.ToList();
+                await ReplyAsync($"Here is a list of all tags for {Context.Guild}\n{string.Join(", ", ListTags.GetRange(0, ListTags.Count / 2))}");
+                await ReplyAsync(string.Join(", ", ListTags.GetRange(ListTags.Count / 2, ListTags.Count)));
+            }
+            await ReplyAsync(!string.IsNullOrWhiteSpace(Tags) ? $"Here is a list of all tags for {Context.Guild}\n{Tags}" : $"{Context.Guild} doesn't have any tags.");
         }
 
         bool Exists(string Name)
