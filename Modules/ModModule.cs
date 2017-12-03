@@ -69,13 +69,14 @@ namespace Valerie.Modules
                 return;
             }
             Context.Server.ModLog.Cases.FirstOrDefault(x => x.CaseNumber == Case).Reason = Reason;
-            ITextChannel Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Server.ModLog.TextChannel));
+            var Channel = await Context.Guild.GetTextChannelAsync(Convert.ToUInt64(Context.Server.ModLog.TextChannel));
             if (await Channel.GetMessageAsync(Convert.ToUInt64(GetCase.MessageId)) is IUserMessage Message)
                 await Message.ModifyAsync(x =>
                 {
                     x.Content = $"**{GetCase.CaseType}** | Case {GetCase.CaseNumber}\n**User:** {GetCase.UserInfo}\n**Reason:** {Reason}\n" +
                         $"**Responsible Moderator:** {GetCase.ResponsibleMod}";
                 });
+            GetCase.Reason = Reason;
             await SaveAsync(ModuleEnums.Server);
         }
 
