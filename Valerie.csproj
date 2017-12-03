@@ -19,7 +19,7 @@
     <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.30.0.896" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.30.0.1035" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.6.0-beta3" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171201-1037" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.0-nightly-20171203-0501" />
     <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0003" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0002" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0002" />
