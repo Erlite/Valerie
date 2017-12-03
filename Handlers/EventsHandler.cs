@@ -91,7 +91,7 @@ namespace Valerie.Handlers
             var Config = ServerHandler.GetServer(User.Guild.Id);
             string WelcomeMessage = !Config.JoinMessages.Any() ? $"Welcomoe {User}. We were expecting you ( ͡° ͜ʖ ͡°)" :
                 StringExt.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention);
-            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
+            var Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
             if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
             var Role = User.Guild.GetRole(Convert.ToUInt64(Config.ModLog.AutoAssignRole));
             if (Role != null) await User.AddRoleAsync(Role).ConfigureAwait(false);
@@ -103,7 +103,7 @@ namespace Valerie.Handlers
             var Config = ServerHandler.GetServer(User.Guild.Id);
             string WelcomeMessage = !Config.LeaveMessages.Any() ? $"{User} down. I REPEAT! {User} DOWNN!" :
                 StringExt.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username);
-            ITextChannel Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
+            var Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
         }
 
