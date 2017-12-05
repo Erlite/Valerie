@@ -156,6 +156,7 @@ namespace Valerie.Modules
         public Task DailyAsync()
         {
             var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            var Get = User.DailyReward;
             if (User == null)
             {
                 Context.Server.Memory.Add(new MemoryWrapper
@@ -168,9 +169,8 @@ namespace Valerie.Modules
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
             }
             var Passed = DateTime.UtcNow - User.DailyReward;
-            var Wait = User.DailyReward - Passed;
-            if (Passed.Hours < 24 || Passed.Days < 1)
-                return ReplyAsync($"You need to wait **{Wait.Hour}** hour(s), **{Wait.Minute}** minute(s) for your next reward.");
+            var Wait = Get - Passed;
+            if (Passed.Days < 1) return ReplyAsync($"You need to wait **{Wait.Hour}** hour(s), **{Wait.Minute}** minute(s) for your next reward.");
             User.Byte += 100;
             User.DailyReward = DateTime.Now;
             return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
