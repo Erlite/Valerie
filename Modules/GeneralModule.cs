@@ -19,6 +19,14 @@ namespace Valerie.Modules
         [Command("Ping"), Summary("Pings discord gateway.")]
         public Task PingAsync() => ReplyAsync($"{(Context.Client as DiscordSocketClient).Latency} ms.");
 
+        [Command("Invite"), Summary("Gives an invite link for Valerie.")]
+        public Task InviteAsync() => ReplyAsync(
+            $"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591\n" +
+                $"Feel free to join my server: https://discord.gg/nzYTzxD");
+
+        [Command("About"), Summary("Shows information about Valerie.")]
+        public Task AboutAsync() => ReplyAsync($"Hello! I'm Valerie written by Yucked#1195.");
+
         [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
         public Task UserAvatarAsync(IGuildUser User = null) => ReplyAsync((User ?? Context.User).GetAvatarUrl(size: 2048));
 
@@ -208,7 +216,7 @@ namespace Valerie.Modules
                 $"Total: {Client.Guilds.Sum(x => x.Users.Count)}", true);
             Embed.AddField("Database",
                 $"Tags: {Servers.Sum(x => x.Tags.Count)}\n" +
-                $"Cases: {Servers.Sum(x => x.ModLog.Cases.Count)}\n" +
+                $"Stars: {Servers.Sum(x => x.Starboard.StarboardMessages.Sum(y => y.Stars))}\n" +
                 $"Bytes: {Servers.Sum(x => x.Memory.Sum(y => y.Byte))}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
             Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
@@ -226,13 +234,20 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: Embed.Build());
         }
 
-        [Command("Invite"), Summary("Gives an invite link for Valerie.")]
-        public Task InviteAsync() => ReplyAsync(
-            $"Here is my invite link: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591\n" +
-                $"Feel free to join my server: https://discord.gg/nzYTzxD");
-
-        [Command("About"), Summary("Shows information about Valerie.")]
-        public Task AboutAsync() => ReplyAsync($"Hello! I'm Valerie written by Yucked#1195.");
+        [Command("Streamer"), Summary("Love to notify people when you stream? Just Add yourself here. Action: Add, Remove")]
+        public Task StreamerAsync(ModuleEnums Action = ModuleEnums.Add)
+        {
+            switch (Action)
+            {
+                case ModuleEnums.Add:
+                    if (Context.Server.Streamers.ContainsKey(Context.User.Id)) return ReplyAsync("No need to add yourself again.");
+                    Context.Server.Streamers.Add(Context.User.Id, 0); return SaveAsync(ModuleEnums.Server);
+                case ModuleEnums.Remove:
+                    if (!Context.Server.Streamers.ContainsKey(Context.User.Id)) return ReplyAsync("Seems as if you never added yourself.");
+                    Context.Server.Streamers.Remove(Context.User.Id); return SaveAsync(ModuleEnums.Server);
+            }
+            return Task.CompletedTask;
+        }
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
