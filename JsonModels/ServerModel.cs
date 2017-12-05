@@ -9,7 +9,8 @@ namespace Valerie.JsonModels
         public string JoinChannel { get; set; }
         public string LeaveChannel { get; set; }
         public string ChatterChannel { get; set; }
-        public List<ulong> Admins { get; set; } = new List<ulong>(10);
+        public string StreamChannel { get; set; }
+        public List<ulong> Admins { get; set; } = new List<ulong>(10);        
         public List<string> JoinMessages { get; set; } = new List<string>(5);
         public List<string> LeaveMessages { get; set; } = new List<string>(5);
         public List<ulong> AssignableRoles { get; set; } = new List<ulong>(10);
@@ -19,6 +20,7 @@ namespace Valerie.JsonModels
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
         public List<MemoryWrapper> Memory { get; set; } = new List<MemoryWrapper>();
+        public Dictionary<ulong, int> Streamers { get; set; } = new Dictionary<ulong, int>();
         public Dictionary<ulong, string> AFKUsers { get; set; } = new Dictionary<ulong, string>();
     }
 }
