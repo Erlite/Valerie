@@ -19,7 +19,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatter. To remove channel, don't provide channel name.")]
+        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatter/Stream/Starboard. To remove channel, don't provide channel name.")]
         public Task SetChannelAsync(ModuleEnums ChannelType, ITextChannel Channel = null)
         {
             string ChannelId = $"{Channel?.Id}" ?? null;
@@ -30,6 +30,7 @@ namespace Valerie.Modules
                 case ModuleEnums.Leave: Context.Server.LeaveChannel = ChannelId; break;
                 case ModuleEnums.Mod: Context.Server.ModLog.TextChannel = ChannelId; break;
                 case ModuleEnums.Starboard: Context.Server.Starboard.TextChannel = ChannelId; break;
+                case ModuleEnums.Stream: Context.Server.StreamChannel = ChannelId; break;
             }
             return SaveAsync(ModuleEnums.Server);
         }
@@ -310,7 +311,7 @@ namespace Valerie.Modules
             Context.Server.ChatXP.LevelMessage = "Congrats on hitting level **{rank}**! :beginner:";
             await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
-        
+
         ITextChannel DefaultChannel => Task.Run(async () =>
              (await Context.Guild.GetTextChannelsAsync()).FirstOrDefault(x => x.Name.Contains("general") || x.Name.Contains("lobby") || x.Id == Context.Guild.Id)
              ?? await Context.Guild.GetDefaultChannelAsync()).Result;
