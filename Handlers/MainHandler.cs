@@ -45,6 +45,7 @@ namespace Valerie.Handlers
             Client.MessageReceived += EventsHandler.HandleMessageAsync;
             Client.MessageReceived += EventsHandler.HandleCommandAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
+            Client.GuildMemberUpdated += EventsHandler.GuildMemberUpdatedAsync;
 
             await Client.LoginAsync(TokenType.Bot, ConfigHandler.Config.Token);
             await Client.StartAsync();
