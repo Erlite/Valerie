@@ -6,11 +6,12 @@
         Mod,
         Join,
         Leave,
-        Modify,
-        Chatter,
-        Remove,
-        Starboard,
+        Config,
         Server,
-        Config
+        Modify,
+        Remove,
+        Stream,
+        Chatter,
+        Starboard,
     }
 }
