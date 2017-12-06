@@ -62,10 +62,10 @@ namespace Valerie.Handlers
                 {
                     Byte = Bytes,
                     Id = $"{UserId}",
-                    Memory = Memory.Kilobyte,
+                    Memory = Memory.Byte,
                     DailyReward = DateTime.Now
                 });
-            else MemUser.Byte += Bytes;
+            MemUser.Byte += Bytes;
             Save(Server, GuildId);
         }
     }

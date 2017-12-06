@@ -163,7 +163,7 @@ namespace Valerie.Modules
                 {
                     Byte = 100,
                     Id = $"{Context.User.Id}",
-                    Memory = Memory.Kilobyte,
+                    Memory = Memory.Byte,
                     DailyReward = DateTime.Now
                 });
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
@@ -204,7 +204,7 @@ namespace Valerie.Modules
                 return;
             }
             Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, Math.Pow(RandomNum, 3));
-            await SaveAsync(ModuleEnums.Server, $"BRAVOO! You guessed it right!! ");
+            await ReplyAsync($"BRAVOO! You guessed it right!! ");
         }
 
         [Command("Typefast"), Summary("Check how fast you can type given snippet within 7 seconds to win bytes!")]
