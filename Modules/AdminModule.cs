@@ -12,7 +12,7 @@ namespace Valerie.Modules
     [Name("Admin/Server Owner Commands"), RequireAccess(AccessLevel.Admins), RequireBotPermission(ChannelPermission.SendMessages)]
     public class AdminModule : ValerieBase
     {
-        [Command("Update Prefix"), Summary("Updates current server's prefix.")]
+        [Command("Set Prefix"), Summary("Updates current server's prefix.")]
         public Task PrefixAsync(string Prefix)
         {
             Context.Server.Prefix = Prefix;
@@ -164,7 +164,7 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case ModuleEnums.Add:
-                    if (Context.Server.ChatXP.LevelRoles.Count == 15) return ReplyAsync("You have reached max number of level up roles.");
+                    if (Context.Server.ChatXP.LevelRoles.Count == 20) return ReplyAsync("You have reached max number of level up roles.");
                     else if (Context.Server.ChatXP.LevelRoles.ContainsKey(Role.Id)) return ReplyAsync($"{Role} is already a level-up role.");
                     Context.Server.ChatXP.LevelRoles.Add(Role.Id, Level);
                     return SaveAsync(ModuleEnums.Server);
@@ -208,6 +208,8 @@ namespace Valerie.Modules
                 case ModuleEnums.Add:
                     if (!Check.Item1) return ReplyAsync($"{Url} isn't a valid Url.");
                     else if (Context.Server.ModLog.BlockedUrls.Contains(Check.Item2)) return ReplyAsync($"{Url} already is blocked.");
+                    else if (Context.Server.ModLog.BlockedUrls.Count == Context.Server.ModLog.BlockedUrls.Capacity)
+                        return ReplyAsync($"You have reached max number of blocked links.");
                     Context.Server.ModLog.BlockedUrls.Add(Check.Item2);
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
