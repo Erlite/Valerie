@@ -3,6 +3,7 @@ using System.Linq;
 using Discord.Commands;
 using Valerie.Attributes;
 using Valerie.Extensions;
+using Discord.WebSocket;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
@@ -19,18 +20,18 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatter/Stream/Starboard. To remove channel, don't provide channel name.")]
+        [Command("Set Channel"), Summary("Sets channel for Join/Leave/Chatter/Mod/Reddit/Starboard. To remove channel, don't provide channel name.")]
         public Task SetChannelAsync(ModuleEnums ChannelType, ITextChannel Channel = null)
         {
-            string ChannelId = $"{Channel?.Id}" ?? null;
+            string ChannelId = $"{Channel?.Id}" ?? string.Empty;
             switch (ChannelType)
             {
-                case ModuleEnums.Chatter: Context.Server.ChatterChannel = ChannelId; break;
                 case ModuleEnums.Join: Context.Server.JoinChannel = ChannelId; break;
                 case ModuleEnums.Leave: Context.Server.LeaveChannel = ChannelId; break;
+                case ModuleEnums.Chatter: Context.Server.ChatterChannel = ChannelId; break;
                 case ModuleEnums.Mod: Context.Server.ModLog.TextChannel = ChannelId; break;
+                case ModuleEnums.Reddit: Context.Server.Reddit.TextChannel = ChannelId; break;
                 case ModuleEnums.Starboard: Context.Server.Starboard.TextChannel = ChannelId; break;
-                case ModuleEnums.Stream: Context.Server.StreamChannel = ChannelId; break;
             }
             return SaveAsync(ModuleEnums.Server);
         }
@@ -113,12 +114,35 @@ namespace Valerie.Modules
             return Task.CompletedTask;
         }
 
-        [Command("Toggle AutoMod"), Summary("Enables/Disables AutoMod.")]
-        public Task ToggleAsync()
+        [Command("Toggle"), Summary("Enables/Disables AutoMod/Xp/Feed")]
+        public Task ToggleAsync(ModuleEnums Action)
         {
-            Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
-            string ModState = Context.Server.ModLog.IsAutoModEnabled ? "Enabled" : "Disabled.";
-            return SaveAsync(ModuleEnums.Server, $"AutoMod has been {ModState}");
+            string State = null;
+            switch (Action)
+            {
+                case ModuleEnums.AutoMod:
+                    Context.Server.ModLog.IsAutoModEnabled = !Context.Server.ModLog.IsAutoModEnabled;
+                    State = Context.Server.ModLog.IsAutoModEnabled ? "enabled" : "disabled.";
+                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {State}.");
+                case ModuleEnums.XP:
+                    Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
+                    State = Context.Server.ChatXP.IsEnabled ? "enabled" : "disabled";
+                    return SaveAsync(ModuleEnums.Server, $"{Action} has been {State}.");
+                case ModuleEnums.Reddit:
+                    if (!Context.Server.Reddit.IsEnabled)
+                    {
+                        Context.RedditService.Start(Context.Guild as SocketGuild);
+                        Context.Server.Reddit.IsEnabled = true;
+                    }
+                    else
+                    {
+                        Context.RedditService.Stop(Context.Server.Reddit.TextChannel);
+                        Context.Server.Reddit.IsEnabled = false;
+                    }
+                    State = Context.Server.Reddit.IsEnabled ? "enabled" : "disabled";
+                    return SaveAsync(ModuleEnums.Server, $"{Action} feed has been {State}.");
+            }
+            return Task.CompletedTask;
         }
 
         [Command("Admins"), Summary("Adds/Removes users from server's admins. Action: Add, Remove. Admins are able to change bot's server configuration.")]
@@ -220,6 +244,26 @@ namespace Valerie.Modules
             return Task.CompletedTask;
         }
 
+        [Command("Subreddit"), Summary("Add/remove subreddit. You will get live feed from specified subreddits.. Action: Add, Remove")]
+        public Task SubAsync(ModuleEnums Action, string Subreddit)
+        {
+            switch (Action)
+            {
+                case ModuleEnums.Add:
+                    if (Context.Server.Reddit.Subreddits.Count == Context.Server.Reddit.Subreddits.Capacity)
+                        return ReplyAsync("You have reached max number of subreddits");
+                    else if (Context.Server.Reddit.Subreddits.Contains(Subreddit)) return ReplyAsync($"{Subreddit} already exists.");
+                    else if (!Context.RedditService.VerifySubredditAsync(Subreddit).Result) return ReplyAsync($"{Subreddit} is an invalid subreddit.");
+                    Context.Server.Reddit.Subreddits.Add(Subreddit);
+                    return SaveAsync(ModuleEnums.Server);
+                case ModuleEnums.Remove:
+                    if (!Context.Server.Reddit.Subreddits.Contains(Subreddit)) return ReplyAsync($"{Subreddit} doesn't exists.");
+                    Context.Server.Reddit.Subreddits.Remove(Subreddit);
+                    return SaveAsync(ModuleEnums.Server);
+            }
+            return Task.CompletedTask;
+        }
+
         [Command("Show JoinMsgs"), Alias("Showjms"), Summary("Shows all the join messages for this server.")]
         public Task ShowJoinMsgsAsync()
         {
@@ -227,14 +271,14 @@ namespace Valerie.Modules
             return ReplyAsync($"**Join Messages**\n{string.Join("\n", $"-> {Context.Server.JoinMessages}")}");
         }
 
-        [Command("Show LeaveMsgs"), Alias("Showlms"), Summary("Shows all the join messages for this server.")]
+        [Command("Show LeaveMsgs"), Alias("Slms"), Summary("Shows all the join messages for this server.")]
         public Task ShowLeaveMsgsAsync()
         {
             if (!Context.Server.LeaveMessages.Any()) return ReplyAsync($"{Context.Guild} has no leave messages.");
             return ReplyAsync($"**Leave Messages**\n{string.Join("\n", $"-> {Context.Server.LeaveMessages}")}");
         }
 
-        [Command("Show Admins"), Alias("ShowAs"), Summary("Shows all the current admins for this server.")]
+        [Command("Show Admins"), Alias("SAs"), Summary("Shows all the current admins for this server.")]
         public async Task ShowAdminsAsync()
         {
             if (!Context.Server.Admins.Any())
@@ -248,7 +292,7 @@ namespace Valerie.Modules
             await ReplyAsync($"**{Context.Guild} Admins**\n{Admins}");
         }
 
-        [Command("Show Forbidden"), Alias("Showfb"), Summary("Shows all the forbidden roles for this server.")]
+        [Command("Show Forbidden"), Alias("Sfb"), Summary("Shows all the forbidden roles for this server.")]
         public Task ShowForbiddenAsync()
         {
             if (!Context.Server.ChatXP.ForbiddenRoles.Any()) return ReplyAsync($"{Context.Guild} has no forbidden roles.");
@@ -258,7 +302,7 @@ namespace Valerie.Modules
             return ReplyAsync($"**Forbidden Roles**\n{Roles}");
         }
 
-        [Command("Show Levels"), Alias("Showlvls"), Summary("Shows all the level up roles for this server.")]
+        [Command("Show Levels"), Alias("Slvls"), Summary("Shows all the level up roles for this server.")]
         public Task ShowLevelsAsync()
         {
             if (!Context.Server.ChatXP.LevelRoles.Any()) return ReplyAsync($"{Context.Guild} has no level-up roles.");
@@ -268,18 +312,25 @@ namespace Valerie.Modules
             return ReplyAsync($"**Level-Up Roles**\n{Roles}");
         }
 
-        [Command("Show Badwords"), Alias("Showbws"), Summary("Shows all the bad words for this server.")]
+        [Command("Show Badwords"), Alias("Sbws"), Summary("Shows all the bad words for this server.")]
         public Task ShowBadwordsAsync()
         {
             if (!Context.Server.ModLog.BadWords.Any()) return ReplyAsync($"{Context.Guild} has no prohibited words.");
             return ReplyAsync($"**Bad Words**\n{string.Join(", ", Context.Server.ModLog.BadWords)}");
         }
 
-        [Command("Show BlockedUrls"), Alias("Showbls"), Summary("Shows all the blocked links for this server.")]
+        [Command("Show BlockedUrls"), Alias("Sbls"), Summary("Shows all the blocked links for this server.")]
         public Task ShowBlockedUrlsAsync()
         {
             if (!Context.Server.ModLog.BlockedUrls.Any()) return ReplyAsync($"{Context.Guild} has no blocked urls.");
             return ReplyAsync($"**Blocked Links**\n{string.Join(", ", Context.Server.ModLog.BlockedUrls)}");
+        }
+
+        [Command("Show Subs"), Alias("Ssubs"), Summary("Shows all the subreddits this server is subbed to.")]
+        public Task ShowSubsAsync()
+        {
+            if (!Context.Server.Reddit.Subreddits.Any()) return ReplyAsync($"{Context.Guild} isn't subbed to any subreddits.");
+            return ReplyAsync($"**Subbed Subreddits**\n{string.Join(", ", Context.Server.Reddit.Subreddits)}");
         }
 
         [Command("Setup"), Summary("Set ups Valerie for your Server.")]
@@ -310,7 +361,7 @@ namespace Valerie.Modules
             Context.Server.ChatterChannel = $"{DefaultChannel.Id}";
             Context.Server.JoinChannel = $"{DefaultChannel.Id}";
             Context.Server.LeaveChannel = $"{DefaultChannel.Id}";
-            Context.Server.ChatXP.LevelMessage = "Congrats on hitting level **{rank}**! :beginner:";
+            Context.Server.ChatXP.LevelMessage = "👾 Congarts **{user}** on hitting level {level}! You received **{bytes}** bytes.";
             await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
 
