@@ -1,5 +1,6 @@
 ﻿using System;
 using Discord;
+using Valerie.Services;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
@@ -35,8 +36,9 @@ namespace Valerie
                 }.Initialize())
                 .AddSingleton<MainHandler>()
                 .AddSingleton<ConfigHandler>()
+                .AddSingleton<RedditService>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton<ServerHandler>()
+                .AddSingleton<ServerHandler>()                
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
