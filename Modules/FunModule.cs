@@ -230,6 +230,16 @@ namespace Valerie.Modules
         [Command("Rip"), Summary("Rip? Ripping rip ripped a user? RIP.")]
         public async Task RipAsync(IGuildUser User) => await Context.Channel.SendFileAsync(await GraveAsync(User));
 
+        [Command("Give"), Summary("Wanna be kind and share your bytes?")]
+        public Task GiveAsync(IGuildUser User, double Amount)
+        {
+            var Giver = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
+            if (Giver == null || Giver.Byte < Amount) return ReplyAsync($"Woops, you have insufficent bytes.");
+            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, User.Id, Amount);
+            Giver.Byte -= Amount;
+            return SaveAsync(ModuleEnums.Server, $"Thank you for being so kind.");
+        }
+
         async Task<string> GraveAsync(IGuildUser User)
         {
             var Get = await Context.HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
