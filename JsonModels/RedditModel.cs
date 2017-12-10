@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Valerie.JsonModels
 {
-
     public partial class RedditModel
     {
         [JsonProperty("data")]
@@ -27,14 +26,11 @@ namespace Valerie.JsonModels
         [JsonProperty("author")]
         public string Author { get; set; }
 
-        [JsonProperty("domain")]
-        public string Domain { get; set; }
+        [JsonProperty("created")]
+        public long Created { get; set; }
 
         [JsonProperty("id")]
         public string Id { get; set; }
-
-        [JsonProperty("over_18")]
-        public bool Over18 { get; set; }
 
         [JsonProperty("selftext")]
         public string Selftext { get; set; }
@@ -47,5 +43,5 @@ namespace Valerie.JsonModels
 
         [JsonProperty("url")]
         public string Url { get; set; }
-    }
+    }    
 }

@@ -5,6 +5,7 @@ namespace Valerie.JsonModels
 {
     public class XPWrapper
     {
+        public bool IsEnabled { get; set; }
         public string LevelMessage { get; set; }
         public List<ulong> ForbiddenRoles { get; set; } = new List<ulong>(20);
         public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>(20);
@@ -91,6 +92,14 @@ namespace Valerie.JsonModels
         public string GiphyKey { get; set; } = "dc6zaTOxFJmzC";
         public string GoogleKey { get; set; }
         public string SteamKey { get; set; }
+        public string ImgurKey { get; set; }
         public string CleverBotKey { get; set; }
+    }
+
+    public class RedditWrapper
+    {
+        public bool IsEnabled { get; set; }
+        public string TextChannel { get; set; }
+        public List<string> Subreddits { get; set; } = new List<string>(3);
     }
 }
