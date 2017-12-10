@@ -1,5 +1,4 @@
-﻿using Cookie;
-using Discord;
+﻿using Discord;
 using Valerie.Services;
 using Discord.WebSocket;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ namespace Valerie.Handlers
 {
     public class MainHandler
     {
-        public static CookieClient Cookie { get; set; }
         readonly DiscordSocketClient Client;
         readonly ConfigHandler ConfigHandler;
         readonly EventsHandler EventsHandler;
@@ -25,13 +23,6 @@ namespace Valerie.Handlers
             LogClient.AppInfo();
             ConfigHandler.LoadConfig();
 
-            Cookie = new CookieClient(new CookieConfig
-            {
-                GiphyKey = ConfigHandler.Config.ApplicationKeys.GiphyKey,
-                SteamKey = ConfigHandler.Config.ApplicationKeys.SteamKey,
-                CleverbotKey = ConfigHandler.Config.ApplicationKeys.CleverBotKey
-            });
-
             Client.Log += EventsHandler.LogAsync;
             Client.Ready += EventsHandler.ReadyAsync;
             Client.UserLeft += EventsHandler.UserLeftAsync;
@@ -45,7 +36,6 @@ namespace Valerie.Handlers
             Client.MessageReceived += EventsHandler.HandleMessageAsync;
             Client.MessageReceived += EventsHandler.HandleCommandAsync;
             Client.ReactionRemoved += EventsHandler.ReactionRemovedAsync;
-            Client.GuildMemberUpdated += EventsHandler.GuildMemberUpdatedAsync;
 
             await Client.LoginAsync(TokenType.Bot, ConfigHandler.Config.Token);
             await Client.StartAsync();
