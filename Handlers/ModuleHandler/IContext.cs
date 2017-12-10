@@ -1,5 +1,6 @@
 ﻿using System;
 using Discord;
+using Valerie.Services;
 using System.Net.Http;
 using Discord.Commands;
 using Valerie.JsonModels;
@@ -22,6 +23,7 @@ namespace Valerie.Handlers.ModuleHandler
         public IMessageChannel Channel { get; }
         public IDocumentSession Session { get; }
         public ConfigHandler ConfigHandler { get; }
+        public RedditService RedditService { get; }
         public ServerHandler ServerHandler { get; }
 
         public IContext(IDiscordClient ClientParam, IUserMessage MessageParam, IServiceProvider ServiceProvider)
@@ -35,6 +37,7 @@ namespace Valerie.Handlers.ModuleHandler
             HttpClient = ServiceProvider.GetRequiredService<HttpClient>();
             Config = ServiceProvider.GetRequiredService<ConfigHandler>().Config;
             ConfigHandler = ServiceProvider.GetRequiredService<ConfigHandler>();
+            RedditService = ServiceProvider.GetRequiredService<RedditService>();
             ServerHandler = ServiceProvider.GetRequiredService<ServerHandler>();
             Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
             Server = ServiceProvider.GetRequiredService<ServerHandler>().GetServer(Guild.Id);
