@@ -18,12 +18,13 @@ namespace Valerie.Extensions
             return Role == null ? "Unknown Role." : Role.Name;
         }
 
-        public static string Replace(this string Message, string Param1, string Param2)
+        public static string Replace(this string Message, string Guild = null, string User = null, int Level = 0, double Bytes = 0)
         {
             StringBuilder Builder = new StringBuilder(Message);
-            Builder.Replace("{guild}", Param1);
-            Builder.Replace("{user}", Param2);
-            Builder.Replace("{rank}", Param1);
+            Builder.Replace("{guild}", Guild);
+            Builder.Replace("{user}", User);
+            Builder.Replace("{level}", $"{Level}");
+            Builder.Replace("{bytes}", $"{Bytes}");
             return Builder.ToString();
         }
 
