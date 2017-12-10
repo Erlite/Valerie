@@ -234,20 +234,8 @@ namespace Valerie.Modules
             await ReplyAsync("", embed: Embed.Build());
         }
 
-        [Command("Streamer"), Summary("Love to notify people when you stream? Just Add yourself here. Action: Add, Remove")]
-        public Task StreamerAsync(ModuleEnums Action = ModuleEnums.Add)
-        {
-            switch (Action)
-            {
-                case ModuleEnums.Add:
-                    if (Context.Server.Streamers.ContainsKey(Context.User.Id)) return ReplyAsync("No need to add yourself again.");
-                    Context.Server.Streamers.Add(Context.User.Id, 0); return SaveAsync(ModuleEnums.Server);
-                case ModuleEnums.Remove:
-                    if (!Context.Server.Streamers.ContainsKey(Context.User.Id)) return ReplyAsync("Seems as if you never added yourself.");
-                    Context.Server.Streamers.Remove(Context.User.Id); return SaveAsync(ModuleEnums.Server);
-            }
-            return Task.CompletedTask;
-        }
+        [Command("Donate"), Summary("SUPPORT YUCKED!!")]
+        public Task DonateAsync() => ReplyAsync($"Thank you! You can donate on Patreon or leaving a star on my github! (https://github.com/Yucked/Valerie)");
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
