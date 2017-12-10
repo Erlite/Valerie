@@ -40,8 +40,8 @@ namespace Valerie.Handlers
                 $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}");
 
         internal Task LatencyUpdatedAsync(int Old, int Newer)
-            => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 150) ? UserStatus.DoNotDisturb
-                : (Client.ConnectionState == ConnectionState.Connecting || Newer > 100) ? UserStatus.Idle
+            => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
+                : (Client.ConnectionState == ConnectionState.Connecting || Newer > 200) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
 
         internal async Task JoinedGuildAsync(SocketGuild Guild)
@@ -54,7 +54,7 @@ namespace Valerie.Handlers
         {
             _ = CleanupAsync(User);
             var Config = ServerHandler.GetServer(User.Guild.Id);
-            string WelcomeMessage = !Config.LeaveMessages.Any() ? $"{User} down. I REPEAT! {User} DOWNN!" :
+            string WelcomeMessage = !Config.LeaveMessages.Any() ? $"We have lost **{User}**. Type F to pay respects." :
                 StringExt.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username);
             var Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.LeaveChannel));
             if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
@@ -63,7 +63,7 @@ namespace Valerie.Handlers
         internal async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = ServerHandler.GetServer(User.Guild.Id);
-            string WelcomeMessage = !Config.JoinMessages.Any() ? $"Welcomoe {User}. We were expecting you ( ͡° ͜ʖ ͡°)" :
+            string WelcomeMessage = !Config.JoinMessages.Any() ? $"Welcome {User}. We were expecting you ( ͡° ͜ʖ ͡°)" :
                 StringExt.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention);
             var Channel = User.Guild.GetTextChannel(Convert.ToUInt64(Config.JoinChannel));
             if (Channel != null) await Channel.SendMessageAsync(WelcomeMessage).ConfigureAwait(false);
@@ -92,7 +92,7 @@ namespace Valerie.Handlers
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot ||
                 Context.Config.UsersBlacklist.ContainsKey(Msg.Author.Id) || Context.Server.BlacklistedUsers.Contains(Message.Author.Id)) return;
-            var Result = await CommandService.ExecuteAsync(Context, argPos, null, MultiMatchHandling.Best);
+            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             switch (Result.Error)
             {
                 case CommandError.Exception: LogClient.Write(Source.DISCORD, Result.ErrorReason); break;
@@ -104,20 +104,6 @@ namespace Valerie.Handlers
         internal Task UserBannedAsync(SocketUser User, SocketGuild Guild)
         {
             return Task.CompletedTask;
-        }
-
-        internal Task GuildMemberUpdatedAsync(SocketGuildUser Old, SocketGuildUser New)
-        {
-            var Server = ServerHandler.GetServer(New.Guild.Id);
-            var Channel = New.Guild.GetTextChannel(Convert.ToUInt64(Server.StreamChannel));
-            if (!New.Game.HasValue || New.Game.Value.StreamType == StreamType.NotStreaming ||
-                !Server.Streamers.ContainsKey(New.Id) || Channel == null) return Task.CompletedTask;
-            var Embed = ValerieEmbed.Embed(EmbedColor.Random, New.GetAvatarUrl(),
-                $"{New.Username} Just Started Streaming {New.Game.Value.Name}! Watch it while it's live!",
-                ImageUrl: New.Game.Value.StreamUrl ?? "https://i.imgur.com/Twa13Ku.png");
-            Server.Streamers[New.Id]++;
-            ServerHandler.Save(Server, New.Guild.Id);
-            return Channel.SendMessageAsync(string.Empty, embed: Embed.Build());
         }
 
         internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id));
@@ -211,7 +197,7 @@ namespace Valerie.Handlers
             var User = Message.Author as IGuildUser;
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (HasRole) return Task.CompletedTask;
+            if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
             {
                 Config.ChatXP.Rankings.Add(User.Id, Random.Next(Message.Content.Length));
@@ -259,7 +245,7 @@ namespace Valerie.Handlers
             else
             {
                 await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
-                ITextChannel Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
+                var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ModLog.TextChannel));
                 IUserMessage Msg = null;
                 if (Channel != null)
                     Msg = await Channel.SendMessageAsync($"**Kick** | Case {Config.ModLog.Cases.Count + 1 }\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Maxed out warnings.\n" +
@@ -282,9 +268,10 @@ namespace Valerie.Handlers
 
         async Task CleverbotHandlerAsync(SocketMessage Message, ServerModel Config)
         {
+            if (string.IsNullOrWhiteSpace(Config.ChatterChannel)) return;
             var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
             if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("v")) return;
-            var Clever = await MainHandler.Cookie.Cleverbot.TalkAsync(Message.Content);
+            var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content);
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
         }
 
@@ -294,9 +281,9 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
-            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, Math.Sqrt(DateTime.Now.Second));
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, NewLevel * Math.Sqrt(NewXp));
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, $"{NewLevel}", User.Username));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: NewLevel * Math.Sqrt(NewXp)));
             if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
