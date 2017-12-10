@@ -3,9 +3,9 @@ using System;
 using AngleSharp;
 using System.Linq;
 using AngleSharp.Dom;
-using Valerie.Handlers;
 using Newtonsoft.Json;
 using Discord.Commands;
+using Valerie.Extensions;
 using Valerie.JsonModels;
 using Google.Apis.Services;
 using AngleSharp.Dom.Html;
@@ -85,7 +85,7 @@ namespace Valerie.Modules
             var Content = JsonConvert.DeserializeObject<CryptoModel[]>(await Get.Content.ReadAsStringAsync())[0];
             if (string.IsNullOrWhiteSpace(Content.Id)) { return; }
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, AuthorName: $"{Content.Rank} | {Content.Name}", ThumbUrl: "https://i.imgur.com/Gn60URV.png",
-                FooterText: $"Last Updated: {UnixDT(Convert.ToDouble(Content.LastUpdated))}");
+                FooterText: $"Last Updated: {DateExt.UnixDT(Convert.ToDouble(Content.LastUpdated))}");
             Embed.AddField("Prices", $"**USD:** {Content.PriceUsd}\n**Bitcoin:** {Content.PriceBtc}", true);
             Embed.AddField("Market", $"**Cap:** {Content.MarketCapUsd}\n**24 Hour Volume:** {Content.The24hVolumeUsd}", true);
             Embed.AddField("Changes", $"**1 Hour:** {Content.PercentChange1h}\n**24 Hours:** {Content.PercentChange24h}\n**7 Days:** {Content.PercentChange7d}", true);
@@ -132,12 +132,12 @@ namespace Valerie.Modules
             string Response = null;
             if (!string.IsNullOrWhiteSpace(SearchTerms))
             {
-                var GetGif = await MainHandler.Cookie.Giphy.SearchAsync(SearchTerms);
+                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchAsync(SearchTerms);
                 Response = GetGif.Datum[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
             }
             else
             {
-                var gif = await MainHandler.Cookie.Giphy.TrendingAsync();
+                var gif = await Context.ConfigHandler.Cookie.Giphy.TrendingAsync();
                 var Random = Context.Random.Next(gif.Pagination.Count);
                 Response = gif.Datum[Random].EmbedURL;
             }
@@ -147,9 +147,9 @@ namespace Valerie.Modules
         [Command("SteamUser"), Summary("Shows info about a steam user.")]
         public async Task UserAsync(string UserId)
         {
-            var UserInfo = await MainHandler.Cookie.Steam.GetUsersInfoAsync(new List<string> { UserId });
-            var UserGames = await MainHandler.Cookie.Steam.OwnedGamesAsync(UserId);
-            var UserRecent = await MainHandler.Cookie.Steam.RecentGamesAsync(UserId);
+            var UserInfo = await Context.ConfigHandler.Cookie.Steam.GetUsersInfoAsync(new List<string> { UserId });
+            var UserGames = await Context.ConfigHandler.Cookie.Steam.OwnedGamesAsync(UserId);
+            var UserRecent = await Context.ConfigHandler.Cookie.Steam.RecentGamesAsync(UserId);
             var Info = UserInfo.PlayersInfo.Players.FirstOrDefault();
             string State;
             if (Info.ProfileState == 0) State = "Offline";
@@ -165,8 +165,8 @@ namespace Valerie.Modules
             embed.AddField("Display Name", $"{Info.Name}", true);
             embed.AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true);
             embed.AddField("Person State", State, true);
-            embed.AddField("Profile Created", UnixDT(Info.TimeCreated), true);
-            embed.AddField("Last Online", UnixDT(Info.LastLogOff), true);
+            embed.AddField("Profile Created", DateExt.UnixDT(Info.TimeCreated), true);
+            embed.AddField("Last Online", DateExt.UnixDT(Info.LastLogOff), true);
             embed.AddField("Primary Clan ID", Info.PrimaryClanId, true);
             embed.AddField("Owned Games", UserGames.OwnedGames.GamesCount, true);
             embed.AddField("Recently Played Games", UserRecent.RecentGames.TotalCount, true);
@@ -201,9 +201,6 @@ namespace Valerie.Modules
                 Description: $"**Information: **{Content.Explanation}", ImageUrl: Content.Hdurl).Build());
 
         }
-
-        DateTime UnixDT(double Unix)
-            => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
 
         Task<IDocument> DocumentAsync(string Url) => BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(Url);
 
