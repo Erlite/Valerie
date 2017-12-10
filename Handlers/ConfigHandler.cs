@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cookie;
+using System;
 using Valerie.Services;
 using Valerie.JsonModels;
 using Raven.Client.Documents;
@@ -51,6 +52,16 @@ namespace Valerie.Handlers
                 Session.Store(GetConfig, "Config");
                 Session.SaveChanges();
             }
+        }
+
+        public CookieClient Cookie
+        {
+            get => new CookieClient(new CookieConfig
+            {
+                GiphyKey = Config.ApplicationKeys.GiphyKey,
+                SteamKey = Config.ApplicationKeys.SteamKey,
+                CleverbotKey = Config.ApplicationKeys.CleverBotKey
+            });
         }
     }
 }
