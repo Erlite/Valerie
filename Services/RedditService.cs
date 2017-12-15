@@ -91,10 +91,17 @@ namespace Valerie.Services
                 Url = $"https://api.imgur.com/3/image/{GetLink[3]}?client_id={ConfigHandler.Config.ApplicationKeys.ImgurKey}";
                 IsAlbum = false;
             }
-            var Get = await HttpClient.GetStringAsync(Url).ConfigureAwait(false);
-            var Convert = JsonConvert.DeserializeObject<ImgurModel>(Get);
-            if (!Convert.Success || Convert.Status == 401) return Link;
-            return IsAlbum ? Convert.Data.Images[0].Link : Convert.Data.Link;
+            try
+            {
+                var Get = await HttpClient.GetStringAsync(Url).ConfigureAwait(false);
+                var Convert = JsonConvert.DeserializeObject<ImgurModel>(Get);
+                if (!Convert.Success || Convert.Status == 401) return Link;
+                return IsAlbum ? Convert.Data.Images[0].Link : Convert.Data.Link;
+            }
+            catch
+            {
+                return Link;
+            }
         }
     }
 }
