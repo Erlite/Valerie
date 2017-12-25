@@ -21,8 +21,7 @@ namespace Valerie.JsonModels
     public class MemoryWrapper
     {
         public string Id { get; set; }
-        public double Byte { get; set; }
-        public Memory Memory { get; set; }
+        public float Byte { get; set; }
         public DateTime DailyReward { get; set; }
     }
 

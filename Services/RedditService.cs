@@ -67,7 +67,16 @@ namespace Valerie.Services
         }
 
         public async Task<RedditModel> GetSubredditAsync(string Subreddit)
-            => JsonConvert.DeserializeObject<RedditModel>(await HttpClient.GetStringAsync($"https://reddit.com/r/{Subreddit}/new.json?limit=5").ConfigureAwait(false));
+        {
+            string Get = null;
+            try
+            {
+                Get = await HttpClient.GetStringAsync($"https://reddit.com/r/{Subreddit}/new.json?limit=5").ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<RedditModel>(Get);
+            }
+            catch { }
+            return null;
+        }
 
         public async Task<bool> VerifySubredditAsync(string Subreddit)
         {

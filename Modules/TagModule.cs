@@ -13,7 +13,7 @@ namespace Valerie.Modules
     public class TagModule : ValerieBase
     {
         [Command("Tag"), Summary("Shows a tag with the given name.")]
-        public Task TagAsync(string TagName)
+        public Task TagAsync([Remainder] string TagName)
         {
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
             if (!NotExists(TagName)) return Task.CompletedTask;

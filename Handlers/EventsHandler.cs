@@ -270,7 +270,7 @@ namespace Valerie.Handlers
         {
             if (string.IsNullOrWhiteSpace(Config.ChatterChannel)) return;
             var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
-            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("v")) return;
+            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("Valerie")) return;
             var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content);
             await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
         }
@@ -281,9 +281,9 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
-            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, NewLevel * Math.Sqrt(NewXp));
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (float)Math.Sqrt(NewXp) / NewLevel);
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: NewLevel * Math.Sqrt(NewXp)));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: Math.Pow(Math.Sqrt(NewXp), NewLevel)));
             if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;

@@ -53,7 +53,7 @@ namespace Valerie.Handlers
             }
         }
 
-        public void MemoryUpdate(ulong GuildId, ulong UserId, double Bytes)
+        public void MemoryUpdate(ulong GuildId, ulong UserId, float Bytes)
         {
             var Server = GetServer(GuildId);
             var MemUser = Server.Memory.FirstOrDefault(x => x.Id == $"{UserId}");
@@ -62,7 +62,6 @@ namespace Valerie.Handlers
                 {
                     Byte = Bytes,
                     Id = $"{UserId}",
-                    Memory = Memory.Byte,
                     DailyReward = DateTime.Now
                 });
             MemUser.Byte += Bytes;
