@@ -235,7 +235,7 @@ namespace Valerie.Modules
         }
 
         [Command("Donate"), Summary("SUPPORT YUCKED!!")]
-        public Task DonateAsync() => ReplyAsync($"Thank you! You can donate on Patreon or leaving a star on my github! (https://github.com/Yucked/Valerie)");
+        public Task DonateAsync() => ReplyAsync($"Thank you! You can support by leaving a star on my github! (https://github.com/Yucked/Valerie)");
 
         async Task<IReadOnlyCollection<GitModel>> GitStatsAsync()
         {
