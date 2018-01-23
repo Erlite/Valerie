@@ -18,8 +18,8 @@ namespace Valerie.JsonModels
         public ModWrapper ModLog { get; set; } = new ModWrapper();
         public RedditWrapper Reddit { get; set; } = new RedditWrapper();
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
+        public List<UserProfile> Profiles { get; set; } = new List<UserProfile>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
-        public List<MemoryWrapper> Memory { get; set; } = new List<MemoryWrapper>();
         public Dictionary<ulong, string> AFKUsers { get; set; } = new Dictionary<ulong, string>();
     }
 }
