@@ -49,7 +49,7 @@ namespace Valerie.Handlers.ModuleHandler
             Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.ModLog.Cases.Count + 1} <Reason>`*";
             var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.ModLog.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
                     $"**Responsible Moderator:** {Context.User}");
-            Context.Server.ModLog.Cases.Add(new CaseWrapper()
+            Context.Server.ModLog.Cases.Add(new CaseWrapper
             {
                 Reason = Reason,
                 CaseType = CaseType,
@@ -59,7 +59,7 @@ namespace Valerie.Handlers.ModuleHandler
                 CaseNumber = Context.Server.ModLog.Cases.Count + 1
             });
             Context.ServerHandler.Save(Context.Server, Context.Guild.Id);
-        }
+        }        
 
         public async Task<IUserMessage> ReplyAndDeleteAsync(string Message, TimeSpan? Timeout = null)
         {
@@ -72,15 +72,14 @@ namespace Valerie.Handlers.ModuleHandler
         public Task<SocketMessage> ResponseWaitAsync(bool User = true, bool Channel = true, TimeSpan? Timeout = null)
         {
             var Interactive = new Interactive<SocketMessage>();
-            if (User)
-                Interactive.AddInteractive(new InteractiveUser());
-            if (Channel)
-                Interactive.AddInteractive(new InteractiveChannel());
+            if (User) Interactive.AddInteractive(new InteractiveUser());
+            if (Channel) Interactive.AddInteractive(new InteractiveChannel());
             return ResponseWaitAync(Interactive, Timeout);
         }
 
         async Task<SocketMessage> ResponseWaitAync(IInteractive<SocketMessage> Interactive, TimeSpan? Timeout = null)
         {
+            var Client = Context.Client as DiscordSocketClient;
             Timeout = Timeout ?? TimeSpan.FromSeconds(15);
             var Trigger = new TaskCompletionSource<SocketMessage>();
             async Task InteractiveHandlerAsync(SocketMessage Message)
@@ -88,9 +87,9 @@ namespace Valerie.Handlers.ModuleHandler
                 var Result = await Interactive.JudgeAsync(Context, Message).ConfigureAwait(false);
                 if (Result) Trigger.SetResult(Message);
             }
-            (Context.Client as DiscordSocketClient).MessageReceived += InteractiveHandlerAsync;
+            Client.MessageReceived += InteractiveHandlerAsync;
             var PersonalTask = await Task.WhenAny(Trigger.Task, Task.Delay(Timeout.Value)).ConfigureAwait(false);
-            (Context.Client as DiscordSocketClient).MessageReceived -= InteractiveHandlerAsync;
+            Client.MessageReceived -= InteractiveHandlerAsync;
             if (PersonalTask == Trigger.Task) return await Trigger.Task.ConfigureAwait(false); else return null;
         }
     }
