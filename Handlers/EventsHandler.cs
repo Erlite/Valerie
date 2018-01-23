@@ -44,10 +44,11 @@ namespace Valerie.Handlers
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 200) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
 
-        internal async Task JoinedGuildAsync(SocketGuild Guild)
+        internal Task JoinedGuildAsync(SocketGuild Guild)
         {
             ServerHandler.AddServer(Guild.Id);
-            await Guild.DefaultChannel.SendMessageAsync("Thank you for inviting me to your server! Guild prefix is `!!`. Type `!!Cmds` for commands.");
+            string Msg = ConfigHandler.Config.ServerMessage ?? "Thank you for inviting me to your server! Guild prefix is `!!`. Type `!!Cmds` for commands.";
+            return Guild.DefaultChannel.SendMessageAsync(Msg);
         }
 
         internal async Task UserLeftAsync(SocketGuildUser User)
@@ -240,8 +241,7 @@ namespace Valerie.Handlers
                 return;
             }
 
-            if (!(Config.ModLog.Warnings[Message.Author.Id] >= Config.ModLog.MaxWarnings))
-                Config.ModLog.Warnings[Message.Author.Id]++;
+            if (!(Config.ModLog.Warnings[Message.Author.Id] >= Config.ModLog.MaxWarnings)) Config.ModLog.Warnings[Message.Author.Id]++;
             else
             {
                 await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
@@ -281,9 +281,9 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
-            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (float)Math.Sqrt(NewXp) / NewLevel);
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (int)Math.Sqrt(NewXp) / NewLevel);
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: Math.Pow(Math.Sqrt(NewXp), NewLevel)));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: (int)Math.Pow(Math.Sqrt(NewXp), NewLevel)));
             if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
