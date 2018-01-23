@@ -21,18 +21,19 @@ namespace Valerie
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = true,
-                    LogLevel = LogSeverity.Error
+                    LogLevel = LogSeverity.Warning
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = true,
+                    IgnoreExtraArgs = true,
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore
                 {
                     Database = "Valerie",
-                    Urls = new[] { "http://127.0.0.1:8000" }
+                    Urls = new[] { "http://127.0.0.1:8080" }
                 }.Initialize())
                 .AddSingleton<MainHandler>()
                 .AddSingleton<ConfigHandler>()
@@ -40,6 +41,7 @@ namespace Valerie
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<ServerHandler>()                
                 .AddSingleton(new HttpClient())
+                .AddSingleton<UpdateService>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
