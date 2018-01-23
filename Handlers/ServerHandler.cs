@@ -1,8 +1,8 @@
-﻿using Valerie.Services;
+﻿using System;
+using System.Linq;
+using Valerie.Services;
 using Valerie.JsonModels;
 using Raven.Client.Documents;
-using System.Linq;
-using System;
 
 namespace Valerie.Handlers
 {
@@ -53,7 +53,7 @@ namespace Valerie.Handlers
             }
         }
 
-        public void MemoryUpdate(ulong GuildId, ulong UserId, float Bytes)
+        public void MemoryUpdate(ulong GuildId, ulong UserId, int Bytes)
         {
             var Server = GetServer(GuildId);
             var MemUser = Server.Memory.FirstOrDefault(x => x.Id == $"{UserId}");
