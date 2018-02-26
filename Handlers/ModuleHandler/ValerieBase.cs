@@ -72,10 +72,8 @@ namespace Valerie.Handlers.ModuleHandler
         public Task<SocketMessage> ResponseWaitAsync(bool User = true, bool Channel = true, TimeSpan? Timeout = null)
         {
             var Interactive = new Interactive<SocketMessage>();
-            if (User)
-                Interactive.AddInteractive(new InteractiveUser());
-            if (Channel)
-                Interactive.AddInteractive(new InteractiveChannel());
+            if (User) Interactive.AddInteractive(new InteractiveUser());
+            if (Channel) Interactive.AddInteractive(new InteractiveChannel());
             return ResponseWaitAync(Interactive, Timeout);
         }
 
