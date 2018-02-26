@@ -29,7 +29,6 @@ namespace Valerie.Handlers
             Client.LeftGuild += EventsHandler.LeftGuildAsync;
             Client.UserJoined += EventsHandler.UserJoinedAsync;
             Client.JoinedGuild += EventsHandler.JoinedGuildAsync;
-            Client.UserBanned += EventsHandler.UserBannedAsync;
             Client.GuildAvailable += EventsHandler.GuildAvailableAsync;
             Client.ReactionAdded += EventsHandler.ReactionAddedAsync;
             Client.LatencyUpdated += EventsHandler.LatencyUpdatedAsync;
