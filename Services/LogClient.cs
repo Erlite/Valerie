@@ -13,42 +13,41 @@ namespace Valerie.Services
         public static void Write(Source Source, string Text)
         {
             Console.Write(Environment.NewLine);
-            Append($"{DateTime.Now.ToShortTimeString()} ", ConsoleColor.Gray);
+            Append($"{DateTime.Now}\n", ConsoleColor.Gray);
             switch (Source)
             {
-                case Source.CONFIG: Append($"[{Source}]", ConsoleColor.DarkYellow); break;
-                case Source.DISCORD: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
-                case Source.SERVER: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
+                case Source.CONFIG: Append($"  => [{Source}]", ConsoleColor.DarkYellow); break;
+                case Source.DISCORD: Append($"  => [{Source}]", ConsoleColor.DarkCyan); break;
+                case Source.SERVER: Append($"  => [{Source}]", ConsoleColor.DarkMagenta); break;
             }
             Append($" {Text}", ConsoleColor.White);
         }
 
-        public static void AppInfo(string Version)
+        public static void AppInfo()
         {
             var Header = new[]
             {
                 @"",
-                @"      ██╗   ██╗ █████╗ ██╗     ███████╗██████╗ ██╗███████╗",
-                @"      ██║   ██║██╔══██╗██║     ██╔════╝██╔══██╗██║██╔════╝",
-                @"      ██║   ██║███████║██║     █████╗  ██████╔╝██║█████╗  ",
-                @"      ╚██╗ ██╔╝██╔══██║██║     ██╔══╝  ██╔══██╗██║██╔══╝  ",
-                @"       ╚████╔╝ ██║  ██║███████╗███████╗██║  ██║██║███████╗",
-                @"        ╚═══╝  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝",
+                @"      (`-.     ('-.                 ('-.  _  .-')             ('-.   ",
+                @"    _(OO  )_  ( OO ).-.           _(  OO)( \( -O )          _(  OO)  ",
+                @",--(_/   ,. \ / . --. / ,--.     (,------.,------.  ,-.-') (,------. ",
+                @"\   \   /(__/ | \-.  \  |  |.-')  |  .---'|   /`. ' |  |OO) |  .---' ",
+                @" \   \ /   /.-'-'  |  | |  | OO ) |  |    |  /  | | |  |  \ |  |     ",
+                @"  \   '   /, \| |_.'  | |  |`-' |(|  '--. |  |_.' | |  |(_/(|  '--.  ",
+                @"   \     /__) |  .-.  |(|  '---.' |  .--' |  .  '.',|  |_.' |  .--'  ",
+                @"    \   /     |  | |  | |      |  |  `---.|  |\  \(_|  |    |  `---. ",
+                @"     `-'      `--' `--' `------'  `------'`--' '--' `--'    `------' ",
                 @""
             };
 
             foreach (var Line in Header)
             {
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(Line);
             }
-
-            Append($"-> APPLICATION INFORMATION\n\n", ConsoleColor.Yellow);
-            Append($"    -> GENERAL\n", ConsoleColor.Red);
-            Append($"        Author: Yucked\n        License: GPL-3.0\n        Github Repo: Yucked/Valerie\n\n", ConsoleColor.Gray);
-            Append($"    -> VERSIONS\n", ConsoleColor.Red);
-            Append($"        Valerie: {Version ?? "Unknown Version"}\n        Discord: {Discord.DiscordConfig.Version}\n        RavenDB: RavenDB.Client 4.0.0-nightly-20180120-0500\n", ConsoleColor.Gray);
-        }
+            Append("-> Application Information\n", ConsoleColor.Magenta);
+            Append($"   Author: Yucked\n   Github: https://github.com/Yucked/Valerie\n   Discord.Net Version: {Discord.DiscordConfig.Version}", ConsoleColor.Gray);
+        }        
     }
 
     public enum Source

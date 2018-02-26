@@ -7,7 +7,6 @@ namespace Valerie.JsonModels
         public string Id { get; set; }
         public string Token { get; set; }
         public string Prefix { get; set; }
-        public string Version { get; set; }
         public string ReportChannel { get; set; }
         public string ServerMessage { get; set; }
         public List<string> Games { get; set; } = new List<string>();

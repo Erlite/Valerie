@@ -26,29 +26,20 @@ namespace Valerie.Handlers
 
         public void LoadConfig()
         {
-            try
+            using (var Session = Store.OpenSession())
             {
-                using (var Session = Store.OpenSession())
+                if (Session.Advanced.Exists("Config")) return;
+                LogClient.Write(Source.CONFIG, "Enter Token: ");
+                string Token = Console.ReadLine();
+                LogClient.Write(Source.CONFIG, "Enter Prefix: ");
+                string Prefix = Console.ReadLine();
+                Session.Store(new ConfigModel
                 {
-                    if (Session.Advanced.Exists("Config")) return;
-                    LogClient.Write(Source.CONFIG, "Enter Token: ");
-                    string Token = Console.ReadLine();
-                    LogClient.Write(Source.CONFIG, "Enter Prefix: ");
-                    string Prefix = Console.ReadLine();
-                    Session.Store(new ConfigModel
-                    {
-                        Id = "Config",
-                        Token = Token,
-                        Prefix = Prefix
-                    });
-                    Session.SaveChanges();
-                }
-            }
-            catch
-            {
-                LogClient.Write(Source.CONFIG, $"Databae doesn't exist. Please create a database first.");
-                Console.Read();
-                Environment.Exit(Environment.ExitCode);
+                    Id = "Config",
+                    Token = Token,
+                    Prefix = Prefix
+                });
+                Session.SaveChanges();
             }
         }
 

@@ -24,7 +24,7 @@ namespace Valerie.Modules
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
 
         [Command("Slotmachine"), Summary("Want to earn quick bytes? That's how you earn some.")]
-        public Task SlotMachineAsync(int Bet = 100)
+        public Task SlotMachineAsync(float Bet = 50.69F)
         {
             var Slots = new string[] { "☄", "🔥", "👾", "🔆", "👀", "👅", "🍑" };
             var UserByte = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
@@ -60,7 +60,7 @@ namespace Valerie.Modules
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET BYTES!")]
-        public Task FlipAsync(char Side, int Bet = 100)
+        public Task FlipAsync(char Side, float Bet = 50.69F)
         {
             var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
             if (User == null || User.Byte < Bet) return ReplyAsync($"You do not have enough bytes.");
@@ -202,7 +202,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: {RandomNum}.");
                 return;
             }
-            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (int)Math.Pow(RandomNum, 3));
+            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (float)Math.Pow(RandomNum, 3));
             await ReplyAsync($"BRAVOO! You guessed it right!! ");
         }
 
@@ -221,7 +221,7 @@ namespace Valerie.Modules
             }
             if (Check.Content == Snippet)
             {
-                Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (int)Math.Pow(Word.Length, 2));
+                Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (float)Math.Pow(Word.Length, 2));
                 await ReplyAsync($"**{Context.User}, THE MAD MAN DID IT!!**");
             }
         }
@@ -230,7 +230,7 @@ namespace Valerie.Modules
         public async Task RipAsync(IGuildUser User) => await Context.Channel.SendFileAsync(await GraveAsync(User));
 
         [Command("Give"), Summary("Wanna be kind and share your bytes?")]
-        public Task GiveAsync(IGuildUser User, int Amount)
+        public Task GiveAsync(IGuildUser User, float Amount)
         {
             var Giver = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
             if (Giver == null || Giver.Byte < Amount) return ReplyAsync($"Woops, you have insufficent bytes.");

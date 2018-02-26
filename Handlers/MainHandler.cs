@@ -10,21 +10,18 @@ namespace Valerie.Handlers
         readonly DiscordSocketClient Client;
         readonly ConfigHandler ConfigHandler;
         readonly EventsHandler EventsHandler;
-        readonly UpdateService UpdateService;
 
-        public MainHandler(DiscordSocketClient DiscordParam, ConfigHandler ConfigParam, EventsHandler EventParam, UpdateService UpdateParam)
+        public MainHandler(DiscordSocketClient DiscordParam, ConfigHandler ConfigParam, EventsHandler EventParam)
         {
             Client = DiscordParam;
             EventsHandler = EventParam;
             ConfigHandler = ConfigParam;
-            UpdateService = UpdateParam;
         }
 
         public async Task StartAsync()
         {
+            LogClient.AppInfo();
             ConfigHandler.LoadConfig();
-            LogClient.AppInfo(ConfigHandler.Config.Version);
-            await UpdateService.InitializeAsync();
 
             Client.Log += EventsHandler.LogAsync;
             Client.Ready += EventsHandler.ReadyAsync;
