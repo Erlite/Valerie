@@ -36,19 +36,19 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case ModuleEnums.Add:
-                    if (Context.Server.AFKUsers.ContainsKey(Context.User.Id))
+                    if (Context.Server.Profiles.ContainsKey(Context.User.Id) && Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are already AFK.");
-                    Context.Server.AFKUsers.Add(Context.User.Id, AFKMessage);
+                    Context.Server.Profiles.Add(Context.User.Id, new UserProfile { AFKMessage = AFKMessage, IsAFK = true });
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
-                    if (!Context.Server.AFKUsers.ContainsKey(Context.User.Id))
+                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || !Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are not AFK.");
-                    Context.Server.AFKUsers.Remove(Context.User.Id);
+                    Context.Server.Profiles[Context.User.Id].IsAFK = false;
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Modify:
-                    if (!Context.Server.AFKUsers.ContainsKey(Context.User.Id))
+                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || !Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are not AFK.");
-                    Context.Server.AFKUsers[Context.User.Id] = AFKMessage;
+                    Context.Server.Profiles[Context.User.Id].AFKMessage = AFKMessage;
                     return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
@@ -167,9 +167,8 @@ namespace Valerie.Modules
         public Task WarningsAsync(IGuildUser User = null)
         {
             User = Context.User as IGuildUser ?? User;
-            if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
-                return ReplyAsync($"{User} has no previous warnings.");
-            return ReplyAsync($"{User} has been warned {Context.Server.ModLog.Warnings[User.Id]} times.");
+            if (!Context.Server.Profiles.ContainsKey(User.Id)) return ReplyAsync($"{User} has no previous warnings.");
+            return ReplyAsync($"{User} has been warned {Context.Server.Profiles[User.Id].Warnings} times.");
         }
 
         [Command("Show Selfroles"), Alias("Ssr"), Summary("Shows a list of all assignable roles for this server.")]
@@ -217,7 +216,7 @@ namespace Valerie.Modules
             Embed.AddField("Database",
                 $"Tags: {Servers.Sum(x => x.Tags.Count)}\n" +
                 $"Stars: {Servers.Sum(x => x.Starboard.StarboardMessages.Sum(y => y.Stars))}\n" +
-                $"Bytes: {Servers.Sum(x => x.Memory.Sum(y => y.Byte))}", true);
+                $"Bytes: {Servers.Sum(x => x.Profiles.Sum(y => y.Value.Bytes))}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
             Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
             Embed.AddField("Programmer", $"[Yucked](https://github.com/Yucked)", true);

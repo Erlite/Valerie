@@ -101,11 +101,6 @@ namespace Valerie.Handlers
             }
         }
 
-        internal Task UserBannedAsync(SocketUser User, SocketGuild Guild)
-        {
-            return Task.CompletedTask;
-        }
-
         internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id));
 
         internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id));
@@ -184,9 +179,8 @@ namespace Valerie.Handlers
         Task CleanupAsync(SocketGuildUser User)
         {
             var Config = ServerHandler.GetServer(User.Guild.Id);
-            if (!(Config.AFKUsers.ContainsKey(User.Id) || Config.ChatXP.Rankings.ContainsKey(User.Id))) return Task.CompletedTask;
-            Config.AFKUsers.Remove(User.Id);
-            Config.ChatXP.Rankings.Remove(User.Id);
+            if (!(Config.Profiles.ContainsKey(User.Id))) return Task.CompletedTask;
+            Config.Profiles.Remove(User.Id);
             Config.Tags.RemoveAll(x => x.Owner == $"{User.Id}");
             ServerHandler.Save(Config, User.Guild.Id);
             return Task.CompletedTask;
@@ -198,15 +192,15 @@ namespace Valerie.Handlers
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
-            if (!Config.ChatXP.Rankings.ContainsKey(User.Id))
+            if (!Config.Profiles.ContainsKey(User.Id))
             {
-                Config.ChatXP.Rankings.Add(User.Id, Random.Next(Message.Content.Length));
+                Config.Profiles.Add(User.Id, new UserProfile { ChatXP = Random.Next(Message.Content.Length) });
                 ServerHandler.Save(Config, User.Guild.Id);
                 return Task.CompletedTask;
             }
-            int Old = Config.ChatXP.Rankings[User.Id];
-            Config.ChatXP.Rankings[User.Id] += Random.Next(Message.Content.Length);
-            var New = Config.ChatXP.Rankings[User.Id];
+            int Old = Config.Profiles[User.Id].ChatXP;
+            Config.Profiles[User.Id].ChatXP += Random.Next(Message.Content.Length);
+            var New = Config.Profiles[User.Id].ChatXP;
             ServerHandler.Save(Config, User.Guild.Id);
             return LevelUpAsync(Message, Config, Old, New);
         }
@@ -219,10 +213,10 @@ namespace Valerie.Handlers
 
         async Task AFKHandlerAsync(SocketMessage Message, ServerModel Config)
         {
-            if (!Message.MentionedUsers.Any(x => Config.AFKUsers.ContainsKey(x.Id))) return;
-            string Reason = null;
-            var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFKUsers.TryGetValue(u.Id, out Reason));
-            if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Reason}");
+            if (!Message.MentionedUsers.Any(x => Config.Profiles.ContainsKey(x.Id))) return;
+            UserProfile Profile = null;
+            var User = Message.MentionedUsers.FirstOrDefault(u => Config.Profiles.TryGetValue(u.Id, out Profile));
+            if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Profile.AFKMessage}");
         }
 
         async Task AutoModAsync(SocketUserMessage Message, ServerModel Config)
@@ -233,15 +227,14 @@ namespace Valerie.Handlers
             if (!BadWords.Item1 || !BadUrls.Item1) return;
             _ = WarnAsync(BadWords, Message);
             _ = WarnAsync(BadUrls, Message);
-            if (!Config.ModLog.Warnings.ContainsKey(Message.Author.Id))
+            if (!Config.Profiles.ContainsKey(Message.Author.Id))
             {
-                Config.ModLog.Warnings.Add(Message.Author.Id, 1);
+                Config.Profiles.Add(Message.Author.Id, new UserProfile { Warnings = 1 });
                 ServerHandler.Save(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
                 return;
             }
 
-            if (!(Config.ModLog.Warnings[Message.Author.Id] >= Config.ModLog.MaxWarnings))
-                Config.ModLog.Warnings[Message.Author.Id]++;
+            if (!(Config.Profiles[Message.Author.Id].Warnings >= Config.ModLog.MaxWarnings)) Config.Profiles[Message.Author.Id].Warnings++;
             else
             {
                 await (Message.Author as SocketGuildUser).KickAsync("Kicked by Auto Mod.");
@@ -281,7 +274,7 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
-            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (float)Math.Sqrt(NewXp) / NewLevel);
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (int)Math.Sqrt(NewXp) / NewLevel);
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
                 await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: Math.Pow(Math.Sqrt(NewXp), NewLevel)));
             if (!Config.ChatXP.LevelRoles.Any()) return;

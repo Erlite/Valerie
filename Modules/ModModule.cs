@@ -165,16 +165,16 @@ namespace Valerie.Modules
         public async Task WarnAysnc(IGuildUser User, [Remainder]string Reason)
         {
             string WarnMessage = $"**[Warned in {Context.Guild}]** {Reason}";
-            if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id))
+            if (!Context.Server.Profiles.ContainsKey(User.Id))
             {
-                Context.Server.ModLog.Warnings.Add(User.Id, 1);
+                Context.Server.Profiles.Add(User.Id, new UserProfile { Warnings = 1 });
                 await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
                 await SaveAsync(ModuleEnums.Server, $"**{User} has been warned** :ok_hand:");
                 return;
             }
 
-            Context.Server.ModLog.Warnings[User.Id]++;
-            if (Context.Server.ModLog.Warnings[User.Id] == 3)
+            Context.Server.Profiles[User.Id].Warnings++;
+            if (Context.Server.Profiles[User.Id].Warnings == 3)
             {
                 await User.KickAsync($"{User} was Kicked due to reaching Max number of warnings.");
                 await ReplyAsync($"{User} was Kicked due to reaching Max number of warnings.");
@@ -189,9 +189,8 @@ namespace Valerie.Modules
         [Command("ResetWarns"), Summary("Resets users warnings.")]
         public Task ResetWarnsAsync(IGuildUser User)
         {
-            if (!Context.Server.ModLog.Warnings.ContainsKey(User.Id) || !Context.Server.ModLog.Warnings.Any())
-                return ReplyAsync($"{User} has no warnings.");
-            Context.Server.ModLog.Warnings[User.Id] = 0;
+            if (!Context.Server.Profiles.ContainsKey(User.Id)) return ReplyAsync($"{User} has no warnings.");
+            Context.Server.Profiles[User.Id].Warnings = 0;
             return SaveAsync(ModuleEnums.Server);
         }
 

@@ -24,11 +24,11 @@ namespace Valerie.Modules
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
 
         [Command("Slotmachine"), Summary("Want to earn quick bytes? That's how you earn some.")]
-        public Task SlotMachineAsync(float Bet = 50.69F)
+        public Task SlotMachineAsync(int Bet = 100)
         {
             var Slots = new string[] { "☄", "🔥", "👾", "🔆", "👀", "👅", "🍑" };
-            var UserByte = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (UserByte.Byte < Bet || UserByte == null) return ReplyAsync("You do not have enough bytes.");
+            var UserByte = Context.Server.Profiles[Context.User.Id];
+            if (UserByte.Bytes < Bet || UserByte == null) return ReplyAsync("You do not have enough bytes.");
             var embed = new EmbedBuilder();
             int[] GetSlot = new int[]
             {
@@ -46,13 +46,13 @@ namespace Valerie.Modules
 
             if (win == 0)
             {
-                UserByte.Byte -= Bet;
+                UserByte.Bytes -= Bet;
                 embed.Description = $"*Aww..* it seems you lost **{Bet}** bytes. 😞";
                 embed.Color = new Color(0xff0000);
             }
             else
             {
-                UserByte.Byte += Bet;
+                UserByte.Bytes += Bet;
                 embed.Description = $"**CONGRATS!** You won **{Bet}** bytes. 🎉";
                 embed.Color = new Color(0x93ff89);
             }
@@ -60,20 +60,20 @@ namespace Valerie.Modules
         }
 
         [Command("Flip"), Summary("Flips a coin! DON'T FORGOT TO BET BYTES!")]
-        public Task FlipAsync(char Side, float Bet = 50.69F)
+        public Task FlipAsync(char Side, int Bet = 100)
         {
-            var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (User == null || User.Byte < Bet) return ReplyAsync($"You do not have enough bytes.");
+            var User = Context.Server.Profiles[Context.User.Id];
+            if (User == null || User.Bytes < Bet) return ReplyAsync($"You do not have enough bytes.");
             Side = Char.ToLower(Side);
             bool Heads = Context.Random.Next(0, 101) < 50 ? true : false;
             if ((Side == 'h' && Heads) || (Side == 't' && !Heads))
             {
-                User.Byte += Bet;
+                User.Bytes += Bet;
                 return SaveAsync(ModuleEnums.Server, $"**CONGRATS!** You won **{Bet}** bytes. 🎉");
             }
             else if ((Side == 'h' && !Heads) || (Side == 't' && Heads))
             {
-                User.Byte -= Bet;
+                User.Bytes -= Bet;
                 return SaveAsync(ModuleEnums.Server, $"*Aww..* it seems you lost **{Bet}** bytes. 😞");
             }
             else return ReplyAsync($"Side can either be `h` or `t`.");
@@ -106,14 +106,14 @@ namespace Valerie.Modules
         [Command("XpLeaderboards"), Alias("XPL", "XpTop"), Summary("Shows top 10 users with the highest XP for this server.")]
         public async Task XpLeaderboardAsync()
         {
-            if (!Context.Server.ChatXP.Rankings.Any())
+            if (!Context.Server.Profiles.Any())
             {
                 await ReplyAsync($"{Context.Guild} leadboards is empty.");
                 return;
             }
             var Embed = ValerieEmbed.Embed(EmbedColor.Yellow, Title: $"XP Leaderboards For {Context.Guild}");
 
-            var Ordered = Context.Server.ChatXP.Rankings.OrderByDescending(x => x.Value).Where(y => y.Value != 0).Take(10).ToList();
+            var Ordered = Context.Server.Profiles.OrderByDescending(x => x.Value.ChatXP).Where(y => y.Value.ChatXP != 0).Take(10).ToList();
             if (Ordered.Count > 3)
             {
                 Embed.AddField($"🥇: {await StringExt.CheckUserAsync(Context, Ordered[0].Key)}", $"**Total XP:** {Ordered[0].Value}", true);
@@ -129,9 +129,8 @@ namespace Valerie.Modules
         public Task RankAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            if (!Context.Server.ChatXP.Rankings.ContainsKey(User.Id))
-                return ReplyAsync($"**{User}** isn't ranked yet. 🙄");
-            var UserRank = Context.Server.ChatXP.Rankings[User.Id];
+            if (!Context.Server.Profiles.ContainsKey(User.Id)) return ReplyAsync($"**{User}** isn't ranked yet. 🙄");
+            var UserRank = Context.Server.Profiles[User.Id].ChatXP;
             return ReplyAsync($"**{User} Stats 🔰**\n*Level:* {IntExt.GetLevel(UserRank)} | *Total XP:* {UserRank} | " +
                 $"*Next Level:* {IntExt.GetXpForNextLevel(IntExt.GetLevel(UserRank))}");
         }
@@ -155,13 +154,13 @@ namespace Valerie.Modules
         [Command("Daily"), Summary("Get your daily dose of bytes.")]
         public Task DailyAsync()
         {
-            var User = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");            
+            var User = Context.Server.Profiles[Context.User.Id];
             if (User == null)
             {
-                Context.Server.Memory.Add(new MemoryWrapper
+                Context.Server.Profiles.Add(Context.User.Id, new UserProfile
                 {
-                    Byte = 100,
-                    Id = $"{Context.User.Id}",
+                    Bytes = 100,
+                    DailyStreak = 0,
                     DailyReward = DateTime.Now
                 });
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
@@ -170,7 +169,8 @@ namespace Valerie.Modules
             var Passed = DateTime.UtcNow - User.DailyReward;
             var Wait = Get - Passed;
             if (Passed.Days < 1) return ReplyAsync($"You need to wait **{Wait.Hour}** hour(s), **{Wait.Minute}** minute(s) for your next reward.");
-            User.Byte += 100;
+            User.Bytes += User.DailyStreak * 100;
+            User.DailyStreak++;
             User.DailyReward = DateTime.Now;
             return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
         }
@@ -179,9 +179,9 @@ namespace Valerie.Modules
         public Task BytesAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
-            var GetUser = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{User.Id}");
+            var GetUser = Context.Server.Profiles[User.Id];
             if (GetUser is null) return ReplyAsync($"**{User}** has no bytes 😶");
-            var UserByte = IntExt.GetMemory(GetUser.Byte);
+            var UserByte = IntExt.GetMemory(GetUser.Bytes);
             return ReplyAsync($"**{User}** has {UserByte.Item2} {UserByte.Item1}s ⚜");
         }
 
@@ -202,7 +202,7 @@ namespace Valerie.Modules
                 await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: {RandomNum}.");
                 return;
             }
-            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (float)Math.Pow(RandomNum, 3));
+            Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (int)Math.Pow(RandomNum, 3));
             await ReplyAsync($"BRAVOO! You guessed it right!! ");
         }
 
@@ -221,7 +221,7 @@ namespace Valerie.Modules
             }
             if (Check.Content == Snippet)
             {
-                Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (float)Math.Pow(Word.Length, 2));
+                Context.ServerHandler.MemoryUpdate(Context.Guild.Id, Context.User.Id, (int)Math.Pow(Word.Length, 2));
                 await ReplyAsync($"**{Context.User}, THE MAD MAN DID IT!!**");
             }
         }
@@ -230,12 +230,12 @@ namespace Valerie.Modules
         public async Task RipAsync(IGuildUser User) => await Context.Channel.SendFileAsync(await GraveAsync(User));
 
         [Command("Give"), Summary("Wanna be kind and share your bytes?")]
-        public Task GiveAsync(IGuildUser User, float Amount)
+        public Task GiveAsync(IGuildUser User, int Amount)
         {
-            var Giver = Context.Server.Memory.FirstOrDefault(x => x.Id == $"{Context.User.Id}");
-            if (Giver == null || Giver.Byte < Amount) return ReplyAsync($"Woops, you have insufficent bytes.");
+            var Giver = Context.Server.Profiles[User.Id];
+            if (Giver == null || Giver.Bytes < Amount) return ReplyAsync($"Woops, you have insufficent bytes.");
             Context.ServerHandler.MemoryUpdate(Context.Guild.Id, User.Id, Amount);
-            Giver.Byte -= Amount;
+            Giver.Bytes -= Amount;
             return SaveAsync(ModuleEnums.Server, $"Thank you for being so kind.");
         }
 
