@@ -28,26 +28,27 @@ namespace Valerie.Services
             var Header = new[]
             {
                 @"",
-                @"      (`-.     ('-.                 ('-.  _  .-')             ('-.   ",
-                @"    _(OO  )_  ( OO ).-.           _(  OO)( \( -O )          _(  OO)  ",
-                @",--(_/   ,. \ / . --. / ,--.     (,------.,------.  ,-.-') (,------. ",
-                @"\   \   /(__/ | \-.  \  |  |.-')  |  .---'|   /`. ' |  |OO) |  .---' ",
-                @" \   \ /   /.-'-'  |  | |  | OO ) |  |    |  /  | | |  |  \ |  |     ",
-                @"  \   '   /, \| |_.'  | |  |`-' |(|  '--. |  |_.' | |  |(_/(|  '--.  ",
-                @"   \     /__) |  .-.  |(|  '---.' |  .--' |  .  '.',|  |_.' |  .--'  ",
-                @"    \   /     |  | |  | |      |  |  `---.|  |\  \(_|  |    |  `---. ",
-                @"     `-'      `--' `--' `------'  `------'`--' '--' `--'    `------' ",
+                @"      ██╗   ██╗ █████╗ ██╗     ███████╗██████╗ ██╗███████╗",
+                @"      ██║   ██║██╔══██╗██║     ██╔════╝██╔══██╗██║██╔════╝",
+                @"      ██║   ██║███████║██║     █████╗  ██████╔╝██║█████╗  ",
+                @"      ╚██╗ ██╔╝██╔══██║██║     ██╔══╝  ██╔══██╗██║██╔══╝  ",
+                @"       ╚████╔╝ ██║  ██║███████╗███████╗██║  ██║██║███████╗",
+                @"        ╚═══╝  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝",
                 @""
             };
 
             foreach (var Line in Header)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine(Line);
             }
-            Append("-> Application Information\n", ConsoleColor.Magenta);
-            Append($"   Author: Yucked\n   Github: https://github.com/Yucked/Valerie\n   Discord.Net Version: {Discord.DiscordConfig.Version}", ConsoleColor.Gray);
-        }        
+
+            Append($"-> APPLICATION INFORMATION\n\n", ConsoleColor.Yellow);
+            Append($"    -> GENERAL\n", ConsoleColor.Red);
+            Append($"        Author: Yucked\n        License: GPL-3.0\n        Github Repo: Yucked/Valerie\n\n", ConsoleColor.Gray);
+            Append($"    -> VERSIONS\n", ConsoleColor.Red);
+            Append($"        Valerie: 18-Alpha-02-26\n        Discord: {Discord.DiscordConfig.Version}\n        RavenDB: RavenDB.Client 4.0.0-nightly-20180120-0500\n", ConsoleColor.Gray);
+        }
     }
 
     public enum Source
