@@ -9,20 +9,12 @@ namespace Valerie.JsonModels
         public string LevelMessage { get; set; }
         public List<ulong> ForbiddenRoles { get; set; } = new List<ulong>(20);
         public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>(20);
-        public Dictionary<ulong, int> Rankings { get; set; } = new Dictionary<ulong, int>();
     }
 
     public class StarboardWrapper
     {
         public string TextChannel { get; set; }
         public List<StarboardMessages> StarboardMessages { get; set; } = new List<StarboardMessages>();
-    }
-
-    public class MemoryWrapper
-    {
-        public string Id { get; set; }
-        public float Byte { get; set; }
-        public DateTime DailyReward { get; set; }
     }
 
     public enum Memory
@@ -66,7 +58,6 @@ namespace Valerie.JsonModels
         public List<string> BadWords { get; set; } = new List<string>(50);
         public List<string> BlockedUrls { get; set; } = new List<string>(50);
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
-        public Dictionary<ulong, int> Warnings { get; set; } = new Dictionary<ulong, int>();
     }
 
     public class CaseWrapper
@@ -100,5 +91,16 @@ namespace Valerie.JsonModels
         public bool IsEnabled { get; set; }
         public string TextChannel { get; set; }
         public List<string> Subreddits { get; set; } = new List<string>(3);
+    }
+
+    public class UserProfile
+    {
+        public int Bytes { get; set; }
+        public int ChatXP { get; set; }
+        public bool IsAFK { get; set; }
+        public int Warnings { get; set; }
+        public int DailyStreak { get; set; }
+        public string AFKMessage { get; set; }
+        public DateTime DailyReward { get; set; }
     }
 }
