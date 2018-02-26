@@ -21,7 +21,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server, Tag.Response);
         }
 
-        [Command("Tag Create"), Alias("Tag New", "Tag Add"), Summary("Creates a new tag for this server.")]
+        [Command("TagCreate"), Alias("TagNew", "TagAdd"), Summary("Creates a new tag for this server.")]
         public Task CreateAsync(string Name, string Response)
         {
             if (Exists(Name)) return Task.CompletedTask;
@@ -56,7 +56,7 @@ namespace Valerie.Modules
             await SaveAsync(ModuleEnums.Server, $"**{GetName.Content}** tag has been created!");
         }
 
-        [Command("Tag Modify"), Alias("Tag Change", "Tag Update"), Summary("Updates an existing tag")]
+        [Command("TagModify"), Alias("TagChange", "TagUpdate"), Summary("Updates an existing tag")]
         public Task ModifyAsync(string Name, string Response)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -67,7 +67,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Tag Delete"), Alias("Tag Remove"), Summary("Deletes a tag.")]
+        [Command("TagDelete"), Alias("TagRemove"), Summary("Deletes a tag.")]
         public Task DeleteAsync(string Name)
         {
             if (!NotExists(Name)) return Task.CompletedTask;
@@ -78,7 +78,7 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Server);
         }
 
-        [Command("Tag User"), Summary("Shows all tags owned by you or a given user.")]
+        [Command("TagUser"), Summary("Shows all tags owned by you or a given user.")]
         public Task UserAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
