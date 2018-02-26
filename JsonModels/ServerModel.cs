@@ -19,7 +19,6 @@ namespace Valerie.JsonModels
         public RedditWrapper Reddit { get; set; } = new RedditWrapper();
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
-        public List<MemoryWrapper> Memory { get; set; } = new List<MemoryWrapper>();
-        public Dictionary<ulong, string> AFKUsers { get; set; } = new Dictionary<ulong, string>();
+        public Dictionary<ulong, UserProfile> Profiles { get; set; } = new Dictionary<ulong, UserProfile>();
     }
 }

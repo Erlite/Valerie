@@ -53,18 +53,18 @@ namespace Valerie.Handlers
             }
         }
 
-        public void MemoryUpdate(ulong GuildId, ulong UserId, float Bytes)
+        public void MemoryUpdate(ulong GuildId, ulong UserId, int Bytes)
         {
             var Server = GetServer(GuildId);
-            var MemUser = Server.Memory.FirstOrDefault(x => x.Id == $"{UserId}");
+            var MemUser = Server.Profiles[UserId];
             if (MemUser == null)
-                Server.Memory.Add(new MemoryWrapper
+                Server.Profiles.Add(UserId, new UserProfile
                 {
-                    Byte = Bytes,
-                    Id = $"{UserId}",
+                    Bytes = Bytes,
+                    DailyStreak = 0,
                     DailyReward = DateTime.Now
                 });
-            MemUser.Byte += Bytes;
+            MemUser.Bytes += Bytes;
             Save(Server, GuildId);
         }
     }
