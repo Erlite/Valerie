@@ -105,7 +105,7 @@ namespace Valerie.Modules
         [Command("Archive"), Summary("Archives a channel and uploads a JSON.")]
         public async Task ArchiveCommand(IMessageChannel Channel, int Amount = 5000)
         {
-            var listOfMessages = new List<IMessage>(await Channel.GetMessagesAsync(Amount).Flatten());
+            var listOfMessages = new List<IMessage>(await Channel.GetMessagesAsync(Amount).FlattenAsync());
 
             List<Archive> list = new List<Archive>(listOfMessages.Capacity);
             foreach (var message in listOfMessages)

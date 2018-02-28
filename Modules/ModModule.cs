@@ -84,7 +84,7 @@ namespace Valerie.Modules
         public async Task PurgeChannelAsync(ITextChannel Channel = null)
         {
             Channel = Channel ?? Context.Channel as ITextChannel;
-            var Messages = await Channel.GetMessagesAsync(100).Flatten();
+            var Messages = await Channel.GetMessagesAsync().FlattenAsync();
             await Channel.DeleteMessagesAsync(Messages);
         }
 
@@ -94,7 +94,7 @@ namespace Valerie.Modules
         public async Task PurgeUserAsync(IGuildUser User = null, int Amount = 10)
         {
             User = Context.Client.CurrentUser as IGuildUser ?? User;
-            var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).Flatten()).Where(x => x.Author.Id == User.Id);
+            var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).FlattenAsync()).Where(x => x.Author.Id == User.Id);
             if (Amount <= 100) await (Context.Channel as ITextChannel).DeleteMessagesAsync(GetMessages);
             else if (Amount > 100) foreach (var msg in GetMessages) await msg.DeleteAsync().ConfigureAwait(false);
         }
@@ -102,7 +102,7 @@ namespace Valerie.Modules
         [Command("Purge"), Alias("Delete", "Del"), Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task Purge(int Amount = 10)
         {
-            var GetMessages = await Context.Channel.GetMessagesAsync(Amount).Flatten();
+            var GetMessages = await Context.Channel.GetMessagesAsync(Amount).FlattenAsync();
             if (Amount <= 100) await (Context.Channel as ITextChannel).DeleteMessagesAsync(GetMessages);
             else if (Amount > 100) foreach (var msg in GetMessages) await msg.DeleteAsync().ConfigureAwait(false);
         }
@@ -183,7 +183,7 @@ namespace Valerie.Modules
             }
 
             await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
-            await ReplyAsync($"**{User} has been warned** :ok_hand:");
+            await SaveAsync(ModuleEnums.Server, $"**{User} has been warned** :ok_hand:");
         }
 
         [Command("ResetWarns"), Summary("Resets users warnings.")]
