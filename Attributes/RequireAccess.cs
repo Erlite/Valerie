@@ -22,7 +22,7 @@ namespace Valerie.Attributes
             }
             var Context = (context as IContext);
             var User = Context.User as IGuildUser;
-            var AdminPerms = (User.Id == Context.Guild.OwnerId || User.GuildPermissions.Administrator || Context.Server.Admins.Contains(User.Id) ||
+            var AdminPerms = (User.Id == Context.Guild.OwnerId || User.GuildPermissions.Administrator || (Context.Server.Profiles.ContainsKey(User.Id)  && Context.Server.Profiles[User.Id].IsAdmin)||
                 User.Id == Context.Client.GetApplicationInfoAsync().GetAwaiter().GetResult().Owner.Id);
             var ModPerms = (User.GuildPermissions.KickMembers || User.GuildPermissions.BanMembers || User.GuildPermissions.ManageRoles || User.GuildPermissions.ManageMessages);
             if (GetAccessLevel == AccessLevel.Admins && AdminPerms) return Task.FromResult(PreconditionResult.FromSuccess());

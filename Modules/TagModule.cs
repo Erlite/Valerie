@@ -72,7 +72,7 @@ namespace Valerie.Modules
         {
             if (!NotExists(Name)) return Task.CompletedTask;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
-            if (Convert.ToUInt64(Tag.Owner) != Context.User.Id || Context.Server.Admins.Contains(Context.User.Id))
+            if (Convert.ToUInt64(Tag.Owner) != Context.User.Id || !(Context.Server.Profiles.ContainsKey(Context.User.Id) && Context.Server.Profiles[Context.User.Id].IsAdmin))
                 return ReplyAsync($"You are not the owner of tag `{Name}`.");
             Context.Server.Tags.Remove(Tag);
             return SaveAsync(ModuleEnums.Server);

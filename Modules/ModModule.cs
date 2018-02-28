@@ -167,7 +167,7 @@ namespace Valerie.Modules
             string WarnMessage = $"**[Warned in {Context.Guild}]** {Reason}";
             if (!Context.Server.Profiles.ContainsKey(User.Id))
             {
-                Context.Server.Profiles.Add(User.Id, new UserProfile { Warnings = 1 });
+                Context.Server.Profiles.Add(User.Id, new UserProfile { Warnings = 1, DailyReward = DateTime.Now });
                 await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
                 await SaveAsync(ModuleEnums.Server, $"**{User} has been warned** :ok_hand:");
                 return;
@@ -200,14 +200,13 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case ModuleEnums.Add:
-                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} is already blacklisted.");
-                    else if (Context.Server.BlacklistedUsers.Count == Context.Server.BlacklistedUsers.Capacity)
-                        return ReplyAsync("Blacklist can't have more than 50 users.");
-                    Context.Server.BlacklistedUsers.Add(User.Id);
+                    if (Context.Server.Profiles.ContainsKey(User.Id) && Context.Server.Profiles[User.Id].IsBlacklisted) return ReplyAsync($"{User} is already blacklisted.");
+                    if (!Context.Server.Profiles.ContainsKey(User.Id)) Context.Server.Profiles.Add(User.Id, new UserProfile { IsBlacklisted = true });
+                    else Context.Server.Profiles[User.Id].IsBlacklisted = true;
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
-                    if (Context.Server.BlacklistedUsers.Contains(User.Id)) return ReplyAsync($"{User} isn't  blacklisted.");
-                    Context.Server.BlacklistedUsers.Remove(User.Id);
+                    if (!Context.Server.Profiles.ContainsKey(User.Id)) return ReplyAsync($"{User} isn't  blacklisted.");
+                    Context.Server.Profiles[User.Id].IsBlacklisted = false;
                     return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;

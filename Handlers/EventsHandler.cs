@@ -36,8 +36,12 @@ namespace Valerie.Handlers
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), IServiceProvider);
         }
 
-        internal Task ReadyAsync() => Client.SetGameAsync(!ConfigHandler.Config.Games.Any() ?
+        internal async Task ReadyAsync()
+        {
+            await Client.SetGameAsync(!ConfigHandler.Config.Games.Any() ?
                 $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}");
+            LogClient.Write(Source.DISCORD, "Ready to rock n roll !");
+        }
 
         internal Task LatencyUpdatedAsync(int Old, int Newer)
             => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
@@ -73,10 +77,10 @@ namespace Valerie.Handlers
 
         internal Task HandleMessageAsync(SocketMessage Message)
         {
+            var Config = ServerHandler.GetServer((Message.Channel as SocketGuildChannel).Guild.Id);
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
             if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.UsersBlacklist.ContainsKey(User.Id) ||
-                ServerHandler.GetServer((Message.Channel as SocketGuildChannel).Guild.Id).BlacklistedUsers.Contains(User.Id)) return Task.CompletedTask;
-            var Config = ServerHandler.GetServer(User.Guild.Id);
+                (Config.Profiles.ContainsKey(User.Id) && Config.Profiles[User.Id].IsBlacklisted)) return Task.CompletedTask;
             _ = AutoModAsync(Msg, Config);
             _ = AFKHandlerAsync(Msg, Config);
             _ = CleverbotHandlerAsync(Msg, Config);
@@ -91,7 +95,7 @@ namespace Valerie.Handlers
             var Context = new IContext(Client, Msg, Provider);
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot ||
-                Context.Config.UsersBlacklist.ContainsKey(Msg.Author.Id) || Context.Server.BlacklistedUsers.Contains(Message.Author.Id)) return;
+                Context.Config.UsersBlacklist.ContainsKey(Msg.Author.Id) || (Context.Server.Profiles.ContainsKey(Msg.Author.Id) && Context.Server.Profiles[Msg.Author.Id].IsBlacklisted)) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             switch (Result.Error)
             {
@@ -194,7 +198,7 @@ namespace Valerie.Handlers
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             if (!Config.Profiles.ContainsKey(User.Id))
             {
-                Config.Profiles.Add(User.Id, new UserProfile { ChatXP = Random.Next(Message.Content.Length) });
+                Config.Profiles.Add(User.Id, new UserProfile { ChatXP = Random.Next(Message.Content.Length), DailyReward = DateTime.Now });
                 ServerHandler.Save(Config, User.Guild.Id);
                 return Task.CompletedTask;
             }
@@ -213,10 +217,10 @@ namespace Valerie.Handlers
 
         async Task AFKHandlerAsync(SocketMessage Message, ServerModel Config)
         {
-            if (!Message.MentionedUsers.Any(x => Config.Profiles.ContainsKey(x.Id))) return;
-            UserProfile Profile = null;
-            var User = Message.MentionedUsers.FirstOrDefault(u => Config.Profiles.TryGetValue(u.Id, out Profile));
-            if (User != null && !Profile.IsAFK) await Message.Channel.SendMessageAsync($"Message left by {User}: {Profile.AFKMessage}");
+            if (!Message.MentionedUsers.Any(x => Config.AFKUsers.ContainsKey(x.Id))) return;
+            string Reason = null;
+            var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFKUsers.TryGetValue(u.Id, out Reason));
+            if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
         }
 
         async Task AutoModAsync(SocketUserMessage Message, ServerModel Config)
@@ -229,7 +233,7 @@ namespace Valerie.Handlers
             _ = WarnAsync(BadUrls, Message);
             if (!Config.Profiles.ContainsKey(Message.Author.Id))
             {
-                Config.Profiles.Add(Message.Author.Id, new UserProfile { Warnings = 1 });
+                Config.Profiles.Add(Message.Author.Id, new UserProfile { Warnings = 1, DailyReward = DateTime.Now });
                 ServerHandler.Save(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
                 return;
             }

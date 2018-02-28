@@ -4,6 +4,7 @@ using Discord.Commands;
 using Valerie.Attributes;
 using Valerie.Extensions;
 using Discord.WebSocket;
+using Valerie.JsonModels;
 using Valerie.Modules.Addons;
 using System.Threading.Tasks;
 using Valerie.Handlers.ModuleHandler;
@@ -151,13 +152,13 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case ModuleEnums.Add:
-                    if (Context.Server.Admins.Contains(User.Id)) return ReplyAsync($"{User} is already an Admin.");
-                    else if (Context.Server.Admins.Count == Context.Server.Admins.Capacity) return ReplyAsync($"It seems you have reached max number of admins.");
-                    Context.Server.Admins.Add(User.Id);
+                    if (Context.Server.Profiles.ContainsKey(User.Id) && Context.Server.Profiles[User.Id].IsAdmin) return ReplyAsync($"{User} is already an Admin.");
+                    if (Context.Server.Profiles.ContainsKey(User.Id)) Context.Server.Profiles[User.Id].IsAdmin = true;
+                    else Context.Server.Profiles.Add(User.Id, new UserProfile { IsAdmin = true });
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
-                    if (!Context.Server.Admins.Contains(User.Id)) return ReplyAsync($"{User} isn't an Admin.");
-                    Context.Server.Admins.Remove(User.Id);
+                    if (!Context.Server.Profiles.ContainsKey(User.Id) || !Context.Server.Profiles[User.Id].IsAdmin) return ReplyAsync($"{User} isn't an Admin.");
+                    Context.Server.Profiles[User.Id].IsAdmin = false;
                     return SaveAsync(ModuleEnums.Server);
             }
             return Task.CompletedTask;
@@ -281,14 +282,14 @@ namespace Valerie.Modules
         [Command("Show Admins"), Alias("SAs"), Summary("Shows all the current admins for this server.")]
         public async Task ShowAdminsAsync()
         {
-            if (!Context.Server.Admins.Any())
+            if (!Context.Server.Profiles.Any())
             {
                 await ReplyAsync($"{Context.Guild} has no admins.");
                 return;
             }
             string Admins = null;
-            foreach (var Id in Context.Server.Admins)
-                Admins += $"\n-> {Id} | {await StringExt.CheckUserAsync(Context, Id)}";
+            foreach (var Profile in Context.Server.Profiles.Where(x => x.Value.IsAdmin == true))
+                Admins += $"\n-> {Profile.Key} | {await StringExt.CheckUserAsync(Context, Profile.Key)}";
             await ReplyAsync($"**{Context.Guild} Admins**\n{Admins}");
         }
 

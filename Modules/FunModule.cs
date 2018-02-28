@@ -116,12 +116,12 @@ namespace Valerie.Modules
             var Ordered = Context.Server.Profiles.OrderByDescending(x => x.Value.ChatXP).Where(y => y.Value.ChatXP != 0).Take(10).ToList();
             if (Ordered.Count > 3)
             {
-                Embed.AddField($"🥇: {await StringExt.CheckUserAsync(Context, Ordered[0].Key)}", $"**Total XP:** {Ordered[0].Value}", true);
-                Embed.AddField($"🥈: {await StringExt.CheckUserAsync(Context, Ordered[1].Key)}", $"**Total XP:** {Ordered[1].Value}", true);
-                Embed.AddField($"🥉: {await StringExt.CheckUserAsync(Context, Ordered[2].Key)}", $"**Total XP:** {Ordered[2].Value}", true);
-                foreach (var Rank in Ordered.Skip(3)) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value}", true);
+                Embed.AddField($"🥇: {await StringExt.CheckUserAsync(Context, Ordered[0].Key)}", $"**Total XP:** {Ordered[0].Value.ChatXP}", true);
+                Embed.AddField($"🥈: {await StringExt.CheckUserAsync(Context, Ordered[1].Key)}", $"**Total XP:** {Ordered[1].Value.ChatXP}", true);
+                Embed.AddField($"🥉: {await StringExt.CheckUserAsync(Context, Ordered[2].Key)}", $"**Total XP:** {Ordered[2].Value.ChatXP}", true);
+                foreach (var Rank in Ordered.Skip(3)) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value.ChatXP}", true);
             }
-            else foreach (var Rank in Ordered) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value}", true);
+            else foreach (var Rank in Ordered) Embed.AddField($"{await StringExt.CheckUserAsync(Context, Rank.Key)}", $"**Total XP:** {Rank.Value.ChatXP}", true);
             await ReplyAsync("", embed: Embed.Build());
         }
 
