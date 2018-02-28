@@ -36,17 +36,17 @@ namespace Valerie.Modules
             switch (Action)
             {
                 case ModuleEnums.Add:
-                    if (Context.Server.Profiles.ContainsKey(Context.User.Id) && Context.Server.Profiles[Context.User.Id].IsAFK)
+                    if (Context.Server.Profiles.ContainsKey(Context.User.Id) || !Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are already AFK.");
                     Context.Server.Profiles.Add(Context.User.Id, new UserProfile { AFKMessage = AFKMessage, IsAFK = true });
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Remove:
-                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || !Context.Server.Profiles[Context.User.Id].IsAFK)
+                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.Profiles[Context.User.Id].IsAFK = false;
                     return SaveAsync(ModuleEnums.Server);
                 case ModuleEnums.Modify:
-                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || !Context.Server.Profiles[Context.User.Id].IsAFK)
+                    if (!Context.Server.Profiles.ContainsKey(Context.User.Id) || Context.Server.Profiles[Context.User.Id].IsAFK)
                         return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.Profiles[Context.User.Id].AFKMessage = AFKMessage;
                     return SaveAsync(ModuleEnums.Server);

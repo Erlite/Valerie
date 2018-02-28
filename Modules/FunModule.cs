@@ -154,8 +154,7 @@ namespace Valerie.Modules
         [Command("Daily"), Summary("Get your daily dose of bytes.")]
         public Task DailyAsync()
         {
-            var User = Context.Server.Profiles[Context.User.Id];
-            if (User == null)
+            if (!Context.Server.Profiles.ContainsKey(Context.User.Id))
             {
                 Context.Server.Profiles.Add(Context.User.Id, new UserProfile
                 {
@@ -165,6 +164,7 @@ namespace Valerie.Modules
                 });
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
             }
+            var User = Context.Server.Profiles[Context.User.Id];
             var Get = User.DailyReward;
             var Passed = DateTime.UtcNow - User.DailyReward;
             var Wait = Get - Passed;
