@@ -13,12 +13,12 @@ namespace Valerie.Services
         public static void Write(Source Source, string Text)
         {
             Console.Write(Environment.NewLine);
-            Append($"{DateTime.Now}\n", ConsoleColor.Gray);
+            Append($"{DateTime.Now.ToShortTimeString()} ", ConsoleColor.Gray);
             switch (Source)
             {
-                case Source.CONFIG: Append($"  => [{Source}]", ConsoleColor.DarkYellow); break;
-                case Source.DISCORD: Append($"  => [{Source}]", ConsoleColor.DarkCyan); break;
-                case Source.SERVER: Append($"  => [{Source}]", ConsoleColor.DarkMagenta); break;
+                case Source.CONFIG: Append($"[{Source}]", ConsoleColor.DarkYellow); break;
+                case Source.DISCORD: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
+                case Source.SERVER: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
             }
             Append($" {Text}", ConsoleColor.White);
         }
