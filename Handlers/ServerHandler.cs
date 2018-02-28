@@ -28,7 +28,7 @@ namespace Valerie.Handlers
             LogClient.Write(Source.SERVER, $"Removed Server With Id: {Id}");
         }
 
-        public void AddServer(ulong Id)
+        public void AddServer(ulong Id, string Name = null)
         {
             using (var Session = Store.OpenSession())
             {
@@ -40,7 +40,8 @@ namespace Valerie.Handlers
                 });
                 Session.SaveChanges();
             }
-            LogClient.Write(Source.SERVER, $"Added Server With Id: {Id}");
+            string Msg = string.IsNullOrWhiteSpace(Name) ? $"Added Server With Id: {Id}" : $"Created Config For {Name}";
+            LogClient.Write(Source.SERVER, Msg);
         }
 
         public void Save(ServerModel Server, ulong Id)

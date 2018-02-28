@@ -33,7 +33,7 @@ namespace Valerie.Handlers
         public async Task InitializeAsync(IServiceProvider IServiceProvider)
         {
             Provider = IServiceProvider;
-            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), IServiceProvider);
         }
 
         internal Task ReadyAsync() => Client.SetGameAsync(!ConfigHandler.Config.Games.Any() ?
@@ -46,7 +46,7 @@ namespace Valerie.Handlers
 
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
-            ServerHandler.AddServer(Guild.Id);
+            ServerHandler.AddServer(Guild.Id, Guild.Name);
             await Guild.DefaultChannel.SendMessageAsync("Thank you for inviting me to your server! Guild prefix is `!!`. Type `!!Cmds` for commands.");
         }
 
@@ -103,7 +103,7 @@ namespace Valerie.Handlers
 
         internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id));
 
-        internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id));
+        internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id, Guild.Name));
 
         internal Task LogAsync(LogMessage Log) => Task.Run(() => LogClient.Write(Source.DISCORD, Log.Message ?? Log.Exception.Message));
 
@@ -216,7 +216,7 @@ namespace Valerie.Handlers
             if (!Message.MentionedUsers.Any(x => Config.Profiles.ContainsKey(x.Id))) return;
             UserProfile Profile = null;
             var User = Message.MentionedUsers.FirstOrDefault(u => Config.Profiles.TryGetValue(u.Id, out Profile));
-            if (User != null) await Message.Channel.SendMessageAsync($"Message left by {User}: {Profile.AFKMessage}");
+            if (User != null && !Profile.IsAFK) await Message.Channel.SendMessageAsync($"Message left by {User}: {Profile.AFKMessage}");
         }
 
         async Task AutoModAsync(SocketUserMessage Message, ServerModel Config)
