@@ -15,8 +15,8 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9.1" />
     <PackageReference Include="Cookie" Version="2.7.2" />
-    <PackageReference Include="Discord.Net" Version="2.0.0-beta-00854" />
-    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.32.2.1132" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00890" />
+    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.32.2.1146" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.32.2.1131" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.6.1" />
     <PackageReference Include="RavenDB.Client" Version="4.0.2-nightly-20180226-0500" />
