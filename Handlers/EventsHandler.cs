@@ -38,9 +38,9 @@ namespace Valerie.Handlers
 
         internal async Task ReadyAsync()
         {
-            await Client.SetGameAsync(!ConfigHandler.Config.Games.Any() ?
-                $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}");
             LogClient.Write(Source.DISCORD, "Ready to rock n roll !");
+            await Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
+                $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         }
 
         internal Task LatencyUpdatedAsync(int Old, int Newer)
