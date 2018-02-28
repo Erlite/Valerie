@@ -185,6 +185,10 @@ namespace Valerie.Modules
             return SaveAsync(ModuleEnums.Config);
         }
 
+        [Command("Status"), Summary("Sets the activity of bot.")]
+        public Task StatusAsync(ActivityType Activity, [Remainder] string Message)
+            => (Context.Client as DiscordSocketClient).SetActivityAsync(new Game(Message, Activity));
+
         IEnumerable<Assembly> GetAssemblies()
         {
             var Assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
