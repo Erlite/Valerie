@@ -97,10 +97,10 @@ namespace Valerie.JsonModels
     {
         public int Bytes { get; set; }
         public int ChatXP { get; set; }
-        public bool IsAFK { get; set; }
         public int Warnings { get; set; }
+        public bool IsAdmin { get; set; }
         public int DailyStreak { get; set; }
-        public string AFKMessage { get; set; }
-        public DateTime DailyReward { get; set; }
+        public bool IsBlacklisted { get; set; }
+        public DateTime DailyReward { get; set; } = DateTime.Now;
     }
 }
