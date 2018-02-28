@@ -26,6 +26,7 @@ namespace Valerie
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = true,
+                    IgnoreExtraArgs = true,
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
@@ -38,7 +39,7 @@ namespace Valerie
                 .AddSingleton<ConfigHandler>()
                 .AddSingleton<RedditService>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton<ServerHandler>()                
+                .AddSingleton<ServerHandler>()
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
