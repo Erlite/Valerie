@@ -57,15 +57,18 @@ namespace Valerie.Handlers
         public void MemoryUpdate(ulong GuildId, ulong UserId, int Bytes)
         {
             var Server = GetServer(GuildId);
-            var MemUser = Server.Profiles[UserId];
-            if (MemUser == null)
+            if (!Server.Profiles.ContainsKey(UserId))
                 Server.Profiles.Add(UserId, new UserProfile
                 {
                     Bytes = Bytes,
                     DailyStreak = 0,
                     DailyReward = DateTime.Now
                 });
-            MemUser.Bytes += Bytes;
+            else
+            {
+                var MemUser = Server.Profiles[UserId];
+                MemUser.Bytes += Bytes;
+            }
             Save(Server, GuildId);
         }
     }
