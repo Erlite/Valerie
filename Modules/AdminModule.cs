@@ -362,7 +362,7 @@ namespace Valerie.Modules
             Context.Server.ChatterChannel = $"{DefaultChannel.Id}";
             Context.Server.JoinChannel = $"{DefaultChannel.Id}";
             Context.Server.LeaveChannel = $"{DefaultChannel.Id}";
-            Context.Server.ChatXP.LevelMessage = "👾 Congarts **{user}** on hitting level {level}! You received **{bytes}** bytes.";
+            Context.Server.ChatXP.LevelMessage = "👾 Congrats **{user}** on hitting level {level}! You received **{bytes}** bytes.";
             await SaveAsync(ModuleEnums.Server, $"*{Context.Guild}'s* configuration has been completed!");
         }
 
