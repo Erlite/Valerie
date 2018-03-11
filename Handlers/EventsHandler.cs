@@ -198,7 +198,7 @@ namespace Valerie.Handlers
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             if (!Config.Profiles.ContainsKey(User.Id))
             {
-                Config.Profiles.Add(User.Id, new UserProfile { ChatXP = Random.Next(Message.Content.Length), DailyReward = DateTime.Now });
+                Config.Profiles.Add(User.Id, new UserProfile { ChatXP = Random.Next(Message.Content.Length) });
                 ServerHandler.Save(Config, User.Guild.Id);
                 return Task.CompletedTask;
             }
@@ -233,7 +233,7 @@ namespace Valerie.Handlers
             _ = WarnAsync(BadUrls, Message);
             if (!Config.Profiles.ContainsKey(Message.Author.Id))
             {
-                Config.Profiles.Add(Message.Author.Id, new UserProfile { Warnings = 1, DailyReward = DateTime.Now });
+                Config.Profiles.Add(Message.Author.Id, new UserProfile { Warnings = 1 });
                 ServerHandler.Save(Config, (Message.Channel as SocketGuildChannel).Guild.Id);
                 return;
             }
@@ -278,9 +278,10 @@ namespace Valerie.Handlers
             int OldLevel = IntExt.GetLevel(OldXp);
             int NewLevel = IntExt.GetLevel(NewXp);
             if (!(NewLevel > OldLevel)) return;
-            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, (int)Math.Sqrt(NewXp) / NewLevel);
+            int NewBytes = (int)Math.Sqrt(Math.PI * NewXp);
+            ServerHandler.MemoryUpdate(User.Guild.Id, User.Id, NewBytes);
             if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: Math.Pow(Math.Sqrt(NewXp), NewLevel)));
+                await Message.Channel.SendMessageAsync(StringExt.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Bytes: NewBytes));
             if (!Config.ChatXP.LevelRoles.Any()) return;
             var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
             if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
