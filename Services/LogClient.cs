@@ -19,6 +19,7 @@ namespace Valerie.Services
                 case Source.CONFIG: Append($"[{Source}]", ConsoleColor.DarkYellow); break;
                 case Source.DISCORD: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
                 case Source.SERVER: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
+                case Source.PRESENCE: Append($"[{Source}]", ConsoleColor.DarkRed); break;
             }
             Append($" {Text}", ConsoleColor.White);
         }
@@ -55,6 +56,7 @@ namespace Valerie.Services
     {
         CONFIG,
         SERVER,
-        DISCORD
+        DISCORD,
+        PRESENCE
     }
 }
