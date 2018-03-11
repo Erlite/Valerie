@@ -160,18 +160,24 @@ namespace Valerie.Modules
                 {
                     Bytes = 100,
                     DailyStreak = 0,
-                    DailyReward = DateTime.Now
+                    DailyReward = Time
                 });
                 return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
             }
             var User = Context.Server.Profiles[Context.User.Id];
+            if (!User.DailyReward.HasValue)
+            {
+                User.Bytes = 100;
+                User.DailyReward = Time;
+                return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
+            }
             var Get = User.DailyReward;
-            var Passed = DateTime.UtcNow - User.DailyReward;
+            var Passed = Time - User.DailyReward;
             var Wait = Get - Passed;
-            if (Passed.Days < 1) return ReplyAsync($"You need to wait **{Wait.Hour}** hour(s), **{Wait.Minute}** minute(s) for your next reward.");
+            if (Passed.Value.Days < 1) return ReplyAsync($"You need to wait **{Wait.Value.Hour}** hour(s), **{Wait.Value.Minute}** minute(s) for your next reward.");
             User.Bytes += User.DailyStreak * 100;
             User.DailyStreak++;
-            User.DailyReward = DateTime.Now;
+            User.DailyReward = Time;
             return SaveAsync(ModuleEnums.Server, $"You recieved 100 bytes ☺");
         }
 
@@ -275,5 +281,7 @@ namespace Valerie.Modules
                 return $"{SavePath}/image.png";
             }
         }
+
+        DateTime Time => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Eastern Standard Time");
     }
 }

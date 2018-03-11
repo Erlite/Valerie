@@ -167,7 +167,7 @@ namespace Valerie.Modules
             string WarnMessage = $"**[Warned in {Context.Guild}]** {Reason}";
             if (!Context.Server.Profiles.ContainsKey(User.Id))
             {
-                Context.Server.Profiles.Add(User.Id, new UserProfile { Warnings = 1, DailyReward = DateTime.Now });
+                Context.Server.Profiles.Add(User.Id, new UserProfile { Warnings = 1 });
                 await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
                 await SaveAsync(ModuleEnums.Server, $"**{User} has been warned** :ok_hand:");
                 return;
