@@ -38,18 +38,20 @@ namespace Valerie.Services
                 foreach (var Subreddit in Server.Reddit.Subreddits)
                 {
                     var SubIds = new List<string>();
-                    var Sub = (await GetSubredditAsync(Subreddit).ConfigureAwait(false)).Data.Children[0].ChildData;
+                    var Sub = await GetSubredditAsync(Subreddit).ConfigureAwait(false);
+                    if (Sub == null) return;
+                    var Data = Sub.Data.Children[0].ChildData;
 
                     if (PostTrack.ContainsKey(SubChannel.Id)) PostTrack.TryGetValue(SubChannel.Id, out SubIds);
-                    if (SubIds.Contains(Sub.Id)) return;
-                    string Description = Sub.Selftext.Length > 1990 ? $"{Sub.Selftext.Substring(0, 1500)}...." : Sub.Selftext;
-                    string Title = Sub.Title.Length > 40 ? $"{Sub.Title.Substring(0, 35)}...." : Sub.Title;
-                    string Image = await GetImgurLinkAsync(Sub.Url).ConfigureAwait(false);
-                    var Embed = ValerieEmbed.Embed(EmbedColor.Random, AuthorName: $"[r/{Sub.Subreddit}]  Poster: {Sub.Author}",
+                    if (SubIds.Contains(Data.Id)) return;
+                    string Description = Data.Selftext.Length > 1990 ? $"{Data.Selftext.Substring(0, 1500)}...." : Data.Selftext;
+                    string Title = Data.Title.Length > 40 ? $"{Data.Title.Substring(0, 35)}...." : Data.Title;
+                    string Image = await GetImgurLinkAsync(Data.Url).ConfigureAwait(false);
+                    var Embed = ValerieEmbed.Embed(EmbedColor.Random, AuthorName: $"[r/{Data.Subreddit}]  Poster: {Data.Author}",
                         AuthorUrl: Image, AuthorIcon: "https://i.imgur.com/IgrRtnE.png", Title: Title, Description: Description ?? null,
-                    ImageUrl: Image, FooterText: $"Posted At {DateExt.UnixDT(Sub.Created)}");
+                    ImageUrl: Image, FooterText: $"Posted At {DateExt.UnixDT(Data.Created)}");
                     await SubChannel.SendMessageAsync(string.Empty, embed: Embed.Build());
-                    SubIds.Add(Sub.Id);
+                    SubIds.Add(Data.Id);
                     PostTrack.Remove(SubChannel.Id);
                     PostTrack.Add(SubChannel.Id, SubIds);
                 }
