@@ -18,7 +18,7 @@ namespace Valerie.Modules
     {
         [Command("Boobs"), Summary("Oh my, you naughty lilttle boiii!")]
         public async Task BoobsAsync()
-            => await ReplyAsync($"http://media.oboobs.ru/{ await RuNsfwAsync("http://api.oboobs.ru/boobs/", 11272)}");
+            => await ReplyAsync($"http://media.oboobs.ru/{ await RuNsfwAsync("http://api.oboobs.ru/boobs/", 12560)}");
 
         [Command("Ass"), Summary("I can't believe you need help with this command.")]
         public async Task BumsAsync()
