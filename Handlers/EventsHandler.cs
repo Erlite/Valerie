@@ -105,7 +105,7 @@ namespace Valerie.Handlers
             }
         }
 
-        internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id));
+        internal Task LeftGuildAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.RemoveServer(Guild.Id, Guild.Name));
 
         internal Task GuildAvailableAsync(SocketGuild Guild) => Task.Run(() => ServerHandler.AddServer(Guild.Id, Guild.Name));
 
@@ -267,9 +267,9 @@ namespace Valerie.Handlers
         {
             if (string.IsNullOrWhiteSpace(Config.ChatterChannel)) return;
             var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Convert.ToUInt64(Config.ChatterChannel));
-            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("Valerie")) return;
-            var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content);
-            await Channel.SendMessageAsync(Clever.Ouput ?? "Mehehehe, halo m8.").ConfigureAwait(false);
+            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("valerie")) return;
+            var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content.ToLower().Replace("valerie", ""));
+            await Channel.SendMessageAsync(Clever.CleverOutput).ConfigureAwait(false);
         }
 
         async Task LevelUpAsync(SocketMessage Message, ServerModel Config, int OldXp, int NewXp)
