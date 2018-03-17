@@ -19,6 +19,7 @@ namespace Valerie.Modules
     public class FunModule : ValerieBase
     {
         string SavePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+        DateTime Time => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Eastern Standard Time");
         string Normal = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,-./:;<=>?@[\\]^_`{|}~ ";
         string FullWidth = "０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯ" +
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
@@ -153,7 +154,7 @@ namespace Valerie.Modules
 
         [Command("Daily"), Summary("Get your daily dose of bytes.")]
         public Task DailyAsync()
-        {
+        {            
             if (!Context.Server.Profiles.ContainsKey(Context.User.Id))
             {
                 Context.Server.Profiles.Add(Context.User.Id, new UserProfile
@@ -174,7 +175,7 @@ namespace Valerie.Modules
             var Get = User.DailyReward;
             var Passed = Time - User.DailyReward;
             var Wait = Get - Passed;
-            if (Passed.Value.Days < 1) return ReplyAsync($"You need to wait **{Wait.Value.Hour}** hour(s), **{Wait.Value.Minute}** minute(s) for your next reward.");
+            if (Passed.Value.TotalHours < 24) return ReplyAsync($"You need to wait **{Wait.Value.Hour}** hour(s), **{Wait.Value.Minute}** minute(s) for your next reward.");
             User.Bytes += User.DailyStreak * 100;
             User.DailyStreak++;
             User.DailyReward = Time;
@@ -248,11 +249,20 @@ namespace Valerie.Modules
         [Command("Clap"), Summary("Adds clap to your sentence message.")]
         public Task ClapAsync([Remainder] string Message) => ReplyAsync(Message.Replace(" ", " 👏 "));
 
+        [Command("Profile"), Summary("Shows a users profile with stats.")]
+        public async Task ProfileAsync(IGuildUser User = null)
+        {
+            User = User ?? Context.User as IGuildUser;
+            var Embed = ValerieEmbed.Embed(EmbedColor.Random, User.GetAvatarUrl(), $"Displaying {User.Username}'s Profile");
+            Embed.AddField("", "", true);
+            Embed.AddField("", "", true);
+        }
+
+
         async Task<string> GraveAsync(IGuildUser User)
         {
             var Get = await Context.HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
-            using (var UserImage = File.Create($"{SavePath}/user.png"))
-                await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
+            using (var UserImage = File.Create($"{SavePath}/user.png")) await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
 
             using (var Grave = SixLabors.ImageSharp.Image.Load<Rgba32>($"{SavePath}/grave.png"))
             {
@@ -267,7 +277,6 @@ namespace Valerie.Modules
                 });
                 Grave.Save($"{SavePath}/user.png");
             }
-
             return $"{SavePath}/user.png";
         }
 
@@ -281,7 +290,5 @@ namespace Valerie.Modules
                 return $"{SavePath}/image.png";
             }
         }
-
-        DateTime Time => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Eastern Standard Time");
     }
 }
