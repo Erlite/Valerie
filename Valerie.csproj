@@ -3,28 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Authors>Yucked</Authors>
-    <Company>Noegenesis Studios</Company>
-    <Copyright>Yucked</Copyright>
-    <PackageLicenseUrl>https://github.com/yucked/Valerie/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/yucked/Valerie</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/yucked/Valerie</RepositoryUrl>
-    <RepositoryType>public</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.9.9.1" />
-    <PackageReference Include="Cookie" Version="2.7.2" />
-    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00890" />
-    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.32.2.1146" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.32.2.1131" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.6.1" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.2-nightly-20180226-0500" />
-    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0003" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0002" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0002" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00915" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.3-nightly-20180325-0400" />
   </ItemGroup>
-
- 
 
 </Project>
