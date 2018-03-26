@@ -1,6 +1,5 @@
 ﻿using System;
 using Discord;
-using Valerie.Services;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
@@ -11,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie
 {
-    public class Start
+    class Core
     {
-        static void Main(string[] args) => new Start().InitializeAsync().GetAwaiter().GetResult();
+        static void Main(string[] args) => new Core().InitializeAsync().GetAwaiter().GetResult();
 
         async Task InitializeAsync()
         {
@@ -26,7 +25,6 @@ namespace Valerie
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = true,
-                    IgnoreExtraArgs = true,
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
@@ -36,15 +34,14 @@ namespace Valerie
                     Urls = new[] { "http://127.0.0.1:8080" }
                 }.Initialize())
                 .AddSingleton<MainHandler>()
+                .AddSingleton<GuildHandler>()
                 .AddSingleton<ConfigHandler>()
-                .AddSingleton<RedditService>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton<ServerHandler>()
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
-            await Provider.GetRequiredService<MainHandler>().StartAsync();
+            await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
 
             await Task.Delay(-1);
