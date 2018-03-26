@@ -9,11 +9,14 @@ namespace Valerie.Models
         public string Prefix { get; set; }
         public string ReportChannel { get; set; }
         public string ServerMessage { get; set; }
-        public List<string> Games { get; set; } = new List<string>();
+        public List<string> Games { get; set; } = new List<string>()
+        {
+            "with Yucked.", "Guess the prefix.", "Borderlands 2"
+        };
         public List<string> Imports { get; set; } = new List<string>()
         {
-            "System", "System.IO", "System.Reflection", "System.Linq", "System.Collections.Generic",
-            "System.Net.Http", "System.Threading", "Newtonsoft.Json"
+            "System", "System.IO", "System.Linq", "System.Net.Http", "Newtonsoft.Json",
+            "System.Threading", "System.Reflection", "System.Collections.Generic", 
         };
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
