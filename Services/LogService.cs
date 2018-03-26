@@ -2,7 +2,7 @@
 
 namespace Valerie.Services
 {
-    public class LogClient
+    public class LogService
     {
         static void Append(string Text, ConsoleColor Color)
         {
@@ -10,21 +10,15 @@ namespace Valerie.Services
             Console.Write(Text);
         }
 
-        public static void Write(Source Source, string Text)
+        public static void Write(string Source, string Text, ConsoleColor? Color = null)
         {
             Console.Write(Environment.NewLine);
             Append($"{DateTime.Now.ToShortTimeString()} ", ConsoleColor.Gray);
-            switch (Source)
-            {
-                case Source.CONFIG: Append($"[{Source}]", ConsoleColor.DarkYellow); break;
-                case Source.DISCORD: Append($"[{Source}]", ConsoleColor.DarkCyan); break;
-                case Source.SERVER: Append($"[{Source}]", ConsoleColor.DarkMagenta); break;
-                case Source.PRESENCE: Append($"[{Source}]", ConsoleColor.DarkRed); break;
-            }
+            Append($"[{Source}]", Color ?? ConsoleColor.White);
             Append($" {Text}", ConsoleColor.White);
         }
 
-        public static void AppInfo()
+        public static void PrintApplicationInformation()
         {
             var Header = new[]
             {
@@ -50,13 +44,5 @@ namespace Valerie.Services
             Append($"    -> VERSIONS\n", ConsoleColor.Red);
             Append($"        Valerie: 18-Alpha-02-26\n        Discord: {Discord.DiscordConfig.Version}\n        RavenDB: RavenDB.Client 4.0.0-nightly-20180120-0500\n", ConsoleColor.Gray);
         }
-    }
-
-    public enum Source
-    {
-        CONFIG,
-        SERVER,
-        DISCORD,
-        PRESENCE
     }
 }
