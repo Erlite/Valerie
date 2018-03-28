@@ -26,14 +26,21 @@ namespace Valerie.Handlers
         {
             LogService.PrintApplicationInformation();
             await DatabaseCheck();
+
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
+            Client.LeftGuild += Events.LeftGuild;
             Client.Connected += Events.Connected;
-            Client.LeftGuild += Events.LeftGuildAsync;
+            Client.UserLeft += Events.UserLeftAsync;
             Client.Disconnected += Events.Disconnected;
             Client.GuildAvailable += Events.GuildAvailable;
+            Client.UserJoined += Events.UserJoinedAsync;
             Client.JoinedGuild += Events.JoinedGuildAsync;
-
+            Client.LatencyUpdated += Events.LatencyUpdated;
+            Client.ReactionAdded += Events.ReactionAddedAsync;
+            Client.MessageReceived += Events.HandleMessageAsync;
+            Client.ReactionRemoved += Events.ReactionRemovedAsync;
+            Client.MessageReceived += Events.CommandHandlerAsync;
 
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
