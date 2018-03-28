@@ -1,4 +1,6 @@
-﻿using Valerie.Models;
+﻿using System;
+using Valerie.Models;
+using Valerie.Services;
 using Raven.Client.Documents;
 
 namespace Valerie.Handlers
@@ -8,11 +10,15 @@ namespace Valerie.Handlers
         IDocumentStore Store { get; }
         public GuildHandler(IDocumentStore store) => Store = store;
 
-        public GuildModel GetServer(ulong Id) { using (var Session = Store.OpenSession()) return Session.Load<GuildModel>($"{Id}"); }
+        public GuildModel GetGuild(ulong Id) { using (var Session = Store.OpenSession()) return Session.Load<GuildModel>($"{Id}"); }
 
-        public void RemoveServer(ulong Id) { using (var Session = Store.OpenSession()) Session.Delete($"{Id}"); }
+        public void RemoveGuild(ulong Id, string Event, string Name = null)
+        {
+            using (var Session = Store.OpenSession()) Session.Delete($"{Id}");
+            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", ConsoleColor.DarkCyan);
+        }
 
-        public void AddServer(ulong Id, string Name = null)
+        public void AddGuild(ulong Id, string Event, string Name = null)
         {
             using (var Session = Store.OpenSession())
             {
@@ -24,9 +30,10 @@ namespace Valerie.Handlers
                 });
                 Session.SaveChanges();
             }
+            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Added Server With Id: {Id}" : $"Created Config For {Name}", ConsoleColor.DarkCyan);
         }
 
-        public void Save(GuildModel Server, ulong Id)
+        public void Save(GuildModel Server)
         {
             if (Server == null) return;
             using (var Session = Store.OpenSession())
