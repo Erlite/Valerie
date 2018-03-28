@@ -1,5 +1,6 @@
 ﻿using System;
 using Discord;
+using Valerie.Helpers;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
@@ -33,10 +34,11 @@ namespace Valerie
                     Database = "Valerie",
                     Urls = new[] { "http://127.0.0.1:8080" }
                 }.Initialize())
+                .AddSingleton<GuildHelper>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<GuildHandler>()
                 .AddSingleton<ConfigHandler>()
-                .AddSingleton<EventsHandler>()
+                .AddSingleton<EventsHandler>()                
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
