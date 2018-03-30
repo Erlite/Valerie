@@ -15,7 +15,7 @@ namespace Valerie.Handlers
         public void RemoveGuild(ulong Id, string Event, string Name = null)
         {
             using (var Session = Store.OpenSession()) Session.Delete($"{Id}");
-            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", ConsoleColor.DarkCyan);
+            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", ConsoleColor.DarkRed);
         }
 
         public void AddGuild(ulong Id, string Event, string Name = null)
