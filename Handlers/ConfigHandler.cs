@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cookie;
+using System;
 using Valerie.Models;
 using Valerie.Services;
 using Raven.Client.Documents;
@@ -11,6 +12,15 @@ namespace Valerie.Handlers
         public ConfigHandler(IDocumentStore store) => Store = store;
 
         public ConfigModel Config { get { using (var Session = Store.OpenSession()) return Session.Load<ConfigModel>("Config"); } }
+        public CookieClient Cookie
+        {
+            get => new CookieClient(new CookieConfig
+            {
+                GiphyKey = Config.APIKeys["Giphy"],
+                SteamKey = Config.APIKeys["Steam"],
+                CleverbotKey = Config.APIKeys["Cleverbot"]
+            });
+        }
 
         public void ConfigCheck()
         {
