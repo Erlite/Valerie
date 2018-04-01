@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00915" />
+    <PackageReference Include="Cookie" Version="2.7.2" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00919" />
     <PackageReference Include="RavenDB.Client" Version="4.0.3-nightly-20180325-0400" />
   </ItemGroup>
 
