@@ -4,7 +4,7 @@ namespace Valerie.Addons
 {
     public class Embeds
     {
-        public static EmbedBuilder BuildEmbed(Paint Paint)
+        public static EmbedBuilder GetEmbed(Paint Paint)
         {
             var Embed = new EmbedBuilder();
             switch (Paint)
