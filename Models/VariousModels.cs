@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Valerie.Models
@@ -13,38 +14,55 @@ namespace Valerie.Models
 
     public class StarboardWrapper
     {
-        public string TextChannel { get; set; }
+        public string _TextChannel { get; set; }
         public List<StarboardMessage> StarboardMessages { get; set; } = new List<StarboardMessage>();
+        [JsonIgnore]
+        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
     }
 
     public class StarboardMessage
     {
         public int Stars { get; set; }
-        public string AuthorId { get; set; }
-        public string ChannelId { get; set; }
-        public string MessageId { get; set; }
-        public string StarboardMessageId { get; set; }
+        public string _AuthorId { get; set; }
+        public string _ChannelId { get; set; }
+        public string _MessageId { get; set; }
+        public string _StarboardMessageId { get; set; }
+        [JsonIgnore]
+        public ulong AuthorId { get => UInt64.TryParse(_AuthorId, out ulong authorId) ? authorId : 0; set => _AuthorId = $"{value}"; }
+        [JsonIgnore]
+        public ulong ChannelId { get => UInt64.TryParse(_ChannelId, out ulong channelId) ? channelId : 0; set => _ChannelId = $"{value}"; }
+        [JsonIgnore]
+        public ulong MessageId { get => UInt64.TryParse(_MessageId, out ulong messageId) ? messageId : 0; set => _MessageId = $"{value}"; }
+        [JsonIgnore]
+        public ulong StarboardMessageId { get => UInt64.TryParse(_StarboardMessageId, out ulong starboardId) ? starboardId : 0; set => _StarboardMessageId = $"{value}"; }
     }
 
     public class TagWrapper
     {
         public int Uses { get; set; }
         public string Name { get; set; }
-        public string Owner { get; set; }
-        public string Response { get; set; }
+        public string Content { get; set; }
+        public string _Owner { get; set; }
         public DateTime CreationDate { get; set; }
+        [JsonIgnore]
+        public ulong Owner { get => UInt64.TryParse(_Owner, out ulong Id) ? Id : 0; set => _Owner = $"{value}"; }
     }
 
     public class ModWrapper
     {
-        public string MuteRole { get; set; }
+        public string _JoinRole { get; set; }
         public int MaxWarnings { get; set; }
-        public string TextChannel { get; set; }
-        public string AutoAssignRole { get; set; }
-        public bool IsAutoModEnabled { get; set; }
+        public string _MuteRole { get; set; }
+        public string _TextChannel { get; set; }
         public List<string> BadWords { get; set; } = new List<string>(50);
         public List<string> BlockedUrls { get; set; } = new List<string>(50);
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
+        [JsonIgnore]
+        public ulong JoinRole { get => UInt64.TryParse(_JoinRole, out ulong Id) ? Id : 0; set => _JoinRole = $"{value}"; }
+        [JsonIgnore]
+        public ulong MuteRole { get => UInt64.TryParse(_MuteRole, out ulong Id) ? Id : 0; set => _MuteRole = $"{value}"; }
+        [JsonIgnore]
+        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
     }
 
     public class CaseWrapper
@@ -67,14 +85,17 @@ namespace Valerie.Models
     public class RedditWrapper
     {
         public bool IsEnabled { get; set; }
-        public string TextChannel { get; set; }
+        public string _TextChannel { get; set; }
         public List<string> Subreddits { get; set; } = new List<string>(5);
+        [JsonIgnore]
+        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
     }
 
     public class UserProfile
     {
-        public int Bytes { get; set; }
+        public bool IsVux { get; set; }
         public int ChatXP { get; set; }
+        public int Crystals { get; set; }
         public int Warnings { get; set; }
         public bool IsAdmin { get; set; }
         public int DailyStreak { get; set; }
