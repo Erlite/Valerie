@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Discord.Commands;
+using System.Threading.Tasks;
 
 namespace Valerie.Preconditions
 {
