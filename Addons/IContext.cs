@@ -1,6 +1,7 @@
 ﻿using System;
 using Discord;
 using Valerie.Models;
+using Valerie.Helpers;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Commands;
@@ -24,6 +25,7 @@ namespace Valerie.Addons
         public GuildHandler GuildHandler { get; }
         public IDocumentSession Session { get; }
         public ConfigHandler ConfigHandler { get; }
+        public MethodHelper MethodHelper { get; }
 
         public IContext(IDiscordClient ClientParam, IUserMessage MessageParam, IServiceProvider ServiceProvider)
         {
@@ -37,8 +39,9 @@ namespace Valerie.Addons
             GuildHandler = ServiceProvider.GetRequiredService<GuildHandler>();
             Config = ServiceProvider.GetRequiredService<ConfigHandler>().Config;
             ConfigHandler = ServiceProvider.GetRequiredService<ConfigHandler>();
-            Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
+            MethodHelper = ServiceProvider.GetRequiredService<MethodHelper>();
             Server = ServiceProvider.GetRequiredService<GuildHandler>().GetGuild(Guild.Id);
+            Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
         }
     }
 }
