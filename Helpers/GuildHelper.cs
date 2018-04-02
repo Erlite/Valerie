@@ -16,9 +16,9 @@ namespace Valerie.Helpers
             GuildHandler = guildHandler;
         }
 
-        public IMessageChannel DefaultChannel(ulong Id)
+        public IMessageChannel DefaultChannel(ulong GuildId)
         {
-            var Guild = Client.GetGuild(Id);
+            var Guild = Client.GetGuild(GuildId);
             return Guild.TextChannels.FirstOrDefault(x => x.Name.Contains("general") || x.Name.Contains("lobby") || x.Id == Guild.Id) ?? Guild.DefaultChannel;
         }
 
