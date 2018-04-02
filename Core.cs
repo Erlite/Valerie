@@ -26,6 +26,7 @@ namespace Valerie
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = true,
+                    IgnoreExtraArgs = false,
                     CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
