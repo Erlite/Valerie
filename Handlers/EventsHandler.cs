@@ -118,7 +118,7 @@ namespace Valerie.Handlers
             var Config = GuildHandler.GetGuild(Guild.Id);
             var StarboardChannel = Guild.GetTextChannel(Config.Starboard.TextChannel) as IMessageChannel;
             if (Message == null || StarboardChannel == null || Reaction.Channel.Id == Config.Starboard.TextChannel) return;
-            var Embed = BuildEmbed(Paint.Yellow)
+            var Embed = GetEmbed(Paint.Yellow)
                 .WithAuthor(x =>
                 {
                     x.Name = Message.Author.Username;
@@ -162,7 +162,7 @@ namespace Valerie.Handlers
             var Config = GuildHandler.GetGuild(Guild.Id);
             var StarboardChannel = Guild.GetTextChannel(Config.Starboard.TextChannel) as IMessageChannel;
             if (Message == null || StarboardChannel == null) return;
-            var Embed = BuildEmbed(Paint.Yellow)
+            var Embed = GetEmbed(Paint.Yellow)
                 .WithAuthor(x =>
                 {
                     x.Name = Message.Author.Username;
