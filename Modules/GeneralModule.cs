@@ -16,7 +16,7 @@ namespace Valerie.Modules
     public class GeneralModule : Base
     {
         [Command("Ping"), Summary("Replies back with a pong?")]
-        public async Task PingAsync() => await ReplyAsync(string.Empty, BuildEmbed(Paint.Lime)
+        public async Task PingAsync() => await ReplyAsync(string.Empty, GetEmbed(Paint.Lime)
             .WithTitle("Beep Boop, Boop Beep!")
             .WithThumbnailUrl(Emotes.DHeart.Url)
             .AddField("Gateway", $"{(Context.Client as DiscordSocketClient).Latency} ms", true)
@@ -33,9 +33,12 @@ namespace Valerie.Modules
                 await ReplyAndDeleteAsync($"Hmm, I can't submit a blank feedback. Try again maybe?");
                 return;
             }
-            await ReportChannel.SendMessageAsync($"**New Feedback From {Context.Guild}**\n\n**User:** {Context.User} ({Context.User.Id})\n" +
-                $"**Response:** {Response}");
-            await ReplyAsync("Thank you for sumbitting your feedback. 😊");
+            await ReportChannel.SendMessageAsync(string.Empty, embed: GetEmbed(Paint.Aqua)
+                .WithAuthor(x => { x.Name = $"Feedback from {Context.User}"; x.IconUrl = Context.User.GetAvatarUrl(); })
+                .WithDescription($"**Feedback:**\n{Response.Content}")
+                .WithFooter(x => { x.Text = $"{Context.Guild} | {Context.Guild.Id}"; })
+                .Build());
+            await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
         }
 
         [Command("Stats"), Summary("Displays information about Valerie and her stats.")]
@@ -49,7 +52,7 @@ namespace Valerie.Modules
             foreach (var Commit in Commits.Take(3))
                 Description += $"[[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})] {Commit.Commit.Message}\n";
 
-            var Embed = BuildEmbed(Paint.Magenta)
+            var Embed = GetEmbed(Paint.Magenta)
                 .WithAuthor(x =>
                 {
                     x.Name = $"{Context.Client.CurrentUser.Username} Statistics 🔰";
