@@ -9,5 +9,6 @@ namespace Valerie.Addons
         public static Emote DEyes { get => Emote.Parse("<:zoomeyes:390046883281633290>"); }
         public static Emote DHammer { get => Emote.Parse("<:dblMod:401724520806875139>"); }
         public static Emote DSupporter { get => Emote.Parse("<:dblSupporter:401725034453925889>"); }
+        public static Emote PepeSad { get => Emote.Parse("<:PepeSad:420351909833211904>"); }
     }
 }
