@@ -21,6 +21,7 @@ namespace Valerie.Addons
         public IDiscordClient Client { get; }
         public HttpClient HttpClient { get; }
         public IUserMessage Message { get; }
+        public GuildHelper GuildHelper { get; }
         public IMessageChannel Channel { get; }
         public GuildHandler GuildHandler { get; }
         public IDocumentSession Session { get; }
@@ -36,6 +37,7 @@ namespace Valerie.Addons
             Guild = (MessageParam.Channel as IGuildChannel).Guild;
             Random = ServiceProvider.GetRequiredService<Random>();
             HttpClient = ServiceProvider.GetRequiredService<HttpClient>();
+            GuildHelper = ServiceProvider.GetRequiredService<GuildHelper>();
             GuildHandler = ServiceProvider.GetRequiredService<GuildHandler>();
             Config = ServiceProvider.GetRequiredService<ConfigHandler>().Config;
             ConfigHandler = ServiceProvider.GetRequiredService<ConfigHandler>();
