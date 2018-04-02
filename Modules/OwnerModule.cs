@@ -25,7 +25,7 @@ namespace Valerie.Modules
                     await Context.Client.CurrentUser.ModifyAsync(x => x.Username = Value);
                     break;
                 case UpdateType.Status:
-                    var Split = Value.Split('-');
+                    var Split = Value.Split(':');
                     await (Context.Client as DiscordSocketClient).SetActivityAsync(
                         new Game(Split[1], (ActivityType)Enum.Parse(typeof(ActivityType), Split[0]))).ConfigureAwait(false);
                     break;
