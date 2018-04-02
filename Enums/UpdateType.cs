@@ -4,6 +4,7 @@
     {
         Status,
         Avatar,
+        Prefix,
         Username
     }
 }
