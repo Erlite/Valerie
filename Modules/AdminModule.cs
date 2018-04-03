@@ -68,5 +68,53 @@ namespace Valerie.Modules
                .Build();
             return ReplyAsync(string.Empty, Embed);
         }
+
+        [Command("Setup"), Summary("Set ups Valerie for your Server.")]
+        public async Task SetupAsync()
+        {
+            if (Context.Server.IsConfigured == true)
+            {
+                await ReplyAsync($"{Context.Guild} has already been configured.");
+                return;
+            }
+            var Channels = await Context.Guild.GetTextChannelsAsync();
+            var SetupMessage = await ReplyAsync($"Initializing *{Context.Guild}'s* config .... ");
+            OverwritePermissions Permissions = new OverwritePermissions(sendMessages: PermValue.Deny);
+            OverwritePermissions VPermissions = new OverwritePermissions(sendMessages: PermValue.Allow);
+            var HasStarboard = Channels.FirstOrDefault(x => x.Name == "starboard");
+            var HasMod = Channels.FirstOrDefault(x => x.Name == "logs");
+            if (Channels.Contains(HasStarboard)) Context.Server.Starboard.TextChannel = HasStarboard.Id;
+            else
+            {
+                var Starboard = await Context.Guild.CreateTextChannelAsync("starboard");
+                await Starboard.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Starboard.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
+                Context.Server.Starboard.TextChannel = Starboard.Id;
+            }
+            if (Channels.Contains(HasMod)) Context.Server.Mod.TextChannel = HasMod.Id;
+            else
+            {
+                var Mod = await Context.Guild.CreateTextChannelAsync("logs");
+                await Mod.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, Permissions);
+                await Mod.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
+                Context.Server.Mod.TextChannel = Mod.Id;
+            }
+            Context.Server.ChatterChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
+            Context.Server.JoinChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
+            Context.Server.LeaveChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
+            Context.Server.ChatXP.LevelMessage = "👾 Congrats **{user}** on hitting level {level}! You received **{crystals}** crystals.";
+            Context.Server.JoinMessages.Add("{user} in da houuuuuuseeeee! Turn up!");
+            Context.Server.JoinMessages.Add("Whalecum to {guild}, {user}! Make yourself comfy wink wink.");
+            Context.Server.LeaveMessages.Add("{user} abandoned us ... Fake frens :((");
+            Context.Server.LeaveMessages.Add("Fuck {user} and fuck this guild and fuck all of you!");
+            Context.Server.ChatXP.IsEnabled = true;
+            Context.Server.IsConfigured = true;
+            await ReplyAsync($"Configuration for {Context.Guild} is finished.", Document: DocumentType.Server);
+        }
+
+        [Command("Show Subreddits"), Summary("Shows all the subreddits this server is subbed to.")]
+        public Task ShowSubsAsync() =>
+            !Context.Server.Reddit.Subreddits.Any() ? ReplyAsync($"{Context.Guild} isn't subbed to any subreddits.") :
+            ReplyAsync($"**Subbed Subreddits**\n{string.Join(", ", Context.Server.Reddit.Subreddits)}");
     }
 }
