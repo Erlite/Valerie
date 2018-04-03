@@ -45,7 +45,7 @@ namespace Valerie.Modules
         }
 
         [Command("Update"), Priority(1), Summary("Updates an existing tag.")]
-        public Task ModifyAsync(string Name, string Response)
+        public Task UpdateAsync(string Name, string Response)
         {
             if (!CheckTag(Name)) return Task.CompletedTask;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
