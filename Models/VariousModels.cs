@@ -54,7 +54,7 @@ namespace Valerie.Models
         public int MaxWarnings { get; set; }
         public string _MuteRole { get; set; }
         public string _TextChannel { get; set; }
-        public List<string> BadWords { get; set; } = new List<string>(50);
+        public List<string> BlockedWords { get; set; } = new List<string>(50);
         public List<string> BlockedUrls { get; set; } = new List<string>(50);
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         [JsonIgnore]
