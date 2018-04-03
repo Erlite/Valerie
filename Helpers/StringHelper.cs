@@ -25,6 +25,12 @@ namespace Valerie.Helpers
             return Role == null ? "Unknown Role." : Role.Name;
         }
 
+        public static string CheckChannel(SocketGuild Guild, ulong Id)
+        {
+            var Channel = Guild.GetTextChannel(Id);
+            return Channel == null ? "Unknown Channel." : Channel.Name;
+        }
+
         public static string Star(int Stars)
         {
             if (Stars <= 5 && Stars > 0) return "⭐";
