@@ -12,10 +12,10 @@ namespace Valerie.Modules
     [Name("Valerie's Owner Commands"), RequireOwner]
     public class OwnerModule : Base
     {
-        [Command("Update"), Summary("Upd")]
-        public async Task UpdateAsync(UpdateType Update, [Remainder] string Value)
+        [Command("Update"), Summary("Updates Valerie's Information.")]
+        public async Task UpdateAsync(UpdateType UpdateType, [Remainder] string Value)
         {
-            switch (Update)
+            switch (UpdateType)
             {
                 case UpdateType.Avatar:
                     using (var Picture = new FileStream(Value, FileMode.Open))
@@ -33,7 +33,7 @@ namespace Valerie.Modules
                     Context.Config.Prefix = Value;
                     break;
             }
-            await ReplyAsync($"{Update} has been updated {Emotes.DWink}", Document: DocumentType.Config);
+            await ReplyAsync($"{UpdateType} has been updated {Emotes.DWink}", Document: DocumentType.Config);
         }
 
         [Command("GetInvite"), Summary("Makes an invite for the  specified guild.")]
