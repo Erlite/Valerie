@@ -8,6 +8,7 @@ namespace Valerie.Models
     {
         public string Id { get; set; }
         public string Prefix { get; set; }
+        public bool IsConfigured { get; set; }
         public string _JoinChannel { get; set; }
         public string _LeaveChannel { get; set; }
         public string _ChatterChannel { get; set; }
