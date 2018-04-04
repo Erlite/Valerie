@@ -33,9 +33,13 @@ namespace Valerie.Modules
             await ReplyAsync($"What is going to be the response for *{GetName.Content}*?");
             var GetContent = await ResponseWaitAsync();
             if (GetContent == null) return;
+            await ReplyAsync($"Do you want {GetName.Content} to be auto-responsive? (Y/N)");
+            var GetToggle = await ResponseWaitAsync();
+            var Check = GetToggle.Content.ToLower() == "y" ? true : false;
             Context.Server.Tags.Add(new TagWrapper
             {
                 Uses = 1,
+                AutoRespond = Check,
                 Owner = Context.User.Id,
                 Name = GetName.Content,
                 Content = GetContent.Content,
