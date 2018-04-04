@@ -154,5 +154,58 @@ namespace Valerie.Modules
                 .WithImageUrl(Content.Hdurl).Build());
 
         }
+
+        [Command("SteamUser"), Summary("Shows info about a steam user.")]
+        public async Task UserAsync(string UserId)
+        {
+            var UserInfo = await Context.ConfigHandler.Cookie.Steam.GetUsersInfoAsync(new[] { UserId }.ToList());
+            var UserGames = await Context.ConfigHandler.Cookie.Steam.OwnedGamesAsync(UserId);
+            var UserRecent = await Context.ConfigHandler.Cookie.Steam.RecentGamesAsync(UserId);
+            var Info = UserInfo.PlayersInfo.Players.FirstOrDefault();
+            string State;
+            if (Info.ProfileState == 0) State = "Offline";
+            else if (Info.ProfileState == 1) State = "Online";
+            else if (Info.ProfileState == 2) State = "Busy";
+            else if (Info.ProfileState == 3) State = "Away";
+            else if (Info.ProfileState == 4) State = "Snooze";
+            else if (Info.ProfileState == 5) State = "Looking to trade";
+            else State = "Looking to play";
+
+            var Embed = GetEmbed(Paint.Aqua)
+                .WithAuthor(x =>
+               {
+                   x.Name = Info.RealName;
+                   x.Url = Info.ProfileLink;
+                   x.IconUrl = "https://png.icons8.com/material/256/e5e5e5/steam.png";
+               })
+              .WithThumbnailUrl(Info.AvatarFullUrl)
+              .AddField("Display Name", $"{Info.Name}", true)
+              .AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true)
+              .AddField("Person State", State, true)
+              .AddField("Profile Created", MethodHelper.UnixDateTime(Info.TimeCreated), true)
+              .AddField("Last Online", MethodHelper.UnixDateTime(Info.LastLogOff), true)
+              .AddField("Primary Clan ID", Info.PrimaryClanId ?? "None.", true)
+              .AddField("Owned Games", UserGames.OwnedGames.GamesCount, true)
+              .AddField("Recently Played Games", UserRecent.RecentGames.TotalCount, true);
+            await ReplyAsync(string.Empty, Embed.Build());
+        }
+
+        [Command("Giphy"), Alias("Gif"), Summary("Searches Giphy for your Gifs??")]
+        public async Task Giphy([Remainder] string SearchTerms = null)
+        {
+            string Response = null;
+            if (!string.IsNullOrWhiteSpace(SearchTerms))
+            {
+                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchAsync(SearchTerms);
+                Response = GetGif.Datum[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
+            }
+            else
+            {
+                var Gif = await Context.ConfigHandler.Cookie.Giphy.TrendingAsync();
+                var Random = Context.Random.Next(Gif.Pagination.Count);
+                Response = Gif.Datum[Random].EmbedURL;
+            }
+            await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua).WithImageUrl(Response).Build());
+        }
     }
 }
