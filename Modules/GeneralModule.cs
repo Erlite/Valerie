@@ -41,7 +41,7 @@ namespace Valerie.Modules
             await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
         }
 
-        [Command("Stats"), Summary("Displays information about Valerie and her stats.")]
+        [Command("Stats"), Alias("About", "Info"), Summary("Displays information about Valerie and her stats.")]
         public async Task StatsAsync()
         {
             var Client = Context.Client as DiscordSocketClient;
