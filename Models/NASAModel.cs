@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Valerie.Modules
+namespace Valerie.Models
 {
     public class NASAModel
     {
