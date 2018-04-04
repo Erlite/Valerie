@@ -43,6 +43,7 @@ namespace Valerie.Models
         public string Name { get; set; }
         public string Content { get; set; }
         public string _Owner { get; set; }
+        public bool AutoRespond { get; set; }
         public DateTime CreationDate { get; set; }
         [JsonIgnore]
         public ulong Owner { get => UInt64.TryParse(_Owner, out ulong Id) ? Id : 0; set => _Owner = $"{value}"; }
