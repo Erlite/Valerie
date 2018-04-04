@@ -23,6 +23,7 @@ namespace Valerie.Handlers
         ConfigHandler ConfigHandler { get; }
         IServiceProvider Provider { get; set; }
         CommandService CommandService { get; }
+        Dictionary<ulong, Dictionary<ulong, List<string>>> Waitlist { get; set; }
         public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command, Random random, GuildHelper guildHelper)
         {
             Client = client;
@@ -31,6 +32,7 @@ namespace Valerie.Handlers
             ConfigHandler = config;
             GuildHelper = guildHelper;
             CommandService = command;
+            Waitlist = new Dictionary<ulong, Dictionary<ulong, List<string>>>();
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
