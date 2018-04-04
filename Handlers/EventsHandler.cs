@@ -90,6 +90,7 @@ namespace Valerie.Handlers
             _ = AFKHandlerAsync(Msg, Config);
             _ = XpHandlerAsync(Message, Config);
             _ = CleverbotHandlerAsync(Msg, Config);
+            _ = AutoTagAsync(Msg, Config);
             return Task.CompletedTask;
         }
 
@@ -248,6 +249,15 @@ namespace Valerie.Handlers
             await User.AddRoleAsync(Role);
             foreach (var lvlrole in Config.ChatXP.LevelRoles)
                 if (lvlrole.Value < NewLevel) if (!User.Roles.Contains(User.Guild.GetRole(lvlrole.Key))) await User.AddRoleAsync(User.Guild.GetRole(lvlrole.Key));
+        }
+
+        Task AutoTagAsync(SocketMessage Message, GuildModel Config)
+        {
+            if (!Config.Tags.Any(x => x.AutoRespond == true)) return Task.CompletedTask;
+            var Tags = Config.Tags.Where(x => x.AutoRespond == true);
+            var Content = Tags.FirstOrDefault(x => Message.Content.StartsWith(x.Name));
+            if (Content != null) return Message.Channel.SendMessageAsync(Content.Content);
+            return Task.CompletedTask;
         }
     }
 }
