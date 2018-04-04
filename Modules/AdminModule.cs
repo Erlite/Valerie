@@ -1,5 +1,4 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using System.Linq;
 using Valerie.Enums;
 using Valerie.Models;
