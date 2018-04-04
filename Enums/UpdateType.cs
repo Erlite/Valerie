@@ -4,7 +4,9 @@
     {
         Status,
         Avatar,
-        Prefix,
-        Username
+        Prefix,        
+        Nickname,
+        Username,
+        ReportChannel
     }
 }
