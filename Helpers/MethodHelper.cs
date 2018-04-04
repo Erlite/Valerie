@@ -1,4 +1,5 @@
-﻿using Valerie.Models;
+﻿using System;
+using Valerie.Models;
 using Newtonsoft.Json;
 using System.Net.Http;
 using Discord.WebSocket;
@@ -16,6 +17,8 @@ namespace Valerie.Helpers
             HttpClient = httpClient;
             Client = client;
         }
+
+        public static DateTime UnixDateTime(double Unix) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
 
         public async Task<IReadOnlyCollection<GithubModel>> GetCommitsAsync()
         {
