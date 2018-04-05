@@ -11,15 +11,8 @@ namespace Valerie.Models
         public string Prefix { get; set; }
         public string ServerMessage { get; set; }
         public string _ReportChannel { get; set; }
-        public List<string> Games { get; set; } = new List<string>()
-        {
-            "with Yucked.", "Guess the prefix.", "Borderlands 2"
-        };
-        public List<string> Imports { get; set; } = new List<string>()
-        {
-            "System", "System.IO", "System.Linq", "System.Net.Http", "Newtonsoft.Json",
-            "System.Threading", "System.Reflection", "System.Collections.Generic",
-        };
+        public List<string> Games { get; set; } = new List<string>();
+        public List<string> Imports { get; set; } = new List<string>();
         public List<ulong> VuxUsers { get; set; } = new List<ulong>();
         public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
