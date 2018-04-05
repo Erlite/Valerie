@@ -23,10 +23,10 @@ namespace Valerie.Models
         public Dictionary<ulong, string> AFK { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<ulong, UserProfile> Profiles { get; set; } = new Dictionary<ulong, UserProfile>();
         [JsonIgnore]
-        public ulong JoinChannel { get => Convert.ToUInt64(_JoinChannel); set => _JoinChannel = $"{value}"; }
+        public ulong JoinChannel { get => UInt64.TryParse(_JoinChannel, out ulong Id) ? Id : 0; set => _JoinChannel = $"{value}"; }
         [JsonIgnore]
-        public ulong LeaveChannel { get => Convert.ToUInt64(_LeaveChannel); set => _LeaveChannel = $"{value}"; }
+        public ulong LeaveChannel { get => UInt64.TryParse(_LeaveChannel, out ulong Id) ? Id : 0; set => _LeaveChannel = $"{value}"; }
         [JsonIgnore]
-        public ulong ChatterChannel { get => Convert.ToUInt64(_ChatterChannel); set => _ChatterChannel = $"{value}"; }
+        public ulong ChatterChannel { get => UInt64.TryParse(_ChatterChannel, out ulong Id) ? Id : 0 set => _ChatterChannel = $"{value}"; }
     }
 }
