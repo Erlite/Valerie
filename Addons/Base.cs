@@ -64,7 +64,7 @@ namespace Valerie.Addons
                     break;
             }
             if (Check == false)
-                LogService.Write(nameof(SaveDocuments), $"Failed to save {Document} document.", ConsoleColor.Red);
+                LogService.Write("DOCS", $"Failed to save {Document} document.", ConsoleColor.Red);
         }
     }
 }
