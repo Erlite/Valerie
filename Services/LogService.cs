@@ -1,9 +1,20 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Valerie.Services
 {
     public class LogService
     {
+        public void Initialize()
+        {
+            var LogPath = Path.Combine(Directory.GetCurrentDirectory(), "log.txt");
+            if (!File.Exists(LogPath)) File.Create(LogPath);
+        }
+
+        static Task LogAsync(string Message)
+            => File.AppendAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "log.txt"), Message + Environment.NewLine);
+
         static void Append(string Text, ConsoleColor Color)
         {
             Console.ForegroundColor = Color;
@@ -16,6 +27,7 @@ namespace Valerie.Services
             Append($"{DateTime.Now.ToShortTimeString()} ", ConsoleColor.Gray);
             Append($"[{Source}]", Color ?? ConsoleColor.White);
             Append($" {Text}", ConsoleColor.White);
+            _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
         }
 
         public static void PrintApplicationInformation()
