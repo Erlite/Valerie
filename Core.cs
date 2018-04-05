@@ -2,6 +2,7 @@
 using Discord;
 using Valerie.Helpers;
 using Valerie.Handlers;
+using Valerie.Services;
 using System.Net.Http;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -35,6 +36,7 @@ namespace Valerie
                     Database = "Valerie",
                     Urls = new[] { "http://127.0.0.1:8080" }
                 }.Initialize())
+                .AddSingleton<LogService>()
                 .AddSingleton<GuildHelper>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<GuildHandler>()
@@ -45,6 +47,7 @@ namespace Valerie
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
+            Provider.GetRequiredService<LogService>().Initialize();
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
 
