@@ -9,12 +9,12 @@ namespace Valerie.Models
         public string Id { get; set; }
         public string Token { get; set; }
         public string Prefix { get; set; }
-        public string ServerMessage { get; set; }
+        public string JoinMessage { get; set; }
         public string _ReportChannel { get; set; }
         public List<string> Games { get; set; } = new List<string>();
+        public List<ulong> Blacklist { get; set; } = new List<ulong>();
         public List<string> Imports { get; set; } = new List<string>();
         public List<ulong> VuxUsers { get; set; } = new List<ulong>();
-        public Dictionary<ulong, string> Blacklist { get; set; } = new Dictionary<ulong, string>();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
         { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" } };
         [JsonIgnore]
