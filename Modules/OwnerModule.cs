@@ -6,11 +6,10 @@ using Valerie.Addons;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using System.ComponentModel;
 
 namespace Valerie.Modules
 {
-    [Name("Valerie's Owner Commands"), RequireOwner]
+    [Name("Valerie's Owner Commands"), RequireOwner, RequireBotPermission(ChannelPermission.SendMessages)]
     public class OwnerModule : Base
     {
         [Command("Update"), Summary("Updates Valerie's Information.")]
