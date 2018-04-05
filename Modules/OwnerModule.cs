@@ -1,11 +1,15 @@
 ﻿using System;
 using Discord;
 using System.IO;
+using System.Linq;
 using Valerie.Enums;
+using Valerie.Models;
 using Valerie.Addons;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Valerie.Modules
 {
@@ -38,6 +42,9 @@ namespace Valerie.Modules
                 case UpdateType.ReportChannel:
                     Context.Config.ReportChannel = Convert.ToUInt64(Value.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""));
                     break;
+                case UpdateType.JoinMessage:
+                    Context.Config.JoinMessage = Value;
+                    break;
             }
             await ReplyAsync($"{UpdateType} has been updated {Emotes.DWink}", Document: DocumentType.Config);
         }
@@ -48,6 +55,70 @@ namespace Valerie.Modules
             var channel = await Context.Client.GetChannelAsync((await Context.Client.GetGuildAsync(GuildId)).DefaultChannelId);
             var invite = await (channel as SocketGuildChannel).CreateInviteAsync(null);
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync($"Here is your invite link: <{invite.Url}>");
+        }
+
+        [Command("Blacklist"), Summary("Adds or removes a user from the blacklist.")]
+        public Task BlaclistAsync(char Action, IUser User)
+        {
+            switch (Action)
+            {
+                case 'a':
+                    if (Context.Config.Blacklist.Contains(User.Id)) return ReplyAsync($"{User} is already in global blacklist.");
+                    Context.Config.Blacklist.Add(User.Id);
+                    return ReplyAsync($"{User} has been added to global blacklist.", Document: DocumentType.Config);
+                case 'r':
+                    if (!Context.Config.Blacklist.Contains(User.Id)) return ReplyAsync($"{User} isn't globally blacklisted.");
+                    Context.Config.Blacklist.Remove(User.Id);
+                    return ReplyAsync($"{User} has been removed from global blacklist.", Document: DocumentType.Config);
+            }
+            return Task.CompletedTask;
+        }
+
+        [Command("Eval"), Summary("Evaluates C# code.")]
+        public async Task EvalAsync([Remainder] string Code)
+        {
+            var Message = await ReplyAsync("Debugging ...");
+            var Imports = Context.Config.Namespaces.Any() ? Context.Config.Namespaces :
+                new[] { "System", "System.Linq", "System.Collections.Generic", "System.IO", "System.Threading.Tasks" }.ToList();
+            var Options = ScriptOptions.Default.AddReferences(Context.MethodHelper.GetAssemblies()).AddImports(Imports);
+            var Globals = new EvalModel
+            {
+                Context = Context,
+                Guild = Context.Guild as SocketGuild,
+                User = Context.User as SocketGuildUser,
+                Client = Context.Client as DiscordSocketClient,
+                Channel = Context.Channel as SocketGuildChannel
+            };
+            try
+            {
+                var Eval = await CSharpScript.EvaluateAsync(Code, Options, Globals, typeof(EvalModel));
+                await Message.ModifyAsync(x => x.Content = $"{Eval ?? "No Result Produced."}");
+            }
+            catch (Exception Ex)
+            {
+                await Message.ModifyAsync(x => x.Content = Ex.Message ?? Ex.StackTrace);
+            }
+        }
+
+        [Command("Namespace"), Summary("Shows a list of all namespaces in Valerie's config.")]
+        public Task NamespaceAsync()
+            => ReplyAsync(Context.Config.Namespaces.Any() ? $"**__Current Namespaces:__**\n{string.Join(", ", Context.Config.Namespaces)}" : "No namespaces.");
+
+        [Command("Namespace"), Summary("Shows a list of all namespaces in Valerie's config.")]
+        public Task NamespaceAsync(char Action, string Namespace)
+        {
+            switch (Action)
+            {
+                case 'a':
+                    if (Context.Config.Namespaces.Contains(Namespace)) return ReplyAsync($"{Namespace} namespace already exists.");
+                    Context.Config.Namespaces.Add(Namespace);
+                    return ReplyAsync($"{Namespace} has been added.", Document: DocumentType.Config);
+                case 'r':
+                    if (!Context.Config.Namespaces.Contains(Namespace)) return ReplyAsync($"{Namespace} namespace doesn't exist.");
+                    Context.Config.Namespaces.Remove(Namespace);
+                    return ReplyAsync($"{Namespace} has been removed.", Document: DocumentType.Config);
+            }
+            return Task.CompletedTask;
         }
     }
 }
