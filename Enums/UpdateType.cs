@@ -7,6 +7,7 @@
         Prefix,        
         Nickname,
         Username,
+        JoinMessage,
         ReportChannel
     }
 }
