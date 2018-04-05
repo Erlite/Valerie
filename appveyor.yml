@@ -1,0 +1,11 @@
+version: 18.4.{build}
+image: Visual Studio 2017
+clone_folder: C:\Projects\Valerie
+build:
+  verbosity: detailed  
+before_build:
+- cmd: >-
+    dotnet restore
+build_script:
+- cmd: >-
+    dotnet build
