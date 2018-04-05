@@ -43,15 +43,15 @@ namespace Valerie.Handlers
 
         internal Task Ready() => Task.Run(() =>
         {
-            LogService.Write(nameof(Ready), "Ready to pound your pussy.", ConsoleColor.Green);
+            LogService.Write(nameof(Ready), "Ready to rock n roll.", ConsoleColor.Green);
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
         internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, nameof(LeftGuild), Guild.Name));
         internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, nameof(GuildAvailable), Guild.Name));
-        internal Task Connected() => Task.Run(() => LogService.Write(nameof(Connected), "Givin thicc booty some of that succ.", ConsoleColor.Green));
+        internal Task Connected() => Task.Run(() => LogService.Write(nameof(Connected), "Succesfully made handshake with Discord.", ConsoleColor.Green));
         internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(nameof(Log), log.Message ?? log.Exception.Message, ConsoleColor.Yellow));
-        internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(nameof(Disconnected), $"Disconnected from Discord: {Error.Message ?? Error.StackTrace}", ConsoleColor.Red));
+        internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(nameof(Disconnected), Error.Message ?? Error.StackTrace, ConsoleColor.Red));
         internal Task LatencyUpdated(int Old, int Newer) => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 250) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
@@ -107,7 +107,7 @@ namespace Valerie.Handlers
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             switch (Result.Error)
             {
-                case CommandError.Exception: LogService.Write("Command Exception", Result.ErrorReason, ConsoleColor.Red); break;
+                case CommandError.Exception: LogService.Write("Exception", Result.ErrorReason, ConsoleColor.Red); break;
                 case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
             }
             _ = Task.Run(() => RecordCommand(Context, argPos));
