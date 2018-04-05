@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Valerie.Models;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Reflection;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -27,6 +29,14 @@ namespace Valerie.Helpers
             var Content = JsonConvert.DeserializeObject<IReadOnlyCollection<GithubModel>>(await Request.Content.ReadAsStringAsync());
             HttpClient.DefaultRequestHeaders.Clear();
             return Content;
+        }
+
+        public IEnumerable<Assembly> GetAssemblies()
+        {
+            var Assemblies = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+            foreach (var Ass in Assemblies) yield return Assembly.Load(Ass);
+            yield return Assembly.GetEntryAssembly();
+            yield return typeof(ILookup<string, string>).GetTypeInfo().Assembly;
         }
     }
 }
