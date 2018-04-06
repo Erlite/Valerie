@@ -1,8 +1,11 @@
 ﻿using Discord;
 using System.Linq;
 using Valerie.Models;
+using Valerie.Addons;
 using Valerie.Handlers;
 using Discord.WebSocket;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Valerie.Helpers
 {
@@ -39,6 +42,31 @@ namespace Valerie.Helpers
             var Config = GuildHandler.GetGuild(GuildId);
             Config.Profiles[UserId] = Profile;
             GuildHandler.Save(Config);
+        }
+
+        public async Task LogAsync(IContext Context, IUser User, CaseType CaseType, string Reason)
+        {
+            var ModChannel = await Context.Guild.GetTextChannelAsync(Context.Server.Mod.TextChannel);
+            if (ModChannel == null) return;
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.Mod.Cases.Count + 1} <Reason>`*";
+            var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.Mod.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {Context.User}");
+            Context.Server.Mod.Cases.Add(new CaseWrapper()
+            {
+                Reason = Reason,
+                UserId = User.Id,
+                CaseType = CaseType,
+                MessageId = Message.Id,
+                ModId = Context.User.Id,
+                CaseNumber = Context.Server.Mod.Cases.Count + 1
+            });
+        }
+
+
+        public async Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
+        {
+            if (Amount <= 100) await Channel.DeleteMessagesAsync(Messages).ConfigureAwait(false);
+            else foreach (var Message in Messages) await Message.DeleteAsync().ConfigureAwait(false);
         }
     }
 }
