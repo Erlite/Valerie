@@ -11,7 +11,7 @@ using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
 {
-    [Name("General Commands"), RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
+    [Name("NOT SAFE FOR WORK Commands"), RequireNSFW, RequireBotPermission(ChannelPermission.SendMessages)]
     public class NSFWModule : Base
     {
         [Command("Lewd"), Summary("Replies back with some newd stuff.")]
