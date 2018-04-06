@@ -27,6 +27,6 @@ namespace Valerie.Models
         [JsonIgnore]
         public ulong LeaveChannel { get => UInt64.TryParse(_LeaveChannel, out ulong Id) ? Id : 0; set => _LeaveChannel = $"{value}"; }
         [JsonIgnore]
-        public ulong ChatterChannel { get => UInt64.TryParse(_ChatterChannel, out ulong Id) ? Id : 0 set => _ChatterChannel = $"{value}"; }
+        public ulong ChatterChannel { get => UInt64.TryParse(_ChatterChannel, out ulong Id) ? Id : 0; set => _ChatterChannel = $"{value}"; }
     }
 }
