@@ -58,7 +58,7 @@ namespace Valerie.Modules
             await (await Context.User.GetOrCreateDMChannelAsync()).SendMessageAsync($"Here is your invite link: <{invite.Url}>");
         }
 
-        [Command("Blacklist"), Summary("Adds or removes a user from the blacklist.")]
+        [Command("GlobalBlacklist"), Summary("Adds or removes a user from the global blacklist.")]
         public Task BlaclistAsync(char Action, IUser User)
         {
             switch (Action)
