@@ -6,12 +6,13 @@ using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
 using Discord.WebSocket;
+using Valerie.Preconditions;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
 {
-    [Name("Administrative Commands"), RequireBotPermission(ChannelPermission.SendMessages)]
+    [Name("Administrative Commands"), RequirePermission(AccessLevel.ADMINISTRATOR), RequireBotPermission(ChannelPermission.SendMessages)]
     public class AdminModule : Base
     {
         [Command("Settings"), Summary("Displays current guild's settings.")]
@@ -111,8 +112,8 @@ namespace Valerie.Modules
             await ReplyAsync($"Configuration for {Context.Guild} is finished.", Document: DocumentType.Server);
         }
 
-        [Command("Show Subreddits"), Summary("Shows all the subreddits this server is subbed to.")]
-        public Task ShowSubsAsync() =>
+        [Command("Subreddits"), Summary("Shows all the subreddits this server is subbed to.")]
+        public Task SubredditsAsync() =>
             !Context.Server.Reddit.Subreddits.Any() ? ReplyAsync($"{Context.Guild} isn't subbed to any subreddits.") :
             ReplyAsync($"**Subbed Subreddits**\n{string.Join(", ", Context.Server.Reddit.Subreddits)}");
     }
