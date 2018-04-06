@@ -1,5 +1,4 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using System.Linq;
 using Valerie.Enums;
 using Valerie.Models;
@@ -9,7 +8,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Preconditions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace Valerie.Modules
 {
