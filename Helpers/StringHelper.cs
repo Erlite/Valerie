@@ -1,4 +1,5 @@
 ﻿using System;
+using Discord;
 using System.Linq;
 using System.Text;
 using Valerie.Enums;
@@ -13,8 +14,9 @@ namespace Valerie.Helpers
 {
     public class StringHelper
     {
-        public static string CheckUser(DiscordSocketClient Client, ulong UserId)
+        public static string CheckUser(IDiscordClient client, ulong UserId)
         {
+            var Client = client as DiscordSocketClient;
             var User = Client.GetUser(UserId);
             return User == null ? "Unknown User." : User.Username;
         }
