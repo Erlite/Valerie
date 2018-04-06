@@ -129,7 +129,12 @@ namespace Valerie.Modules
             var SaveFile = Path.Combine(Directory.GetCurrentDirectory(), $"{Channel.Name}.txt");
             if (!File.Exists(SaveFile)) File.Create(SaveFile);
             foreach (var Message in MessagesList)
-                await File.AppendAllTextAsync(SaveFile, $"[{Message.CreatedAt}] [{Message.Author}]({Message.Author.Id}) {Message.Content} {Message.Attachments.FirstOrDefault()}{Environment.NewLine}");
+            {
+                var Embed = Message.Embeds.FirstOrDefault();
+                var Content = (Message.Content ?? Message.Attachments.FirstOrDefault().Url) ??
+                    $"{Environment.NewLine}{Embed?.Description} {Embed?.Url} {Embed?.Video?.Url} {Embed?.Thumbnail} {Embed?.Image?.Url} {Embed?.Image?.Url}";
+                await File.AppendAllTextAsync(SaveFile, $"[{Message.CreatedAt}] [{Message.Author}]({Message.Author.Id}) {Content}{Environment.NewLine}");
+            }
             await ReplyAsync($"Finished archiving {Amount} messages for {Channel}.");
         }
     }
