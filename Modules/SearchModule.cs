@@ -1,18 +1,17 @@
 ﻿using System;
 using Discord;
 using System.Linq;
-using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Newtonsoft.Json;
 using Discord.Commands;
-using Discord.WebSocket;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
 {
+    [Name("Search Commands"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class SearchModule : Base
     {
         [Command("Urban"), Summary("Searches urban dictionary for your word.")]
