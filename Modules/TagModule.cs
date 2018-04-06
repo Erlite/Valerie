@@ -83,7 +83,7 @@ namespace Valerie.Modules
         {
             if (!CheckTag(Name, true)) return;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
-            var User = StringHelper.CheckUser(Context.Client as DiscordSocketClient, Tag.Owner);
+            var User = StringHelper.CheckUser(Context.Client, Tag.Owner);
             await ReplyAsync(string.Empty, GetEmbed(Paint.Lime)
                 .WithAuthor(x =>
                 {
