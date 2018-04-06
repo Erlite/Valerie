@@ -54,7 +54,7 @@ namespace Valerie.Modules
                 .AddField("Name", Command.Name, true)
                 .AddField("Aliases", string.Join(", ", Command.Aliases), true)
                 .AddField("Arguments", Command.Parameters.Any() ? string.Join(", ", Command.Parameters) : "No arguments.")
-                .AddField("Usages", $"{Context.Config.Prefix}{Command.Name} {string.Join(", ", Command.Parameters)}")
+                .AddField("Usages", $"{Context.Config.Prefix}{Command.Name} {string.Join(" ", Command.Parameters)}")
                 .AddField("Summary", Command.Summary)
                 .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                 .Build();
