@@ -1,8 +1,8 @@
 ﻿namespace Valerie.Enums
 {
     public enum AccessLevel
-    {
-        ADMIN,
-        MODERATOR
+    {        
+        MODERATOR,
+        ADMINISTRATOR
     }
 }
