@@ -12,8 +12,8 @@ namespace Valerie.Services
             if (!File.Exists(LogPath)) File.Create(LogPath);
         }
 
-        static Task LogAsync(string Message)
-            => File.AppendAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "log.txt"), Message + Environment.NewLine);
+        static async Task LogAsync(string Message)
+            => await File.AppendAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "log.txt"), Message + Environment.NewLine);
 
         static void Append(string Text, ConsoleColor Color)
         {
