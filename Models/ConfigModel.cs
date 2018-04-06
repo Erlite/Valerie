@@ -14,7 +14,7 @@ namespace Valerie.Models
         public List<string> Games { get; set; } = new List<string>();
         public List<ulong> Blacklist { get; set; } = new List<ulong>();
         public List<ulong> VuxUsers { get; set; } = new List<ulong>();
-        public List<string> Namespaces { get; set; } = new List<string>();        
+        public List<string> Namespaces { get; set; } = new List<string>();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
         { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" } };
         [JsonIgnore]
