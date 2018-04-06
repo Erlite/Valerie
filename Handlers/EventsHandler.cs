@@ -59,7 +59,7 @@ namespace Valerie.Handlers
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
             GuildHandler.AddGuild(Guild.Id, nameof(JoinedGuildAsync).Remove(10), Guild.Name);
-            await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.ServerMessage ?? "Thank you for inviting me to your server. Your guild prefix is `!`. Type `!Cmds` for commands.");
+            await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.JoinMessage ?? "Thank you for inviting me to your server. Your guild prefix is `!`. Type `!Cmds` for commands.");
         }
 
         internal async Task UserLeftAsync(SocketGuildUser User)
@@ -87,7 +87,7 @@ namespace Valerie.Handlers
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
             var Config = GuildHandler.GetGuild(Guild.Id);
             if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
-            if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.Blacklist.ContainsKey(User.Id) ||
+            if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
                 GuildHelper.GetProfile(Guild.Id, Msg.Author.Id).IsBlacklisted) return Task.CompletedTask;
             _ = AFKHandlerAsync(Msg, Config);
             _ = XpHandlerAsync(Message, Config);
@@ -103,7 +103,7 @@ namespace Valerie.Handlers
             var Context = new IContext(Client, Msg, Provider);
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot) return;
-            if (Context.Config.Blacklist.ContainsKey(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
+            if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             switch (Result.Error)
             {
