@@ -69,11 +69,17 @@ namespace Valerie.Models
     public class CaseWrapper
     {
         public string Reason { get; set; }
+        public string _ModId { get; set; }
+        public string _UserId { get; set; }
         public int CaseNumber { get; set; }
-        public string UserInfo { get; set; }
-        public string MessageId { get; set; }
+        public string _MessageId { get; set; }
         public CaseType CaseType { get; set; }
-        public string ResponsibleMod { get; set; }
+        [JsonIgnore]
+        public ulong ModId { get => UInt64.TryParse(_ModId, out ulong Id) ? Id : 0; set => _ModId = $"{value}"; }
+        [JsonIgnore]
+        public ulong UserId { get => UInt64.TryParse(_UserId, out ulong Id) ? Id : 0; set => _UserId = $"{value}"; }
+        [JsonIgnore]
+        public ulong MessageId { get => UInt64.TryParse(_MessageId, out ulong Id) ? Id : 0; set => _MessageId = $"{value}"; }
     }
 
     public enum CaseType
