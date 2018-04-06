@@ -8,6 +8,7 @@ using Valerie.Addons;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 
@@ -119,6 +120,17 @@ namespace Valerie.Modules
                     return ReplyAsync($"{Namespace} has been removed.", Document: DocumentType.Config);
             }
             return Task.CompletedTask;
+        }
+
+        [Command("Archive"), Summary("Archives a channel and uploads a JSON.")]
+        public async Task ArchiveCommand(IMessageChannel Channel, int Amount = 5000)
+        {
+            var MessagesList = new List<IMessage>(await Channel.GetMessagesAsync(Amount).FlattenAsync()).OrderByDescending(x => x.CreatedAt);
+            var SaveFile = Path.Combine(Directory.GetCurrentDirectory(), $"{Channel.Name}.txt");
+            if (!File.Exists(SaveFile)) File.Create(SaveFile);
+            foreach (var Message in MessagesList)
+                await File.AppendAllTextAsync(SaveFile, $"[{Message.CreatedAt}] [{Message.Author}]({Message.Author.Id}) {Message.Content} {Message.Attachments.FirstOrDefault()}{Environment.NewLine}");
+            await ReplyAsync($"Finished archiving {Amount} messages for {Channel}.");
         }
     }
 }
