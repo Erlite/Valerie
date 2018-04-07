@@ -15,6 +15,6 @@ deploy:
   description: Beta rewrite
   auth_token:
     secure: Ec8aEBaQI0OfIUNnutSWCSgn97CV21IWwhZYIyNDvMaWesVrEP6KO43IeV0KUuofiEN0s0jl6dKj+R11Fhvggw==
-  repository: Valerie
+  repository: Yucked/Valerie
   artifact: .dll
   prerelease: true
