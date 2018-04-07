@@ -34,18 +34,13 @@ namespace Valerie.Modules
                     await (Context.Client as DiscordSocketClient).SetActivityAsync(
                         new Game(Split[1], (ActivityType)Enum.Parse(typeof(ActivityType), Split[0]))).ConfigureAwait(false);
                     break;
-                case UpdateType.Prefix:
-                    Context.Config.Prefix = Value;
-                    break;
+                case UpdateType.Prefix: Context.Config.Prefix = Value; break;
                 case UpdateType.Nickname:
                     await (await Context.Guild.GetCurrentUserAsync(CacheMode.AllowDownload)).ModifyAsync(x => x.Nickname = Value);
                     break;
                 case UpdateType.ReportChannel:
-                    Context.Config.ReportChannel = Convert.ToUInt64(Value.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""));
-                    break;
-                case UpdateType.JoinMessage:
-                    Context.Config.JoinMessage = Value;
-                    break;
+                    Context.Config.ReportChannel = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value).Item2; break;
+                case UpdateType.JoinMessage: Context.Config.JoinMessage = Value; break;
             }
             await ReplyAsync($"{UpdateType} has been updated {Emotes.DWink}", Document: DocumentType.Config);
         }
