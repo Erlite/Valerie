@@ -84,7 +84,7 @@ namespace Valerie.Modules
             if (string.IsNullOrWhiteSpace(Content.Id)) { await ReplyAsync($"Couldn't find anything on {Currency}."); return; }
             await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua)
                 .WithAuthor($"{Content.Rank} | {Content.Name}", "https://png.icons8.com/color/512/000000/ethereum.png")
-               .WithFooter($"Last Updated: {MethodHelper.UnixDateTime(Convert.ToDouble(Content.LastUpdated))}", "https://png.icons8.com/color/512/000000/ethereum.png")
+               .WithFooter($"Last Updated: {Context.MethodHelper.UnixDateTime(Convert.ToDouble(Content.LastUpdated))}", "https://png.icons8.com/color/512/000000/ethereum.png")
                .AddField("Prices", $"**USD:** {Content.PriceUsd}\n**Bitcoin:** {Content.PriceBtc}", true)
                .AddField("Market", $"**Cap:** {Content.MarketCapUsd}\n**24 Hour Volume:** {Content.The24hVolumeUsd}", true)
                .AddField("Changes", $"**1 Hour:** {Content.PercentChange1h}\n**24 Hours:** {Content.PercentChange24h}\n**7 Days:** {Content.PercentChange7d}", true)
@@ -147,8 +147,8 @@ namespace Valerie.Modules
               .AddField("Display Name", $"{Info.Name}", true)
               .AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true)
               .AddField("Person State", State, true)
-              .AddField("Profile Created", MethodHelper.UnixDateTime(Info.TimeCreated), true)
-              .AddField("Last Online", MethodHelper.UnixDateTime(Info.LastLogOff), true)
+              .AddField("Profile Created", Context.MethodHelper.UnixDateTime(Info.TimeCreated), true)
+              .AddField("Last Online", Context.MethodHelper.UnixDateTime(Info.LastLogOff), true)
               .AddField("Primary Clan ID", Info.PrimaryClanId ?? "None.", true)
               .AddField("Owned Games", UserGames.OwnedGames.GamesCount, true)
               .AddField("Recently Played Games", UserRecent.RecentGames.TotalCount, true);
