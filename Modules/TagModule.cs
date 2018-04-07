@@ -85,11 +85,7 @@ namespace Valerie.Modules
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
             var User = StringHelper.CheckUser(Context.Client, Tag.Owner);
             await ReplyAsync(string.Empty, GetEmbed(Paint.Lime)
-                .WithAuthor(x =>
-                {
-                    x.Name = $"Tag Information";
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                })
+                .WithAuthor($"Tag Information", Context.Client.CurrentUser.GetAvatarUrl())
                 .AddField("Name", Tag.Name, true)
                 .AddField("Owner", User, true)
                 .AddField("Uses", Tag.Uses, true)

@@ -28,10 +28,7 @@ namespace Valerie.Modules
             var TermInfo = Data.List[Context.Random.Next(0, Data.List.Count)];
             await ReplyAsync(string.Empty,
                 GetEmbed(Paint.Aqua)
-                .WithFooter(x =>
-                {
-                    x.Text = !Data.Tags.Any() ? "No related terms." : string.Join(", ", Data.Tags);
-                })
+                .WithFooter(!Data.Tags.Any() ? "No related terms." : string.Join(", ", Data.Tags))
                 .AddField($"Definition of {TermInfo.Word}", TermInfo.Definition)
                 .AddField("Example", TermInfo.Example).Build());
         }
@@ -54,11 +51,7 @@ namespace Valerie.Modules
             var Topics = Convert.RelatedTopics.Take(3);
             await ReplyAsync(string.Empty,
                 GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-                {
-                    x.Name = Convert.Heading;
-                    x.Url = Convert.AbstractURL;
-                })
+                .WithAuthor(Convert.Heading, url: Convert.AbstractURL)
                 .WithThumbnailUrl(Convert.Image ?? "https://png.icons8.com/color/256/000000/duckduckgo.png")
                 .WithDescription(Convert.Abstract)
                 .AddField("Related Topics", $"{string.Join("\n", Topics.Select(x => $"🔸 [{x.Text}]({x.FirstURL})"))}").Build());
@@ -76,11 +69,7 @@ namespace Valerie.Modules
                 return;
             }
             var Embed = GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-               {
-                   x.Name = $"Displaying Results For {Search}";
-                   x.IconUrl = "https://avatars2.githubusercontent.com/u/9141961?s=200&v=4";
-               });
+                .WithAuthor($"Displaying Results For {Search}", "https://avatars2.githubusercontent.com/u/9141961?s=200&v=4");
             foreach (var Result in ConvertedJson.Results.Take(5).OrderBy(x => x.Name))
                 Embed.AddField(Result.Name, $"Kind: {Result.Kind} | Type: {Result.Type}\n" +
                     $"[{Result.Snippet}]({Result.URL})");
@@ -94,16 +83,8 @@ namespace Valerie.Modules
             var Content = JsonConvert.DeserializeObject<CryptoModel[]>(await Get.Content.ReadAsStringAsync())[0];
             if (string.IsNullOrWhiteSpace(Content.Id)) { await ReplyAsync($"Couldn't find anything on {Currency}."); return; }
             await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-               {
-                   x.Name = $"{Content.Rank} | {Content.Name}";
-                   x.IconUrl = "https://png.icons8.com/color/512/000000/ethereum.png";
-               })
-               .WithFooter(x =>
-               {
-                   x.Text = $"Last Updated: {MethodHelper.UnixDateTime(Convert.ToDouble(Content.LastUpdated))}";
-                   x.IconUrl = "https://png.icons8.com/color/512/000000/ethereum.png";
-               })
+                .WithAuthor($"{Content.Rank} | {Content.Name}", "https://png.icons8.com/color/512/000000/ethereum.png")
+               .WithFooter($"Last Updated: {MethodHelper.UnixDateTime(Convert.ToDouble(Content.LastUpdated))}", "https://png.icons8.com/color/512/000000/ethereum.png")
                .AddField("Prices", $"**USD:** {Content.PriceUsd}\n**Bitcoin:** {Content.PriceBtc}", true)
                .AddField("Market", $"**Cap:** {Content.MarketCapUsd}\n**24 Hour Volume:** {Content.The24hVolumeUsd}", true)
                .AddField("Changes", $"**1 Hour:** {Content.PercentChange1h}\n**24 Hours:** {Content.PercentChange24h}\n**7 Days:** {Content.PercentChange7d}", true)
@@ -122,12 +103,7 @@ namespace Valerie.Modules
             }
             var Content = JsonConvert.DeserializeObject<NASAModel>(await Get.Content.ReadAsStringAsync());
             await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-                {
-                    x.Name = $"{Content.Title} | {Content.Date}";
-                    x.IconUrl = Content.Hdurl;
-                    x.Url = Content.Url;
-                })
+                .WithAuthor($"{Content.Title} | {Content.Date}", Content.Hdurl, Content.Url)
                 .WithDescription(Content.Explanation)
                 .WithImageUrl(Content.Hdurl).Build());
         }
@@ -143,12 +119,7 @@ namespace Valerie.Modules
             }
             var Content = JsonConvert.DeserializeObject<NASAModel>(await Get.Content.ReadAsStringAsync());
             await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-                {
-                    x.Name = $"{Content.Title} | {Content.Date}";
-                    x.IconUrl = Content.Hdurl;
-                    x.Url = Content.Url;
-                })
+                .WithAuthor($"{Content.Title} | {Content.Date}", Content.Hdurl, Content.Url)
                 .WithDescription(Content.Explanation)
                 .WithImageUrl(Content.Hdurl).Build());
 
@@ -171,12 +142,7 @@ namespace Valerie.Modules
             else State = "Looking to play";
 
             var Embed = GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-               {
-                   x.Name = Info.RealName;
-                   x.Url = Info.ProfileLink;
-                   x.IconUrl = "https://png.icons8.com/material/256/e5e5e5/steam.png";
-               })
+                .WithAuthor(Info.RealName, "https://png.icons8.com/material/256/e5e5e5/steam.png", Info.ProfileLink)
               .WithThumbnailUrl(Info.AvatarFullUrl)
               .AddField("Display Name", $"{Info.Name}", true)
               .AddField("Location", $"{Info.State ?? "No State"}, {Info.Country ?? "No Country"}", true)

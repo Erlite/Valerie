@@ -21,11 +21,7 @@ namespace Valerie.Modules
             string Feed = Context.Server.Reddit.IsEnabled ? "Enabled." : "Disabled.";
             string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";
             var Embed = GetEmbed(Paint.PaleYellow)
-               .WithAuthor(x =>
-               {
-                   x.Name = $"{Context.Guild} Settings";
-                   x.IconUrl = Context.Guild.IconUrl;
-               })
+               .WithAuthor($"{Context.Guild} Settings", Context.Guild.IconUrl)
                .AddField("General Information",
                 $"```ebnf\n" +
                 $"Prefix                : {Context.Server.Prefix}\n" +

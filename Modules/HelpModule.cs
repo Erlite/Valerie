@@ -23,16 +23,8 @@ namespace Valerie.Modules
         public Task CommandsAsync()
         {
             var Embed = GetEmbed(Paint.Aqua)
-                .WithAuthor(x =>
-                {
-                    x.Name = "List of all commands";
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                })
-                .WithFooter(x =>
-               {
-                   x.Text = $"For More Information On A Command's Usage: {Context.Config.Prefix}Info CommandName";
-                   x.IconUrl = Emotes.DSupporter.Url;
-               });
+                .WithAuthor("List of all commands", Context.Client.CurrentUser.GetAvatarUrl())
+                .WithFooter($"For More Information On A Command's Usage: {Context.Config.Prefix}Info CommandName", Emotes.DSupporter.Url);
             foreach (var Commands in CommandService.Commands.GroupBy(x => x.Module.Name).OrderBy(y => y.Key))
             {
                 Embed.AddField(Commands.Key, string.Join(", ", Commands.Select(x => x.Name).Distinct()));
@@ -46,11 +38,7 @@ namespace Valerie.Modules
             var Command = CommandService.Search(Context, CommandName).Commands?.FirstOrDefault().Command;
             if (Command == null) return ReplyAsync($"{CommandName} command doesn't exist.");
             var Embed = GetEmbed(Paint.Magenta)
-                .WithAuthor(x =>
-               {
-                   x.Name = "Detailed Command Information";
-                   x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-               })
+                .WithAuthor("Detailed Command Information", Context.Client.CurrentUser.GetAvatarUrl())
                 .AddField("Name", Command.Name, true)
                 .AddField("Aliases", string.Join(", ", Command.Aliases), true)
                 .AddField("Arguments", Command.Parameters.Any() ? string.Join(", ", Command.Parameters) : "No arguments.")

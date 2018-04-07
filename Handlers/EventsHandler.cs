@@ -122,12 +122,8 @@ namespace Valerie.Handlers
             var StarboardChannel = Guild.GetTextChannel(Config.Starboard.TextChannel) as IMessageChannel;
             if (Message == null || StarboardChannel == null || Reaction.Channel.Id == Config.Starboard.TextChannel) return;
             var Embed = GetEmbed(Paint.Yellow)
-                .WithAuthor(x =>
-                {
-                    x.Name = Message.Author.Username;
-                    x.IconUrl = Message.Author.GetAvatarUrl();
-                })
-                .WithFooter(x => { x.Text = Message.Timestamp.ToString("F"); });
+                .WithAuthor(Message.Author.Username, Message.Author.GetAvatarUrl())
+                .WithFooter(Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
             if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == Message.Id);
@@ -166,12 +162,8 @@ namespace Valerie.Handlers
             var StarboardChannel = Guild.GetTextChannel(Config.Starboard.TextChannel) as IMessageChannel;
             if (Message == null || StarboardChannel == null) return;
             var Embed = GetEmbed(Paint.Yellow)
-                .WithAuthor(x =>
-                {
-                    x.Name = Message.Author.Username;
-                    x.IconUrl = Message.Author.GetAvatarUrl();
-                })
-                .WithFooter(x => { x.Text = Message.Timestamp.ToString("F"); });
+                .WithAuthor(Message.Author.Username, Message.Author.GetAvatarUrl())
+                .WithFooter(Message.Timestamp.ToString("F"));
             if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
             if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == Message.Id);
