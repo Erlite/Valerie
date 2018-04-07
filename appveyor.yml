@@ -1,4 +1,5 @@
 version: 18.4.{build}
+skip_tags: true
 image: Visual Studio 2017
 clone_folder: C:\Projects\Valerie
 build:
