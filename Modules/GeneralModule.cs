@@ -2,11 +2,14 @@
 using Discord;
 using System.Net;
 using System.Linq;
+using Valerie.Enums;
 using Valerie.Addons;
 using Valerie.Models;
+using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using static Valerie.Addons.Embeds;
 using System.Net.NetworkInformation;
 
@@ -34,9 +37,9 @@ namespace Valerie.Modules
                 return;
             }
             await ReportChannel.SendMessageAsync(string.Empty, embed: GetEmbed(Paint.Aqua)
-                .WithAuthor(x => { x.Name = $"Feedback from {Context.User}"; x.IconUrl = Context.User.GetAvatarUrl(); })
+                .WithAuthor($"Feedback from {Context.User}", Context.User.GetAvatarUrl())
                 .WithDescription($"**Feedback:**\n{Response.Content}")
-                .WithFooter(x => { x.Text = $"{Context.Guild} | {Context.Guild.Id}"; })
+                .WithFooter($"{Context.Guild} | {Context.Guild.Id}")
                 .Build());
             await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
         }
@@ -53,11 +56,7 @@ namespace Valerie.Modules
                 Description += $"[[{Commit.Sha.Substring(0, 6)}]({Commit.HtmlUrl})] {Commit.Commit.Message}\n";
 
             var Embed = GetEmbed(Paint.Magenta)
-                .WithAuthor(x =>
-                {
-                    x.Name = $"{Context.Client.CurrentUser.Username} Statistics 🔰";
-                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                })
+                .WithAuthor($"{Context.Client.CurrentUser.Username} Statistics 🔰", Context.Client.CurrentUser.GetAvatarUrl())
                 .WithDescription((await Client.GetApplicationInfoAsync()).Description)
                 .AddField("Latest Commits", Description, false)
                 .AddField("Channels",
@@ -74,8 +73,95 @@ namespace Valerie.Modules
                 $"Crystals: {Servers.Sum(x => x.Profiles.Sum(y => y.Value.Crystals))}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
             Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
-            Embed.AddField("Programmer", $"[Yucked](https://github.com/Yucked)", true);
+            Embed.AddField("Programmer", $"[{(await Context.Client.GetApplicationInfoAsync()).Owner}](https://github.com/Yucked)", true);
             await ReplyAsync("", embed: Embed.Build());
+        }
+
+        [Command("Avatar"), Summary("Shows users avatar in higher resolution.")]
+        public Task UserAvatarAsync(IGuildUser User = null) => ReplyAsync((User ?? Context.User).GetAvatarUrl(size: 2048));
+
+        [Command("AFK"), Summary("Adds Or Removes you from AFK list. Actions: Add/Remove/Modify")]
+        public Task AFKAsync(char Action = 'a', [Remainder] string AFKMessage = "Hey I'm AFK. Leave a DM?")
+        {
+            switch (Action)
+            {
+                case 'a':
+                    if (Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are already AFK.");
+                    Context.Server.AFK.Add(Context.User.Id, AFKMessage);
+                    return ReplyAsync($"You are", Document: DocumentType.Server);
+                case 'r':
+                    if (!Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are not AFK.");
+                    Context.Server.AFK.Remove(Context.User.Id);
+                    return ReplyAsync($"", Document: DocumentType.Server);
+                case 'm':
+                    if (!Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are not AFK.");
+                    Context.Server.AFK[Context.User.Id] = AFKMessage;
+                    return ReplyAsync($"", Document: DocumentType.Server);
+            }
+            return Task.CompletedTask;
+        }
+
+        [Command("GuildInfo"), Summary("Displays information about guild.")]
+        public Task GuildInfoAsync()
+        {
+            var Guild = Context.Guild as SocketGuild;
+            return ReplyAsync(string.Empty, GetEmbed(Paint.Lime)
+                .WithAuthor($"{Context.Guild}'s Information | {Context.Guild.Id}", Context.Guild.IconUrl)
+               .WithFooter($"Created On: {Guild.CreatedAt}")
+                .WithThumbnailUrl(Context.Guild.IconUrl)
+                .AddField("Owner", Guild.Owner, true)
+                .AddField("Default Channel", Guild.DefaultChannel.Name ?? "No Default Channel", true)
+                .AddField("Message Notifications", Guild.DefaultMessageNotifications, true)
+                .AddField("Verification Level", Guild.VerificationLevel, true)
+                .AddField("MFA Level", Guild.MfaLevel, true)
+                .AddField("Text Channels", Guild.TextChannels.Count, true)
+                .AddField("Voice Channels", Guild.VoiceChannels.Count, true)
+                .AddField("Bot Members", Guild.Users.Count(x => x.IsBot == true), true)
+                .AddField("Human Members", Guild.Users.Count(x => x.IsBot == false), true)
+                .AddField("Total Members", Guild.MemberCount, true)
+                .AddField("Roles", string.Join(", ", Guild.Roles.OrderByDescending(x => x.Position).Select(x => x.Name))).Build());
+        }
+
+        [Command("RoleInfo"), Summary("Displays information about a role.")]
+        public Task RoleInfoAsync(IRole Role)
+        {
+            var Permissions = Role.Permissions.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var Denied = new List<string>();
+            var Granted = new List<string>();
+            foreach (var Permission in Permissions.Where(x => x.PropertyType == typeof(bool)))
+            {
+                var GetValue = (bool)Permission.GetValue(Role.Permissions, null);
+                if (GetValue == false) Denied.Add(Permission.Name);
+                else Granted.Add(Permission.Name);
+            }
+            return ReplyAsync(string.Empty, GetEmbed(Paint.Rose)
+                .WithTitle($"{Role.Name} Information")
+                .WithFooter($"Created On: {Role.CreatedAt}")
+                .AddField("ID", Role.Id, true)
+                .AddField("Color", Role.Color, true)
+                .AddField("Role Position", Role.Position, true)
+                .AddField("Is Hoisted?", Role.IsHoisted ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Managed?", Role.IsManaged ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Mentionable?", Role.IsMentionable ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Granted Permissions", string.Join(", ", Granted))
+                .AddField("Denied Permissions", string.Join(", ", Denied)).Build());
+        }
+
+        [Command("UserInfo"), Summary("Displays information about a user.")]
+        public Task UserInfoAsync(SocketGuildUser User = null)
+        {
+            User = User ?? Context.User as SocketGuildUser;
+            return ReplyAsync(string.Empty, GetEmbed(Paint.Rose)
+                .WithAuthor($"{User.Username} Information | {User.Id}", User.GetAvatarUrl())
+                .WithThumbnailUrl(User.GetAvatarUrl())
+                .AddField("Hierarchy", User.Hierarchy, true)
+                .AddField("Is Bot", User.IsBot ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Deafened?", User.IsDeafened ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Muted?", User.IsMuted ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Self Deafened?", User.IsSelfDeafened ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Self Muted?", User.IsSelfMuted ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Suppressed?", User.IsSuppressed ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Webhook?", User.IsWebhook ? Emotes.TickYes : Emotes.TickNo, true).Build());
         }
     }
 }
