@@ -3,8 +3,9 @@ using Discord;
 using System.Net;
 using System.Linq;
 using Valerie.Enums;
-using Valerie.Addons;
 using Valerie.Models;
+using Valerie.Addons;
+using Valerie.Helpers;
 using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -153,15 +154,67 @@ namespace Valerie.Modules
             User = User ?? Context.User as SocketGuildUser;
             return ReplyAsync(string.Empty, GetEmbed(Paint.Rose)
                 .WithAuthor($"{User.Username} Information | {User.Id}", User.GetAvatarUrl())
-                .WithThumbnailUrl(User.GetAvatarUrl())
-                .AddField("Hierarchy", User.Hierarchy, true)
-                .AddField("Is Bot", User.IsBot ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Deafened?", User.IsDeafened ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Muted?", User.IsMuted ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Self Deafened?", User.IsSelfDeafened ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Self Muted?", User.IsSelfMuted ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Suppressed?", User.IsSuppressed ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Webhook?", User.IsWebhook ? Emotes.TickYes : Emotes.TickNo, true).Build());
+                .WithThumbnailUrl(User.GetAvatarUrl()).
+                AddField("Muted?", User.IsMuted ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Bot?", User.IsBot ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Creation Date", User.CreatedAt, true)
+                .AddField("Join Date", User.JoinedAt, true)
+                .AddField("Status", User.Status, true)
+                .AddField("Permissions", string.Join(", ", User.GuildPermissions.ToList()), true)
+                .AddField("Roles", string.Join(", ", (User as SocketGuildUser).Roles.OrderBy(x => x.Position).Select(x => x.Name)), true).Build());
+        }
+
+        [Command("Discrim"), Summary("Gets all users who match a certain user's discriminator.")]
+        public Task DiscrimAsync(IGuildUser User)
+        {
+            var MatchList = new List<string>();
+            foreach (var Guilds in (Context.Client as DiscordSocketClient).Guilds)
+            {
+                var Users = Guilds.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
+                foreach (var user in Users)
+                    if (!MatchList.Contains(user.Username)) MatchList.Add(user.Username);
+            }
+            return ReplyAsync(MatchList.Any() ? $"**Users matching {User} discriminator:** {string.Join(", ", MatchList)}" :
+                $"Couldn't find any users matching {User} discriminator");
+        }
+
+        [Command("Case"), Summary("Shows information about a specific case.")]
+        public Task CaseAsync(int CaseNumber = 0)
+        {
+            if (CaseNumber == 0 && Context.Server.Mod.Cases.Any()) CaseNumber = Context.Server.Mod.Cases.LastOrDefault().CaseNumber;
+            var Case = Context.Server.Mod.Cases.FirstOrDefault(x => x.CaseNumber == CaseNumber);
+            if (Case == null) return ReplyAsync($"Case #{CaseNumber} doesn't exist.");
+            return ReplyAsync(string.Empty, GetEmbed(Paint.Crimson)
+                .AddField("User", StringHelper.CheckUser(Context.Client, Case.UserId), true)
+                .AddField("Responsible Moderator", StringHelper.CheckUser(Context.Client, Case.ModId), true)
+                .AddField("Case Type", Case.CaseType, true)
+                .AddField("Reason", Case.Reason).Build());
+        }
+
+        [Command("Warnings"), Summary("Shows current number of warnings for specified user.")]
+        public Task WarningsAsync(IGuildUser User = null)
+            => ReplyAsync($"{Context.User} has {Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id).Warnings} warnings.");
+
+        [Command("Selfroles"), Summary("Shows a list of all assignable roles for current server.")]
+        public Task SelfRolesAsync()
+            => ReplyAsync(!Context.Server.AssignableRoles.Any() ? $"There are no self-assignable roles {Emotes.PepeSad}" :
+                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, x)))}");
+
+        [Command("Iam"), Summary("Adds you to the specified role. Role must be a self-assignable role.")]
+        public Task IAmAsync(IRole Role)
+        {
+            var User = Context.User as SocketGuildUser;
+            if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
+            else if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
+            return User.AddRoleAsync(Role);
+        }
+
+        [Command("IamNot"), Summary("Removes you from the specified role. Role must be a self-assignable role.")]
+        public Task IAmNotAsync(IRole Role)
+        {
+            var User = Context.User as SocketGuildUser;
+            if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
+            return User.AddRoleAsync(Role);
         }
     }
 }
