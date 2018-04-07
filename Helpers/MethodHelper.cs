@@ -4,7 +4,6 @@ using Valerie.Models;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Reflection;
-using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -13,14 +12,12 @@ namespace Valerie.Helpers
     public class MethodHelper
     {
         HttpClient HttpClient { get; }
-        DiscordSocketClient Client { get; }
-        public MethodHelper(HttpClient httpClient, DiscordSocketClient client)
+        public MethodHelper(HttpClient httpClient)
         {
             HttpClient = httpClient;
-            Client = client;
         }
 
-        public static DateTime UnixDateTime(double Unix) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
+        public DateTime UnixDateTime(double Unix) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
 
         public async Task<IReadOnlyCollection<GithubModel>> GetCommitsAsync()
         {
