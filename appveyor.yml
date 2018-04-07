@@ -10,7 +10,7 @@ build_script:
 - cmd: >-
     dotnet build
 artifacts:
-- path: bin
+- path: C:\Projects\Valerie\bin\Debug\netcoreapp2.0\Valerie.dll
   name: Valerie-beta
 deploy:
 - provider: GitHub
