@@ -9,12 +9,14 @@ before_build:
 build_script:
 - cmd: >-
     dotnet build
+artifacts:
+- path: bin
+  name: Valerie-beta
 deploy:
 - provider: GitHub
   release: Beta
   description: Beta rewrite
   auth_token:
-    secure: Ec8aEBaQI0OfIUNnutSWCSgn97CV21IWwhZYIyNDvMaWesVrEP6KO43IeV0KUuofiEN0s0jl6dKj+R11Fhvggw==
-  repository: Yucked/Valerie
+    secure: R4oIbHp3fZbnppdBYdwDj5z6QoTcanjQi/HRhtu4NqJibm0XVTh0yGZlNNZH99ll6b4oJ7i0I9crEhPTtIPNV+xE9JA93ptrBLBXw/eLoH0=
   artifact: .dll
   prerelease: true
