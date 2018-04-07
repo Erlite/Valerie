@@ -10,14 +10,11 @@ build_script:
 - cmd: >-
     dotnet build
 deploy:
-  release: ValerieBeta-v$(appveyor_build_version)
-  description: 'Release description'
-  provider: GitHub
+- provider: GitHub
+  release: Beta
+  description: Beta rewrite
   auth_token:
-    secure: YWGiNJ6m0I8QPX9U0iz67sXfWTbqPyPv0xXcmUy4tquhJFw78df1W2h6R95
-  artifact: /.*\.dll/
-  draft: false
-  prerelease: true 
-  on:
-    branch: master
-    appveyor_repo_tag: true       
+    secure: Ec8aEBaQI0OfIUNnutSWCSgn97CV21IWwhZYIyNDvMaWesVrEP6KO43IeV0KUuofiEN0s0jl6dKj+R11Fhvggw==
+  repository: Valerie
+  artifact: .dll
+  prerelease: true
