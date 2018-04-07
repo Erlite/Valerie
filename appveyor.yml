@@ -10,12 +10,12 @@ build_script:
 - cmd: >-
     dotnet build
 artifacts:
-- path: C:\Projects\Valerie\bin\Debug\netcoreapp2.0\Valerie.dll
+- path: bin\Debug\netcoreapp2.0\Valerie.dll
   name: Valerie-beta
 deploy:
 - provider: GitHub
-  release: Beta
-  description: Beta rewrite
+  release: Betav$(appveyor_build_version)
+  description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
   artifact: .dll
