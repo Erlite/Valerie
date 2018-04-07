@@ -72,13 +72,21 @@ namespace Valerie.Helpers
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
         {
             UInt64.TryParse(Channel.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""), out ulong Id);
-            return Guild.GetTextChannel(Id) == null ? (false, 0) : (true, Id);
+            var GetChannel = Guild.GetTextChannel(Id);
+            if (GetChannel != null) return (true, Id);
+            var FindChannel = Guild.TextChannels.FirstOrDefault(x => x.Name == Channel.ToLower());
+            if (FindChannel != null) return (true, FindChannel.Id);
+            return (false, 0);
         }
 
         public (bool, ulong) GetRoleId(SocketGuild Guild, string Role)
         {
             UInt64.TryParse(Role.Replace('<', ' ').Replace('>', ' ').Replace('@', ' ').Replace('&', ' ').Replace(" ", ""), out ulong Id);
-            return Guild.GetRole(Id) == null ? (false, 0) : (true, Id);
+            var GetRole = Guild.GetRole(Id);
+            if (GetRole != null) return (true, Id);
+            var FindRole = Guild.Roles.FirstOrDefault(x => x.Name.ToLower() == Role.ToLower());
+            if (FindRole != null) return (true, FindRole.Id);
+            return (false, 0);
         }
     }
 }
