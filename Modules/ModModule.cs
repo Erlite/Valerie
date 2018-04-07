@@ -79,21 +79,21 @@ namespace Valerie.Modules
             await ReplyAsync($"Case #{CaseNum} has been updated.", Document: DocumentType.Server);
         }
 
-        [Command("Purge"),
-            Summary("Purges specified user messages with specified limit. If no user is provided, default user will be bot and default limit will be 10."),
-            RequireBotPermission(ChannelPermission.ManageMessages)]
-        public async Task PurgeUserAsync(IGuildUser User = null, int Amount = 10)
-        {
-            User = User ?? Context.Client.CurrentUser as IGuildUser;
-            var GetMessages = (await Context.Channel.GetMessagesAsync(Amount).FlattenAsync()).Where(x => x.Author.Id == User.Id);
-            await Context.GuildHelper.PurgeAync(GetMessages.Cast<IUserMessage>(), Context.Channel as ITextChannel, Amount);
-        }
-
-        [Command("Purge"), Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
+        [Command("Purge"), Priority(0), Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeAsync(int Amount = 10)
         {
             var GetMessages = await Context.Channel.GetMessagesAsync(Amount).FlattenAsync();
             await Context.GuildHelper.PurgeAync(GetMessages.Cast<IUserMessage>(), Context.Channel as ITextChannel, Amount).ConfigureAwait(false);
+        }
+
+        [Command("Purge"), Priority(10),
+            Summary("Purges specified user messages with specified limit. If no user is provided, default user will be bot and default limit will be 10."),
+            RequireBotPermission(ChannelPermission.ManageMessages)]
+        public async Task PurgeUserAsync(SocketGuildUser User = null, int Amount = 10)
+        {
+            User = User ?? Context.Client.CurrentUser as SocketGuildUser;
+            var GetMessages = await Context.Channel.GetMessagesAsync(Amount).FlattenAsync();
+            await Context.GuildHelper.PurgeAync(GetMessages.Where(x => x.Author.Id == User.Id).Cast<IUserMessage>(), Context.Channel as ITextChannel, Amount);
         }
 
         [Command("Mute"), Summary("Mutes a user."), RequireBotPermission(GuildPermission.ManageRoles)]
