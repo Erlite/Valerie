@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using System.Linq;
 using Valerie.Models;
 using Valerie.Addons;
@@ -62,11 +63,22 @@ namespace Valerie.Helpers
             });
         }
 
-
         public async Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
         {
             if (Amount <= 100) await Channel.DeleteMessagesAsync(Messages).ConfigureAwait(false);
             else foreach (var Message in Messages) await Message.DeleteAsync().ConfigureAwait(false);
+        }
+
+        public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
+        {
+            UInt64.TryParse(Channel.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""), out ulong Id);
+            return Guild.GetTextChannel(Id) == null ? (false, 0) : (true, Id);
+        }
+
+        public (bool, ulong) GetRoleId(SocketGuild Guild, string Role)
+        {
+            UInt64.TryParse(Role.Replace('<', ' ').Replace('>', ' ').Replace('@', ' ').Replace('&', ' ').Replace(" ", ""), out ulong Id);
+            return Guild.GetRole(Id) == null ? (false, 0) : (true, Id);
         }
     }
 }
