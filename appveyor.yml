@@ -1,9 +1,16 @@
 version: 18.4.{build}
 skip_tags: true
 image: Visual Studio 2017
+skip_commits:
+  message: /Update/
+  author: Yucked
 clone_folder: C:\Projects\Valerie
+shallow_clone: true
+clone_depth: 2
+configuration: Debug
 build:
-  verbosity: detailed
+  parallel: true
+  verbosity: detailed  
 before_build:
 - cmd: >-
     dotnet restore
@@ -11,7 +18,7 @@ build_script:
 - cmd: >-
     dotnet build
 artifacts:
-- path: bin\Debug\netcoreapp2.0\Valerie.dll
+- path: bin\Debug\netcoreapp2.0
   name: ValerieRewrite
 deploy:
 - provider: GitHub
