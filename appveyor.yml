@@ -28,3 +28,10 @@ deploy:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
   artifact: ValerieRewrite
   prerelease: true
+notifications:
+- provider: Webhook
+  url: https://discordapp.com/api/webhooks/433746401298481154/5N2Lz_sX1WgSDh74HwEtNjXllaRfrPl4tQ1dxxRuWJnvUwyPtgJKJwLZ8kxGCcxNLhEZ
+  method: POST
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true  
