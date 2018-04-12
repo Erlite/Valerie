@@ -89,15 +89,15 @@ namespace Valerie.Modules
                 case 'a':
                     if (Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are already AFK.");
                     Context.Server.AFK.Add(Context.User.Id, AFKMessage);
-                    return ReplyAsync($"You are", Document: DocumentType.Server);
+                    return ReplyAsync("Users will be notified that you are AFK when you are mentioned.", Document: DocumentType.Server);
                 case 'r':
                     if (!Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.AFK.Remove(Context.User.Id);
-                    return ReplyAsync($"", Document: DocumentType.Server);
+                    return ReplyAsync("You are no longer AFK.", Document: DocumentType.Server);
                 case 'm':
                     if (!Context.Server.AFK.ContainsKey(Context.User.Id)) return ReplyAsync("Whoops, it seems you are not AFK.");
                     Context.Server.AFK[Context.User.Id] = AFKMessage;
-                    return ReplyAsync($"", Document: DocumentType.Server);
+                    return ReplyAsync("Your AFK messages has been modified.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
         }
