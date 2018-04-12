@@ -3,7 +3,6 @@ skip_tags: true
 image: Visual Studio 2017
 skip_commits:
   message: /Update/
-  author: Yucked
 clone_folder: C:\Projects\Valerie
 shallow_clone: true
 configuration: Debug
