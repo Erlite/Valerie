@@ -9,6 +9,7 @@ namespace Valerie.Models
         public string Id { get; set; }
         public string Token { get; set; }
         public string Prefix { get; set; }
+        public string UpdateId { get; set; }
         public string JoinMessage { get; set; }
         public string _ReportChannel { get; set; }
         public List<string> Games { get; set; } = new List<string>();
@@ -16,7 +17,7 @@ namespace Valerie.Models
         public List<ulong> VuxUsers { get; set; } = new List<ulong>();
         public List<string> Namespaces { get; set; } = new List<string>();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
-        { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" } };
+        { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" }, {"AppVeyor", "" } };
         [JsonIgnore]
         public ulong ReportChannel { get => UInt64.TryParse(_ReportChannel, out ulong Id) ? Id : 0; set => _ReportChannel = $"{value}"; }
     }
