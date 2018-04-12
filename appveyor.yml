@@ -6,7 +6,6 @@ skip_commits:
   author: Yucked
 clone_folder: C:\Projects\Valerie
 shallow_clone: true
-clone_depth: 2
 configuration: Debug
 build:
   parallel: true
@@ -22,9 +21,14 @@ artifacts:
   name: ValerieRewrite
 deploy:
 - provider: GitHub
-  release: Beta-v$(appveyor_build_version)
+  tag: Rewrite
+  release: Rewrite
   description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
-  artifact: ValerieRewrite
-  prerelease: true
+  artifact: ValerieRewrite.zip
+  draft: true
+  prerelease: false
+  force_update: true
+  on:
+    branch: master
