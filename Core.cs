@@ -43,6 +43,7 @@ namespace Valerie
                 .AddSingleton<ConfigHandler>()
                 .AddSingleton<MethodHelper>()
                 .AddSingleton<EventsHandler>()
+                .AddSingleton<UpdateService>()
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
