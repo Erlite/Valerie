@@ -13,19 +13,22 @@ namespace Valerie.Handlers
         HttpClient HttpClient { get; }
         EventsHandler Events { get; }
         DiscordSocketClient Client { get; }
+        UpdateService UpdateService { get; }
 
-        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client)
+        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client, UpdateService updateService)
         {
             Client = client;
             Config = config;
-            Events = events;            
+            Events = events;
             HttpClient = httpClient;
+            UpdateService = updateService;
         }
 
         public async Task InitializeAsync()
         {
             LogService.PrintApplicationInformation();
             await DatabaseCheck();
+            await UpdateService.InitializeAsync();
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
