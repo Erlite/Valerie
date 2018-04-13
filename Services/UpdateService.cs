@@ -4,7 +4,6 @@ using System.Linq;
 using Valerie.Handlers;
 using Newtonsoft.Json;
 using System.Net.Http;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 
@@ -32,6 +31,7 @@ namespace Valerie.Services
 
         public async Task InitializeAsync()
         {
+            LogService.Write("Update", "Checking for updates ...", ConsoleColor.Yellow);
             HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("appllication/json"));
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
             var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
@@ -44,6 +44,11 @@ namespace Valerie.Services
             if (ConfigHandler.Config.UpdateId == ProjectContent.Build.Jobs[0].JobId)
             {
                 LogService.Write("Update", "Already updated.", ConsoleColor.Green);
+                return;
+            }
+            if (ProjectContent.Build.Jobs[0].JobId == ConfigHandler.Config.UpdateId)
+            {
+                LogService.Write("Update", "Already using the latest version!", ConsoleColor.Green);
                 return;
             }
             var GetArtifacts = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts").ConfigureAwait(false);
