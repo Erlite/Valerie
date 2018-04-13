@@ -37,6 +37,13 @@ namespace Valerie.Modules
         {
             var Command = CommandService.Search(Context, CommandName).Commands?.FirstOrDefault().Command;
             if (Command == null) return ReplyAsync($"{CommandName} command doesn't exist.");
+            string Arguments = null;
+            string Values = null;
+            foreach (var Parameter in Command.Parameters)
+            {
+                if (Parameter.Type.IsEnum) string.Join(", ", Parameter.Type.GetEnumValues());
+                string.Join(", ", $"`{Parameter.Type}` {Parameter.}")
+            }
             var Embed = GetEmbed(Paint.Magenta)
                 .WithAuthor("Detailed Command Information", Context.Client.CurrentUser.GetAvatarUrl())
                 .AddField("Name", Command.Name, true)
