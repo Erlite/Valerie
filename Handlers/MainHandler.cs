@@ -28,7 +28,7 @@ namespace Valerie.Handlers
         {
             LogService.PrintApplicationInformation();
             await DatabaseCheck();
-            await UpdateService.InitializeAsync();
+            //await UpdateService.InitializeAsync();
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
