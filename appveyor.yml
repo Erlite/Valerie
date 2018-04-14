@@ -11,7 +11,9 @@ after_build:
 - cmd: dotnet build
 artifacts:
 - path: bin\Debug\netcoreapp2.1
-  name: ValerieRewrite
+  name: Rewrite-Core2.1
+- path: bin\Debug\netcoreapp2.0
+  name: Rewrite-Core2.0
 deploy:
 - provider: GitHub
   tag: Rewrite
