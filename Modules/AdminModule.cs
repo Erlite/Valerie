@@ -45,8 +45,8 @@ namespace Valerie.Modules
                 $"+ Join Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.JoinRole)}\n" +
                 $"+ Mute Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.MuteRole)}\n" +
                 $"+ Subreddits          : {Context.Server.Reddit.Subreddits.Count}\n" +
-                $"+ Profanity Check        : {Context.Server.Mod.BlockedWords.Count}\n" +
-                $"+ Invite Check          : {Context.Server.Mod.BlockedUrls.Count}\n" +
+                $"+ Profanity Check     : {Context.Server.Mod.BlockedWords.Count}\n" +
+                $"+ Invite Check        : {Context.Server.Mod.BlockedUrls.Count}\n" +
                 $"+ Max Warnings        : {Context.Server.Mod.MaxWarnings}\n" +
                 $"+ Level Up Roles      : {Context.Server.ChatXP.LevelRoles.Count}\n" +
                 $"+ Blacklisted Users   : {Context.Server.Profiles.Where(x => x.Value.IsBlacklisted).Count()}\n" +
