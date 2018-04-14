@@ -51,12 +51,12 @@ namespace Valerie.Models
 
     public class ModWrapper
     {
+        public bool AntiInvite { get; set; }
         public string _JoinRole { get; set; }
         public int MaxWarnings { get; set; }
         public string _MuteRole { get; set; }
+        public bool AntiProfanity { get; set; }
         public string _TextChannel { get; set; }
-        public List<string> BlockedWords { get; set; } = new List<string>(50);
-        public List<string> BlockedUrls { get; set; } = new List<string>(50);
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         [JsonIgnore]
         public ulong JoinRole { get => UInt64.TryParse(_JoinRole, out ulong Id) ? Id : 0; set => _JoinRole = $"{value}"; }
