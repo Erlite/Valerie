@@ -1,23 +1,17 @@
 version: 18.4.{build}
 skip_tags: true
 image: Visual Studio 2017 Preview
-skip_commits:
-  message: /Update/
-clone_folder: C:\Projects\Valerie
 shallow_clone: true
-configuration: Debug
-build:
-  parallel: true
-  verbosity: detailed  
+clone_folder: C:\Projects\Valerie
 before_build:
-- cmd: >-
-    dotnet restore
-build_script:
-- cmd: >-
-    dotnet build
+- cmd: dotnet restore
+build:
+  verbosity: detailed
+after_build:
+- cmd: dotnet build
 artifacts:
 - path: bin\Debug\netcoreapp2.1
-  name: ValerieRewrite
+  name: ValerieRewrite.zip
 deploy:
 - provider: GitHub
   tag: Rewrite
