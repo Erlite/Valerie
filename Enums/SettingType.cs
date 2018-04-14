@@ -11,6 +11,9 @@
         MaxWarnings,
         RedditChannel,
         ChatterChannel,
-        StarboardChannel
+        StarboardChannel,
+        ToggleChatXP,
+        ToggleRedditFeed,
+        ToggleNSFWFeed
     }
 }
