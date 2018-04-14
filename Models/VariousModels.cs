@@ -104,7 +104,6 @@ namespace Valerie.Models
         public int ChatXP { get; set; }
         public int Crystals { get; set; }
         public int Warnings { get; set; }
-        public bool IsAdmin { get; set; }
         public int DailyStreak { get; set; }
         public bool IsBlacklisted { get; set; }
         public DateTime? DailyReward { get; set; }
