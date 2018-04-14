@@ -11,7 +11,7 @@ after_build:
 - cmd: dotnet build
 artifacts:
 - path: bin\Debug\netcoreapp2.1
-  name: ValerieRewrite.zip
+  name: ValerieRewrite
 deploy:
 - provider: GitHub
   tag: Rewrite
@@ -19,9 +19,9 @@ deploy:
   description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
-  artifact: ValerieRewrite.zip
-  draft: true
-  prerelease: false
+  artifact: ValerieRewrite
+  draft: false
+  prerelease: true
   force_update: true
   on:
     branch: master
