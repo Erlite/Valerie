@@ -21,7 +21,7 @@ deploy:
   description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
-  artifact: ValerieRewrite
+  artifact: Rewrite-Core2.1, Rewrite-Core2.0
   draft: false
   prerelease: true
   force_update: true
