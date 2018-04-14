@@ -21,15 +21,8 @@ namespace Valerie.Helpers
             GuildHandler = guildHandler;
         }
 
-        public string ProfanityRegex { get => "\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|n+i+g+g+e+r+|f+a+g+|g+a+y+)(w+i+t+|e+r+|i+n+g+)?\b"; }
-        public string InviteRegex { get => @"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?(d+i+s+c+o+r+d+|a+p+p)+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"; }
-
-        public bool RegexMatches(string Message)
-        {
-            var Words = new Regex(ProfanityRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var Invites = new Regex(InviteRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return Words.Match(Message).Success || Invites.Match(Message).Success;
-        }
+        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|n+i+g+g+e+r+|f+a+g+|g+a+y+)(w+i+t+|e+r+|i+n+g+)?\b"; }
+        string InviteRegex { get => @"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?(d+i+s+c+o+r+d+|a+p+p)+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"; }
 
         public IMessageChannel DefaultChannel(ulong GuildId)
         {
@@ -99,5 +92,11 @@ namespace Valerie.Helpers
             if (FindRole != null) return (true, FindRole.Id);
             return (false, 0);
         }
+
+        public bool InviteMatch(string Message) => CheckMatch(InviteRegex).Match(Message).Success;
+
+        public bool ProfanityMatch(string Message) => CheckMatch(ProfanityRegex).Match(Message).Success;
+
+        public Regex CheckMatch(string Pattern) => new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
     }
 }
