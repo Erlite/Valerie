@@ -13,7 +13,9 @@
         ChatterChannel,
         StarboardChannel,
         ToggleChatXP,
+        ToggleAntiInvite,
         ToggleRedditFeed,
-        ToggleNSFWFeed
+        ToggleNSFWFeed,
+        ToggleAntiProfanity,
     }
 }
