@@ -9,6 +9,8 @@ using Discord.WebSocket;
 using Valerie.Preconditions;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Valerie.Modules
 {
@@ -19,7 +21,7 @@ namespace Valerie.Modules
         public Task SettingsAsync()
         {
             string Feed = Context.Server.Reddit.IsEnabled ? "Enabled." : "Disabled.";
-            string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";
+            string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";            
             var Embed = GetEmbed(Paint.PaleYellow)
                .WithAuthor($"{Context.Guild} Settings", Context.Guild.IconUrl)
                .AddField("General Information",
@@ -40,12 +42,11 @@ namespace Valerie.Modules
                 $"```diff\n" +
                 $"+ Reddit Feed         : {Feed}\n" +
                 $"+ Chat XP             : {XP}\n" +
-                $"+ Admins              : {Context.Server.Profiles.Where(x => x.Value.IsAdmin).Count()}\n" +
                 $"+ Join Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.JoinRole)}\n" +
                 $"+ Mute Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.MuteRole)}\n" +
                 $"+ Subreddits          : {Context.Server.Reddit.Subreddits.Count}\n" +
-                $"+ Blocked Words       : {Context.Server.Mod.BlockedWords.Count}\n" +
-                $"+ Blocked URLS        : {Context.Server.Mod.BlockedUrls.Count}\n" +
+                $"+ Profanity Check        : {Context.Server.Mod.BlockedWords.Count}\n" +
+                $"+ Invite Check          : {Context.Server.Mod.BlockedUrls.Count}\n" +
                 $"+ Max Warnings        : {Context.Server.Mod.MaxWarnings}\n" +
                 $"+ Level Up Roles      : {Context.Server.ChatXP.LevelRoles.Count}\n" +
                 $"+ Blacklisted Users   : {Context.Server.Profiles.Where(x => x.Value.IsBlacklisted).Count()}\n" +
@@ -111,7 +112,6 @@ namespace Valerie.Modules
         [Command("Set"), Summary("Sets certain values for current server's config.")]
         public Task SetAsync(SettingType SettingType, [Remainder] string Value)
         {
-            string CustomMessage = null;
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
             if ((ChannelCheck.Item1 || RoleCheck.Item1) == false)
@@ -130,6 +130,43 @@ namespace Valerie.Modules
                 case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = int.TryParse(Value, out int Result) ? Result : 0; break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
+        }
+
+        [Command("Set"), Summary("Sets certain values for current server's config.")]
+        public Task SetAsync(SettingType SettingType)
+        {
+            switch (SettingType)
+            {
+                case SettingType.ToggleChatXP: break;
+                case SettingType.ToggleNSFWFeed: break;
+                case SettingType.ToggleRedditFeed: break;
+            }
+            return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
+        }
+
+        [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
+        public Task SelfRoleAsync(char Action, IRole Role)
+        {
+            var Check = CollectionCheck(Context.Server.AssignableRoles, Role.Id, Role.Name);
+            switch (Action)
+            {
+                case 'a':
+                    if (!Check.Item1) return ReplyAsync(Check.Item2);
+                    Context.Server.AssignableRoles.Add(Role.Id);
+                    return ReplyAsync($"`{Role.Name}`", Document: DocumentType.Server);
+                case 'r':
+                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"I couldn't find  {Role.Name} role.");
+                    Context.Server.AssignableRoles.Remove(Role.Id);
+                    return ReplyAsync($"", Document: DocumentType.Server);
+            }
+            return Task.CompletedTask;
+        }
+
+        (bool, string) CollectionCheck<T>(List<T> Collection, object Value, string ObjectName)
+        {
+            if (Collection.Contains((T)Value)) return (false, $"{ObjectName} already exists in.");
+            if (Collection.Count == Collection.Capacity) return (false, "Reached max number of entries.");
+            return (true, $"{ObjectName} has been added to {Collection.GetType().Name}");
         }
     }
 }
