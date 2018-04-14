@@ -63,8 +63,7 @@ namespace Valerie.Modules
         {
             if (!CheckTag(Name, true)) return Task.CompletedTask;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
-            if (Tag.Owner != Context.User.Id || Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsAdmin)
-                return ReplyAsync($"You are not the owner of tag `{Name}`.");
+            if (Tag.Owner != Context.User.Id) return ReplyAsync($"You are not the owner of tag `{Name}`.");
             Context.Server.Tags.Remove(Tag);
             return ReplyAsync($"Tag `{Name}` has been removed.", Document: DocumentType.Server);
         }
