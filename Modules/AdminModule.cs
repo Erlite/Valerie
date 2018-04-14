@@ -20,8 +20,11 @@ namespace Valerie.Modules
         [Command("Settings"), Summary("Displays current guild's settings.")]
         public Task SettingsAsync()
         {
+            string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";
             string Feed = Context.Server.Reddit.IsEnabled ? "Enabled." : "Disabled.";
-            string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";            
+            string AntiInvite = Context.Server.Mod.AntiInvite ? "Enabled." : "Disabled.";
+            string AntiProfanity = Context.Server.Mod.AntiProfanity ? "Enabled." : "Disabled.";
+
             var Embed = GetEmbed(Paint.PaleYellow)
                .WithAuthor($"{Context.Guild} Settings", Context.Guild.IconUrl)
                .AddField("General Information",
@@ -45,8 +48,8 @@ namespace Valerie.Modules
                 $"+ Join Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.JoinRole)}\n" +
                 $"+ Mute Role           : {StringHelper.CheckRole(Context.Guild as SocketGuild, Context.Server.Mod.MuteRole)}\n" +
                 $"+ Subreddits          : {Context.Server.Reddit.Subreddits.Count}\n" +
-                $"+ Profanity Check     : {Context.Server.Mod.BlockedWords.Count}\n" +
-                $"+ Invite Check        : {Context.Server.Mod.BlockedUrls.Count}\n" +
+                $"+ Profanity Check     : {AntiProfanity}\n" +
+                $"+ Invite Check        : {AntiInvite}\n" +
                 $"+ Max Warnings        : {Context.Server.Mod.MaxWarnings}\n" +
                 $"+ Level Up Roles      : {Context.Server.ChatXP.LevelRoles.Count}\n" +
                 $"+ Blacklisted Users   : {Context.Server.Profiles.Where(x => x.Value.IsBlacklisted).Count()}\n" +
@@ -140,6 +143,8 @@ namespace Valerie.Modules
                 case SettingType.ToggleChatXP: break;
                 case SettingType.ToggleNSFWFeed: break;
                 case SettingType.ToggleRedditFeed: break;
+                case SettingType.ToggleAntiInvite: break;
+                case SettingType.ToggleAntiProfanity: break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
         }
@@ -147,26 +152,28 @@ namespace Valerie.Modules
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
         public Task SelfRoleAsync(char Action, IRole Role)
         {
-            var Check = CollectionCheck(Context.Server.AssignableRoles, Role.Id, Role.Name);
+            if (Role == Context.Guild.EveryoneRole) return ReplyAsync($"Role can't be everyone role.");
+            var Check = CollectionCheck(Context.Server.AssignableRoles, Role.Id, Role.Name, "assignable roles", 10);
             switch (Action)
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
                     Context.Server.AssignableRoles.Add(Role.Id);
-                    return ReplyAsync($"`{Role.Name}`", Document: DocumentType.Server);
+                    return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"I couldn't find  {Role.Name} role.");
+                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
                     Context.Server.AssignableRoles.Remove(Role.Id);
-                    return ReplyAsync($"", Document: DocumentType.Server);
+                    return ReplyAsync($"`{Role.Name}` is no longer an assignable role.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
         }
 
-        (bool, string) CollectionCheck<T>(List<T> Collection, object Value, string ObjectName)
+        (bool, string) CollectionCheck<T>(List<T> Collection, object Value, string ObjectName, string CollectionName, int Capacity)
         {
-            if (Collection.Contains((T)Value)) return (false, $"{ObjectName} already exists in.");
-            if (Collection.Count == Collection.Capacity) return (false, "Reached max number of entries.");
-            return (true, $"{ObjectName} has been added to {Collection.GetType().Name}");
+            var check = Collection.Contains((T)Value);
+            if (Collection.Contains((T)Value)) return (false, $"`{ObjectName}` already exists in {CollectionName}.");
+            if (Collection.Count == Capacity) return (false, $"Reached max number of entries {Emotes.DEyes}");
+            return (true, $"`{ObjectName}` has been added to {CollectionName}");
         }
     }
 }
