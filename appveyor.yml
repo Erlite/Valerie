@@ -6,7 +6,7 @@ clone_folder: C:\Projects\Valerie
 before_build:
 - cmd: dotnet restore
 build:
-  verbosity: detailed
+  verbosity: minimal
 after_build:
 - cmd: dotnet build
 artifacts:
