@@ -6,7 +6,6 @@ using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
-using Discord.WebSocket;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
 
