@@ -296,3 +296,5 @@ bin/
 obj/
 
 Resources/
+
+log\.txt
