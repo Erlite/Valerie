@@ -49,8 +49,8 @@ namespace Valerie.Handlers
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
-        internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, nameof(LeftGuild), Guild.Name));
-        internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, nameof(GuildAvailable), Guild.Name));
+        internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, Guild.Name));
+        internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, Guild.Name));
         internal Task Connected() => Task.Run(() => LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet));
         internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(LogSource.EXC, log.Exception.Message, CC.Crimson));
         internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(LogSource.DSN, Error.Message, CC.Crimson));
@@ -60,7 +60,7 @@ namespace Valerie.Handlers
 
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
-            GuildHandler.AddGuild(Guild.Id, nameof(JoinedGuildAsync).Remove(10), Guild.Name);
+            GuildHandler.AddGuild(Guild.Id, Guild.Name);
             await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.JoinMessage ?? "Thank you for inviting me to your server. Your guild prefix is `!`. Type `!Cmds` for commands.");
         }
 
@@ -200,7 +200,7 @@ namespace Valerie.Handlers
         Task XpHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             var User = Message.Author as IGuildUser;
-            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
+            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);

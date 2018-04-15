@@ -13,13 +13,13 @@ namespace Valerie.Handlers
 
         public GuildModel GetGuild(ulong Id) { using (var Session = Store.OpenSession()) return Session.Load<GuildModel>($"{Id}"); }
 
-        public void RemoveGuild(ulong Id, string Event, string Name = null)
+        public void RemoveGuild(ulong Id, string Name = null)
         {
             using (var Session = Store.OpenSession()) Session.Delete($"{Id}");
             LogService.Write(LogSource.EVT, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", Color.Crimson);
         }
 
-        public void AddGuild(ulong Id, string Event, string Name = null)
+        public void AddGuild(ulong Id, string Name = null)
         {
             using (var Session = Store.OpenSession())
             {
