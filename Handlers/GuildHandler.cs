@@ -1,5 +1,6 @@
-﻿using System;
+﻿using Valerie.Enums;
 using Valerie.Models;
+using System.Drawing;
 using Valerie.Services;
 using Raven.Client.Documents;
 
@@ -15,7 +16,7 @@ namespace Valerie.Handlers
         public void RemoveGuild(ulong Id, string Event, string Name = null)
         {
             using (var Session = Store.OpenSession()) Session.Delete($"{Id}");
-            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", ConsoleColor.DarkRed);
+            LogService.Write(LogSource.EVT, string.IsNullOrWhiteSpace(Name) ? $"Removed Server With Id: {Id}" : $"Removed Config For {Name}", Color.Crimson);
         }
 
         public void AddGuild(ulong Id, string Event, string Name = null)
@@ -30,7 +31,7 @@ namespace Valerie.Handlers
                 });
                 Session.SaveChanges();
             }
-            LogService.Write(Event, string.IsNullOrWhiteSpace(Name) ? $"Added Server With Id: {Id}" : $"Created Config For {Name}", ConsoleColor.DarkCyan);
+            LogService.Write(LogSource.EVT, string.IsNullOrWhiteSpace(Name) ? $"Added Server With Id: {Id}" : $"Created Config For {Name}", Color.Orange);
         }
 
         public void Save(GuildModel Server)

@@ -10,7 +10,7 @@ namespace Valerie.Addons
 {
     public class Base : ModuleBase<IContext>
     {
-        public async Task<IUserMessage> ReplyAsync(string Message, Embed Embed = null, DocumentType Document = DocumentType.None)
+        public async Task<IUserMessage> ReplyAsync(string Message, Embed Embed = null, DocumentType Document = DocumentType.None, string AuditReason = null)
         {
             await Context.Channel.TriggerTypingAsync();
             _ = Task.Run(() => SaveDocuments(Document));
@@ -63,7 +63,7 @@ namespace Valerie.Addons
                     Check = !Context.Session.Advanced.HasChanges;
                     break;
             }
-            if (Check == false) LogService.Write("DOCS", $"Failed to save {Document} document.", ConsoleColor.Red);
+            if (Check == false) LogService.Write(LogSource.DOC, $"Failed to save {Document} document.", System.Drawing.Color.Crimson);
         }
     }
 }

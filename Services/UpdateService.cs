@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using Valerie.Enums;
+using System.Drawing;
 using Valerie.Handlers;
 using Newtonsoft.Json;
 using System.Net.Http;
@@ -32,7 +34,7 @@ namespace Valerie.Services
 
         public void InitializeTimer() => UpdateTimer = new Timer(async _ =>
              {
-                 LogService.Write("Update", "Checking for updates...", ConsoleColor.Magenta);
+                 LogService.Write(LogSource.UPT, "Checking for updates...", Color.MediumPurple);
                  await UpdateCheck();
              }, null, TimeSpan.FromSeconds(30), TimeSpan.FromHours(2));
 
@@ -43,19 +45,19 @@ namespace Valerie.Services
             var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
             if (!GetProject.IsSuccessStatusCode)
             {
-                LogService.Write("Update", "Something went wrong while trying to get project...", ConsoleColor.Red);
+                LogService.Write(LogSource.UPT, "Something went wrong while trying to get project...", Color.IndianRed);
                 return;
             }
             var ProjectContent = JsonConvert.DeserializeObject<UpdateService>(await GetProject.Content.ReadAsStringAsync().ConfigureAwait(false));
             if (File.Exists($"{ProjectContent.Build.Jobs[0].JobId}.zip"))
             {
-                LogService.Write("Update", "Already using the latest update.", ConsoleColor.Green);
+                LogService.Write(LogSource.UPT, "Already using the latest update.", Color.LightCoral);
                 return;
             }
             var GetArtifacts = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts").ConfigureAwait(false);
             if (!GetArtifacts.IsSuccessStatusCode)
             {
-                LogService.Write("Update", "Something went wrong while trying to get artifacts...", ConsoleColor.Red);
+                LogService.Write(LogSource.UPT, "Something went wrong while trying to get artifacts...", Color.IndianRed);
                 return;
             }
             var ArtifactsContent = JsonConvert.DeserializeObject<UpdateService[]>(await GetArtifacts.Content.ReadAsStringAsync().ConfigureAwait(false));
@@ -64,12 +66,12 @@ namespace Valerie.Services
             var GetFile = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts/{ArtifactsContent[0].FileName}").ConfigureAwait(false);
             if (!GetFile.IsSuccessStatusCode)
             {
-                LogService.Write("Update", "Something went wrong while trying to get file...", ConsoleColor.Red);
+                LogService.Write(LogSource.UPT, "Something went wrong while trying to get file...", Color.IndianRed);
                 return;
             }
             await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
                 .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
-            LogService.Write("Update", "Finished downloading update.", ConsoleColor.Green);
+            LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using Discord;
+using Valerie.Enums;
 using Valerie.Services;
 using System.Net.Http;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using CC = System.Drawing.Color;
 
 namespace Valerie.Handlers
 {
@@ -55,7 +57,7 @@ namespace Valerie.Handlers
             }
             catch
             {
-                LogService.Write(nameof(DatabaseCheck), "Either RavenDB isn't running or Database 'Valerie' has not been created.", ConsoleColor.Red);
+                LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
                 await Task.Delay(5000);
                 Environment.Exit(Environment.ExitCode);
             }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using Valerie.Enums;
+using System.Drawing;
 using System.Threading.Tasks;
+using Console = Colorful.Console;
 
 namespace Valerie.Services
 {
@@ -16,46 +19,28 @@ namespace Valerie.Services
         static async Task LogAsync(string Message)
             => await File.AppendAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "log.txt"), Message + Environment.NewLine);
 
-        static void Append(string Text, ConsoleColor Color)
+        static void Append(string Text, Color Color)
         {
             Console.ForegroundColor = Color;
             Console.Write(Text);
         }
 
-        public static void Write(string Source, string Text, ConsoleColor? Color = null)
+        public static void Write(LogSource Source, string Text, Color Color)
         {
             Console.Write(Environment.NewLine);
-            Append($"{DateTime.Now.ToShortTimeString()} ", ConsoleColor.Gray);
-            Append($"[{Source}]", Color ?? ConsoleColor.White);
-            Append($" {Text}", ConsoleColor.White);
+            Append($"-> {DateTime.Now.ToShortTimeString()} ", Color.DarkGray);
+            Append($"[{Source}]", Color);
+            Append($" {Text}", Color.WhiteSmoke);
             _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
         }
 
         public void PrintApplicationInformation()
         {
-            var Header = new[]
-            {
-                @"",
-                @"      ██╗   ██╗ █████╗ ██╗     ███████╗██████╗ ██╗███████╗",
-                @"      ██║   ██║██╔══██╗██║     ██╔════╝██╔══██╗██║██╔════╝",
-                @"      ██║   ██║███████║██║     █████╗  ██████╔╝██║█████╗  ",
-                @"      ╚██╗ ██╔╝██╔══██║██║     ██╔══╝  ██╔══██╗██║██╔══╝  ",
-                @"       ╚████╔╝ ██║  ██║███████╗███████╗██║  ██║██║███████╗",
-                @"        ╚═══╝  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝",
-                @""
-            };
-
-            foreach (var Line in Header)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine(Line);
-            }
-
-            Append($"-> APPLICATION INFORMATION\n\n", ConsoleColor.Yellow);
-            Append($"    -> GENERAL\n", ConsoleColor.Red);
-            Append($"        Author: Yucked\n        License: GPL-3.0\n        Github Repo: Yucked/Valerie\n\n", ConsoleColor.Gray);
-            Append($"    -> VERSIONS\n", ConsoleColor.Red);
-            Append($"        Valerie: 18-Alpha-02-26\n        Discord: {Discord.DiscordConfig.Version}\n        RavenDB: RavenDB.Client 4.0.0-nightly-20180120-0500\n", ConsoleColor.Gray);
+            Console.WriteAscii("VALERIE", Color.Pink);
+            Append("-> INFORMATION\n", Color.PaleVioletRed);
+            Append(
+                "      Author  : Yucked\n" +
+                "      Version : Beta-18.4.x\n", Color.Olive);
         }
     }
 }
