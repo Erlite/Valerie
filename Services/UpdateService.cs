@@ -40,38 +40,30 @@ namespace Valerie.Services
 
         async Task UpdateCheck()
         {
-            HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("appllication/json"));
-            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
-            var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
-            if (!GetProject.IsSuccessStatusCode)
+            try
             {
-                LogService.Write(LogSource.UPT, "Something went wrong while trying to get project...", Color.IndianRed);
-                return;
+                HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("appllication/json"));
+                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
+                var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
+                var ProjectContent = JsonConvert.DeserializeObject<UpdateService>(await GetProject.Content.ReadAsStringAsync().ConfigureAwait(false));
+                if (File.Exists($"{ProjectContent.Build.Jobs[0].JobId}.zip"))
+                {
+                    LogService.Write(LogSource.UPT, "Already using the latest update.", Color.LightCoral);
+                    return;
+                }
+                var GetArtifacts = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts").ConfigureAwait(false);
+                var ArtifactsContent = JsonConvert.DeserializeObject<UpdateService[]>(await GetArtifacts.Content.ReadAsStringAsync().ConfigureAwait(false));
+                HttpClient.DefaultRequestHeaders.Accept.Clear();
+                HttpClient.DefaultRequestHeaders.Authorization = null;
+                var GetFile = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts/{ArtifactsContent[0].FileName}").ConfigureAwait(false);
+                await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
+                LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
             }
-            var ProjectContent = JsonConvert.DeserializeObject<UpdateService>(await GetProject.Content.ReadAsStringAsync().ConfigureAwait(false));
-            if (File.Exists($"{ProjectContent.Build.Jobs[0].JobId}.zip"))
+            catch
             {
-                LogService.Write(LogSource.UPT, "Already using the latest update.", Color.LightCoral);
-                return;
+                LogService.Write(LogSource.EXC, "Something went wrong when trying to update!", Color.Crimson);
             }
-            var GetArtifacts = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts").ConfigureAwait(false);
-            if (!GetArtifacts.IsSuccessStatusCode)
-            {
-                LogService.Write(LogSource.UPT, "Something went wrong while trying to get artifacts...", Color.IndianRed);
-                return;
-            }
-            var ArtifactsContent = JsonConvert.DeserializeObject<UpdateService[]>(await GetArtifacts.Content.ReadAsStringAsync().ConfigureAwait(false));
-            HttpClient.DefaultRequestHeaders.Accept.Clear();
-            HttpClient.DefaultRequestHeaders.Authorization = null;
-            var GetFile = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts/{ArtifactsContent[0].FileName}").ConfigureAwait(false);
-            if (!GetFile.IsSuccessStatusCode)
-            {
-                LogService.Write(LogSource.UPT, "Something went wrong while trying to get file...", Color.IndianRed);
-                return;
-            }
-            await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
-            LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
         }
     }
 }
