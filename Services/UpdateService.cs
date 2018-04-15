@@ -52,11 +52,6 @@ namespace Valerie.Services
                 LogService.Write("Update", "Already using the latest update.", ConsoleColor.Green);
                 return;
             }
-            if (ProjectContent.Build.Jobs[0].JobId == ConfigHandler.Config.UpdateId)
-            {
-                LogService.Write("Update", "Already using the latest version!", ConsoleColor.Green);
-                return;
-            }
             var GetArtifacts = await HttpClient.GetAsync($"https://ci.appveyor.com/api/buildjobs/{ProjectContent.Build.Jobs[0].JobId}/artifacts").ConfigureAwait(false);
             if (!GetArtifacts.IsSuccessStatusCode)
             {
