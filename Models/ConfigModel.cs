@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -10,7 +9,6 @@ namespace Valerie.Models
         public string Id { get; set; }
         public string Token { get; set; }
         public string Prefix { get; set; }
-        public string UpdateId { get; set; }
         public string JoinMessage { get; set; }
         public string _ReportChannel { get; set; }
         public List<string> Games { get; set; } = new List<string>();
