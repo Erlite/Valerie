@@ -4,6 +4,7 @@ using System.Linq;
 using Valerie.Handlers;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 
@@ -12,6 +13,7 @@ namespace Valerie.Services
     public class UpdateService
     {
         HttpClient HttpClient { get; }
+        Timer UpdateTimer { get; set; }
         ConfigHandler ConfigHandler { get; }
 
         [JsonProperty("build")]
@@ -29,9 +31,15 @@ namespace Valerie.Services
             ConfigHandler = configHandler;
         }
 
-        public async Task InitializeAsync()
+        public void InitializeTimer() => UpdateTimer = new Timer(async _ =>
+             {
+                 LogService.Write("Update", "Checking for updates ...", ConsoleColor.Yellow);
+                 await UpdateCheck();
+             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+
+
+        async Task UpdateCheck()
         {
-            LogService.Write("Update", "Checking for updates ...", ConsoleColor.Yellow);
             HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("appllication/json"));
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
             var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
@@ -68,7 +76,7 @@ namespace Valerie.Services
             }
 
             await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                .CopyToAsync(new FileStream(ArtifactsContent[0].FileName.Split('/').Last(), FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
+                .CopyToAsync(new FileStream(ArtifactsContent[0].FileName.Split('\\').Last(), FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
             LogService.Write("Update", "Finished downloading update.", ConsoleColor.Green);
             ConfigHandler.Config.UpdateId = ProjectContent.Build.Jobs[0].JobId;
             ConfigHandler.Save(ConfigHandler.Config);
