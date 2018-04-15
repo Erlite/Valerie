@@ -1,22 +1,25 @@
 ﻿using Discord;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
+using Newtonsoft.Json;
 using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Preconditions;
 using System.Threading.Tasks;
-using static Valerie.Addons.Embeds;
 using System.Collections.Generic;
+using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
 {
     [Name("Administrative Commands"), RequirePermission(AccessLevel.ADMINISTRATOR), RequireBotPermission(ChannelPermission.SendMessages)]
     public class AdminModule : Base
     {
-        [Command("Settings"), Summary("Displays current guild's settings.")]
+        [Command("Settings"), Summary("Displays current server's settings.")]
         public Task SettingsAsync()
         {
             string XP = Context.Server.ChatXP.IsEnabled ? "Enabled." : "Disabled.";
@@ -68,7 +71,7 @@ namespace Valerie.Modules
             return ReplyAsync(string.Empty, Embed);
         }
 
-        [Command("Setup"), Summary("Set ups Valerie for your Server.")]
+        [Command("Setup"), Summary("Set ups Valerie for your server.")]
         public async Task SetupAsync()
         {
             if (Context.Server.IsConfigured == true)
@@ -159,6 +162,36 @@ namespace Valerie.Modules
                     break;
             }
             return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
+        }
+
+        [Command("Export"), Summary("Exports your server config as a json file.")]
+        public async Task ExportAsync()
+        {
+            var Owner = await (Context.Guild as SocketGuild).Owner.GetOrCreateDMChannelAsync();
+            if (Context.Guild.OwnerId != Context.User.Id)
+            {
+                await ReplyAsync($"Requires Server's Owner.");
+                return;
+            }
+            var Serialize = JsonConvert.SerializeObject(Context.Server, Formatting.Indented, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Include
+            });
+            await Owner.SendFileAsync(new MemoryStream(Encoding.Unicode.GetBytes(Serialize)), $"{Context.Guild.Id}-Config.json");
+        }
+
+        [Command("Reset"), Summary("Resets your server config.")]
+        public Task ResetAsync()
+        {
+            if (Context.Guild.OwnerId != Context.User.Id) return ReplyAsync($"Requires Server's Owner.");
+            Context.Session.Delete($"{Context.Guild.Id}");
+            Context.Session.Store(new GuildModel
+            {
+                Id = $"{Context.Guild.Id}",
+                Prefix = ""
+            });
+            Context.Session.SaveChanges();
+            return ReplyAsync($"Server's config has been reset.");
         }
 
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
