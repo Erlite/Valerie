@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Colorful.Console" Version="1.2.6" />
     <PackageReference Include="Cookie" Version="2.7.2" />
     <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00921" />
     <PackageReference Include="Discord.Net.Providers.WS4Net" Version="2.0.0-beta2-00921" />
