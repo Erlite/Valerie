@@ -10,6 +10,7 @@ namespace Valerie.Services
         {
             var LogPath = Path.Combine(Directory.GetCurrentDirectory(), "log.txt");
             if (!File.Exists(LogPath)) File.Create(LogPath);
+            PrintApplicationInformation();
         }
 
         static async Task LogAsync(string Message)
@@ -30,7 +31,7 @@ namespace Valerie.Services
             _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
         }
 
-        public static void PrintApplicationInformation()
+        public void PrintApplicationInformation()
         {
             var Header = new[]
             {
