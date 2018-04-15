@@ -10,7 +10,6 @@ using Valerie.Preconditions;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Valerie.Modules
 {
@@ -138,15 +137,28 @@ namespace Valerie.Modules
         [Command("Set"), Summary("Sets certain values for current server's config.")]
         public Task SetAsync(SettingType SettingType)
         {
+            string State = null;
             switch (SettingType)
             {
-                case SettingType.ToggleChatXP: break;
+                case SettingType.ToggleChatXP:
+                    Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
+                    State = Context.Server.ChatXP.IsEnabled ? "enabled" : "disabled";
+                    break;
                 case SettingType.ToggleNSFWFeed: break;
-                case SettingType.ToggleRedditFeed: break;
-                case SettingType.ToggleAntiInvite: break;
-                case SettingType.ToggleAntiProfanity: break;
+                case SettingType.ToggleRedditFeed:
+                    Context.Server.Reddit.IsEnabled = !Context.Server.Reddit.IsEnabled;
+                    State = Context.Server.Reddit.IsEnabled ? "enabled" : "disabled";
+                    break;
+                case SettingType.ToggleAntiInvite:
+                    Context.Server.Mod.AntiInvite = !Context.Server.Mod.AntiInvite;
+                    State = Context.Server.Mod.AntiInvite ? "enabled" : "disabled";
+                    break;
+                case SettingType.ToggleAntiProfanity:
+                    Context.Server.Mod.AntiProfanity = !Context.Server.Mod.AntiProfanity;
+                    State = Context.Server.Mod.AntiProfanity ? "enabled" : "disabled";
+                    break;
             }
-            return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
+            return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
         }
 
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
@@ -158,15 +170,30 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
-                    Context.Server.AssignableRoles.Add(Role.Id);
+                    Context.Server.AssignableRoles.Add($"{Role.Id}");
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
-                    Context.Server.AssignableRoles.Remove(Role.Id);
+                    if (!Context.Server.AssignableRoles.Contains($"{Role.Id}")) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
+                    Context.Server.AssignableRoles.Remove($"{Role.Id}");
                     return ReplyAsync($"`{Role.Name}` is no longer an assignable role.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
         }
+
+        [Command("Forbidden"), Summary("Shows all the forbidden roles for this server.")]
+        public Task ForbiddenAsync()
+            => ReplyAsync(!Context.Server.ChatXP.ForbiddenRoles.Any() ? $"{Context.Guild} has no forbidden roles." :
+                $"**Forbidden Roles:**\n{Context.Server.ChatXP.ForbiddenRoles.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, x)}")}");
+
+        [Command("Levels"), Summary("Shows all the level up roles for this server.")]
+        public Task LevelsAsync()
+            => ReplyAsync(!Context.Server.ChatXP.LevelRoles.Any() ? $"{Context.Guild} has no level-up roles." :
+                $"**Level Up Roles:**\n{Context.Server.ChatXP.LevelRoles.Keys.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, x)}")}");
+
+        [Command("Subreddit"), Summary("Shows all the subreddits this server is subbed to.")]
+        public Task SubredditAsync()
+            => ReplyAsync(!Context.Server.Reddit.Subreddits.Any() ? $"This server isn't subscribed to any subreddits {Emotes.PepeSad}" :
+                $"**Subbed To Following Subreddits:** {string.Join(", ", Context.Server.Reddit.Subreddits)}");
 
         (bool, string) CollectionCheck<T>(List<T> Collection, object Value, string ObjectName, string CollectionName, int Capacity)
         {
