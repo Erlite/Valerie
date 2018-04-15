@@ -198,13 +198,13 @@ namespace Valerie.Modules
         [Command("Selfroles"), Summary("Shows a list of all assignable roles for current server.")]
         public Task SelfRolesAsync()
             => ReplyAsync(!Context.Server.AssignableRoles.Any() ? $"There are no self-assignable roles {Emotes.PepeSad}" :
-                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, x)))}");
+                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, Convert.ToUInt64(x))))}");
 
         [Command("Iam"), Summary("Adds you to the specified role. Role must be a self-assignable role.")]
         public Task IAmAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
+            if (!Context.Server.AssignableRoles.Contains($"{Role.Id}")) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
             else if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
             return User.AddRoleAsync(Role);
         }
