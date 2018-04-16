@@ -17,6 +17,7 @@ namespace Valerie.Helpers
             HttpClient = httpClient;
         }
 
+        public List<Type> GetNamespaces(string Namespace) => Assembly.GetExecutingAssembly().GetTypes().Where(x => String.Equals(x.Namespace, Namespace, StringComparison.Ordinal)).ToList();
         public DateTime UnixDateTime(double Unix) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
         public DateTime EasternTime => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Eastern Standard Time");
 
