@@ -18,6 +18,7 @@ namespace Valerie.Helpers
         }
 
         public DateTime UnixDateTime(double Unix) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Unix).ToLocalTime();
+        public DateTime EasternTime => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Eastern Standard Time");
 
         public async Task<IReadOnlyCollection<GithubModel>> GetCommitsAsync()
         {
