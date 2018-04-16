@@ -21,12 +21,13 @@ namespace Valerie.Handlers
         Random Random { get; }
         GuildHelper GuildHelper { get; }
         GuildHandler GuildHandler { get; }
+        MethodHelper MethodHelper { get; }
         DiscordSocketClient Client { get; }
         ConfigHandler ConfigHandler { get; }
-        IServiceProvider Provider { get; set; }
         CommandService CommandService { get; }
-        Dictionary<ulong, Dictionary<ulong, List<string>>> Waitlist { get; set; }
-        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command, Random random, GuildHelper guildHelper)
+        IServiceProvider Provider { get; set; }
+
+        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command, Random random, GuildHelper guildHelper, MethodHelper methodHelper)
         {
             Client = client;
             Random = random;
@@ -34,13 +35,19 @@ namespace Valerie.Handlers
             ConfigHandler = config;
             GuildHelper = guildHelper;
             CommandService = command;
-            Waitlist = new Dictionary<ulong, Dictionary<ulong, List<string>>>();
+            MethodHelper = methodHelper;
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
         {
             Provider = ServiceProvider;
-            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), ServiceProvider);
+            foreach (var Module in MethodHelper.GetNamespaces("Valerie.Modules"))
+            {
+                if (Module.Name.Contains("Admin")) continue;
+                await CommandService.AddModuleAsync(Module, ServiceProvider);
+                await Task.Delay(1500);
+                LogService.Write(LogSource.DSD, $"Loading {Module.Name} Into Command Service...", CC.LemonChiffon);
+            }
         }
 
         internal Task Ready() => Task.Run(() =>
