@@ -100,7 +100,6 @@ namespace Valerie.Models
 
     public class UserProfile
     {
-        public bool IsVux { get; set; }
         public int ChatXP { get; set; }
         public int Crystals { get; set; }
         public int Warnings { get; set; }
