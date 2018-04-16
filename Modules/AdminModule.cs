@@ -12,7 +12,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Valerie.Preconditions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
