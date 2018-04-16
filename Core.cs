@@ -48,7 +48,7 @@ namespace Valerie
                 .AddSingleton<MethodHelper>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<UpdateService>()
-                .AddSingleton(new HttpClient())
+                .AddSingleton<HttpClient>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
