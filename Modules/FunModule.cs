@@ -53,14 +53,23 @@ namespace Valerie.Modules
         public Task DailyAsync()
         {
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            var OldTime = Profile.DailyReward.Value;
-            var Passed = Context.MethodHelper.EasternTime - OldTime;
-            var WaitTime = OldTime - Passed;
-            if (Passed.Hours < 24 || Passed.Days < 1) return ReplyAsync($"Woops, you'll have to wait {WaitTime.Hour} hours, {WaitTime.Minute} minutes {Emotes.PepeSad}");
-            Profile.DailyStreak++;
-            Profile.Crystals += Profile.DailyStreak * 100;
-            Profile.DailyReward = Context.MethodHelper.EasternTime;
-            return ReplyAsync($"You've received your daily reward. {Emotes.DHeart}", Document: DocumentType.Server);
+            if (Profile.DailyReward.HasValue)
+            {
+                var OldTime = Profile.DailyReward.Value;
+                var Passed = Context.MethodHelper.EasternTime - OldTime;
+                var WaitTime = OldTime - Passed;
+                if (Passed.Hours < 24 || Passed.Days < 1) return ReplyAsync($"Woops, you'll have to wait {WaitTime.Hour} hours, {WaitTime.Minute} minutes {Emotes.PepeSad}");
+                Profile.DailyStreak++;
+                Profile.Crystals += Profile.DailyStreak * 100;
+                Profile.DailyReward = Context.MethodHelper.EasternTime;
+            }
+            else
+            {
+                Profile.DailyReward = Context.MethodHelper.EasternTime;
+                Profile.Crystals += 100;
+            }
+            Context.GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
+            return ReplyAsync($"You've received your daily reward. {Emotes.DHeart}");
         }
 
     }
