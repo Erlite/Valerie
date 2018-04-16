@@ -144,8 +144,8 @@ namespace Valerie.Modules
                 .AddField("Is Hoisted?", Role.IsHoisted ? Emotes.TickYes : Emotes.TickNo, true)
                 .AddField("Is Managed?", Role.IsManaged ? Emotes.TickYes : Emotes.TickNo, true)
                 .AddField("Is Mentionable?", Role.IsMentionable ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Granted Permissions", string.Join(", ", Granted))
-                .AddField("Denied Permissions", string.Join(", ", Denied)).Build());
+                .AddField("Granted Permissions", Granted.Any() ? string.Join(", ", Granted) : "No permissions granted.")
+                .AddField("Denied Permissions", Denied.Any() ? string.Join(", ", Denied) : "No permissions denied.").Build());
         }
 
         [Command("UserInfo"), Summary("Displays information about a user.")]
