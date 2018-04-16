@@ -98,5 +98,13 @@ namespace Valerie.Helpers
         public bool ProfanityMatch(string Message) => CheckMatch(ProfanityRegex).Match(Message).Success;
 
         public Regex CheckMatch(string Pattern) => new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public (bool, string) ListCheck<T>(List<T> Collection, object Value, string ObjectName, string CollectionName)
+        {
+            var check = Collection.Contains((T)Value);
+            if (Collection.Contains((T)Value)) return (false, $"`{ObjectName}` already exists in {CollectionName}.");
+            if (Collection.Count == Collection.Capacity) return (false, $"Reached max number of entries {Emotes.DEyes}");
+            return (true, $"`{ObjectName}` has been added to {CollectionName}");
+        }
     }
 }
