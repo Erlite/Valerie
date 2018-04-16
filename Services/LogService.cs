@@ -39,8 +39,9 @@ namespace Valerie.Services
             Console.WriteAscii("VALERIE", Color.Pink);
             Append("-> INFORMATION\n", Color.PaleVioletRed);
             Append(
-                "      Author  : Yucked\n" +
-                "      Version : Beta-18.4.x\n", Color.Olive);
+                "      Author  :  Yucked\n" +
+                "      Version :  18.4.X - Rewrite\n" +
+                "      Discord :  Discord.me/Glitched\n", Color.Olive);
         }
     }
 }
