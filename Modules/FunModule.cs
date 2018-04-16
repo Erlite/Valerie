@@ -2,6 +2,7 @@
 using Discord;
 using System.Linq;
 using Valerie.Enums;
+using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
@@ -9,7 +10,7 @@ using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
-using Valerie.Models;
+using System.Collections.Specialized;
 
 namespace Valerie.Modules
 {
@@ -183,26 +184,25 @@ namespace Valerie.Modules
             var Servers = Context.Session.Query<GuildModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
             var Profiles = Servers.Select(x => x.Profiles.Where(y => y.Key == User.Id));
             var Starboard = Servers.Select(x => x.Starboard.StarboardMessages.Where(y => y.AuthorId == User.Id));
-
             var GuildProfile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
             var Commands = GuildProfile.Commands.OrderByDescending(x => x.Value);
             string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.PepeSad}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
+            var Blacklisted = GuildProfile.IsBlacklisted ? Emotes.TickYes : Emotes.TickNo;
+
             var Embed = GetEmbed(Paint.Magenta)
                 .WithAuthor($"👾 {User.Username} Profile", User.GetAvatarUrl())
                 .WithThumbnailUrl(User.GetAvatarUrl())
-                .AddField("XP",
-                $"**Guild XP**    : {GuildProfile.ChatXP}\n" +
-                $"**Global XP**  : {Profiles.Sum(x => x.Sum(y => y.Value.ChatXP))}", true)
-                .AddField("Crystals",
-                $"**Guild Crystals**   : {GuildProfile.Crystals}\n" +
-                $"**Global Crystals** : {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
-                .AddField("Daily Streak", GuildProfile.DailyStreak, true)
-                .AddField("Blacklisted?", GuildProfile.IsBlacklisted ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Warnings", GuildProfile.Warnings, true)
-                .AddField("Favorite Command", FavCommand, true)
-                .AddField("Stars",
-                $"**Guild Stars**   : {Context.Server.Starboard.StarboardMessages.Where(x => x.AuthorId == User.Id).Sum(x => x.Stars)}\n" +
-                $"**Global Stars**  : {Starboard.Sum(x => x.Sum(y => y.Stars))}", true);
+                .AddField("Server Stats",
+                $"**Level:** {IntHelper.GetLevel(GuildProfile.ChatXP)}  ({GuildProfile.ChatXP} / {IntHelper.NextLevelXp(IntHelper.GetLevel(GuildProfile.ChatXP))})\n" +
+                $"**Rank:** {IntHelper.GetGuildRank(Context, User.Id)} / {Context.Server.Profiles.Count}\n" +                
+                $"**Stars:** {Context.Server.Starboard.StarboardMessages.Where(x => x.AuthorId == User.Id).Sum(x => x.Stars)}\n" +
+                $"**Crystals:** {GuildProfile.Crystals}", true)
+                .AddField("Global Stats",
+                $"**XP:** {Profiles.Sum(x => x.Sum(y => y.Value.ChatXP))}\n" +                
+                $"**Stars:** {Starboard.Sum(x => x.Sum(y => y.Stars))}\n" +
+                $"Crystals: {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
+                .AddField("Blacklisted Or Warned?", $"{Blacklisted} | {GuildProfile.Warnings}", true)
+                .AddField("Favorite Command", FavCommand, true);
             return ReplyAsync(string.Empty, Embed.Build());
         }
     }
