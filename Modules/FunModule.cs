@@ -5,9 +5,11 @@ using Valerie.Enums;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
+using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
+using Valerie.Models;
 
 namespace Valerie.Modules
 {
@@ -141,11 +143,11 @@ namespace Valerie.Modules
             int MinNum = Context.Random.Next(0, 50);
             int MaxNum = Context.Random.Next(50, 101);
             int RandomNum = Context.Random.Next(MinNum, MaxNum);
-            await ReplyAsync($"Guess a number between {MinNum} and {MaxNum}. You have 10 seconds. GO!!!");
+            await ReplyAsync($"Guess a number between **{MinNum}** and **{MaxNum}**. You have **10** seconds. *GO!!!*");
             var UserGuess = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(10));
             if (RandomNum != int.Parse(UserGuess.Content))
             {
-                await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: {RandomNum}.");
+                await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: **{RandomNum}**.");
                 return;
             }
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
@@ -157,7 +159,7 @@ namespace Valerie.Modules
         [Command("Leaderboards"), Summary("Shows top 10 users with the highest XP for this server.")]
         public Task LeaderboardAsync()
         {
-            if (!Context.Server.Profiles.Any()) return ReplyAsync($"{Context.Guild} leadboards is empty.");
+            if (!Context.Server.Profiles.Any() || !Context.Server.ChatXP.IsEnabled) return ReplyAsync($"{Context.Guild} leadboards is empty.");
             var Embed = GetEmbed(Paint.Yellow)
                 .WithTitle($"XP Leaderboards For {Context.Guild}");
 
@@ -169,7 +171,38 @@ namespace Valerie.Modules
                 Embed.AddField($"🥉: {StringHelper.CheckUser(Context.Client, Ordered[2].Key)}", $"**Total XP:** {Ordered[2].Value.ChatXP}", true);
                 foreach (var Rank in Ordered.Skip(3)) Embed.AddField($"{StringHelper.CheckUser(Context.Client, Rank.Key)}", $"**Total XP:** {Rank.Value.ChatXP}", true);
             }
-            else foreach (var Rank in Ordered) Embed.AddField($"{StringHelper.CheckUser(Context.Client, Rank.Key)}", $"**Total XP:** {Rank.Value.ChatXP}", true);
+            else foreach (var Rank in Ordered)
+                    Embed.AddField($"{StringHelper.CheckUser(Context.Client, Rank.Key)}", $"**Total XP:** {Rank.Value.ChatXP}", true);
+            return ReplyAsync(string.Empty, Embed.Build());
+        }
+
+        [Command("Profile"), Summary("Shows your profile statistics.")]
+        public Task ProfileAsync(SocketGuildUser User = null)
+        {
+            User = User ?? Context.User as SocketGuildUser;
+            var Servers = Context.Session.Query<GuildModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
+            var Profiles = Servers.Select(x => x.Profiles.Where(y => y.Key == User.Id));
+            var Starboard = Servers.Select(x => x.Starboard.StarboardMessages.Where(y => y.AuthorId == User.Id));
+
+            var GuildProfile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
+            var Commands = GuildProfile.Commands.OrderByDescending(x => x.Value);
+            string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.PepeSad}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
+            var Embed = GetEmbed(Paint.Magenta)
+                .WithAuthor($"👾 {User.Username} Profile", User.GetAvatarUrl())
+                .WithThumbnailUrl(User.GetAvatarUrl())
+                .AddField("XP",
+                $"**Guild XP**    : {GuildProfile.ChatXP}\n" +
+                $"**Global XP**  : {Profiles.Sum(x => x.Sum(y => y.Value.ChatXP))}", true)
+                .AddField("Crystals",
+                $"**Guild Crystals**   : {GuildProfile.Crystals}\n" +
+                $"**Global Crystals** : {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
+                .AddField("Daily Streak", GuildProfile.DailyStreak, true)
+                .AddField("Blacklisted?", GuildProfile.IsBlacklisted ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Warnings", GuildProfile.Warnings, true)
+                .AddField("Favorite Command", FavCommand, true)
+                .AddField("Stars",
+                $"**Guild Stars**   : {Context.Server.Starboard.StarboardMessages.Where(x => x.AuthorId == User.Id).Sum(x => x.Stars)}\n" +
+                $"**Global Stars**  : {Starboard.Sum(x => x.Sum(y => y.Stars))}", true);
             return ReplyAsync(string.Empty, Embed.Build());
         }
     }
