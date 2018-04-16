@@ -7,6 +7,7 @@ using Valerie.Handlers;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Valerie.Helpers
 {
@@ -19,6 +20,9 @@ namespace Valerie.Helpers
             Client = client;
             GuildHandler = guildHandler;
         }
+
+        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|n+i+g+g+e+r+|f+a+g+|g+a+y+)(w+i+t+|e+r+|i+n+g+)?\b"; }
+        string InviteRegex { get => @"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?(d+i+s+c+o+r+d+|a+p+p)+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"; }
 
         public IMessageChannel DefaultChannel(ulong GuildId)
         {
@@ -87,6 +91,20 @@ namespace Valerie.Helpers
             var FindRole = Guild.Roles.FirstOrDefault(x => x.Name.ToLower() == Role.ToLower());
             if (FindRole != null) return (true, FindRole.Id);
             return (false, 0);
+        }
+
+        public bool InviteMatch(string Message) => CheckMatch(InviteRegex).Match(Message).Success;
+
+        public bool ProfanityMatch(string Message) => CheckMatch(ProfanityRegex).Match(Message).Success;
+
+        public Regex CheckMatch(string Pattern) => new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public (bool, string) ListCheck<T>(List<T> Collection, object Value, string ObjectName, string CollectionName)
+        {
+            var check = Collection.Contains((T)Value);
+            if (Collection.Contains((T)Value)) return (false, $"`{ObjectName}` already exists in {CollectionName}.");
+            if (Collection.Count == Collection.Capacity) return (false, $"Reached max number of entries {Emotes.DEyes}");
+            return (true, $"`{ObjectName}` has been added to {CollectionName}");
         }
     }
 }

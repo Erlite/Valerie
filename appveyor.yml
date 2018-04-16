@@ -1,23 +1,19 @@
 version: 18.4.{build}
 skip_tags: true
 image: Visual Studio 2017 Preview
-skip_commits:
-  message: /Update/
-clone_folder: C:\Projects\Valerie
 shallow_clone: true
-configuration: Debug
-build:
-  parallel: true
-  verbosity: detailed  
+clone_folder: C:\Projects\Valerie
 before_build:
-- cmd: >-
-    dotnet restore
-build_script:
-- cmd: >-
-    dotnet build
+- cmd: dotnet restore
+build:
+  verbosity: minimal
+after_build:
+- cmd: dotnet build
 artifacts:
 - path: bin\Debug\netcoreapp2.1
-  name: ValerieRewrite
+  name: Rewrite-Core2.1
+- path: bin\Debug\netcoreapp2.0
+  name: Rewrite-Core2.0
 deploy:
 - provider: GitHub
   tag: Rewrite
@@ -25,9 +21,9 @@ deploy:
   description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
-  artifact: ValerieRewrite.zip
-  draft: true
-  prerelease: false
+  artifact: Rewrite-Core2.1, Rewrite-Core2.0
+  draft: false
+  prerelease: true
   force_update: true
   on:
     branch: master

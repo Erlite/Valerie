@@ -1,7 +1,9 @@
 ﻿using Cookie;
 using System;
+using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Services;
+using System.Drawing;
 using Raven.Client.Documents;
 
 namespace Valerie.Handlers
@@ -27,9 +29,9 @@ namespace Valerie.Handlers
             using (var Session = Store.OpenSession())
             {
                 if (Session.Advanced.Exists("Config")) return;
-                LogService.Write("Config", "Enter Bot's Token: ", ConsoleColor.DarkCyan);
+                LogService.Write(LogSource.CNF, "Enter Bot's Token: ", Color.LightCoral);
                 string Token = Console.ReadLine();
-                LogService.Write("Config", "Enter Bot's Prefix: ", ConsoleColor.DarkCyan);
+                LogService.Write(LogSource.CNF, "Enter Bot's Prefix: ", Color.LightCoral);
                 string Prefix = Console.ReadLine();
                 Session.Store(new ConfigModel
                 {

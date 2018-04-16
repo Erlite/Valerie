@@ -1,9 +1,11 @@
 ﻿using System;
 using Discord;
+using Valerie.Enums;
 using Valerie.Services;
 using System.Net.Http;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using CC = System.Drawing.Color;
 
 namespace Valerie.Handlers
 {
@@ -13,22 +15,18 @@ namespace Valerie.Handlers
         HttpClient HttpClient { get; }
         EventsHandler Events { get; }
         DiscordSocketClient Client { get; }
-        UpdateService UpdateService { get; }
 
-        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client, UpdateService updateService)
+        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client)
         {
             Client = client;
             Config = config;
             Events = events;
             HttpClient = httpClient;
-            UpdateService = updateService;
         }
 
         public async Task InitializeAsync()
         {
-            LogService.PrintApplicationInformation();
             await DatabaseCheck();
-            //await UpdateService.InitializeAsync();
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
@@ -59,7 +57,7 @@ namespace Valerie.Handlers
             }
             catch
             {
-                LogService.Write(nameof(DatabaseCheck), "Either RavenDB isn't running or Database 'Valerie' has not been created.", ConsoleColor.Red);
+                LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
                 await Task.Delay(5000);
                 Environment.Exit(Environment.ExitCode);
             }

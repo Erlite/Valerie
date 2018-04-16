@@ -8,8 +8,8 @@ namespace Valerie.Models
     {
         public bool IsEnabled { get; set; }
         public string LevelMessage { get; set; }
-        public List<ulong> ForbiddenRoles { get; set; } = new List<ulong>(20);
-        public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>(20);
+        public List<string> ForbiddenRoles { get; set; } = new List<string>(20);
+        public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>();
     }
 
     public class StarboardWrapper
@@ -51,12 +51,12 @@ namespace Valerie.Models
 
     public class ModWrapper
     {
+        public bool AntiInvite { get; set; }
         public string _JoinRole { get; set; }
         public int MaxWarnings { get; set; }
         public string _MuteRole { get; set; }
+        public bool AntiProfanity { get; set; }
         public string _TextChannel { get; set; }
-        public List<string> BlockedWords { get; set; } = new List<string>(50);
-        public List<string> BlockedUrls { get; set; } = new List<string>(50);
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         [JsonIgnore]
         public ulong JoinRole { get => UInt64.TryParse(_JoinRole, out ulong Id) ? Id : 0; set => _JoinRole = $"{value}"; }
@@ -104,7 +104,6 @@ namespace Valerie.Models
         public int ChatXP { get; set; }
         public int Crystals { get; set; }
         public int Warnings { get; set; }
-        public bool IsAdmin { get; set; }
         public int DailyStreak { get; set; }
         public bool IsBlacklisted { get; set; }
         public DateTime? DailyReward { get; set; }

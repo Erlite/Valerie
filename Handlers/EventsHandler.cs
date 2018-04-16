@@ -1,6 +1,7 @@
 ﻿using System;
 using Discord;
 using System.Linq;
+using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
@@ -9,6 +10,7 @@ using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using CC = System.Drawing.Color;
 using System.Collections.Generic;
 using static Valerie.Addons.Embeds;
 
@@ -43,22 +45,22 @@ namespace Valerie.Handlers
 
         internal Task Ready() => Task.Run(() =>
         {
-            LogService.Write(nameof(Ready), "Ready to rock n roll.", ConsoleColor.Green);
+            LogService.Write(LogSource.RDY, "Drum Roll, Please?", CC.BlueViolet);
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
-        internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, nameof(LeftGuild), Guild.Name));
-        internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, nameof(GuildAvailable), Guild.Name));
-        internal Task Connected() => Task.Run(() => LogService.Write(nameof(Connected), "Succesfully made handshake with Discord.", ConsoleColor.Green));
-        internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(nameof(Log), log.Message ?? log.Exception.Message, ConsoleColor.Yellow));
-        internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(nameof(Disconnected), Error.Message ?? Error.StackTrace, ConsoleColor.Red));
+        internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, Guild.Name));
+        internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, Guild.Name));
+        internal Task Connected() => Task.Run(() => LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet));
+        internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(LogSource.EXC, log.Exception.Message, CC.Crimson));
+        internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(LogSource.DSN, Error.Message, CC.Crimson));
         internal Task LatencyUpdated(int Old, int Newer) => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 250) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
 
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
-            GuildHandler.AddGuild(Guild.Id, nameof(JoinedGuildAsync).Remove(10), Guild.Name);
+            GuildHandler.AddGuild(Guild.Id, Guild.Name);
             await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.JoinMessage ?? "Thank you for inviting me to your server. Your guild prefix is `!`. Type `!Cmds` for commands.");
         }
 
@@ -107,7 +109,7 @@ namespace Valerie.Handlers
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             switch (Result.Error)
             {
-                case CommandError.Exception: LogService.Write("Exception", Result.ErrorReason, ConsoleColor.Red); break;
+                case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
                 case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
             }
             _ = Task.Run(() => RecordCommand(Context, argPos));
@@ -198,7 +200,7 @@ namespace Valerie.Handlers
         Task XpHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             var User = Message.Author as IGuildUser;
-            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
+            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);

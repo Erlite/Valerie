@@ -11,6 +11,11 @@
         MaxWarnings,
         RedditChannel,
         ChatterChannel,
-        StarboardChannel
+        StarboardChannel,
+        ToggleChatXP,
+        ToggleAntiInvite,
+        ToggleRedditFeed,
+        ToggleNSFWFeed,
+        ToggleAntiProfanity,
     }
 }
