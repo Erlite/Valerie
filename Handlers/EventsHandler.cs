@@ -41,13 +41,7 @@ namespace Valerie.Handlers
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
         {
             Provider = ServiceProvider;
-            foreach (var Module in MethodHelper.GetNamespaces("Valerie.Modules"))
-            {
-                if (Module.Name.Contains("Admin")) continue;
-                await CommandService.AddModuleAsync(Module, ServiceProvider);
-                await Task.Delay(1500);
-                LogService.Write(LogSource.DSD, $"Loading {Module.Name} Into Command Service...", CC.LemonChiffon);
-            }
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), ServiceProvider);
         }
 
         internal Task Ready() => Task.Run(() =>
