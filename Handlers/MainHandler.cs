@@ -40,6 +40,7 @@ namespace Valerie.Handlers
             Client.LatencyUpdated += Events.LatencyUpdated;
             Client.ReactionAdded += Events.ReactionAddedAsync;
             Client.MessageReceived += Events.HandleMessageAsync;
+            Client.MessageDeleted += Events.MessageDeletedAsync;
             Client.ReactionRemoved += Events.ReactionRemovedAsync;
             Client.MessageReceived += Events.CommandHandlerAsync;
 
