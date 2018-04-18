@@ -57,6 +57,7 @@ namespace Valerie.Models
         public string _MuteRole { get; set; }
         public bool AntiProfanity { get; set; }
         public string _TextChannel { get; set; }
+        public bool LogDeletedMessages { get; set; }
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         [JsonIgnore]
         public ulong JoinRole { get => UInt64.TryParse(_JoinRole, out ulong Id) ? Id : 0; set => _JoinRole = $"{value}"; }
@@ -107,5 +108,20 @@ namespace Valerie.Models
         public bool IsBlacklisted { get; set; }
         public DateTime? DailyReward { get; set; }
         public Dictionary<string, int> Commands { get; set; } = new Dictionary<string, int>();
+    }
+
+    public class MessageWrapper
+    {
+        public string Content { get; set; }
+        public string _AuthorId { get; set; }
+        public string _ChannelId { get; set; }
+        public string _MessageId { get; set; }
+        public DateTime DateTime { get; set; }
+        [JsonIgnore]
+        public ulong AuthorId { get => UInt64.TryParse(_AuthorId, out ulong Id) ? Id : 0; set => _AuthorId = $"{value}"; }
+        [JsonIgnore]
+        public ulong ChannelId { get => UInt64.TryParse(_ChannelId, out ulong Id) ? Id : 0; set => _ChannelId = $"{value}"; }
+        [JsonIgnore]
+        public ulong MessageId { get => UInt64.TryParse(_MessageId, out ulong Id) ? Id : 0; set => _MessageId = $"{value}"; }
     }
 }
