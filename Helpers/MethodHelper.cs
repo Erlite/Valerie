@@ -25,6 +25,7 @@ namespace Valerie.Helpers
         {
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             var Request = await HttpClient.GetAsync("https://api.github.com/repos/Yucked/Valerie/commits");
+            if (!Request.IsSuccessStatusCode) return null;
             var Content = JsonConvert.DeserializeObject<IReadOnlyCollection<GithubModel>>(await Request.Content.ReadAsStringAsync());
             HttpClient.DefaultRequestHeaders.Clear();
             return Content;
