@@ -41,13 +41,7 @@ namespace Valerie.Handlers
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
         {
             Provider = ServiceProvider;
-            foreach (var Module in MethodHelper.GetNamespaces("Valerie.Modules"))
-            {
-                if (Module.Name.Contains("Admin")) continue;
-                await CommandService.AddModuleAsync(Module, ServiceProvider);
-                await Task.Delay(1500);
-                LogService.Write(LogSource.DSD, $"Loading {Module.Name} Into Command Service...", CC.LemonChiffon);
-            }
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), ServiceProvider);
         }
 
         internal Task Ready() => Task.Run(() =>
@@ -120,6 +114,22 @@ namespace Valerie.Handlers
                 case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
             }
             _ = Task.Run(() => RecordCommand(Context, argPos));
+        }
+
+        internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
+        {
+            var Config = GuildHandler.GetGuild((Channel as SocketGuildChannel).Guild.Id);
+            var Message = await Cache.GetOrDownloadAsync();
+            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages) return;
+            Config.DeletedMessages.Add(new MessageWrapper
+            {
+                ChannelId = Channel.Id,
+                MessageId = Message.Id,
+                AuthorId = Message.Author.Id,
+                DateTime = Message.Timestamp.DateTime,
+                Content = Message.Content ?? Message.Attachments.FirstOrDefault()?.Url
+            });
+            GuildHandler.Save(Config);
         }
 
         internal async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)

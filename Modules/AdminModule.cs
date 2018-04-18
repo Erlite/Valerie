@@ -160,6 +160,10 @@ namespace Valerie.Modules
                     Context.Server.Mod.AntiProfanity = !Context.Server.Mod.AntiProfanity;
                     State = Context.Server.Mod.AntiProfanity ? "enabled" : "disabled";
                     break;
+                case SettingType.ToggleMessageLog:
+                    Context.Server.Mod.LogDeletedMessages = !Context.Server.Mod.LogDeletedMessages;
+                    State = Context.Server.Mod.LogDeletedMessages ? "enabled" : "disabled";
+                    break;
             }
             return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
         }
@@ -325,5 +329,20 @@ namespace Valerie.Modules
         public Task SubredditAsync()
             => ReplyAsync(!Context.Server.Reddit.Subreddits.Any() ? $"This server isn't subscribed to any subreddits {Emotes.PepeSad}" :
                 $"**Subbed To Following Subreddits:** {string.Join(", ", Context.Server.Reddit.Subreddits)}");
+
+        [Command("MessageLog"), Summary("Retrives messages from deleted messages.")]
+        public Task MessageLogAsync(int Old = 0)
+        {
+            if (!Context.Server.DeletedMessages.Any() || Context.Server.DeletedMessages[Old] == null)
+                return ReplyAsync("Failed to retrive deleted messages.");
+            var Get = Old == 0 ? Context.Server.DeletedMessages.LastOrDefault() : Context.Server.DeletedMessages[Old];
+            var User = StringHelper.CheckUser(Context.Client, Get.AuthorId);
+            var GetUser = (Context.Client as DiscordSocketClient).GetUser(Get.AuthorId);
+            var Embed = GetEmbed(Paint.Aqua)
+                .WithAuthor($"{User} - {Get.DateTime}", GetUser != null ? GetUser.GetAvatarUrl() : Context.Client.CurrentUser.GetAvatarUrl())
+                .WithDescription(Get.Content)
+                .WithFooter($"Channel: {StringHelper.CheckChannel(Context.Guild as SocketGuild, Get.ChannelId)} | Message Id: {Get.MessageId}");
+            return ReplyAsync(string.Empty, Embed.Build());
+        }
     }
 }
