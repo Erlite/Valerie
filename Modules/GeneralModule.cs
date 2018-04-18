@@ -169,11 +169,8 @@ namespace Valerie.Modules
         {
             var MatchList = new List<string>();
             foreach (var Guilds in (Context.Client as DiscordSocketClient).Guilds)
-            {
-                var Users = Guilds.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id);
-                foreach (var user in Users)
+                foreach (var user in Guilds.Users.Where(x => x.Discriminator == User.Discriminator && x.Id != User.Id))
                     if (!MatchList.Contains(user.Username)) MatchList.Add(user.Username);
-            }
             return ReplyAsync(MatchList.Any() ? $"**Users matching {User} discriminator:** {string.Join(", ", MatchList)}" :
                 $"Couldn't find any users matching {User} discriminator");
         }
