@@ -116,6 +116,22 @@ namespace Valerie.Handlers
             _ = Task.Run(() => RecordCommand(Context, argPos));
         }
 
+        internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
+        {
+            var Config = GuildHandler.GetGuild((Channel as SocketGuildChannel).Guild.Id);
+            var Message = await Cache.GetOrDownloadAsync();
+            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages) return;
+            Config.DeletedMessages.Add(new MessageWrapper
+            {
+                ChannelId = Channel.Id,
+                MessageId = Message.Id,
+                AuthorId = Message.Author.Id,
+                DateTime = Message.Timestamp.DateTime,
+                Content = Message.Content ?? Message.Attachments.FirstOrDefault()?.Url
+            });
+            GuildHandler.Save(Config);
+        }
+
         internal async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> Cache, ISocketMessageChannel Channel, SocketReaction Reaction)
         {
             if (Reaction.Emote.Name != "⭐") return;
