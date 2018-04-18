@@ -16,6 +16,7 @@
         ToggleAntiInvite,
         ToggleRedditFeed,
         ToggleNSFWFeed,
+        ToggleMessageLog,
         ToggleAntiProfanity,
     }
 }
