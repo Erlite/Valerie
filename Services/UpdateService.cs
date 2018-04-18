@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
+using System.IO.Compression;
+using System.Diagnostics;
 
 namespace Valerie.Services
 {
@@ -35,10 +37,10 @@ namespace Valerie.Services
         public void InitializeTimer() => UpdateTimer = new Timer(async _ =>
              {
                  LogService.Write(LogSource.UPT, "Checking for updates...", Color.MediumPurple);
-                 await UpdateCheck();
+                 await DownloadUpdate();
              }, null, TimeSpan.FromSeconds(30), TimeSpan.FromHours(2));
 
-        async Task UpdateCheck()
+        async Task DownloadUpdate()
         {
             try
             {
@@ -46,7 +48,7 @@ namespace Valerie.Services
                 HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
                 var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
                 var ProjectContent = JsonConvert.DeserializeObject<UpdateService>(await GetProject.Content.ReadAsStringAsync().ConfigureAwait(false));
-                if (File.Exists($"{ProjectContent.Build.Jobs[0].JobId}.zip"))
+                if (!VersionCheck(ProjectContent.Build.Jobs[0].JobId))
                 {
                     LogService.Write(LogSource.UPT, "Already using the latest update.", Color.LightCoral);
                     return;
@@ -59,11 +61,21 @@ namespace Valerie.Services
                 await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
                 LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
+                File.WriteAllText("version.txt", ProjectContent.Build.Jobs[0].JobId);
             }
             catch
             {
                 LogService.Write(LogSource.EXC, "Something went wrong when trying to update!", Color.Crimson);
             }
+        }
+
+        bool VersionCheck(string Version)
+        {
+            if (!File.Exists("version.txt")) return false;
+            var CurrentVersion = File.ReadAllText("version.txt");
+            if (Version == CurrentVersion) return false;
+            return true;
+
         }
     }
 }
