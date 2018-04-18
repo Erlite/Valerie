@@ -21,6 +21,7 @@ namespace Valerie.Models
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
         public Dictionary<ulong, string> AFK { get; set; } = new Dictionary<ulong, string>();
+        public List<MessageWrapper> DeletedMessages { get; set; } = new List<MessageWrapper>();
         public Dictionary<ulong, UserProfile> Profiles { get; set; } = new Dictionary<ulong, UserProfile>();
         [JsonIgnore]
         public ulong JoinChannel { get => UInt64.TryParse(_JoinChannel, out ulong Id) ? Id : 0; set => _JoinChannel = $"{value}"; }
