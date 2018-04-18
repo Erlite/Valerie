@@ -15,15 +15,16 @@ namespace Valerie.Services
 {
     public class RedditService
     {
+        Timer FeedTimer { get; set; }
         HttpClient HttpClient { get; }
         DiscordSocketClient Client { get; }
         ConfigHandler ConfigHandler { get; }
-        DocumentStore DocumentStore { get; }
+        IDocumentStore DocumentStore { get; }
 
         Dictionary<ulong, Timer> ChannelTimers { get; set; } = new Dictionary<ulong, Timer>();
         Dictionary<ulong, List<string>> PostTrack { get; set; } = new Dictionary<ulong, List<string>>();
 
-        public RedditService(HttpClient httpClient, ConfigHandler configHandler, DocumentStore documentStore, DiscordSocketClient client)
+        public RedditService(HttpClient httpClient, ConfigHandler configHandler, IDocumentStore documentStore, DiscordSocketClient client)
         {
             Client = client;
             HttpClient = httpClient;
@@ -31,7 +32,12 @@ namespace Valerie.Services
             DocumentStore = documentStore;
         }
 
-        public void Initialize()
+        public void Initialize() => FeedTimer = new Timer(_ =>
+         {
+             Start();
+         }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+
+        public void Start()
         {
             List<GuildModel> Configs;
             using (var Session = DocumentStore.OpenSession())
@@ -40,7 +46,7 @@ namespace Valerie.Services
             {
                 var Channel = Client.GetChannel(Server.Reddit.TextChannel) as IMessageChannel;
                 if (ChannelTimers.ContainsKey(Channel.Id)) return;
-                ChannelTimers.Add(Channel.Id, new Timer(async _ =>
+                var ChannelTimer = new Timer(async _ =>
                 {
                     foreach (var Subbredit in Server.Reddit.Subreddits)
                     {
@@ -51,17 +57,18 @@ namespace Valerie.Services
                         if (PostTrack.ContainsKey(Channel.Id)) PostTrack.TryGetValue(Channel.Id, out PostIds);
                         if (PostIds.Contains(SubData.Id)) return;
                         string Description = SubData.Selftext.Length > 500 ? $"{SubData.Selftext.Substring(0, 400)} ..." : SubData.Selftext;
-                        await Channel.SendMessageAsync($"New Post In **{SubData.Subreddit}** By {SubData.Author}\n\n" +
+                        await Channel.SendMessageAsync($"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n" +
                             $"**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}").ConfigureAwait(false);
                         PostIds.Add(SubData.Id);
                         PostTrack.Remove(Channel.Id);
                         PostTrack.Add(Channel.Id, PostIds);
                     }
-                }, null, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(30)));
+                }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
+                ChannelTimers.Add(Channel.Id, ChannelTimer);
             }
         }
 
-        async Task<RedditModel> SubredditAsync(string SubredditName)
+        public async Task<RedditModel> SubredditAsync(string SubredditName)
         {
             var Get = await HttpClient.GetAsync($"https://reddit.com/r/{SubredditName}/new.json?limit=5").ConfigureAwait(false);
             if (!Get.IsSuccessStatusCode) return null;
