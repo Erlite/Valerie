@@ -147,11 +147,6 @@ namespace Valerie.Modules
                     Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
                     State = Context.Server.ChatXP.IsEnabled ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleNSFWFeed: break;
-                case SettingType.ToggleRedditFeed:
-                    Context.Server.Reddit.IsEnabled = !Context.Server.Reddit.IsEnabled;
-                    State = Context.Server.Reddit.IsEnabled ? "enabled" : "disabled";
-                    break;
                 case SettingType.ToggleAntiInvite:
                     Context.Server.Mod.AntiInvite = !Context.Server.Mod.AntiInvite;
                     State = Context.Server.Mod.AntiInvite ? "enabled" : "disabled";
@@ -163,6 +158,19 @@ namespace Valerie.Modules
                 case SettingType.ToggleMessageLog:
                     Context.Server.Mod.LogDeletedMessages = !Context.Server.Mod.LogDeletedMessages;
                     State = Context.Server.Mod.LogDeletedMessages ? "enabled" : "disabled";
+                    break;
+                case SettingType.ToggleRedditFeed:
+                    if (Context.Server.Reddit.IsEnabled)
+                    {
+                        Context.Server.Reddit.IsEnabled = false;
+                        Context.RedditService.Stop(Context.Channel.Id);
+                        State = "disabled";
+                    }
+                    else
+                    {
+                        Context.Server.Reddit.IsEnabled = true;
+                        State = "enabled";
+                    }
                     break;
             }
             return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
@@ -295,6 +303,7 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
+                    if (Context.RedditService.SubredditAsync(Subreddit).Result == null) return ReplyAsync($"{Subreddit} is an invalid subreddit.");
                     Context.Server.Reddit.Subreddits.Add(Subreddit);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':

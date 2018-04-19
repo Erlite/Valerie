@@ -41,15 +41,16 @@ namespace Valerie
                     Database = "Valerie",
                     Urls = new[] { "http://127.0.0.1:8080" }
                 }.Initialize())
+                .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()
                 .AddSingleton<GuildHelper>()
                 .AddSingleton<MainHandler>()
-                .AddSingleton<GuildHandler>()
-                .AddSingleton<ConfigHandler>()
                 .AddSingleton<MethodHelper>()
+                .AddSingleton<GuildHandler>()
+                .AddSingleton<RedditService>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<UpdateService>()
-                .AddSingleton<HttpClient>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
@@ -57,6 +58,7 @@ namespace Valerie
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
             Provider.GetRequiredService<UpdateService>().InitializeTimer();
+            Provider.GetRequiredService<RedditService>().Initialize();
 
             await Task.Delay(-1);
         }

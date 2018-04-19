@@ -20,6 +20,7 @@ namespace Valerie.Handlers
     {
         Random Random { get; }
         GuildHelper GuildHelper { get; }
+        bool CommandExecuted { get; set; }
         GuildHandler GuildHandler { get; }
         MethodHelper MethodHelper { get; }
         DiscordSocketClient Client { get; }
@@ -108,6 +109,7 @@ namespace Valerie.Handlers
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot) return;
             if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
+            CommandExecuted = Result.IsSuccess;
             switch (Result.Error)
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
@@ -120,7 +122,7 @@ namespace Valerie.Handlers
         {
             var Config = GuildHandler.GetGuild((Channel as SocketGuildChannel).Guild.Id);
             var Message = await Cache.GetOrDownloadAsync();
-            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages) return;
+            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages || CommandExecuted) return;
             Config.DeletedMessages.Add(new MessageWrapper
             {
                 ChannelId = Channel.Id,

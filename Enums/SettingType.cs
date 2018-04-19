@@ -15,7 +15,6 @@
         ToggleChatXP,
         ToggleAntiInvite,
         ToggleRedditFeed,
-        ToggleNSFWFeed,
         ToggleMessageLog,
         ToggleAntiProfanity,
     }
