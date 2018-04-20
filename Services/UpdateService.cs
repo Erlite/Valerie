@@ -6,10 +6,9 @@ using Valerie.Handlers;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
-using System.IO.Compression;
-using System.Diagnostics;
 
 namespace Valerie.Services
 {
@@ -48,7 +47,7 @@ namespace Valerie.Services
                 HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHandler.Config.APIKeys["AppVeyor"]);
                 var GetProject = await HttpClient.GetAsync("https://ci.appveyor.com/api/projects/Yucked/Valerie").ConfigureAwait(false);
                 var ProjectContent = JsonConvert.DeserializeObject<UpdateService>(await GetProject.Content.ReadAsStringAsync().ConfigureAwait(false));
-                if (!VersionCheck(ProjectContent.Build.Jobs[0].JobId))
+                if (VersionCheck(ProjectContent.Build.Jobs[0].JobId))
                 {
                     LogService.Write(LogSource.UPT, "Already using the latest update.", Color.LightCoral);
                     return;
@@ -61,7 +60,6 @@ namespace Valerie.Services
                 await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
                 LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
-                File.WriteAllText("version.txt", ProjectContent.Build.Jobs[0].JobId);
             }
             catch
             {
