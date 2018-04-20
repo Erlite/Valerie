@@ -6,7 +6,6 @@ using Valerie.Handlers;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 
@@ -37,7 +36,7 @@ namespace Valerie.Services
              {
                  LogService.Write(LogSource.UPT, "Checking for updates...", Color.MediumPurple);
                  await DownloadUpdate();
-             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromHours(2));
+             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromHours(1));
 
         async Task DownloadUpdate()
         {
@@ -60,6 +59,7 @@ namespace Valerie.Services
                 await (await GetFile.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     .CopyToAsync(new FileStream($"{ProjectContent.Build.Jobs[0].JobId}.zip", FileMode.Create, FileAccess.Write)).ConfigureAwait(false);
                 LogService.Write(LogSource.UPT, "Finished downloading update.", Color.ForestGreen);
+                await File.WriteAllTextAsync("version.txt", ProjectContent.Build.Jobs[0].JobId);
             }
             catch
             {
@@ -69,9 +69,11 @@ namespace Valerie.Services
 
         bool VersionCheck(string Version)
         {
-            if (!File.Exists("version.txt")) return false;
+            if (!File.Exists("version.txt"))
+                return false;
             var CurrentVersion = File.ReadAllText("version.txt");
-            if (Version == CurrentVersion) return false;
+            if (Version != CurrentVersion)
+                return false;
             return true;
 
         }
