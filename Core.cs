@@ -58,7 +58,6 @@ namespace Valerie
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
             Provider.GetRequiredService<UpdateService>().InitializeTimer();
-            Provider.GetRequiredService<RedditService>().Initialize();
 
             await Task.Delay(-1);
         }
