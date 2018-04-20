@@ -12,10 +12,11 @@
         RedditChannel,
         ChatterChannel,
         StarboardChannel,
+        LevelUpMessage,
         ToggleChatXP,
         ToggleAntiInvite,
         ToggleRedditFeed,
         ToggleMessageLog,
-        ToggleAntiProfanity,
+        ToggleAntiProfanity,        
     }
 }
