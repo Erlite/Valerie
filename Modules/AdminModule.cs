@@ -10,8 +10,8 @@ using Valerie.Helpers;
 using Newtonsoft.Json;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Preconditions;
 using System.Threading.Tasks;
+using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
@@ -117,6 +117,7 @@ namespace Valerie.Modules
         [Command("Set"), Summary("Sets certain values for current server's config.")]
         public Task SetAsync(SettingType SettingType, [Remainder] string Value = null)
         {
+            Value = Value ?? string.Empty;
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
             if ((ChannelCheck.Item1 || RoleCheck.Item1) == false)
@@ -138,29 +139,29 @@ namespace Valerie.Modules
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
         }
 
-        [Command("Set"), Summary("Sets certain values for current server's config.")]
-        public Task SetAsync(SettingType SettingType)
+        [Command("Toggle"), Summary("Sets certain values for current server's config.")]
+        public Task SetAsync(ToggleType ToggleType)
         {
             string State = null;
-            switch (SettingType)
+            switch (ToggleType)
             {
-                case SettingType.ToggleChatXP:
+                case ToggleType.ChatXP:
                     Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
                     State = Context.Server.ChatXP.IsEnabled ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleAntiInvite:
+                case ToggleType.AntiInvite:
                     Context.Server.Mod.AntiInvite = !Context.Server.Mod.AntiInvite;
                     State = Context.Server.Mod.AntiInvite ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleAntiProfanity:
+                case ToggleType.AntiProfanity:
                     Context.Server.Mod.AntiProfanity = !Context.Server.Mod.AntiProfanity;
                     State = Context.Server.Mod.AntiProfanity ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleMessageLog:
+                case ToggleType.MessageLog:
                     Context.Server.Mod.LogDeletedMessages = !Context.Server.Mod.LogDeletedMessages;
                     State = Context.Server.Mod.LogDeletedMessages ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleRedditFeed:
+                case ToggleType.RedditFeed:
                     if (Context.Server.Reddit.IsEnabled)
                     {
                         Context.Server.Reddit.IsEnabled = false;
@@ -170,11 +171,12 @@ namespace Valerie.Modules
                     else
                     {
                         Context.Server.Reddit.IsEnabled = true;
+                        Context.RedditService.Start(Context.Guild.Id);
                         State = "enabled";
                     }
                     break;
             }
-            return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
+            return ReplyAsync($"{ToggleType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
         }
 
         [Command("Export"), Summary("Exports your server config as a json file.")]
