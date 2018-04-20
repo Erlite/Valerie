@@ -4,9 +4,9 @@ using Valerie.Enums;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
-using Valerie.Preconditions;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
