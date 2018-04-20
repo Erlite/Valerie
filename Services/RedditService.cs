@@ -17,15 +17,17 @@ namespace Valerie.Services
     public class RedditService
     {
         HttpClient HttpClient { get; }
+        IDocumentStore Store { get; }
         GuildHandler GuildHandler { get; }
         DiscordSocketClient Client { get; }
-
+        Timer AutoFeedTimer { get; set; }
         ConcurrentDictionary<ulong, Timer> ChannelTimers { get; set; } = new ConcurrentDictionary<ulong, Timer>();
         ConcurrentDictionary<ulong, List<string>> PostTrack { get; set; } = new ConcurrentDictionary<ulong, List<string>>();
 
-        public RedditService(HttpClient httpClient, GuildHandler guildHandler, DiscordSocketClient client)
+        public RedditService(HttpClient httpClient, GuildHandler guildHandler, DiscordSocketClient client, IDocumentStore store)
         {
             Client = client;
+            Store = store;
             HttpClient = httpClient;
             GuildHandler = guildHandler;
         }
@@ -33,10 +35,10 @@ namespace Valerie.Services
         public Task Start(ulong GuildId)
         {
             var Server = GuildHandler.GetGuild(GuildId);
-            if (!Server.Reddit.IsEnabled || Server.Reddit.TextChannel == 0 || !Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
+            if (Server.Reddit.TextChannel == 0 || !Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
             var Channel = Client.GetChannel(Server.Reddit.TextChannel) as IMessageChannel;
             if (ChannelTimers.ContainsKey(Channel.Id)) return Task.CompletedTask;
-            var ChannelTimer = new Timer(async _ =>
+            ChannelTimers.TryAdd(Channel.Id, new Timer(async _ =>
             {
                 foreach (var Subbredit in Server.Reddit.Subreddits)
                 {
@@ -53,8 +55,7 @@ namespace Valerie.Services
                     PostTrack.TryRemove(Channel.Id, out List<string> Useless);
                     PostTrack.TryAdd(Channel.Id, PostIds);
                 }
-            }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15));
-            ChannelTimers.TryAdd(Channel.Id, ChannelTimer);
+            }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)));
             return Task.CompletedTask;
         }
 
