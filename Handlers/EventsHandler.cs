@@ -113,7 +113,9 @@ namespace Valerie.Handlers
             switch (Result.Error)
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
-                case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
+                case CommandError.UnmetPrecondition:
+                    if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result.ErrorReason);
+                    break;
             }
             _ = Task.Run(() => RecordCommand(Context, argPos));
         }
