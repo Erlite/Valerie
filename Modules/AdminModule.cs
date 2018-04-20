@@ -115,7 +115,7 @@ namespace Valerie.Modules
         }
 
         [Command("Set"), Summary("Sets certain values for current server's config.")]
-        public Task SetAsync(SettingType SettingType, [Remainder] string Value)
+        public Task SetAsync(SettingType SettingType, [Remainder] string Value = null)
         {
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
@@ -133,6 +133,7 @@ namespace Valerie.Modules
                 case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
                 case SettingType.MuteRole: Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
                 case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = int.TryParse(Value, out int Result) ? Result : 0; break;
+                case SettingType.LevelUpMessage: Context.Server.ChatXP.LevelMessage = Value; break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
         }
