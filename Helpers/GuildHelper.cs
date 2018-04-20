@@ -75,6 +75,7 @@ namespace Valerie.Helpers
 
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
         {
+            if (string.IsNullOrWhiteSpace(Channel)) return (true, 0);
             UInt64.TryParse(Channel.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""), out ulong Id);
             var GetChannel = Guild.GetTextChannel(Id);
             if (GetChannel != null) return (true, Id);
@@ -85,6 +86,7 @@ namespace Valerie.Helpers
 
         public (bool, ulong) GetRoleId(SocketGuild Guild, string Role)
         {
+            if (string.IsNullOrWhiteSpace(Role)) return (true, 0);
             UInt64.TryParse(Role.Replace('<', ' ').Replace('>', ' ').Replace('@', ' ').Replace('&', ' ').Replace(" ", ""), out ulong Id);
             var GetRole = Guild.GetRole(Id);
             if (GetRole != null) return (true, Id);
