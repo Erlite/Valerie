@@ -207,7 +207,7 @@ namespace Valerie.Modules
             return ReplyAsync(string.Empty, Embed.Build());
         }
 
-        [Command("Rank"), Summary("Shows your server's rank.")]
+        [Command("Rank"), Summary("Shows user's server's rank.")]
         public Task RankAsync(SocketGuildUser User = null)
         {
             User = User ?? Context.User as SocketGuildUser;
