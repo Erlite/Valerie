@@ -17,7 +17,7 @@ namespace Valerie.Models
     public class StarboardWrapper
     {
         public ulong TextChannel { get; set; }
-        public List<StarboardMessage> StarboardMessages { get; set; } = new List<StarboardMessage>();        
+        public List<StarboardMessage> StarboardMessages { get; set; } = new List<StarboardMessage>();
     }
 
     public class StarboardMessage
@@ -68,7 +68,7 @@ namespace Valerie.Models
 
     public class CaseWrapper
     {
-        public string Reason { get; set; }        
+        public string Reason { get; set; }
         public string _ModId { get; set; }
         public string _UserId { get; set; }
         public int CaseNumber { get; set; }
@@ -93,7 +93,7 @@ namespace Valerie.Models
     {
         public bool IsEnabled { get; set; }
         public List<string> Subreddits { get; set; } = new List<string>(5);
-        public KeyValuePair<ulong, KeyValuePair<ulong, string>> Webhook { get; set; }
+        public WebhookWrapper Webhook { get; set; } = new WebhookWrapper();
     }
 
     public class UserProfile
@@ -128,6 +128,13 @@ namespace Valerie.Models
         public Embed Embed { get; set; }
         public string Message { get; set; }
         public SettingType Setting { get; set; }
-        public KeyValuePair<ulong, KeyValuePair<ulong, string>> WebhookInfo { get; set; }
+        public WebhookWrapper Webhook { get; set; } = new WebhookWrapper();
+    }
+
+    public class WebhookWrapper
+    {
+        public ulong TextChannel { get; set; }
+        public ulong WebhookId { get; set; }
+        public string WebhookToken { get; set; }
     }
 }

@@ -16,9 +16,9 @@ namespace Valerie.Models
         public List<TagWrapper> Tags { get; set; } = new List<TagWrapper>();
         public StarboardWrapper Starboard { get; set; } = new StarboardWrapper();
         public Dictionary<ulong, string> AFK { get; set; } = new Dictionary<ulong, string>();
-        public KeyValuePair<ulong, KeyValuePair<ulong, string>> JoinWebhook { get; set; }
-        public KeyValuePair<ulong, KeyValuePair<ulong, string>> LeaveWebhook { get; set; }
-        public KeyValuePair<ulong, KeyValuePair<ulong, string>> CleverbotWebhook { get; set; }
+        public WebhookWrapper JoinWebhook { get; set; } = new WebhookWrapper();
+        public WebhookWrapper LeaveWebhook { get; set; } = new WebhookWrapper();
+        public WebhookWrapper CleverbotWebhook { get; set; } = new WebhookWrapper();
         public List<MessageWrapper> DeletedMessages { get; set; } = new List<MessageWrapper>();
         public Dictionary<ulong, UserProfile> Profiles { get; set; } = new Dictionary<ulong, UserProfile>();
     }
