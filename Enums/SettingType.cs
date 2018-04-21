@@ -10,7 +10,7 @@
         LeaveChannel,
         MaxWarnings,
         RedditChannel,
-        ChatterChannel,
+        CleverbotChannel,
         StarboardChannel,
         LevelUpMessage
     }
