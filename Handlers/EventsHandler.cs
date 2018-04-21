@@ -79,7 +79,7 @@ namespace Valerie.Handlers
             {
                 Name = Client.CurrentUser.Username,
                 Setting = SettingType.LeaveChannel,
-                WebhookInfo = Config.LeaveWebhook,
+                Webhook = Config.LeaveWebhook,
                 Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
                 : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
             });
@@ -92,7 +92,7 @@ namespace Valerie.Handlers
             {
                 Name = Client.CurrentUser.Username,
                 Setting = SettingType.JoinChannel,
-                WebhookInfo = Config.JoinWebhook,
+                Webhook = Config.JoinWebhook,
                 Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
                 : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention)
             });
@@ -258,18 +258,24 @@ namespace Valerie.Handlers
         async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             Response CleverResponse;
-            if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.Key))
+            string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
+            if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.TextChannel))
             {
-                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content.ToLower().Replace("valerie", string.Empty));
-                CleverbotTracker.Add(Config.CleverbotWebhook.Key, CleverResponse);
+                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(UserMessage);
+                CleverbotTracker.Add(Config.CleverbotWebhook.TextChannel, CleverResponse);
             }
-            else CleverbotTracker.TryGetValue(Config.CleverbotWebhook.Key, out CleverResponse);
+            else
+            {
+                CleverbotTracker.TryGetValue(Config.CleverbotWebhook.TextChannel, out CleverResponse);
+                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(UserMessage);
+                CleverbotTracker[Config.CleverbotWebhook.TextChannel] = CleverResponse;
+            }
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
                 Message = CleverResponse.CleverOutput,
                 Name = "Cleverbot",
                 Setting = SettingType.CleverbotChannel,
-                WebhookInfo = Config.CleverbotWebhook
+                Webhook = Config.CleverbotWebhook
             });
         }
 
