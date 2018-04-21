@@ -1,7 +1,9 @@
 ﻿using Discord;
 using System.IO;
+using System.Linq;
 using Discord.Rest;
-using Valerie.Helpers;
+using Valerie.Enums;
+using Valerie.Models;
 using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Webhook;
@@ -29,29 +31,37 @@ namespace Valerie.Services
         public DiscordWebhookClient WebhookClient(RestWebhook Webhook)
             => new DiscordWebhookClient(Webhook);
 
-        public async Task<RestWebhook> CreateWebhookAsync(SocketTextChannel Channel, string Name)
-            => await Channel.CreateWebhookAsync(Name, new FileStream("Avatar.jpg", FileMode.Open));
-
-        public async Task<RestWebhook> CreateWebhookAsync(SocketTextChannel Channel, SocketGuildUser User)
-            => await Channel.CreateWebhookAsync(User.Username, new FileStream(StringHelper.DownloadUserImageAsync(HttpClient, User).Result, FileMode.Open));
-
-        public async Task TemporaryWebhookAsync(DiscordWebhookClient Client, string Message)
+        public async Task<RestWebhook> CreateWebhookAsync(SocketTextChannel Channel, string Name, SettingType Setting)
         {
-            await Client.SendMessageAsync(Message);
-            await Client.DeleteWebhookAsync();
+            var Config = GuildHandler.GetGuild(Channel.Guild.Id);
+            var Webhook = await Channel.CreateWebhookAsync(Name, new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read));
+            var Info = new KeyValuePair<ulong, KeyValuePair<ulong, string>>(Channel.Id, new KeyValuePair<ulong, string>(Webhook.Id, Webhook.Token));
+            switch (Setting)
+            {
+                case SettingType.RedditChannel: Config.Reddit.Webhook = Info; break;
+                case SettingType.CleverbotChannel: Config.CleverbotWebhook = Info; break;
+                case SettingType.JoinChannel: Config.JoinWebhook = Info; break;
+                case SettingType.LeaveChannel: Config.LeaveWebhook = Info; break;
+            }
+            GuildHandler.Save(Config);
+            return Webhook;
         }
 
-        public async Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, string Message, Embed GetEmbed)
+        public async Task<IUserMessage> SendMessageAsync(WebhookOptions Options)
         {
-            if (Client == null) await Channel.SendMessageAsync(Message, embed: GetEmbed);
-            await Client.SendMessageAsync(Message, embeds: new List<Embed>() { GetEmbed });
+            var Channel = SocketClient.GetChannel(Options.WebhookInfo.Key) as SocketTextChannel;
+            var Get = await GetWebhookAsync(Channel, Options.Name, Options.WebhookInfo.Value.Key, Options.Setting);
+            return await WebhookFallbackAsync(WebhookClient(Options.WebhookInfo.Value.Key, Options.WebhookInfo.Value.Value), Channel, Options.Message, Options.Embed);
         }
 
-        public Task SendMessageAsync(KeyValuePair<ulong, KeyValuePair<ulong, string>> WebhookInfo, string Message, Embed Embed)
+        public async Task<RestWebhook> GetWebhookAsync(SocketTextChannel Channel, string Name, ulong Id, SettingType Setting)
+            => (await Channel.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Name || x?.Id == Id) ?? await CreateWebhookAsync(Channel, Name, Setting);
+
+        Task<IUserMessage> WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, string Message, Embed GetEmbed)
         {
-            var Channel = SocketClient.GetChannel(WebhookInfo.Key) as SocketGuildChannel;
-            var Webhook = WebhookClient(WebhookInfo.Value.Key, WebhookInfo.Value.Value);
-            return WebhookFallbackAsync(Webhook, Channel as ITextChannel, Message, Embed);
+            if (Client == null) return Channel.SendMessageAsync(Message, embed: GetEmbed);
+            Client.SendMessageAsync(Message, embeds: GetEmbed == null ? null : new List<Embed>() { GetEmbed });
+            return null;
         }
     }
 }
