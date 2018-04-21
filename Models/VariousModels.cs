@@ -127,7 +127,6 @@ namespace Valerie.Models
         public string Name { get; set; }
         public Embed Embed { get; set; }
         public string Message { get; set; }
-        public SettingType Setting { get; set; }
         public WebhookWrapper Webhook { get; set; } = new WebhookWrapper();
     }
 

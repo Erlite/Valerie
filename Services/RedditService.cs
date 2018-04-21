@@ -53,7 +53,6 @@ namespace Valerie.Services
                     {
                         Message = $"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}",
                         Name = "Reddit Feed",
-                        Setting = Enums.SettingType.RedditChannel,
                         Webhook = Server.Reddit.Webhook
                     });
                     PostIds.Add(SubData.Id);

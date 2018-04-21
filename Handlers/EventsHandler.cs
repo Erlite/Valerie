@@ -77,8 +77,7 @@ namespace Valerie.Handlers
             var Config = GuildHandler.GetGuild(User.Guild.Id);
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
-                Name = Client.CurrentUser.Username,
-                Setting = SettingType.LeaveChannel,
+                Name = Client.CurrentUser.Username,                
                 Webhook = Config.LeaveWebhook,
                 Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
                 : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
@@ -91,7 +90,6 @@ namespace Valerie.Handlers
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
                 Name = Client.CurrentUser.Username,
-                Setting = SettingType.JoinChannel,
                 Webhook = Config.JoinWebhook,
                 Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
                 : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention)
@@ -273,8 +271,7 @@ namespace Valerie.Handlers
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
                 Message = CleverResponse.CleverOutput,
-                Name = "Cleverbot",
-                Setting = SettingType.CleverbotChannel,
+                Name = "Cleverbot",                
                 Webhook = Config.CleverbotWebhook
             });
         }
