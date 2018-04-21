@@ -1,5 +1,4 @@
 ﻿using System;
-using Discord;
 using System.Linq;
 using Valerie.Models;
 using Valerie.Handlers;
@@ -21,24 +20,25 @@ namespace Valerie.Services
         GuildHandler GuildHandler { get; }
         DiscordSocketClient Client { get; }
         Timer AutoFeedTimer { get; set; }
+        WebhookService WebhookService { get; }
         ConcurrentDictionary<ulong, Timer> ChannelTimers { get; set; } = new ConcurrentDictionary<ulong, Timer>();
         ConcurrentDictionary<ulong, List<string>> PostTrack { get; set; } = new ConcurrentDictionary<ulong, List<string>>();
 
-        public RedditService(HttpClient httpClient, GuildHandler guildHandler, DiscordSocketClient client, IDocumentStore store)
+        public RedditService(HttpClient httpClient, GuildHandler guildHandler, DiscordSocketClient client, IDocumentStore store, WebhookService webhook)
         {
             Client = client;
             Store = store;
             HttpClient = httpClient;
             GuildHandler = guildHandler;
+            WebhookService = webhook;
         }
 
         public Task Start(ulong GuildId)
         {
             var Server = GuildHandler.GetGuild(GuildId);
-            if (Server.Reddit.TextChannel == 0 || !Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
-            var Channel = Client.GetChannel(Server.Reddit.TextChannel) as IMessageChannel;
-            if (ChannelTimers.ContainsKey(Channel.Id)) return Task.CompletedTask;
-            ChannelTimers.TryAdd(Channel.Id, new Timer(async _ =>
+            if (!Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
+            if (ChannelTimers.ContainsKey(Server.Reddit.Webhook.Key)) return Task.CompletedTask;
+            ChannelTimers.TryAdd(Server.Reddit.Webhook.Key, new Timer(async _ =>
             {
                 foreach (var Subbredit in Server.Reddit.Subreddits)
                 {
@@ -46,14 +46,19 @@ namespace Valerie.Services
                     var CheckSub = await SubredditAsync(Subbredit).ConfigureAwait(false);
                     if (CheckSub == null) return;
                     var SubData = CheckSub.Data.Children[0].ChildData;
-                    if (PostTrack.ContainsKey(Channel.Id)) PostTrack.TryGetValue(Channel.Id, out PostIds);
+                    if (PostTrack.ContainsKey(Server.Reddit.Webhook.Key)) PostTrack.TryGetValue(Server.Reddit.Webhook.Key, out PostIds);
                     if (PostIds.Contains(SubData.Id)) return;
                     string Description = SubData.Selftext.Length > 500 ? $"{SubData.Selftext.Substring(0, 400)} ..." : SubData.Selftext;
-                    await Channel.SendMessageAsync($"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n" +
-                        $"**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}").ConfigureAwait(false);
+                    await WebhookService.SendMessageAsync(new WebhookOptions
+                    {
+                        Message = $"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}",
+                        Name = "Reddit Feed",
+                        Setting = Enums.SettingType.RedditChannel,
+                        WebhookInfo = Server.Reddit.Webhook
+                    });
                     PostIds.Add(SubData.Id);
-                    PostTrack.TryRemove(Channel.Id, out List<string> Useless);
-                    PostTrack.TryAdd(Channel.Id, PostIds);
+                    PostTrack.TryRemove(Server.Reddit.Webhook.Key, out List<string> Useless);
+                    PostTrack.TryAdd(Server.Reddit.Webhook.Key, PostIds);
                 }
             }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)));
             return Task.CompletedTask;
