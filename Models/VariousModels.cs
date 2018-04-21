@@ -1,4 +1,6 @@
 ﻿using System;
+using Discord;
+using Valerie.Enums;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -14,10 +16,8 @@ namespace Valerie.Models
 
     public class StarboardWrapper
     {
-        public string _TextChannel { get; set; }
-        public List<StarboardMessage> StarboardMessages { get; set; } = new List<StarboardMessage>();
-        [JsonIgnore]
-        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
+        public ulong TextChannel { get; set; }
+        public List<StarboardMessage> StarboardMessages { get; set; } = new List<StarboardMessage>();        
     }
 
     public class StarboardMessage
@@ -51,25 +51,24 @@ namespace Valerie.Models
 
     public class ModWrapper
     {
+        public bool AutoMod { get; set; }
         public bool AntiInvite { get; set; }
         public string _JoinRole { get; set; }
         public int MaxWarnings { get; set; }
         public string _MuteRole { get; set; }
+        public ulong TextChannel { get; set; }
         public bool AntiProfanity { get; set; }
-        public string _TextChannel { get; set; }
         public bool LogDeletedMessages { get; set; }
         public List<CaseWrapper> Cases { get; set; } = new List<CaseWrapper>();
         [JsonIgnore]
         public ulong JoinRole { get => UInt64.TryParse(_JoinRole, out ulong Id) ? Id : 0; set => _JoinRole = $"{value}"; }
         [JsonIgnore]
         public ulong MuteRole { get => UInt64.TryParse(_MuteRole, out ulong Id) ? Id : 0; set => _MuteRole = $"{value}"; }
-        [JsonIgnore]
-        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
     }
 
     public class CaseWrapper
     {
-        public string Reason { get; set; }
+        public string Reason { get; set; }        
         public string _ModId { get; set; }
         public string _UserId { get; set; }
         public int CaseNumber { get; set; }
@@ -93,10 +92,8 @@ namespace Valerie.Models
     public class RedditWrapper
     {
         public bool IsEnabled { get; set; }
-        public string _TextChannel { get; set; }
         public List<string> Subreddits { get; set; } = new List<string>(5);
-        [JsonIgnore]
-        public ulong TextChannel { get => UInt64.TryParse(_TextChannel, out ulong Id) ? Id : 0; set => _TextChannel = $"{value}"; }
+        public KeyValuePair<ulong, KeyValuePair<ulong, string>> Webhook { get; set; }
     }
 
     public class UserProfile
@@ -123,5 +120,14 @@ namespace Valerie.Models
         public ulong ChannelId { get => UInt64.TryParse(_ChannelId, out ulong Id) ? Id : 0; set => _ChannelId = $"{value}"; }
         [JsonIgnore]
         public ulong MessageId { get => UInt64.TryParse(_MessageId, out ulong Id) ? Id : 0; set => _MessageId = $"{value}"; }
+    }
+
+    public class WebhookOptions
+    {
+        public string Name { get; set; }
+        public Embed Embed { get; set; }
+        public string Message { get; set; }
+        public SettingType Setting { get; set; }
+        public KeyValuePair<ulong, KeyValuePair<ulong, string>> WebhookInfo { get; set; }
     }
 }
