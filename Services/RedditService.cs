@@ -37,8 +37,8 @@ namespace Valerie.Services
         {
             var Server = GuildHandler.GetGuild(GuildId);
             if (!Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
-            if (ChannelTimers.ContainsKey(Server.Reddit.Webhook.Key)) return Task.CompletedTask;
-            ChannelTimers.TryAdd(Server.Reddit.Webhook.Key, new Timer(async _ =>
+            if (ChannelTimers.ContainsKey(Server.Reddit.Webhook.TextChannel)) return Task.CompletedTask;
+            ChannelTimers.TryAdd(Server.Reddit.Webhook.TextChannel, new Timer(async _ =>
             {
                 foreach (var Subbredit in Server.Reddit.Subreddits)
                 {
@@ -46,7 +46,7 @@ namespace Valerie.Services
                     var CheckSub = await SubredditAsync(Subbredit).ConfigureAwait(false);
                     if (CheckSub == null) return;
                     var SubData = CheckSub.Data.Children[0].ChildData;
-                    if (PostTrack.ContainsKey(Server.Reddit.Webhook.Key)) PostTrack.TryGetValue(Server.Reddit.Webhook.Key, out PostIds);
+                    if (PostTrack.ContainsKey(Server.Reddit.Webhook.TextChannel)) PostTrack.TryGetValue(Server.Reddit.Webhook.TextChannel, out PostIds);
                     if (PostIds.Contains(SubData.Id)) return;
                     string Description = SubData.Selftext.Length > 500 ? $"{SubData.Selftext.Substring(0, 400)} ..." : SubData.Selftext;
                     await WebhookService.SendMessageAsync(new WebhookOptions
@@ -54,11 +54,11 @@ namespace Valerie.Services
                         Message = $"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}",
                         Name = "Reddit Feed",
                         Setting = Enums.SettingType.RedditChannel,
-                        WebhookInfo = Server.Reddit.Webhook
+                        Webhook = Server.Reddit.Webhook
                     });
                     PostIds.Add(SubData.Id);
-                    PostTrack.TryRemove(Server.Reddit.Webhook.Key, out List<string> Useless);
-                    PostTrack.TryAdd(Server.Reddit.Webhook.Key, PostIds);
+                    PostTrack.TryRemove(Server.Reddit.Webhook.TextChannel, out List<string> Useless);
+                    PostTrack.TryAdd(Server.Reddit.Webhook.TextChannel, PostIds);
                 }
             }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)));
             return Task.CompletedTask;

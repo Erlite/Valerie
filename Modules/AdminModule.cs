@@ -33,11 +33,11 @@ namespace Valerie.Modules
                 $"```ebnf\n" +
                 $"Prefix                : {Context.Server.Prefix}\n" +
                 $"Log Channel           : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Mod.TextChannel)}\n" +
-                $"Join Channel          : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.JoinWebhook.Key)}\n" +
-                $"Leave Channel         : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.LeaveWebhook.Key)}\n" +
-                $"Reddit Channel        : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Reddit.Webhook.Key)}\n" +
+                $"Join Channel          : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.JoinWebhook.TextChannel)}\n" +
+                $"Leave Channel         : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.LeaveWebhook.TextChannel)}\n" +
+                $"Reddit Channel        : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Reddit.Webhook.TextChannel)}\n" +
                 $"Starboard Channel     : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Starboard.TextChannel)}\n" +
-                $"Cleverbot Channel    : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.CleverbotWebhook.Key)}\n" +
+                $"Cleverbot Channel     : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.CleverbotWebhook.TextChannel)}\n" +
                 $"Join Messages         : {Context.Server.JoinMessages.Count}\n" +
                 $"Leave Messages        : {Context.Server.LeaveMessages.Count}\n" +
                 $"AFK Users             : {Context.Server.AFK.Count}\n" +
@@ -102,9 +102,10 @@ namespace Valerie.Modules
                 Context.Server.Mod.TextChannel = Mod.Id;
             }
             var DefaultChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id) as SocketTextChannel;
-            await Context.WebhookService.CreateWebhookAsync(DefaultChannel, "Cleverbot", SettingType.CleverbotChannel);
-            await Context.WebhookService.CreateWebhookAsync(DefaultChannel, Context.Client.CurrentUser.Username, SettingType.CleverbotChannel);
-            await Context.WebhookService.CreateWebhookAsync(DefaultChannel, Context.Client.CurrentUser.Username, SettingType.CleverbotChannel);
+            var DefaultWebhook = await Context.WebhookService.CreateWebhookAsync(DefaultChannel, Context.Client.CurrentUser.Username);
+            Context.Server.CleverbotWebhook = await Context.WebhookService.CreateWebhookAsync(DefaultChannel, "Cleverbot");
+            Context.Server.JoinWebhook = DefaultWebhook;
+            Context.Server.LeaveWebhook = DefaultWebhook;
             Context.Server.ChatXP.LevelMessage = "👾 Congrats **{user}** on hitting level {level}! You received **{crystals}** crystals.";
             Context.Server.JoinMessages.Add("{user} in da houuuuuuseeeee! Turn up!");
             Context.Server.JoinMessages.Add("Whalecum to {guild}, {user}! Make yourself comfy wink wink.");
@@ -128,17 +129,17 @@ namespace Valerie.Modules
             {
                 case SettingType.Prefix: Context.Server.Prefix = Value; break;
                 case SettingType.CleverbotChannel:
-                    Context.WebhookService.GetWebhookAsync(GetChannel, "Cleverbot", Context.Server.CleverbotWebhook.Key, SettingType.CleverbotChannel);
+                    //Context.WebhookService.GetWebhookAsync(GetChannel, "Cleverbot", Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
                     break;
                 case SettingType.JoinChannel:
-                    Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.Key, SettingType.CleverbotChannel);
+                    //Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
                     break;
                 case SettingType.LeaveChannel:
-                    Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.Key, SettingType.CleverbotChannel);
+                    //Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
                     break;
                 case SettingType.ModChannel: Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.RedditChannel:
-                    Context.WebhookService.GetWebhookAsync(GetChannel, "Reddit Feed", Context.Server.CleverbotWebhook.Key, SettingType.CleverbotChannel);
+                    //Context.WebhookService.GetWebhookAsync(GetChannel, "Reddit Feed", Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
                     break;
                 case SettingType.StarboardChannel: Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
