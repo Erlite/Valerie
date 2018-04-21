@@ -9,6 +9,7 @@ using Valerie.Services;
 using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
+using Cookie.Cleverbot.Models;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
 using System.Collections.Generic;
@@ -20,23 +21,28 @@ namespace Valerie.Handlers
     {
         Random Random { get; }
         GuildHelper GuildHelper { get; }
-        bool CommandExecuted { get; set; }
         GuildHandler GuildHandler { get; }
-        MethodHelper MethodHelper { get; }
         DiscordSocketClient Client { get; }
+        bool CommandExecuted { get; set; }
         ConfigHandler ConfigHandler { get; }
-        CommandService CommandService { get; }
+        MethodHelper MethodHelper { get; }
         IServiceProvider Provider { get; set; }
+        CommandService CommandService { get; }
+        WebhookService WebhookService { get; }
+        Dictionary<ulong, Response> CleverbotTracker { get; set; }
 
-        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command, Random random, GuildHelper guildHelper, MethodHelper methodHelper)
+        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command,
+            Random random, GuildHelper guildH, MethodHelper methodH, WebhookService webhookS)
         {
             Client = client;
             Random = random;
             GuildHandler = guild;
             ConfigHandler = config;
-            GuildHelper = guildHelper;
+            GuildHelper = guildH;
             CommandService = command;
-            MethodHelper = methodHelper;
+            MethodHelper = methodH;
+            WebhookService = webhookS;
+            CleverbotTracker = new Dictionary<ulong, Response>();
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
@@ -69,19 +75,27 @@ namespace Valerie.Handlers
         internal async Task UserLeftAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GetGuild(User.Guild.Id);
-            string Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
-                : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username);
-            var Channel = User.Guild.GetTextChannel(Config.LeaveChannel);
-            if (Channel != null) await Channel.SendMessageAsync(Message).ConfigureAwait(false);
+            await WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Name = Client.CurrentUser.Username,
+                Setting = SettingType.LeaveChannel,
+                WebhookInfo = Config.LeaveWebhook,
+                Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
+                : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
+            });
         }
 
         internal async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GetGuild(User.Guild.Id);
-            string Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
-                : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention);
-            var Channel = User.Guild.GetTextChannel(Config.JoinChannel);
-            if (Channel != null) await Channel.SendMessageAsync(Message).ConfigureAwait(false);
+            await WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Name = Client.CurrentUser.Username,
+                Setting = SettingType.JoinChannel,
+                WebhookInfo = Config.JoinWebhook,
+                Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
+                : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention)
+            });
             var Role = User.Guild.GetRole(Config.Mod.JoinRole);
             if (Role != null) await User.AddRoleAsync(Role).ConfigureAwait(false);
         }
@@ -97,6 +111,7 @@ namespace Valerie.Handlers
             _ = XpHandlerAsync(Message, Config);
             _ = CleverbotHandlerAsync(Msg, Config);
             _ = AutoTagAsync(Msg, Config);
+            _ = AutoModAsync(Msg, Config);
             return Task.CompletedTask;
         }
 
@@ -242,10 +257,20 @@ namespace Valerie.Handlers
 
         async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
-            var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Config.ChatterChannel);
-            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("valerie")) return;
-            var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content.ToLower().Replace("valerie", string.Empty));
-            await Channel.SendMessageAsync(Clever.CleverOutput).ConfigureAwait(false);
+            Response CleverResponse;
+            if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.Key))
+            {
+                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content.ToLower().Replace("valerie", string.Empty));
+                CleverbotTracker.Add(Config.CleverbotWebhook.Key, CleverResponse);
+            }
+            else CleverbotTracker.TryGetValue(Config.CleverbotWebhook.Key, out CleverResponse);
+            await WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Message = CleverResponse.CleverOutput,
+                Name = "Cleverbot",
+                Setting = SettingType.CleverbotChannel,
+                WebhookInfo = Config.CleverbotWebhook
+            });
         }
 
         async Task LevelUpHandlerAsync(SocketMessage Message, GuildModel Config, int OldXp, int NewXp)
@@ -275,6 +300,29 @@ namespace Valerie.Handlers
             var Content = Tags.FirstOrDefault(x => Message.Content.StartsWith(x.Name));
             if (Content != null) return Message.Channel.SendMessageAsync(Content.Content);
             return Task.CompletedTask;
+        }
+
+        async Task AutoModAsync(SocketUserMessage Message, GuildModel Config)
+        {
+            var Guild = (Message.Channel as SocketGuildChannel).Guild;
+            if (!Config.Mod.AutoMod || Message.Author.Id == Guild.Owner.Id || Config.Mod.MaxWarnings == 0) return;
+            string WarningMessage = null;
+            if (!GuildHelper.ProfanityMatch(Message.Content)) return; else WarningMessage = $"{Message.Author.Mention}, your message was removed because it contained profanity.";
+            if (!GuildHelper.InviteMatch(Message.Content)) return; else WarningMessage = $"{Message.Author.Mention}, Invite links are not allowed.";
+            var Profile = GuildHelper.GetProfile(Guild.Id, Message.Author.Id);
+            if (Profile.Warnings >= Config.Mod.MaxWarnings)
+            {
+                await (Message.Author as SocketGuildUser).KickAsync("Reached Max Warnings.");
+                await Guild.GetTextChannel(Config.Mod.TextChannel).SendMessageAsync(
+                    $"**Kick** | Case {Config.Mod.Cases.Count + 1}\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Reached Max Warnings.\n" +
+                    $"**Responsible Moderator:** {Client.CurrentUser}");
+            }
+            else
+            {
+                Profile.Warnings++;
+                await Message.Channel.SendMessageAsync(WarningMessage);
+            }
+            GuildHelper.SaveProfile(Guild.Id, Message.Author.Id, Profile);
         }
     }
 }
