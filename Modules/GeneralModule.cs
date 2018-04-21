@@ -215,7 +215,9 @@ namespace Valerie.Modules
         }
 
         [Command("Invite"), Summary("Valerie's invite link and support server")]
-        public Task InviteAsync() => ReplyAsync($"Here is my invite link: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
+        public Task InviteAsync() => ReplyAsync($"**Invite Link:**\n" +
+            $"Full Permission: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
+            $"Minimal Permisison: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=805694647&scope=bot" +
             $"Feel free to join my server: https://discord.gg/nzYTzxD");
     }
 }
