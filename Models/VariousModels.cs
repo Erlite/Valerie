@@ -10,7 +10,7 @@ namespace Valerie.Models
     {
         public bool IsEnabled { get; set; }
         public string LevelMessage { get; set; }
-        public List<string> ForbiddenRoles { get; set; } = new List<string>(20);
+        public List<ulong> ForbiddenRoles { get; set; } = new List<ulong>(20);
         public Dictionary<ulong, int> LevelRoles { get; set; } = new Dictionary<ulong, int>();
     }
 

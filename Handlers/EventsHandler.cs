@@ -236,7 +236,7 @@ namespace Valerie.Handlers
         Task XpHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             var User = Message.Author as IGuildUser;
-            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
+            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
             if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
             var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);

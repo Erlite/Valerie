@@ -221,11 +221,11 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
-                    Context.Server.AssignableRoles.Add($"{Role.Id}");
+                    Context.Server.AssignableRoles.Add(Role.Id);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.AssignableRoles.Contains($"{Role.Id}")) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
-                    Context.Server.AssignableRoles.Remove($"{Role.Id}");
+                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
+                    Context.Server.AssignableRoles.Remove(Role.Id);
                     return ReplyAsync($"`{Role.Name}` is no longer an assignable role.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
@@ -240,11 +240,11 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
-                    Context.Server.ChatXP.ForbiddenRoles.Add($"{Role.Id}");
+                    Context.Server.ChatXP.ForbiddenRoles.Add(Role.Id);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.ChatXP.ForbiddenRoles.Contains($"{Role.Id}")) return ReplyAsync($"{Role} isn't forbidden from gaining XP.");
-                    Context.Server.ChatXP.ForbiddenRoles.Remove($"{Role.Id}");
+                    if (!Context.Server.ChatXP.ForbiddenRoles.Contains(Role.Id)) return ReplyAsync($"{Role} isn't forbidden from gaining XP.");
+                    Context.Server.ChatXP.ForbiddenRoles.Remove(Role.Id);
                     return ReplyAsync($"`{Role}` has been removed from forbidden roles.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
@@ -340,7 +340,7 @@ namespace Valerie.Modules
         [Command("Forbid"), Summary("Shows all the forbidden roles for this server.")]
         public Task ForbiddenAsync()
             => ReplyAsync(!Context.Server.ChatXP.ForbiddenRoles.Any() ? $"{Context.Guild} has no forbidden roles." :
-                $"**Forbidden Roles:**\n{Context.Server.ChatXP.ForbiddenRoles.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, Convert.ToUInt64(x))}")}");
+                $"**Forbidden Roles:**\n{Context.Server.ChatXP.ForbiddenRoles.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, x)}")}");
 
         [Command("Level"), Summary("Shows all the level up roles for this server.")]
         public Task LevelsAsync()

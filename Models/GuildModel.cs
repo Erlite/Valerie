@@ -9,7 +9,7 @@ namespace Valerie.Models
         public bool IsConfigured { get; set; }
         public List<string> JoinMessages { get; set; } = new List<string>(5);
         public List<string> LeaveMessages { get; set; } = new List<string>(5);
-        public List<ulong> AssignableRoles { get; set; } = new List<ulong(10);
+        public List<ulong> AssignableRoles { get; set; } = new List<ulong>(10);
         public XPWrapper ChatXP { get; set; } = new XPWrapper();
         public ModWrapper Mod { get; set; } = new ModWrapper();
         public RedditWrapper Reddit { get; set; } = new RedditWrapper();
