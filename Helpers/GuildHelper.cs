@@ -1,6 +1,7 @@
 ﻿using System;
 using Discord;
 using System.Linq;
+using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Handlers;
@@ -21,7 +22,7 @@ namespace Valerie.Helpers
             GuildHandler = guildHandler;
         }
 
-        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|n+i+g+g+e+r+|f+a+g+|g+a+y+)(w+i+t+|e+r+|i+n+g+)?\b"; }
+        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+s+s+|n+i+g+g+|f+a+g+|g+a+y+|p+u+s+s+y+)(w+i+t+|e+r+|i+n+g+|h+o+l+e+)?\b"; }
         string InviteRegex { get => @"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?(d+i+s+c+o+r+d+|a+p+p)+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"; }
 
         public IMessageChannel DefaultChannel(ulong GuildId)
@@ -51,12 +52,12 @@ namespace Valerie.Helpers
 
         public async Task LogAsync(IContext Context, IUser User, CaseType CaseType, string Reason)
         {
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.Mod.Cases.Count + 1} <Reason>`*";
             var ModChannel = await Context.Guild.GetTextChannelAsync(Context.Server.Mod.TextChannel);
             if (ModChannel == null) return;
-            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.Mod.Cases.Count + 1} <Reason>`*";
             var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.Mod.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
                     $"**Responsible Moderator:** {Context.User}");
-            Context.Server.Mod.Cases.Add(new CaseWrapper()
+            Context.Server.Mod.Cases.Add(new CaseWrapper
             {
                 Reason = Reason,
                 UserId = User.Id,
