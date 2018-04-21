@@ -113,7 +113,7 @@ namespace Valerie.Helpers
             return Result;
         }
 
-        public static async Task<string> DownloadUserImageAsync(HttpClient HttpClient, SocketGuildUser User)
+        public static async Task<string> DownloadUserImageAsync(HttpClient HttpClient, IUser User)
         {
             var Get = await HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
             using (var UserImage = File.Create($"{CacheFolder}/{User.Id}.png"))
