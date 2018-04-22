@@ -29,7 +29,6 @@ namespace Valerie.Modules
         [Command("Feedback"), Summary("Give feedback on Valerie's performance or suggest new features!")]
         public async Task FeedbackAsync()
         {
-            var ReportChannel = await Context.Client.GetChannelAsync(Context.Config.ReportChannel) as IMessageChannel;
             await ReplyAsync($"*Please provide your feedback in 2-3 sentences.*");
             var Response = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(60));
             if (Response == null || Response.Content.Length < 20)
@@ -37,11 +36,16 @@ namespace Valerie.Modules
                 await ReplyAndDeleteAsync($"Hmm, I can't submit a blank feedback. Try again maybe?");
                 return;
             }
-            await ReportChannel.SendMessageAsync(string.Empty, embed: GetEmbed(Paint.Aqua)
+            await Context.WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Webhook = Context.Config.ReportWebhook,
+                Embed = GetEmbed(Paint.Aqua)
                 .WithAuthor($"Feedback from {Context.User}", Context.User.GetAvatarUrl())
                 .WithDescription($"**Feedback:**\n{Response.Content}")
                 .WithFooter($"{Context.Guild} | {Context.Guild.Id}")
-                .Build());
+                .Build(),
+                Name = "User Feedback / Report"
+            });
             await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
         }
 
