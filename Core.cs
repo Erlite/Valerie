@@ -45,12 +45,13 @@ namespace Valerie
                 .AddSingleton<LogService>()
                 .AddSingleton<GuildHelper>()
                 .AddSingleton<MainHandler>()
-                .AddSingleton<MethodHelper>()
                 .AddSingleton<GuildHandler>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton<RedditService>()
+                .AddSingleton<MethodHelper>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<UpdateService>()
-                .AddSingleton<ConfigHandler>()
+                .AddSingleton<WebhookService>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
