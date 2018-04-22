@@ -1,6 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Valerie.Models
 {
@@ -10,13 +8,11 @@ namespace Valerie.Models
         public string Token { get; set; }
         public string Prefix { get; set; }
         public string JoinMessage { get; set; }
-        public string _ReportChannel { get; set; }
         public List<string> Games { get; set; } = new List<string>();
         public List<ulong> Blacklist { get; set; } = new List<ulong>();
         public List<string> Namespaces { get; set; } = new List<string>();
+        public WebhookWrapper ReportWebhook { get; set; } = new WebhookWrapper();
         public Dictionary<string, string> APIKeys { get; set; } = new Dictionary<string, string>()
-        { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" }, {"AppVeyor", "" } };
-        [JsonIgnore]
-        public ulong ReportChannel { get => UInt64.TryParse(_ReportChannel, out ulong Id) ? Id : 0; set => _ReportChannel = $"{value}"; }
+        { {"Giphy", "dc6zaTOxFJmzC" }, {"Google", "" }, {"Steam", "" }, {"Imgur", "" }, {"Cleverbot", "" } };
     }
 }
