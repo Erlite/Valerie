@@ -1,10 +1,10 @@
 ﻿using System;
 using Discord;
 using Valerie.Models;
-using System.Net.Http;
 using Valerie.Helpers;
 using Valerie.Services;
 using Valerie.Handlers;
+using System.Net.Http;
 using Discord.Commands;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
@@ -25,7 +25,7 @@ namespace Valerie.Addons
         public GuildHelper GuildHelper { get; }
         public IMessageChannel Channel { get; }
         public GuildHandler GuildHandler { get; }
-        public IDocumentSession Session { get; }        
+        public IDocumentSession Session { get; }
         public RedditService RedditService { get; }
         public ConfigHandler ConfigHandler { get; }
         public MethodHelper MethodHelper { get; }
