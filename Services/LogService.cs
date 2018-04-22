@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Valerie.Enums;
-using Valerie.Helpers;
 using System.Drawing;
 using System.Threading.Tasks;
 using Console = Colorful.Console;
@@ -43,8 +42,8 @@ namespace Valerie.Services
             Append("-> INFORMATION\n", Color.PaleVioletRed);
             Append(
                 "      Author  :  Yucked\n" +
-                "      Version :  18.4.X - Rewrite\n" +
-                "      Discord :  Discord.me/Glitched\n", Color.Olive);
+                "      Version :  18.4.X - Stable\n" +
+                "      Discord :  Discord.me/Glitched\n", Color.LightSalmon);
         }
     }
 }
