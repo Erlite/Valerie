@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Discord.Rest;
-using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Handlers;
 using System.Net.Http;
@@ -29,8 +28,14 @@ namespace Valerie.Services
         public DiscordWebhookClient WebhookClient(ulong Id, string Token)
             => new DiscordWebhookClient(Id, Token);
 
-        public DiscordWebhookClient WebhookClient(RestWebhook Webhook)
-            => new DiscordWebhookClient(Webhook);
+        public async Task SendMessageAsync(WebhookOptions Options)
+        {
+            var Channel = SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketTextChannel;
+            if (Channel == null) return;
+            var Get = await GetWebhookAsync(Channel, Options);
+            var client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
+            await WebhookFallbackAsync(client, Channel, Options);
+        }
 
         public async Task<WebhookWrapper> CreateWebhookAsync(SocketTextChannel Channel, string Name)
         {
@@ -46,24 +51,29 @@ namespace Valerie.Services
                 WebhookId = Webhook.Id,
                 WebhookToken = Webhook.Token
             };
-        }
+        }        
 
-        public async Task SendMessageAsync(WebhookOptions Options)
+        public async Task<RestWebhook> GetWebhookAsync(SocketGuild Guild, WebhookOptions Options)
+            => (await Guild?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);
+
+        public async Task<RestWebhook> GetWebhookAsync(SocketTextChannel Channel, WebhookOptions Options)
+            => (await Channel?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);        
+
+        public Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, WebhookOptions Options)
         {
-            var Channel = SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketTextChannel;
-            if (Channel == null) return;
-            var Get = await GetWebhookAsync(Channel, Options);
-            await WebhookFallbackAsync(WebhookClient(Get), Channel, Options);
+            if (Client == null || Channel == null) return Task.CompletedTask;
+            if (Client == null) return Channel.SendMessageAsync(Options.Message, embed: Options.Embed);
+            return Client.SendMessageAsync(Options.Message, embeds: Options.Embed == null ? null : new List<Embed>() { Options.Embed });
         }
 
         public async Task<WebhookWrapper> UpdateWebhookAsync(SocketTextChannel Channel, WebhookWrapper Old, WebhookOptions Options)
         {
-            if (Channel.Id == Old.TextChannel) return Old;
             var GetChannel = SocketClient.GetChannel(Old.TextChannel) as SocketTextChannel;
-            RestWebhook Hook = GetChannel == null ?
+            var Hook = GetChannel == null ?
                 await GetWebhookAsync(Channel.Guild, new WebhookOptions { Webhook = Old }) :
                 await GetWebhookAsync(GetChannel, new WebhookOptions { Webhook = Old });
-            if (Hook != null) await Hook.DeleteAsync();
+            if (Channel.Id == Old.TextChannel && Hook != null) return Old;
+            else if (Hook != null) await Hook.DeleteAsync();
             var New = await Channel.CreateWebhookAsync(Options.Name, AvatarStream);
             return new WebhookWrapper
             {
@@ -71,19 +81,6 @@ namespace Valerie.Services
                 WebhookId = New.Id,
                 WebhookToken = New.Token
             };
-        }
-
-        public async Task<RestWebhook> GetWebhookAsync(SocketTextChannel Channel, WebhookOptions Options)
-            => (await Channel?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);
-
-        public async Task<RestWebhook> GetWebhookAsync(SocketGuild Guild, WebhookOptions Options)
-            => (await Guild?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);
-
-        Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, WebhookOptions Options)
-        {
-            if (Client == null || Channel == null) return Task.CompletedTask;
-            if (Client == null) return Channel.SendMessageAsync(Options.Message, embed: Options.Embed);
-            return Client.SendMessageAsync(Options.Message, embeds: Options.Embed == null ? null : new List<Embed>() { Options.Embed });
         }
     }
 }
