@@ -219,10 +219,5 @@ namespace Valerie.Modules
             $"Full Permission: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
             $"Minimal Permisison: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=805694647&scope=bot" +
             $"Feel free to join my server: https://discord.gg/nzYTzxD");
-
-        [Command("Test")]
-        public async Task TestAsync()
-        {
-        }
     }
 }
