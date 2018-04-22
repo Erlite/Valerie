@@ -38,7 +38,9 @@ namespace Valerie.Services
             }
             catch
             {
-                LogService.Write(Enums.LogSource.DSD, $"Webhook Failed | {Options.Webhook.WebhookId}", System.Drawing.Color.Crimson);
+                LogService.Write(Enums.LogSource.DSD, $"Webhook  {Options.Webhook.WebhookId} Failed | " +
+                    $"{(SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketGuildChannel).Guild.Name}", 
+                    System.Drawing.Color.Crimson);
             }
         }
 
