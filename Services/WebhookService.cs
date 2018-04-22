@@ -30,8 +30,7 @@ namespace Valerie.Services
 
         public async Task SendMessageAsync(WebhookOptions Options)
         {
-            var Channel = SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketTextChannel;
-            if (Channel == null) return;
+            if (!(SocketClient.GetChannel(Options.Webhook.TextChannel) is SocketTextChannel Channel)) return;
             var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
             await WebhookFallbackAsync(Client, Channel, Options);
         }
@@ -66,8 +65,7 @@ namespace Valerie.Services
 
         public async Task<WebhookWrapper> UpdateWebhookAsync(SocketTextChannel Channel, WebhookWrapper Old, WebhookOptions Options)
         {
-            var GetChannel = SocketClient.GetChannel(Old.TextChannel) as SocketTextChannel;
-            var Hook = GetChannel == null ?
+            var Hook = !(SocketClient.GetChannel(Old.TextChannel) is SocketTextChannel GetChannel) ?
                 await GetWebhookAsync(Channel.Guild, new WebhookOptions { Webhook = Old }) :
                 await GetWebhookAsync(GetChannel, new WebhookOptions { Webhook = Old });
             if (Channel.Id == Old.TextChannel && Hook != null) return Old;
