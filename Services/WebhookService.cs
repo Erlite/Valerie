@@ -32,9 +32,8 @@ namespace Valerie.Services
         {
             var Channel = SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketTextChannel;
             if (Channel == null) return;
-            var Get = await GetWebhookAsync(Channel, Options);
-            var client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
-            await WebhookFallbackAsync(client, Channel, Options);
+            var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
+            await WebhookFallbackAsync(Client, Channel, Options);
         }
 
         public async Task<WebhookWrapper> CreateWebhookAsync(SocketTextChannel Channel, string Name)
@@ -43,7 +42,6 @@ namespace Valerie.Services
             {
                 Name = Name
             });
-            var Config = GuildHandler.GetGuild(Channel.Guild.Id);
             var Webhook = Get ?? await Channel.CreateWebhookAsync(Name, AvatarStream);
             return new WebhookWrapper
             {
