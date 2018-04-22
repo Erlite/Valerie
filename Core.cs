@@ -44,6 +44,7 @@ namespace Valerie
                 .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()
                 .AddSingleton<GuildHelper>()
+                .AddSingleton<EventHelper>()
                 .AddSingleton<MainHandler>()
                 .AddSingleton<GuildHandler>()
                 .AddSingleton<ConfigHandler>()
