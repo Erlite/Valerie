@@ -51,7 +51,6 @@ namespace Valerie.Models
 
     public class ModWrapper
     {
-        public bool AutoMod { get; set; }
         public bool AntiInvite { get; set; }
         public string _JoinRole { get; set; }
         public int MaxWarnings { get; set; }
