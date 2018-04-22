@@ -10,7 +10,7 @@ namespace Valerie.Addons
 {
     public class Base : ModuleBase<IContext>
     {
-        public async Task<IUserMessage> ReplyAsync(string Message, Embed Embed = null, DocumentType Document = DocumentType.None, string AuditReason = null)
+        public async Task<IUserMessage> ReplyAsync(string Message, Embed Embed = null, DocumentType Document = DocumentType.None)
         {
             await Context.Channel.TriggerTypingAsync();
             _ = Task.Run(() => SaveDocuments(Document));
