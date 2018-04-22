@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
-using System.Collections.Generic;
 
 namespace Valerie.Modules
 {
@@ -121,9 +121,10 @@ namespace Valerie.Modules
         public Task SetAsync(SettingType SettingType, [Remainder] string Value = null)
         {
             Value = Value ?? string.Empty;
+            var IntCheck = int.TryParse(Value, out int Result);
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
-            if ((ChannelCheck.Item1 || RoleCheck.Item1) == false)
+            if ((ChannelCheck.Item1 || RoleCheck.Item1 || IntCheck) == false)
                 return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. If it's a role or channel, try mentioning it?");
             var GetChannel = (Context.Guild as SocketGuild).GetTextChannel(ChannelCheck.Item2) as SocketTextChannel;
             switch (SettingType)
@@ -158,7 +159,7 @@ namespace Valerie.Modules
                 case SettingType.StarboardChannel: Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
                 case SettingType.MuteRole: Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
-                case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = int.TryParse(Value, out int Result) ? Result : 0; break;
+                case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = Result; break;
                 case SettingType.LevelUpMessage: Context.Server.ChatXP.LevelMessage = Value; break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
