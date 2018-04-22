@@ -59,7 +59,7 @@ namespace Valerie.Services
                     PostTrack.TryRemove(Server.Reddit.Webhook.TextChannel, out List<string> Useless);
                     PostTrack.TryAdd(Server.Reddit.Webhook.TextChannel, PostIds);
                 }
-            }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)));
+            }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30)));
             return Task.CompletedTask;
         }
 
