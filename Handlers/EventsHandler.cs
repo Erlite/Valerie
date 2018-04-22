@@ -21,28 +21,26 @@ namespace Valerie.Handlers
     {
         Random Random { get; }
         GuildHelper GuildHelper { get; }
+        EventHelper EventHelper { get; }
         GuildHandler GuildHandler { get; }
         DiscordSocketClient Client { get; }
         bool CommandExecuted { get; set; }
         ConfigHandler ConfigHandler { get; }
-        MethodHelper MethodHelper { get; }
         IServiceProvider Provider { get; set; }
         CommandService CommandService { get; }
         WebhookService WebhookService { get; }
-        Dictionary<ulong, Response> CleverbotTracker { get; set; }
 
         public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command,
-            Random random, GuildHelper guildH, MethodHelper methodH, WebhookService webhookS)
+            Random random, GuildHelper guildH, WebhookService webhookS, EventHelper eventHelper)
         {
             Client = client;
             Random = random;
             GuildHandler = guild;
-            ConfigHandler = config;
             GuildHelper = guildH;
+            ConfigHandler = config;
+            EventHelper = eventHelper;
             CommandService = command;
-            MethodHelper = methodH;
             WebhookService = webhookS;
-            CleverbotTracker = new Dictionary<ulong, Response>();
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
@@ -102,14 +100,15 @@ namespace Valerie.Handlers
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
             var Config = GuildHandler.GetGuild(Guild.Id);
-            if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
-            if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
-                GuildHelper.GetProfile(Guild.Id, Msg.Author.Id).IsBlacklisted) return Task.CompletedTask;
-            _ = AFKHandlerAsync(Msg, Config);
-            _ = XpHandlerAsync(Message, Config);
-            _ = CleverbotHandlerAsync(Msg, Config);
-            _ = AutoTagAsync(Msg, Config);
-            _ = AutoModAsync(Msg, Config);
+            if (!(Message is SocketUserMessage UserMessage) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
+            if (UserMessage.Source != MessageSource.User || UserMessage.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
+                GuildHelper.GetProfile(Guild.Id, UserMessage.Author.Id).IsBlacklisted) return Task.CompletedTask;
+
+            _ = EventHelper.XPHandlerAsync(UserMessage, Config);
+            _ = EventHelper.ModeratorAsync(UserMessage, Config);
+            _ = EventHelper.ExecuteTagAsync(UserMessage, Config);
+            _ = EventHelper.AFKHandlerAsync(UserMessage, Config);
+            _ = EventHelper.CleverbotHandlerAsync(UserMessage, Config);
             return Task.CompletedTask;
         }
 
@@ -130,7 +129,7 @@ namespace Valerie.Handlers
                     if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result.ErrorReason);
                     break;
             }
-            _ = Task.Run(() => RecordCommand(Context, argPos));
+            _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context));
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
@@ -219,115 +218,6 @@ namespace Valerie.Handlers
                 await SMsg.DeleteAsync();
             }
             GuildHandler.Save(Config);
-        }
-
-        internal void RecordCommand(IContext Context, int ArgPos)
-        {
-            var Search = CommandService.Search(Context, ArgPos);
-            if (!Search.IsSuccess) return;
-            var Command = Search.Commands.FirstOrDefault().Command;
-            var Profile = GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (!Profile.Commands.ContainsKey(Command.Name)) Profile.Commands.Add(Command.Name, 0);
-            Profile.Commands[Command.Name]++;
-            GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
-        }
-
-        Task XpHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            var User = Message.Author as IGuildUser;
-            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
-            var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
-            var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);
-            int Old = Profile.ChatXP;
-            Profile.ChatXP += Random.Next(Message.Content.Length);
-            var New = Profile.ChatXP;
-            GuildHelper.SaveProfile(Convert.ToUInt64(Config.Id), User.Id, Profile);
-            return LevelUpHandlerAsync(Message, Config, Old, New);
-        }
-
-        async Task AFKHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            if (!Message.MentionedUsers.Any(x => Config.AFK.ContainsKey(x.Id))) return;
-            string Reason = null;
-            var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFK.TryGetValue(u.Id, out Reason));
-            if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
-        }
-
-        async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
-            if (!Message.Content.ToLower().StartsWith("valerie") || string.IsNullOrWhiteSpace(UserMessage)) return;
-            Response CleverResponse;            
-            if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.TextChannel))
-            {
-                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(UserMessage);
-                CleverbotTracker.Add(Config.CleverbotWebhook.TextChannel, CleverResponse);
-            }
-            else
-            {
-                CleverbotTracker.TryGetValue(Config.CleverbotWebhook.TextChannel, out CleverResponse);
-                CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(UserMessage);
-                CleverbotTracker[Config.CleverbotWebhook.TextChannel] = CleverResponse;
-            }
-            await WebhookService.SendMessageAsync(new WebhookOptions
-            {
-                Message = CleverResponse.CleverOutput,
-                Name = "Cleverbot",
-                Webhook = Config.CleverbotWebhook
-            });
-        }
-
-        async Task LevelUpHandlerAsync(SocketMessage Message, GuildModel Config, int OldXp, int NewXp)
-        {
-            var User = Message.Author as SocketGuildUser;
-            int OldLevel = IntHelper.GetLevel(OldXp);
-            int NewLevel = IntHelper.GetLevel(NewXp);
-            if (!(NewLevel > OldLevel)) return;
-            int Crystals = (int)Math.Sqrt(Math.PI * NewXp);
-            var Profile = GuildHelper.GetProfile(User.Guild.Id, User.Id);
-            Profile.Crystals += Crystals;
-            GuildHelper.SaveProfile(User.Guild.Id, User.Id, Profile);
-            if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringHelper.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Crystals: Crystals));
-            if (!Config.ChatXP.LevelRoles.Any()) return;
-            var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
-            if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
-            await User.AddRoleAsync(Role);
-            foreach (var lvlrole in Config.ChatXP.LevelRoles)
-                if (lvlrole.Value < NewLevel) if (!User.Roles.Contains(User.Guild.GetRole(lvlrole.Key))) await User.AddRoleAsync(User.Guild.GetRole(lvlrole.Key));
-        }
-
-        Task AutoTagAsync(SocketMessage Message, GuildModel Config)
-        {
-            if (!Config.Tags.Any(x => x.AutoRespond == true)) return Task.CompletedTask;
-            var Tags = Config.Tags.Where(x => x.AutoRespond == true);
-            var Content = Tags.FirstOrDefault(x => Message.Content.StartsWith(x.Name));
-            if (Content != null) return Message.Channel.SendMessageAsync(Content.Content);
-            return Task.CompletedTask;
-        }
-
-        async Task AutoModAsync(SocketUserMessage Message, GuildModel Config)
-        {
-            var Guild = (Message.Channel as SocketGuildChannel).Guild;
-            if (!Config.Mod.AutoMod || Message.Author.Id == Guild.Owner.Id || Config.Mod.MaxWarnings == 0) return;
-            string WarningMessage = null;
-            if (!GuildHelper.ProfanityMatch(Message.Content)) return; else WarningMessage = $"{Message.Author.Mention}, your message was removed because it contained profanity.";
-            if (!GuildHelper.InviteMatch(Message.Content)) return; else WarningMessage = $"{Message.Author.Mention}, Invite links are not allowed.";
-            var Profile = GuildHelper.GetProfile(Guild.Id, Message.Author.Id);
-            if (Profile.Warnings >= Config.Mod.MaxWarnings)
-            {
-                await (Message.Author as SocketGuildUser).KickAsync("Reached Max Warnings.");
-                await Guild.GetTextChannel(Config.Mod.TextChannel).SendMessageAsync(
-                    $"**Kick** | Case {Config.Mod.Cases.Count + 1}\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Reached Max Warnings.\n" +
-                    $"**Responsible Moderator:** {Client.CurrentUser}");
-            }
-            else
-            {
-                Profile.Warnings++;
-                await Message.Channel.SendMessageAsync(WarningMessage);
-            }
-            GuildHelper.SaveProfile(Guild.Id, Message.Author.Id, Profile);
         }
     }
 }
