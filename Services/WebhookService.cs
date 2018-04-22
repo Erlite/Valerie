@@ -30,9 +30,16 @@ namespace Valerie.Services
 
         public async Task SendMessageAsync(WebhookOptions Options)
         {
-            if (!(SocketClient.GetChannel(Options.Webhook.TextChannel) is SocketTextChannel Channel)) return;
-            var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
-            await WebhookFallbackAsync(Client, Channel, Options);
+            try
+            {
+                if (!(SocketClient.GetChannel(Options.Webhook.TextChannel) is SocketTextChannel Channel)) return;
+                var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
+                await WebhookFallbackAsync(Client, Channel, Options);
+            }
+            catch
+            {
+                LogService.Write(Enums.LogSource.DSD, $"Webhook Failed | {Options.Webhook.WebhookId}", System.Drawing.Color.Crimson);
+            }
         }
 
         public async Task<WebhookWrapper> CreateWebhookAsync(SocketTextChannel Channel, string Name)
@@ -48,13 +55,13 @@ namespace Valerie.Services
                 WebhookId = Webhook.Id,
                 WebhookToken = Webhook.Token
             };
-        }        
+        }
 
         public async Task<RestWebhook> GetWebhookAsync(SocketGuild Guild, WebhookOptions Options)
             => (await Guild?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);
 
         public async Task<RestWebhook> GetWebhookAsync(SocketTextChannel Channel, WebhookOptions Options)
-            => (await Channel?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);        
+            => (await Channel?.GetWebhooksAsync())?.FirstOrDefault(x => x?.Name == Options.Name || x?.Id == Options.Webhook.WebhookId);
 
         public Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, WebhookOptions Options)
         {
