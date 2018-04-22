@@ -51,7 +51,7 @@ namespace Valerie.Handlers
 
         internal Task Ready() => Task.Run(() =>
         {
-            LogService.Write(LogSource.RDY, "Drum Roll, Please?", CC.BlueViolet);
+            LogService.Write(LogSource.RDY, "Drum Roll, Please?", CC.GreenYellow);
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
