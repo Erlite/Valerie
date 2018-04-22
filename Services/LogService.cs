@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Valerie.Enums;
+using Valerie.Helpers;
 using System.Drawing;
 using System.Threading.Tasks;
 using Console = Colorful.Console;
@@ -27,8 +28,10 @@ namespace Valerie.Services
 
         public static void Write(LogSource Source, string Text, Color Color)
         {
+            string Date = DateTime.Now.ToShortTimeString().Length <= 7
+                ? $"0{DateTime.Now.ToShortTimeString()}" : DateTime.Now.ToShortTimeString();
             Console.Write(Environment.NewLine);
-            Append($"-> {DateTime.Now.ToShortTimeString()} ", Color.DarkGray);
+            Append($"-> {Date} ", Color.DarkGray);
             Append($"[{Source}]", Color);
             Append($" {Text}", Color.WhiteSmoke);
             _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
