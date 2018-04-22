@@ -77,7 +77,7 @@ namespace Valerie.Handlers
             var Config = GuildHandler.GetGuild(User.Guild.Id);
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
-                Name = Client.CurrentUser.Username,                
+                Name = Client.CurrentUser.Username,
                 Webhook = Config.LeaveWebhook,
                 Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
                 : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
@@ -160,6 +160,7 @@ namespace Valerie.Handlers
             var Embed = GetEmbed(Paint.Yellow)
                 .WithAuthor(Message.Author.Username, Message.Author.GetAvatarUrl())
                 .WithFooter(Message.Timestamp.ToString("F"));
+            var ReactionCount = Message.Reactions.Count(x => x.Key.Name == "⭐");
             if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
             if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == Message.Id);
@@ -176,7 +177,7 @@ namespace Valerie.Handlers
             else
             {
                 var Msg = await StarboardChannel.SendMessageAsync(
-                    $"{StringHelper.Star(Message.Reactions.Count)}{Message.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed.Build());
+                    $"{StringHelper.Star(ReactionCount)}{ReactionCount} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed.Build());
                 Config.Starboard.StarboardMessages.Add(new StarboardMessage
                 {
                     Stars = 1,
@@ -255,6 +256,7 @@ namespace Valerie.Handlers
 
         async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
+            if (!Message.Content.ToLower().StartsWith("valerie")) return;
             Response CleverResponse;
             string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
             if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.TextChannel))
@@ -271,7 +273,7 @@ namespace Valerie.Handlers
             await WebhookService.SendMessageAsync(new WebhookOptions
             {
                 Message = CleverResponse.CleverOutput,
-                Name = "Cleverbot",                
+                Name = "Cleverbot",
                 Webhook = Config.CleverbotWebhook
             });
         }
