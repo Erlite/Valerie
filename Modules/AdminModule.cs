@@ -13,6 +13,7 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
+using System.Collections.Generic;
 
 namespace Valerie.Modules
 {
@@ -223,7 +224,23 @@ namespace Valerie.Modules
         public Task ResetAsync()
         {
             if (Context.Guild.OwnerId != Context.User.Id) return ReplyAsync($"Requires Server's Owner.");
-            return ReplyAsync($"not working.");
+            var Properties = Context.Server.GetType().GetProperties();
+            foreach (var Property in Properties.Where(x => x.Name != "Id" && x.Name != "Prefix"))
+            {
+                if (Property.PropertyType == typeof(bool)) Property.SetValue(Context.Server, false);
+                if (Property.PropertyType == typeof(List<string>)) Property.SetValue(Context.Server, new List<string>());
+                if (Property.PropertyType == typeof(List<ulong>)) Property.SetValue(Context.Server, new List<ulong>());
+                if (Property.PropertyType == typeof(XPWrapper)) Property.SetValue(Context.Server, new XPWrapper());
+                if (Property.PropertyType == typeof(ModWrapper)) Property.SetValue(Context.Server, new ModWrapper());
+                if (Property.PropertyType == typeof(RedditWrapper)) Property.SetValue(Context.Server, new RedditWrapper());
+                if (Property.PropertyType == typeof(List<TagWrapper>)) Property.SetValue(Context.Server, new List<TagWrapper>());
+                if (Property.PropertyType == typeof(StarboardWrapper)) Property.SetValue(Context.Server, new StarboardWrapper());
+                if (Property.PropertyType == typeof(Dictionary<ulong, string>)) Property.SetValue(Context.Server, new Dictionary<ulong, string>());
+                if (Property.PropertyType == typeof(WebhookWrapper)) Property.SetValue(Context.Server, new WebhookWrapper());
+                if (Property.PropertyType == typeof(List<MessageWrapper>)) Property.SetValue(Context.Server, new List<MessageWrapper>());
+                if (Property.PropertyType == typeof(Dictionary<ulong, UserProfile>)) Property.SetValue(Context.Server, new Dictionary<ulong, UserProfile>());
+            }
+            return ReplyAsync("Guild Config has been recreated.", Document: DocumentType.Server);
         }
 
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
