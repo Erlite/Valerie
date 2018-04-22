@@ -256,9 +256,9 @@ namespace Valerie.Handlers
 
         async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
-            if (!Message.Content.ToLower().StartsWith("valerie")) return;
-            Response CleverResponse;
             string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
+            if (!Message.Content.ToLower().StartsWith("valerie") || string.IsNullOrWhiteSpace(UserMessage)) return;
+            Response CleverResponse;            
             if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.TextChannel))
             {
                 CleverResponse = await ConfigHandler.Cookie.Cleverbot.TalkAsync(UserMessage);
