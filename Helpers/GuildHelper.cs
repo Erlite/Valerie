@@ -1,7 +1,6 @@
 ﻿using System;
 using Discord;
 using System.Linq;
-using Valerie.Enums;
 using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Handlers;
@@ -68,11 +67,10 @@ namespace Valerie.Helpers
             });
         }
 
-        public async Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
-        {
-            if (Amount <= 100) await Channel.DeleteMessagesAsync(Messages).ConfigureAwait(false);
-            else foreach (var Message in Messages) await Message.DeleteAsync().ConfigureAwait(false);
-        }
+        public Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
+            => Amount <= 100 ? Channel.DeleteMessagesAsync(Messages) :
+               Task.Run(() => Messages.ToList().ForEach(async x => await x.DeleteAsync().ConfigureAwait(false)));
+
 
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
         {
