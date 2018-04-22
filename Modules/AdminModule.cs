@@ -129,17 +129,30 @@ namespace Valerie.Modules
             {
                 case SettingType.Prefix: Context.Server.Prefix = Value; break;
                 case SettingType.CleverbotChannel:
-                    //Context.WebhookService.GetWebhookAsync(GetChannel, "Cleverbot", Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
+                    Context.Server.CleverbotWebhook =
+                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions { Name = "Cleverbot" }).Result;
                     break;
                 case SettingType.JoinChannel:
-                    //Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
+                    Context.Server.JoinWebhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = Context.Client.CurrentUser.Username
+                        }).Result;
                     break;
                 case SettingType.LeaveChannel:
-                    //Context.WebhookService.GetWebhookAsync(GetChannel, Context.Client.CurrentUser.Username, Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
+                    Context.Server.LeaveWebhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = Context.Client.CurrentUser.Username
+                        }).Result;
                     break;
                 case SettingType.ModChannel: Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.RedditChannel:
-                    //Context.WebhookService.GetWebhookAsync(GetChannel, "Reddit Feed", Context.Server.CleverbotWebhook.TextChannel, SettingType.CleverbotChannel);
+                    Context.Server.Reddit.Webhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = "Reddit Feed"
+                        }).Result;
                     break;
                 case SettingType.StarboardChannel: Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
