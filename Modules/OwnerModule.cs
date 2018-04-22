@@ -76,7 +76,7 @@ namespace Valerie.Modules
             var Message = await ReplyAsync("Debugging ...");
             var Imports = Context.Config.Namespaces.Any() ? Context.Config.Namespaces :
                 new[] { "System", "System.Linq", "System.Collections.Generic", "System.IO", "System.Threading.Tasks" }.ToList();
-            var Options = ScriptOptions.Default.AddReferences(Context.MethodHelper.GetAssemblies()).AddImports(Imports);
+            var Options = ScriptOptions.Default.AddReferences(Context.MethodHelper.GetAssemblies).AddImports(Imports);
             var Globals = new EvalModel
             {
                 Context = Context,
