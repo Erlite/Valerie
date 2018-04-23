@@ -6,8 +6,9 @@ namespace Valerie.Helpers
 {
     public class IntHelper
     {
-        public static int GetLevel(int Xp) => 1 + (int)Math.Pow(Xp, 1 / 7.0);
-        public static int NextLevelXp(int Level) => (int)Math.Pow(Level, 4);
+        static double Percentage { get => 0.085; }
+        public static int GetLevel(int XP) => (int)Math.Floor(Percentage * Math.Sqrt(XP));
+        public static int NextLevelXP(int Level) => (int)Math.Pow((Level + 1) / Percentage, 2);
 
         public static int GetGuildRank(IContext Context, ulong UserId)
         {
