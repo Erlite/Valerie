@@ -9,6 +9,7 @@ using Valerie.Services;
 using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
+using Cookie.Cleverbot.Models;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
 using System.Collections.Generic;
@@ -20,23 +21,26 @@ namespace Valerie.Handlers
     {
         Random Random { get; }
         GuildHelper GuildHelper { get; }
-        bool CommandExecuted { get; set; }
+        EventHelper EventHelper { get; }
         GuildHandler GuildHandler { get; }
-        MethodHelper MethodHelper { get; }
         DiscordSocketClient Client { get; }
+        bool CommandExecuted { get; set; }
         ConfigHandler ConfigHandler { get; }
-        CommandService CommandService { get; }
         IServiceProvider Provider { get; set; }
+        CommandService CommandService { get; }
+        WebhookService WebhookService { get; }
 
-        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command, Random random, GuildHelper guildHelper, MethodHelper methodHelper)
+        public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command,
+            Random random, GuildHelper guildH, WebhookService webhookS, EventHelper eventHelper)
         {
             Client = client;
             Random = random;
             GuildHandler = guild;
+            GuildHelper = guildH;
             ConfigHandler = config;
-            GuildHelper = guildHelper;
+            EventHelper = eventHelper;
             CommandService = command;
-            MethodHelper = methodHelper;
+            WebhookService = webhookS;
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
@@ -47,7 +51,7 @@ namespace Valerie.Handlers
 
         internal Task Ready() => Task.Run(() =>
         {
-            LogService.Write(LogSource.RDY, "Drum Roll, Please?", CC.BlueViolet);
+            LogService.Write(LogSource.RDY, "Drum Roll, Please?", CC.GreenYellow);
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
@@ -69,19 +73,25 @@ namespace Valerie.Handlers
         internal async Task UserLeftAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GetGuild(User.Guild.Id);
-            string Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
-                : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username);
-            var Channel = User.Guild.GetTextChannel(Config.LeaveChannel);
-            if (Channel != null) await Channel.SendMessageAsync(Message).ConfigureAwait(false);
+            await WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Name = Client.CurrentUser.Username,
+                Webhook = Config.LeaveWebhook,
+                Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
+                : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
+            });
         }
 
         internal async Task UserJoinedAsync(SocketGuildUser User)
         {
             var Config = GuildHandler.GetGuild(User.Guild.Id);
-            string Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
-                : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention);
-            var Channel = User.Guild.GetTextChannel(Config.JoinChannel);
-            if (Channel != null) await Channel.SendMessageAsync(Message).ConfigureAwait(false);
+            await WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Name = Client.CurrentUser.Username,
+                Webhook = Config.JoinWebhook,
+                Message = !Config.JoinMessages.Any() ? $"**{User.Username}** is here to rock our world! Yeah, baby!"
+                : StringHelper.Replace(Config.JoinMessages[Random.Next(0, Config.JoinMessages.Count)], User.Guild.Name, User.Mention)
+            });
             var Role = User.Guild.GetRole(Config.Mod.JoinRole);
             if (Role != null) await User.AddRoleAsync(Role).ConfigureAwait(false);
         }
@@ -90,13 +100,15 @@ namespace Valerie.Handlers
         {
             var Guild = (Message.Channel as SocketGuildChannel).Guild;
             var Config = GuildHandler.GetGuild(Guild.Id);
-            if (!(Message is SocketUserMessage Msg) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
-            if (Msg.Source != MessageSource.User || Msg.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
-                GuildHelper.GetProfile(Guild.Id, Msg.Author.Id).IsBlacklisted) return Task.CompletedTask;
-            _ = AFKHandlerAsync(Msg, Config);
-            _ = XpHandlerAsync(Message, Config);
-            _ = CleverbotHandlerAsync(Msg, Config);
-            _ = AutoTagAsync(Msg, Config);
+            if (!(Message is SocketUserMessage UserMessage) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
+            if (UserMessage.Source != MessageSource.User || UserMessage.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
+                GuildHelper.GetProfile(Guild.Id, UserMessage.Author.Id).IsBlacklisted) return Task.CompletedTask;
+
+            _ = EventHelper.XPHandlerAsync(UserMessage, Config);
+            _ = EventHelper.ModeratorAsync(UserMessage, Config);
+            _ = EventHelper.ExecuteTagAsync(UserMessage, Config);
+            _ = EventHelper.AFKHandlerAsync(UserMessage, Config);
+            _ = EventHelper.CleverbotHandlerAsync(UserMessage, Config);
             return Task.CompletedTask;
         }
 
@@ -113,9 +125,11 @@ namespace Valerie.Handlers
             switch (Result.Error)
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
-                case CommandError.UnmetPrecondition: await Context.Channel.SendMessageAsync(Result.ErrorReason); break;
+                case CommandError.UnmetPrecondition:
+                    if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result.ErrorReason);
+                    break;
             }
-            _ = Task.Run(() => RecordCommand(Context, argPos));
+            _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context));
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
@@ -145,6 +159,7 @@ namespace Valerie.Handlers
             var Embed = GetEmbed(Paint.Yellow)
                 .WithAuthor(Message.Author.Username, Message.Author.GetAvatarUrl())
                 .WithFooter(Message.Timestamp.ToString("F"));
+            var ReactionCount = Message.Reactions.Count(x => x.Key.Name == "⭐");
             if (!string.IsNullOrWhiteSpace(Message.Content)) Embed.WithDescription(Message.Content);
             if (Message.Attachments.FirstOrDefault() != null) Embed.WithImageUrl(Message.Attachments.FirstOrDefault().Url);
             var Exists = Config.Starboard.StarboardMessages.FirstOrDefault(x => x.MessageId == Message.Id);
@@ -161,7 +176,7 @@ namespace Valerie.Handlers
             else
             {
                 var Msg = await StarboardChannel.SendMessageAsync(
-                    $"{StringHelper.Star(Message.Reactions.Count)}{Message.Reactions.Count} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed.Build());
+                    $"{StringHelper.Star(ReactionCount)}{ReactionCount} {(Reaction.Channel as ITextChannel).Mention} ID: {Reaction.MessageId}", embed: Embed.Build());
                 Config.Starboard.StarboardMessages.Add(new StarboardMessage
                 {
                     Stars = 1,
@@ -203,76 +218,6 @@ namespace Valerie.Handlers
                 await SMsg.DeleteAsync();
             }
             GuildHandler.Save(Config);
-        }
-
-        internal void RecordCommand(IContext Context, int ArgPos)
-        {
-            var Search = CommandService.Search(Context, ArgPos);
-            if (!Search.IsSuccess) return;
-            var Command = Search.Commands.FirstOrDefault().Command;
-            var Profile = GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (!Profile.Commands.ContainsKey(Command.Name)) Profile.Commands.Add(Command.Name, 0);
-            Profile.Commands[Command.Name]++;
-            GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
-        }
-
-        Task XpHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            var User = Message.Author as IGuildUser;
-            var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => Convert.ToUInt64(x)));
-            var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
-            var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);
-            int Old = Profile.ChatXP;
-            Profile.ChatXP += Random.Next(Message.Content.Length);
-            var New = Profile.ChatXP;
-            GuildHelper.SaveProfile(Convert.ToUInt64(Config.Id), User.Id, Profile);
-            return LevelUpHandlerAsync(Message, Config, Old, New);
-        }
-
-        async Task AFKHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            if (!Message.MentionedUsers.Any(x => Config.AFK.ContainsKey(x.Id))) return;
-            string Reason = null;
-            var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFK.TryGetValue(u.Id, out Reason));
-            if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
-        }
-
-        async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
-        {
-            var Channel = (Message.Channel as SocketGuildChannel).Guild.GetTextChannel(Config.ChatterChannel);
-            if (Channel == null || Message.Channel != Channel || !Message.Content.ToLower().StartsWith("valerie")) return;
-            var Clever = await ConfigHandler.Cookie.Cleverbot.TalkAsync(Message.Content.ToLower().Replace("valerie", string.Empty));
-            await Channel.SendMessageAsync(Clever.CleverOutput).ConfigureAwait(false);
-        }
-
-        async Task LevelUpHandlerAsync(SocketMessage Message, GuildModel Config, int OldXp, int NewXp)
-        {
-            var User = Message.Author as SocketGuildUser;
-            int OldLevel = IntHelper.GetLevel(OldXp);
-            int NewLevel = IntHelper.GetLevel(NewXp);
-            if (!(NewLevel > OldLevel)) return;
-            int Crystals = (int)Math.Sqrt(Math.PI * NewXp);
-            var Profile = GuildHelper.GetProfile(User.Guild.Id, User.Id);
-            Profile.Crystals += Crystals;
-            GuildHelper.SaveProfile(User.Guild.Id, User.Id, Profile);
-            if (!string.IsNullOrWhiteSpace(Config.ChatXP.LevelMessage))
-                await Message.Channel.SendMessageAsync(StringHelper.Replace(Config.ChatXP.LevelMessage, User: $"{User}", Level: NewLevel, Crystals: Crystals));
-            if (!Config.ChatXP.LevelRoles.Any()) return;
-            var Role = User.Guild.GetRole(Config.ChatXP.LevelRoles.Where(x => x.Value == NewLevel).FirstOrDefault().Key);
-            if (User.Roles.Contains(Role) || !User.Guild.Roles.Contains(Role)) return;
-            await User.AddRoleAsync(Role);
-            foreach (var lvlrole in Config.ChatXP.LevelRoles)
-                if (lvlrole.Value < NewLevel) if (!User.Roles.Contains(User.Guild.GetRole(lvlrole.Key))) await User.AddRoleAsync(User.Guild.GetRole(lvlrole.Key));
-        }
-
-        Task AutoTagAsync(SocketMessage Message, GuildModel Config)
-        {
-            if (!Config.Tags.Any(x => x.AutoRespond == true)) return Task.CompletedTask;
-            var Tags = Config.Tags.Where(x => x.AutoRespond == true);
-            var Content = Tags.FirstOrDefault(x => Message.Content.StartsWith(x.Name));
-            if (Content != null) return Message.Channel.SendMessageAsync(Content.Content);
-            return Task.CompletedTask;
         }
     }
 }

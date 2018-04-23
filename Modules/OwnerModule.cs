@@ -20,6 +20,8 @@ namespace Valerie.Modules
         [Command("Update"), Summary("Updates Valerie's Information.")]
         public async Task UpdateAsync(UpdateType UpdateType, [Remainder] string Value)
         {
+            var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
+            var GetChannel = (Context.Guild as SocketGuild).GetTextChannel(ChannelCheck.Item2) as SocketTextChannel;
             switch (UpdateType)
             {
                 case UpdateType.Avatar:
@@ -39,7 +41,11 @@ namespace Valerie.Modules
                     await (await Context.Guild.GetCurrentUserAsync(CacheMode.AllowDownload)).ModifyAsync(x => x.Nickname = Value);
                     break;
                 case UpdateType.ReportChannel:
-                    Context.Config.ReportChannel = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value).Item2; break;
+                    Context.Config.ReportWebhook = await Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                    {
+                        Name = "User Feedback / Report"
+                    });
+                    break;
                 case UpdateType.JoinMessage: Context.Config.JoinMessage = Value; break;
             }
             await ReplyAsync($"{UpdateType} has been updated {Emotes.DWink}", Document: DocumentType.Config);
@@ -76,7 +82,7 @@ namespace Valerie.Modules
             var Message = await ReplyAsync("Debugging ...");
             var Imports = Context.Config.Namespaces.Any() ? Context.Config.Namespaces :
                 new[] { "System", "System.Linq", "System.Collections.Generic", "System.IO", "System.Threading.Tasks" }.ToList();
-            var Options = ScriptOptions.Default.AddReferences(Context.MethodHelper.GetAssemblies()).AddImports(Imports);
+            var Options = ScriptOptions.Default.AddReferences(Context.MethodHelper.GetAssemblies).AddImports(Imports);
             var Globals = new EvalModel
             {
                 Context = Context,

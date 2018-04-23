@@ -1,5 +1,6 @@
 ﻿using System;
 using Discord;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Valerie.Enums;
@@ -14,6 +15,15 @@ namespace Valerie.Helpers
 {
     public class StringHelper
     {
+        public static string CacheFolder
+        {
+            get
+            {
+                if (!Directory.Exists($"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}"))
+                    Directory.CreateDirectory($"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}");
+                return $"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}";
+            }
+        }
         public static string Normal = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,-./:;<=>?@[\\]^_`{|}~ ";
         public static string FullWidth = "０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯ" +
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
@@ -101,6 +111,14 @@ namespace Valerie.Helpers
                 case NsfwType.Cureninja: Result = Matches[Random.Next(Matches.Count)].Groups[1].Value.Replace("\\/", "/"); break;
             }
             return Result;
+        }
+
+        public static async Task<string> DownloadUserImageAsync(HttpClient HttpClient, IUser User)
+        {
+            var Get = await HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
+            using (var UserImage = File.Create($"{CacheFolder}/{User.Id}.png"))
+                await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
+            return $"{CacheFolder}/{User.Id}.png";
         }
     }
 }

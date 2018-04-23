@@ -10,8 +10,9 @@ using Valerie.Helpers;
 using Newtonsoft.Json;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Preconditions;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Modules
@@ -33,11 +34,11 @@ namespace Valerie.Modules
                 $"```ebnf\n" +
                 $"Prefix                : {Context.Server.Prefix}\n" +
                 $"Log Channel           : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Mod.TextChannel)}\n" +
-                $"Join Channel          : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.JoinChannel)}\n" +
-                $"Leave Channel         : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.LeaveChannel)}\n" +
-                $"Reddit Channel        : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Reddit.TextChannel)}\n" +
+                $"Join Channel          : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.JoinWebhook.TextChannel)}\n" +
+                $"Leave Channel         : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.LeaveWebhook.TextChannel)}\n" +
+                $"Reddit Channel        : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Reddit.Webhook.TextChannel)}\n" +
                 $"Starboard Channel     : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.Starboard.TextChannel)}\n" +
-                $"Chatterbot Channel    : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.ChatterChannel)}\n" +
+                $"Cleverbot Channel     : {StringHelper.CheckChannel(Context.Guild as SocketGuild, Context.Server.CleverbotWebhook.TextChannel)}\n" +
                 $"Join Messages         : {Context.Server.JoinMessages.Count}\n" +
                 $"Leave Messages        : {Context.Server.LeaveMessages.Count}\n" +
                 $"AFK Users             : {Context.Server.AFK.Count}\n" +
@@ -101,9 +102,11 @@ namespace Valerie.Modules
                 await Mod.AddPermissionOverwriteAsync(Context.Client.CurrentUser, VPermissions);
                 Context.Server.Mod.TextChannel = Mod.Id;
             }
-            Context.Server.ChatterChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
-            Context.Server.JoinChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
-            Context.Server.LeaveChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id).Id;
+            var DefaultChannel = Context.GuildHelper.DefaultChannel(Context.Guild.Id) as SocketTextChannel;
+            var DefaultWebhook = await Context.WebhookService.CreateWebhookAsync(DefaultChannel, Context.Client.CurrentUser.Username);
+            Context.Server.CleverbotWebhook = await Context.WebhookService.CreateWebhookAsync(DefaultChannel, "Cleverbot");
+            Context.Server.JoinWebhook = DefaultWebhook;
+            Context.Server.LeaveWebhook = DefaultWebhook;
             Context.Server.ChatXP.LevelMessage = "👾 Congrats **{user}** on hitting level {level}! You received **{crystals}** crystals.";
             Context.Server.JoinMessages.Add("{user} in da houuuuuuseeeee! Turn up!");
             Context.Server.JoinMessages.Add("Whalecum to {guild}, {user}! Make yourself comfy wink wink.");
@@ -115,51 +118,76 @@ namespace Valerie.Modules
         }
 
         [Command("Set"), Summary("Sets certain values for current server's config.")]
-        public Task SetAsync(SettingType SettingType, [Remainder] string Value)
+        public Task SetAsync(SettingType SettingType, [Remainder] string Value = null)
         {
+            Value = Value ?? string.Empty;
+            var IntCheck = int.TryParse(Value, out int Result);
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
-            if ((ChannelCheck.Item1 || RoleCheck.Item1) == false)
+            if ((ChannelCheck.Item1 || RoleCheck.Item1 || IntCheck) == false)
                 return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. If it's a role or channel, try mentioning it?");
+            var GetChannel = (Context.Guild as SocketGuild).GetTextChannel(ChannelCheck.Item2) as SocketTextChannel;
             switch (SettingType)
             {
                 case SettingType.Prefix: Context.Server.Prefix = Value; break;
-                case SettingType.ChatterChannel: Context.Server.ChatterChannel = ChannelCheck.Item2; break;
-                case SettingType.JoinChannel: Context.Server.JoinChannel = ChannelCheck.Item2; break;
-                case SettingType.LeaveChannel: Context.Server.LeaveChannel = ChannelCheck.Item2; break;
+                case SettingType.CleverbotChannel:
+                    Context.Server.CleverbotWebhook =
+                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions { Name = "Cleverbot" }).Result;
+                    break;
+                case SettingType.JoinChannel:
+                    Context.Server.JoinWebhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = Context.Client.CurrentUser.Username
+                        }).Result;
+                    break;
+                case SettingType.LeaveChannel:
+                    Context.Server.LeaveWebhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = Context.Client.CurrentUser.Username
+                        }).Result;
+                    break;
                 case SettingType.ModChannel: Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
-                case SettingType.RedditChannel: Context.Server.Reddit.TextChannel = ChannelCheck.Item2; break;
+                case SettingType.RedditChannel:
+                    Context.Server.Reddit.Webhook =
+                        Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
+                        {
+                            Name = "Reddit Feed"
+                        }).Result;
+                    break;
                 case SettingType.StarboardChannel: Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
                 case SettingType.MuteRole: Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
-                case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = int.TryParse(Value, out int Result) ? Result : 0; break;
+                case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = Result; break;
+                case SettingType.LevelUpMessage: Context.Server.ChatXP.LevelMessage = Value; break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
         }
 
-        [Command("Set"), Summary("Sets certain values for current server's config.")]
-        public Task SetAsync(SettingType SettingType)
+        [Command("Toggle"), Summary("Sets certain values for current server's config.")]
+        public Task SetAsync(ToggleType ToggleType)
         {
             string State = null;
-            switch (SettingType)
+            switch (ToggleType)
             {
-                case SettingType.ToggleChatXP:
+                case ToggleType.ChatXP:
                     Context.Server.ChatXP.IsEnabled = !Context.Server.ChatXP.IsEnabled;
                     State = Context.Server.ChatXP.IsEnabled ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleAntiInvite:
+                case ToggleType.AntiInvite:
                     Context.Server.Mod.AntiInvite = !Context.Server.Mod.AntiInvite;
                     State = Context.Server.Mod.AntiInvite ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleAntiProfanity:
+                case ToggleType.AntiProfanity:
                     Context.Server.Mod.AntiProfanity = !Context.Server.Mod.AntiProfanity;
                     State = Context.Server.Mod.AntiProfanity ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleMessageLog:
+                case ToggleType.MessageLog:
                     Context.Server.Mod.LogDeletedMessages = !Context.Server.Mod.LogDeletedMessages;
                     State = Context.Server.Mod.LogDeletedMessages ? "enabled" : "disabled";
                     break;
-                case SettingType.ToggleRedditFeed:
+                case ToggleType.RedditFeed:
                     if (Context.Server.Reddit.IsEnabled)
                     {
                         Context.Server.Reddit.IsEnabled = false;
@@ -169,11 +197,12 @@ namespace Valerie.Modules
                     else
                     {
                         Context.Server.Reddit.IsEnabled = true;
+                        Context.RedditService.Start(Context.Guild.Id);
                         State = "enabled";
                     }
                     break;
             }
-            return ReplyAsync($"{SettingType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
+            return ReplyAsync($"{ToggleType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
         }
 
         [Command("Export"), Summary("Exports your server config as a json file.")]
@@ -196,7 +225,23 @@ namespace Valerie.Modules
         public Task ResetAsync()
         {
             if (Context.Guild.OwnerId != Context.User.Id) return ReplyAsync($"Requires Server's Owner.");
-            return ReplyAsync($"not working.");
+            var Properties = Context.Server.GetType().GetProperties();
+            foreach (var Property in Properties.Where(x => x.Name != "Id" && x.Name != "Prefix"))
+            {
+                if (Property.PropertyType == typeof(bool)) Property.SetValue(Context.Server, false);
+                if (Property.PropertyType == typeof(List<string>)) Property.SetValue(Context.Server, new List<string>());
+                if (Property.PropertyType == typeof(List<ulong>)) Property.SetValue(Context.Server, new List<ulong>());
+                if (Property.PropertyType == typeof(XPWrapper)) Property.SetValue(Context.Server, new XPWrapper());
+                if (Property.PropertyType == typeof(ModWrapper)) Property.SetValue(Context.Server, new ModWrapper());
+                if (Property.PropertyType == typeof(RedditWrapper)) Property.SetValue(Context.Server, new RedditWrapper());
+                if (Property.PropertyType == typeof(List<TagWrapper>)) Property.SetValue(Context.Server, new List<TagWrapper>());
+                if (Property.PropertyType == typeof(StarboardWrapper)) Property.SetValue(Context.Server, new StarboardWrapper());
+                if (Property.PropertyType == typeof(Dictionary<ulong, string>)) Property.SetValue(Context.Server, new Dictionary<ulong, string>());
+                if (Property.PropertyType == typeof(WebhookWrapper)) Property.SetValue(Context.Server, new WebhookWrapper());
+                if (Property.PropertyType == typeof(List<MessageWrapper>)) Property.SetValue(Context.Server, new List<MessageWrapper>());
+                if (Property.PropertyType == typeof(Dictionary<ulong, UserProfile>)) Property.SetValue(Context.Server, new Dictionary<ulong, UserProfile>());
+            }
+            return ReplyAsync("Guild Config has been recreated.", Document: DocumentType.Server);
         }
 
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
@@ -208,11 +253,11 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
-                    Context.Server.AssignableRoles.Add($"{Role.Id}");
+                    Context.Server.AssignableRoles.Add(Role.Id);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.AssignableRoles.Contains($"{Role.Id}")) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
-                    Context.Server.AssignableRoles.Remove($"{Role.Id}");
+                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
+                    Context.Server.AssignableRoles.Remove(Role.Id);
                     return ReplyAsync($"`{Role.Name}` is no longer an assignable role.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
@@ -227,11 +272,11 @@ namespace Valerie.Modules
             {
                 case 'a':
                     if (!Check.Item1) return ReplyAsync(Check.Item2);
-                    Context.Server.ChatXP.ForbiddenRoles.Add($"{Role.Id}");
+                    Context.Server.ChatXP.ForbiddenRoles.Add(Role.Id);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.ChatXP.ForbiddenRoles.Contains($"{Role.Id}")) return ReplyAsync($"{Role} isn't forbidden from gaining XP.");
-                    Context.Server.ChatXP.ForbiddenRoles.Remove($"{Role.Id}");
+                    if (!Context.Server.ChatXP.ForbiddenRoles.Contains(Role.Id)) return ReplyAsync($"{Role} isn't forbidden from gaining XP.");
+                    Context.Server.ChatXP.ForbiddenRoles.Remove(Role.Id);
                     return ReplyAsync($"`{Role}` has been removed from forbidden roles.", Document: DocumentType.Server);
             }
             return Task.CompletedTask;
@@ -327,7 +372,7 @@ namespace Valerie.Modules
         [Command("Forbid"), Summary("Shows all the forbidden roles for this server.")]
         public Task ForbiddenAsync()
             => ReplyAsync(!Context.Server.ChatXP.ForbiddenRoles.Any() ? $"{Context.Guild} has no forbidden roles." :
-                $"**Forbidden Roles:**\n{Context.Server.ChatXP.ForbiddenRoles.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, Convert.ToUInt64(x))}")}");
+                $"**Forbidden Roles:**\n{Context.Server.ChatXP.ForbiddenRoles.Select(x => $"-> {x} | {StringHelper.CheckRole(Context.Guild as SocketGuild, x)}")}");
 
         [Command("Level"), Summary("Shows all the level up roles for this server.")]
         public Task LevelsAsync()

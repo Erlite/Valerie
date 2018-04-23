@@ -1,5 +1,4 @@
 ﻿using System;
-using Discord;
 using System.Linq;
 using Valerie.Models;
 using Valerie.Handlers;
@@ -10,62 +9,58 @@ using Discord.WebSocket;
 using Raven.Client.Documents;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Valerie.Services
 {
     public class RedditService
     {
-        Timer FeedTimer { get; set; }
         HttpClient HttpClient { get; }
+        IDocumentStore Store { get; }
+        GuildHandler GuildHandler { get; }
         DiscordSocketClient Client { get; }
-        ConfigHandler ConfigHandler { get; }
-        IDocumentStore DocumentStore { get; }
+        Timer AutoFeedTimer { get; set; }
+        WebhookService WebhookService { get; }
+        ConcurrentDictionary<ulong, Timer> ChannelTimers { get; set; } = new ConcurrentDictionary<ulong, Timer>();
+        ConcurrentDictionary<ulong, List<string>> PostTrack { get; set; } = new ConcurrentDictionary<ulong, List<string>>();
 
-        Dictionary<ulong, Timer> ChannelTimers { get; set; } = new Dictionary<ulong, Timer>();
-        Dictionary<ulong, List<string>> PostTrack { get; set; } = new Dictionary<ulong, List<string>>();
-
-        public RedditService(HttpClient httpClient, ConfigHandler configHandler, IDocumentStore documentStore, DiscordSocketClient client)
+        public RedditService(HttpClient httpClient, GuildHandler guildHandler, DiscordSocketClient client, IDocumentStore store, WebhookService webhook)
         {
             Client = client;
+            Store = store;
             HttpClient = httpClient;
-            ConfigHandler = configHandler;
-            DocumentStore = documentStore;
+            GuildHandler = guildHandler;
+            WebhookService = webhook;
         }
 
-        public void Initialize() => FeedTimer = new Timer(_ =>
-         {
-             Start();
-         }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
-
-        public void Start()
+        public Task Start(ulong GuildId)
         {
-            List<GuildModel> Configs;
-            using (var Session = DocumentStore.OpenSession())
-                Configs = Session.Query<GuildModel>().Customize(x => x.WaitForNonStaleResults()).ToList();
-            foreach (var Server in Configs.Where(x => x.Reddit.IsEnabled && x.Reddit.TextChannel != 0 && x.Reddit.Subreddits.Any()))
+            var Server = GuildHandler.GetGuild(GuildId);
+            if (!Server.Reddit.Subreddits.Any()) return Task.CompletedTask;
+            if (ChannelTimers.ContainsKey(Server.Reddit.Webhook.TextChannel)) return Task.CompletedTask;
+            ChannelTimers.TryAdd(Server.Reddit.Webhook.TextChannel, new Timer(async _ =>
             {
-                var Channel = Client.GetChannel(Server.Reddit.TextChannel) as IMessageChannel;
-                if (ChannelTimers.ContainsKey(Channel.Id)) return;
-                var ChannelTimer = new Timer(async _ =>
+                foreach (var Subbredit in Server.Reddit.Subreddits)
                 {
-                    foreach (var Subbredit in Server.Reddit.Subreddits)
+                    var PostIds = new List<string>();
+                    var CheckSub = await SubredditAsync(Subbredit).ConfigureAwait(false);
+                    if (CheckSub == null) return;
+                    var SubData = CheckSub.Data.Children[0].ChildData;
+                    if (PostTrack.ContainsKey(Server.Reddit.Webhook.TextChannel)) PostTrack.TryGetValue(Server.Reddit.Webhook.TextChannel, out PostIds);
+                    if (PostIds.Contains(SubData.Id)) return;
+                    string Description = SubData.Selftext.Length > 500 ? $"{SubData.Selftext.Substring(0, 400)} ..." : SubData.Selftext;
+                    await WebhookService.SendMessageAsync(new WebhookOptions
                     {
-                        var PostIds = new List<string>();
-                        var CheckSub = await SubredditAsync(Subbredit).ConfigureAwait(false);
-                        if (CheckSub == null) return;
-                        var SubData = CheckSub.Data.Children[0].ChildData;
-                        if (PostTrack.ContainsKey(Channel.Id)) PostTrack.TryGetValue(Channel.Id, out PostIds);
-                        if (PostIds.Contains(SubData.Id)) return;
-                        string Description = SubData.Selftext.Length > 500 ? $"{SubData.Selftext.Substring(0, 400)} ..." : SubData.Selftext;
-                        await Channel.SendMessageAsync($"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n" +
-                            $"**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}").ConfigureAwait(false);
-                        PostIds.Add(SubData.Id);
-                        PostTrack.Remove(Channel.Id);
-                        PostTrack.Add(Channel.Id, PostIds);
-                    }
-                }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30));
-                ChannelTimers.Add(Channel.Id, ChannelTimer);
-            }
+                        Message = $"New Post In **r/{SubData.Subreddit}** By **{SubData.Author}**\n**{SubData.Title}**\n{Description}\nPost Link: {SubData.Url}",
+                        Name = "Reddit Feed",
+                        Webhook = Server.Reddit.Webhook
+                    });
+                    PostIds.Add(SubData.Id);
+                    PostTrack.TryRemove(Server.Reddit.Webhook.TextChannel, out List<string> Useless);
+                    PostTrack.TryAdd(Server.Reddit.Webhook.TextChannel, PostIds);
+                }
+            }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(30)));
+            return Task.CompletedTask;
         }
 
         public async Task<RedditModel> SubredditAsync(string SubredditName)
@@ -81,8 +76,9 @@ namespace Valerie.Services
             var GetTimer = ChannelTimers[ChannelId];
             GetTimer.Change(Timeout.Infinite, Timeout.Infinite);
             GetTimer.Dispose();
-            GetTimer = null;
-            ChannelTimers.Remove(ChannelId);
+            ChannelTimers.TryRemove(ChannelId, out Timer Useless);
+            Useless.Change(Timeout.Infinite, Timeout.Infinite);
+            Useless.Dispose();
         }
     }
 }

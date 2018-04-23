@@ -27,8 +27,10 @@ namespace Valerie.Services
 
         public static void Write(LogSource Source, string Text, Color Color)
         {
+            string Date = DateTime.Now.ToShortTimeString().Length <= 7
+                ? $"0{DateTime.Now.ToShortTimeString()}" : DateTime.Now.ToShortTimeString();
             Console.Write(Environment.NewLine);
-            Append($"-> {DateTime.Now.ToShortTimeString()} ", Color.DarkGray);
+            Append($"-> {Date} ", Color.DarkGray);
             Append($"[{Source}]", Color);
             Append($" {Text}", Color.WhiteSmoke);
             _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
@@ -40,8 +42,8 @@ namespace Valerie.Services
             Append("-> INFORMATION\n", Color.PaleVioletRed);
             Append(
                 "      Author  :  Yucked\n" +
-                "      Version :  18.4.X - Rewrite\n" +
-                "      Discord :  Discord.me/Glitched\n", Color.Olive);
+                "      Version :  18.4.X - Stable\n" +
+                "      Discord :  Discord.me/Glitched\n", Color.LightSalmon);
         }
     }
 }

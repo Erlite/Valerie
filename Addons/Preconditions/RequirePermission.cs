@@ -2,12 +2,11 @@
 using Discord;
 using System.Linq;
 using Valerie.Enums;
-using Valerie.Addons;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 
-namespace Valerie.Preconditions
+namespace Valerie.Addons.Preconditions
 {
     public class RequirePermission : PreconditionAttribute
     {

@@ -44,13 +44,15 @@ namespace Valerie
                 .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()
                 .AddSingleton<GuildHelper>()
+                .AddSingleton<EventHelper>()
                 .AddSingleton<MainHandler>()
-                .AddSingleton<MethodHelper>()
                 .AddSingleton<GuildHandler>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton<RedditService>()
+                .AddSingleton<MethodHelper>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<UpdateService>()
-                .AddSingleton<ConfigHandler>()
+                .AddSingleton<WebhookService>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
@@ -58,7 +60,6 @@ namespace Valerie
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
             Provider.GetRequiredService<UpdateService>().InitializeTimer();
-            Provider.GetRequiredService<RedditService>().Initialize();
 
             await Task.Delay(-1);
         }

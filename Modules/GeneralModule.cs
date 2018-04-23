@@ -29,7 +29,6 @@ namespace Valerie.Modules
         [Command("Feedback"), Summary("Give feedback on Valerie's performance or suggest new features!")]
         public async Task FeedbackAsync()
         {
-            var ReportChannel = await Context.Client.GetChannelAsync(Context.Config.ReportChannel) as IMessageChannel;
             await ReplyAsync($"*Please provide your feedback in 2-3 sentences.*");
             var Response = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(60));
             if (Response == null || Response.Content.Length < 20)
@@ -37,11 +36,16 @@ namespace Valerie.Modules
                 await ReplyAndDeleteAsync($"Hmm, I can't submit a blank feedback. Try again maybe?");
                 return;
             }
-            await ReportChannel.SendMessageAsync(string.Empty, embed: GetEmbed(Paint.Aqua)
+            await Context.WebhookService.SendMessageAsync(new WebhookOptions
+            {
+                Webhook = Context.Config.ReportWebhook,
+                Embed = GetEmbed(Paint.Aqua)
                 .WithAuthor($"Feedback from {Context.User}", Context.User.GetAvatarUrl())
                 .WithDescription($"**Feedback:**\n{Response.Content}")
                 .WithFooter($"{Context.Guild} | {Context.Guild.Id}")
-                .Build());
+                .Build(),
+                Name = "User Feedback / Report"
+            });
             await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
         }
 
@@ -195,13 +199,13 @@ namespace Valerie.Modules
         [Command("Selfroles"), Summary("Shows a list of all assignable roles for current server.")]
         public Task SelfRolesAsync()
             => ReplyAsync(!Context.Server.AssignableRoles.Any() ? $"There are no self-assignable roles {Emotes.PepeSad}" :
-                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, Convert.ToUInt64(x))))}");
+                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, x)))}");
 
         [Command("Iam"), Summary("Adds you to the specified role. Role must be a self-assignable role.")]
         public Task IAmAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (!Context.Server.AssignableRoles.Contains($"{Role.Id}")) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
+            if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
             else if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
             return User.AddRoleAsync(Role);
         }
@@ -215,7 +219,9 @@ namespace Valerie.Modules
         }
 
         [Command("Invite"), Summary("Valerie's invite link and support server")]
-        public Task InviteAsync() => ReplyAsync($"Here is my invite link: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
+        public Task InviteAsync() => ReplyAsync($"**Invite Link:**\n" +
+            $"Full Permission: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
+            $"Minimal Permisison: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=805694647&scope=bot" +
             $"Feel free to join my server: https://discord.gg/nzYTzxD");
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 using Discord;
 using Valerie.Models;
-using System.Net.Http;
 using Valerie.Helpers;
 using Valerie.Services;
 using Valerie.Handlers;
+using System.Net.Http;
 using Discord.Commands;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
@@ -19,16 +19,17 @@ namespace Valerie.Addons
         public Random Random { get; }
         public GuildModel Server { get; }
         public ConfigModel Config { get; }
-        public IUserMessage Message { get; }
         public IDiscordClient Client { get; }
         public HttpClient HttpClient { get; }
+        public IUserMessage Message { get; }
         public GuildHelper GuildHelper { get; }
         public IMessageChannel Channel { get; }
-        public IDocumentSession Session { get; }        
         public GuildHandler GuildHandler { get; }
-        public MethodHelper MethodHelper { get; }
-        public ConfigHandler ConfigHandler { get; }
+        public IDocumentSession Session { get; }
         public RedditService RedditService { get; }
+        public ConfigHandler ConfigHandler { get; }
+        public MethodHelper MethodHelper { get; }
+        public WebhookService WebhookService { get; }
 
         public IContext(IDiscordClient ClientParam, IUserMessage MessageParam, IServiceProvider ServiceProvider)
         {
@@ -42,9 +43,10 @@ namespace Valerie.Addons
             GuildHelper = ServiceProvider.GetRequiredService<GuildHelper>();
             GuildHandler = ServiceProvider.GetRequiredService<GuildHandler>();
             Config = ServiceProvider.GetRequiredService<ConfigHandler>().Config;
+            RedditService = ServiceProvider.GetRequiredService<RedditService>();
             ConfigHandler = ServiceProvider.GetRequiredService<ConfigHandler>();
             MethodHelper = ServiceProvider.GetRequiredService<MethodHelper>();
-            RedditService = ServiceProvider.GetRequiredService<RedditService>();
+            WebhookService = ServiceProvider.GetRequiredService<WebhookService>();
             Server = ServiceProvider.GetRequiredService<GuildHandler>().GetGuild(Guild.Id);
             Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
         }

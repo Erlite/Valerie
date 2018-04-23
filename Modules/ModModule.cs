@@ -6,8 +6,8 @@ using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
 using Discord.WebSocket;
-using Valerie.Preconditions;
 using System.Threading.Tasks;
+using Valerie.Addons.Preconditions;
 
 namespace Valerie.Modules
 {

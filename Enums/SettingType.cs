@@ -2,7 +2,7 @@
 {
     public enum SettingType
     {
-        Prefix,        
+        Prefix,
         JoinRole,
         MuteRole,
         ModChannel,
@@ -10,12 +10,8 @@
         LeaveChannel,
         MaxWarnings,
         RedditChannel,
-        ChatterChannel,
+        CleverbotChannel,
         StarboardChannel,
-        ToggleChatXP,
-        ToggleAntiInvite,
-        ToggleRedditFeed,
-        ToggleMessageLog,
-        ToggleAntiProfanity,
+        LevelUpMessage
     }
 }

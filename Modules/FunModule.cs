@@ -177,7 +177,7 @@ namespace Valerie.Modules
             return ReplyAsync(string.Empty, Embed.Build());
         }
 
-        [Command("Profile"), Summary("Shows your profile statistics.")]
+        [Command("Profile"), Summary("Shows a users profile statistics.")]
         public Task ProfileAsync(SocketGuildUser User = null)
         {
             User = User ?? Context.User as SocketGuildUser;
@@ -188,22 +188,37 @@ namespace Valerie.Modules
             var Commands = GuildProfile.Commands.OrderByDescending(x => x.Value);
             string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.PepeSad}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
             var Blacklisted = GuildProfile.IsBlacklisted ? Emotes.TickYes : Emotes.TickNo;
+            int TotalXp = Profiles.Sum(x => x.Sum(y => y.Value.ChatXP));
+            int Level = IntHelper.NextLevelXp(IntHelper.GetLevel(TotalXp));
 
             var Embed = GetEmbed(Paint.Magenta)
                 .WithAuthor($"👾 {User.Username} Profile", User.GetAvatarUrl())
                 .WithThumbnailUrl(User.GetAvatarUrl())
                 .AddField("Server Stats",
                 $"**Level:** {IntHelper.GetLevel(GuildProfile.ChatXP)}  ({GuildProfile.ChatXP} / {IntHelper.NextLevelXp(IntHelper.GetLevel(GuildProfile.ChatXP))})\n" +
-                $"**Rank:** {IntHelper.GetGuildRank(Context, User.Id)} / {Context.Server.Profiles.Count}\n" +                
                 $"**Stars:** {Context.Server.Starboard.StarboardMessages.Where(x => x.AuthorId == User.Id).Sum(x => x.Stars)}\n" +
                 $"**Crystals:** {GuildProfile.Crystals}", true)
                 .AddField("Global Stats",
-                $"**XP:** {Profiles.Sum(x => x.Sum(y => y.Value.ChatXP))}\n" +                
+                $"**XP:** {TotalXp} / {Level}\n" +
                 $"**Stars:** {Starboard.Sum(x => x.Sum(y => y.Stars))}\n" +
-                $"Crystals: {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
-                .AddField("Blacklisted Or Warned?", $"{Blacklisted} | {GuildProfile.Warnings}", true)
+                $"**Crystals:** {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
+                .AddField("Blacklisted?", Blacklisted, true)
                 .AddField("Favorite Command", FavCommand, true);
             return ReplyAsync(string.Empty, Embed.Build());
+        }
+
+        [Command("Rank"), Summary("Shows user's server's rank.")]
+        public Task RankAsync(SocketGuildUser User = null)
+        {
+            User = User ?? Context.User as SocketGuildUser;
+            var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
+            return ReplyAsync(string.Empty, GetEmbed(Paint.Yellow)
+                .WithAuthor($"{User.Username}'s Server Rank", User.GetAvatarUrl())
+                .WithThumbnailUrl(User.GetAvatarUrl())
+                .AddField("Rank", $" {IntHelper.GetGuildRank(Context, User.Id)} / {Context.Server.Profiles.Count}", true)
+                .AddField("Level", IntHelper.GetLevel(Profile.ChatXP), true)
+                .AddField("Current XP", $"{Profile.ChatXP} XP", true)
+                .AddField("Next Level XP", IntHelper.NextLevelXp(IntHelper.GetLevel(Profile.ChatXP)), true).Build());
         }
     }
 }

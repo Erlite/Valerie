@@ -21,7 +21,7 @@ namespace Valerie.Helpers
             GuildHandler = guildHandler;
         }
 
-        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+ss+h+o+l+e+|n+i+g+g+e+r+|f+a+g+|g+a+y+)(w+i+t+|e+r+|i+n+g+)?\b"; }
+        string ProfanityRegex { get => @"\b(f+u+c+k+|b+i+t+c+h+|w+h+o+r+e+|c+u+n+t+|a+s+s+|n+i+g+g+|f+a+g+|g+a+y+|p+u+s+s+y+)(w+i+t+|e+r+|i+n+g+|h+o+l+e+)?\b"; }
         string InviteRegex { get => @"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?(d+i+s+c+o+r+d+|a+p+p)+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"; }
 
         public IMessageChannel DefaultChannel(ulong GuildId)
@@ -51,12 +51,12 @@ namespace Valerie.Helpers
 
         public async Task LogAsync(IContext Context, IUser User, CaseType CaseType, string Reason)
         {
+            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.Mod.Cases.Count + 1} <Reason>`*";
             var ModChannel = await Context.Guild.GetTextChannelAsync(Context.Server.Mod.TextChannel);
             if (ModChannel == null) return;
-            Reason = Reason ?? $"*Responsible moderator, please type `{Context.Config.Prefix}Reason {Context.Server.Mod.Cases.Count + 1} <Reason>`*";
             var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Context.Server.Mod.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
                     $"**Responsible Moderator:** {Context.User}");
-            Context.Server.Mod.Cases.Add(new CaseWrapper()
+            Context.Server.Mod.Cases.Add(new CaseWrapper
             {
                 Reason = Reason,
                 UserId = User.Id,
@@ -67,14 +67,14 @@ namespace Valerie.Helpers
             });
         }
 
-        public async Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
-        {
-            if (Amount <= 100) await Channel.DeleteMessagesAsync(Messages).ConfigureAwait(false);
-            else foreach (var Message in Messages) await Message.DeleteAsync().ConfigureAwait(false);
-        }
+        public Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
+            => Amount <= 100 ? Channel.DeleteMessagesAsync(Messages) :
+               Task.Run(() => Messages.ToList().ForEach(async x => await x.DeleteAsync().ConfigureAwait(false)));
+
 
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
         {
+            if (string.IsNullOrWhiteSpace(Channel)) return (true, 0);
             UInt64.TryParse(Channel.Replace('<', ' ').Replace('>', ' ').Replace('#', ' ').Replace(" ", ""), out ulong Id);
             var GetChannel = Guild.GetTextChannel(Id);
             if (GetChannel != null) return (true, Id);
@@ -85,6 +85,7 @@ namespace Valerie.Helpers
 
         public (bool, ulong) GetRoleId(SocketGuild Guild, string Role)
         {
+            if (string.IsNullOrWhiteSpace(Role)) return (true, 0);
             UInt64.TryParse(Role.Replace('<', ' ').Replace('>', ' ').Replace('@', ' ').Replace('&', ' ').Replace(" ", ""), out ulong Id);
             var GetRole = Guild.GetRole(Id);
             if (GetRole != null) return (true, Id);
