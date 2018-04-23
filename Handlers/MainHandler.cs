@@ -44,6 +44,8 @@ namespace Valerie.Handlers
             Client.ReactionRemoved += Events.ReactionRemovedAsync;
             Client.MessageReceived += Events.CommandHandlerAsync;
 
+            AppDomain.CurrentDomain.UnhandledException += Events.UnhandledException;
+
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
         }

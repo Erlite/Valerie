@@ -9,10 +9,8 @@ using Valerie.Services;
 using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
-using Cookie.Cleverbot.Models;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
-using System.Collections.Generic;
 using static Valerie.Addons.Embeds;
 
 namespace Valerie.Handlers
@@ -219,5 +217,8 @@ namespace Valerie.Handlers
             }
             GuildHandler.Save(Config);
         }
+
+        internal void UnhandledException(object Sender, UnhandledExceptionEventArgs ExceptionArgument)
+            => LogService.Write(LogSource.EXC, $"{ExceptionArgument.ExceptionObject}", CC.IndianRed);
     }
 }

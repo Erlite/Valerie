@@ -26,7 +26,17 @@ namespace Valerie.Services
         }
 
         public DiscordWebhookClient WebhookClient(ulong Id, string Token)
-            => new DiscordWebhookClient(Id, Token);
+        {
+            try
+            {
+                return new DiscordWebhookClient(Id, Token);
+            }
+            catch
+            {
+                LogService.Write(Enums.LogSource.DSD, $"Webhook {Id} Failed.", System.Drawing.Color.Crimson);
+                return null;
+            }
+        }
 
         public async Task SendMessageAsync(WebhookOptions Options)
         {
@@ -39,7 +49,7 @@ namespace Valerie.Services
             catch
             {
                 LogService.Write(Enums.LogSource.DSD, $"Webhook  {Options.Webhook.WebhookId} Failed | " +
-                    $"{(SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketGuildChannel).Guild.Name}", 
+                    $"{(SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketGuildChannel).Guild.Name}",
                     System.Drawing.Color.Crimson);
             }
         }
@@ -68,7 +78,11 @@ namespace Valerie.Services
         public Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, WebhookOptions Options)
         {
             if (Client == null || Channel == null) return Task.CompletedTask;
-            if (Client == null) return Channel.SendMessageAsync(Options.Message, embed: Options.Embed);
+            if (Client == null)
+            {
+                LogService.Write(Enums.LogSource.DSD, $"Falling back to Channel: {Channel.Name}", System.Drawing.Color.Yellow);
+                return Channel.SendMessageAsync(Options.Message, embed: Options.Embed);
+            }
             return Client.SendMessageAsync(Options.Message, embeds: Options.Embed == null ? null : new List<Embed>() { Options.Embed });
         }
 
