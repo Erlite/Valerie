@@ -56,7 +56,7 @@ namespace Valerie.Handlers
         internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, Guild.Name));
         internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, Guild.Name));
         internal Task Connected() => Task.Run(() => LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet));
-        internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(LogSource.EXC, log.Exception.Message, CC.Crimson));
+        internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(LogSource.EXC, log.Message ?? log.Exception.Message, CC.Crimson));
         internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(LogSource.DSN, Error.Message, CC.Crimson));
         internal Task LatencyUpdated(int Old, int Newer) => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 250) ? UserStatus.Idle
