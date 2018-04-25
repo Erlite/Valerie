@@ -1,9 +1,9 @@
 ﻿using System;
 using Discord;
 using System.Linq;
+using Cookie.Giphy;
 using Valerie.Models;
 using Valerie.Addons;
-using Valerie.Helpers;
 using Newtonsoft.Json;
 using Discord.Commands;
 using System.Threading.Tasks;
@@ -161,12 +161,12 @@ namespace Valerie.Modules
             string Response = null;
             if (!string.IsNullOrWhiteSpace(SearchTerms))
             {
-                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchAsync(SearchTerms);
+                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchAsync(SearchTerms, Rating: Rating.NSFW);
                 Response = GetGif.Datum[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
             }
             else
             {
-                var Gif = await Context.ConfigHandler.Cookie.Giphy.TrendingAsync();
+                var Gif = await Context.ConfigHandler.Cookie.Giphy.TrendingAsync(Rating: Rating.NSFW);
                 var Random = Context.Random.Next(Gif.Pagination.Count);
                 Response = Gif.Datum[Random].EmbedURL;
             }
