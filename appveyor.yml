@@ -11,19 +11,19 @@ after_build:
 - cmd: dotnet build
 artifacts:
 - path: bin\Debug\netcoreapp2.1
-  name: Rewrite-Core2.1
+  name: Stable-$(appveyor_build_version)-Core2.1
 - path: bin\Debug\netcoreapp2.0
-  name: Rewrite-Core2.0
+  name: Stable-$(appveyor_build_version)-Core2.0
 deploy:
 - provider: GitHub
-  tag: Rewrite
-  release: Rewrite
+  tag: Stable
+  release: Stable
   description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
-  artifact: Rewrite-Core2.1, Rewrite-Core2.0
+  artifact: Stable-$(appveyor_build_version)-Core2.1, Stable-$(appveyor_build_version)-Core2.0
   draft: false
-  prerelease: true
+  prerelease: false
   force_update: true
   on:
     branch: master
