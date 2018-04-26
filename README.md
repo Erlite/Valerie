@@ -9,8 +9,9 @@
 </p>
 
 ### `Features`
-
+Starboard, Tags (Auto Execution), Anti Discord Invite/ Profanity, Search Commands, Warnings, Games, Chat XP, Welcome/Leave Messages, Auto Assign Role, Self Assignable Roles.
 ### `Contributing`
-
+Please don't.
+**Why?** I've a different way of writing code. You are welcome to make a pull request with your changes. I'll merge it if I like it.
 ### `Personal Instance`
 To run your own instance of Valerie, click [here](https://github.com/Yucked/Valerie/wiki/Setup-Guide).
