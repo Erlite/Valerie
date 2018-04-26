@@ -4,8 +4,11 @@ using Valerie.Enums;
 using Valerie.Services;
 using System.Net.Http;
 using Discord.WebSocket;
+using Raven.Client.Documents;
 using System.Threading.Tasks;
+using Raven.Client.ServerWide;
 using CC = System.Drawing.Color;
+using Raven.Client.ServerWide.Operations;
 
 namespace Valerie.Handlers
 {
@@ -14,10 +17,12 @@ namespace Valerie.Handlers
         ConfigHandler Config { get; }
         HttpClient HttpClient { get; }
         EventsHandler Events { get; }
+        IDocumentStore Store { get; }
         DiscordSocketClient Client { get; }
 
-        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client)
+        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client, IDocumentStore store)
         {
+            Store = store;
             Client = client;
             Config = config;
             Events = events;
@@ -54,15 +59,18 @@ namespace Valerie.Handlers
         {
             try
             {
-                var RavenDb = await HttpClient.GetAsync("http://127.0.0.1:8080/studio/index.html").ConfigureAwait(false);
-                var Database = await HttpClient.GetAsync("http://127.0.0.1:8080/studio/index.html#databases/documents?&database=Valerie").ConfigureAwait(false);
-                if (RavenDb.IsSuccessStatusCode || Database.IsSuccessStatusCode) Config.ConfigCheck();
+                var Get = await HttpClient.GetAsync($"{Store.Urls[0]}/studio/index.html#databases/documents?&database=Velixa");
+                if (!Get.IsSuccessStatusCode)
+                {
+                    LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
+                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord("Velixa")));
+                    LogService.Write(LogSource.DTB, "Created Database Velixa.", CC.ForestGreen);
+                }
             }
-            catch
+            catch { }
+            finally
             {
-                LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
-                await Task.Delay(5000);
-                Environment.Exit(Environment.ExitCode);
+                Config.ConfigCheck();
             }
         }
     }
