@@ -51,7 +51,6 @@ namespace Valerie
                 .AddSingleton<RedditService>()
                 .AddSingleton<MethodHelper>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton<UpdateService>()
                 .AddSingleton<WebhookService>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
@@ -59,7 +58,6 @@ namespace Valerie
             Provider.GetRequiredService<LogService>().Initialize();
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
-            Provider.GetRequiredService<UpdateService>().InitializeTimer();
             Provider.GetRequiredService<RedditService>().Initialize();
 
             await Task.Delay(-1);
