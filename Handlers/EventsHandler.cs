@@ -12,6 +12,7 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
 using static Valerie.Addons.Embeds;
+using System.Threading;
 
 namespace Valerie.Handlers
 {
@@ -27,6 +28,7 @@ namespace Valerie.Handlers
         IServiceProvider Provider { get; set; }
         CommandService CommandService { get; }
         WebhookService WebhookService { get; }
+        CancellationTokenSource CancellationToken { get; set; }
 
         public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command,
             Random random, GuildHelper guildH, WebhookService webhookS, EventHelper eventHelper)
@@ -39,6 +41,7 @@ namespace Valerie.Handlers
             EventHelper = eventHelper;
             CommandService = command;
             WebhookService = webhookS;
+            CancellationToken = new CancellationTokenSource();
         }
 
         public async Task InitializeAsync(IServiceProvider ServiceProvider)
@@ -53,11 +56,31 @@ namespace Valerie.Handlers
             Client.SetActivityAsync(new Game(!ConfigHandler.Config.Games.Any() ?
                             $"{ConfigHandler.Config.Prefix}Help" : $"{ConfigHandler.Config.Games[Random.Next(ConfigHandler.Config.Games.Count)]}", ActivityType.Playing));
         });
+
         internal Task LeftGuild(SocketGuild Guild) => Task.Run(() => GuildHandler.RemoveGuild(Guild.Id, Guild.Name));
+
         internal Task GuildAvailable(SocketGuild Guild) => Task.Run(() => GuildHandler.AddGuild(Guild.Id, Guild.Name));
-        internal Task Connected() => Task.Run(() => LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet));
+
+        internal Task Connected()
+        {
+            CancellationToken.Cancel();
+            CancellationToken = new CancellationTokenSource();
+            LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet);
+            return Task.CompletedTask;
+        }
+
         internal Task Log(LogMessage log) => Task.Run(() => LogService.Write(LogSource.EXC, log.Message ?? log.Exception.Message, CC.Crimson));
-        internal Task Disconnected(Exception Error) => Task.Run(() => LogService.Write(LogSource.DSN, Error.Message, CC.Crimson));
+
+        internal Task Disconnected(Exception Error)
+        {
+            _ = Task.Delay(EventHelper.GlobalTimeout, CancellationToken.Token).ContinueWith(async _ =>
+            {
+                LogService.Write(LogSource.DSN, $"Checking connection state...", CC.LightYellow);
+                await EventHelper.CheckStateAsync();
+            });            
+            return Task.CompletedTask;
+        }
+
         internal Task LatencyUpdated(int Old, int Newer) => Client.SetStatusAsync((Client.ConnectionState == ConnectionState.Disconnected || Newer > 500) ? UserStatus.DoNotDisturb
                 : (Client.ConnectionState == ConnectionState.Connecting || Newer > 250) ? UserStatus.Idle
                 : (Client.ConnectionState == ConnectionState.Connected || Newer < 100) ? UserStatus.Online : UserStatus.AFK);
