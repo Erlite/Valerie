@@ -59,12 +59,12 @@ namespace Valerie.Handlers
         {
             try
             {
-                var Get = await HttpClient.GetAsync($"{Store.Urls[0]}/studio/index.html#databases/documents?&database=Velixa");
+                var Get = await HttpClient.GetAsync($"{Store.Urls[0]}/studio/index.html#databases/documents?&database=Valerie");
                 if (!Get.IsSuccessStatusCode)
                 {
                     LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
-                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord("Velixa")));
-                    LogService.Write(LogSource.DTB, "Created Database Velixa.", CC.ForestGreen);
+                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord("Valerie")));
+                    LogService.Write(LogSource.DTB, "Created Database Valerie.", CC.ForestGreen);
                 }
             }
             catch { }
