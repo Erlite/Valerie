@@ -1,11 +1,13 @@
 ﻿using System;
 using Discord;
+using System.Linq;
 using Valerie.Enums;
 using Valerie.Services;
 using System.Net.Http;
+using System.Diagnostics;
 using Discord.WebSocket;
-using Raven.Client.Documents;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using CC = System.Drawing.Color;
 using Raven.Client.ServerWide.Operations;
@@ -57,14 +59,20 @@ namespace Valerie.Handlers
 
         async Task DatabaseCheck()
         {
-            try
+            var Database = await DatabaseHandler.LoadDBConfigAsync();
+            if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
             {
-                var Get = await HttpClient.GetAsync($"{Store.Urls[0]}/studio/index.html#databases/documents?&database=Valerie");
-                if (!Get.IsSuccessStatusCode)
+                LogService.Write(LogSource.DTB, "Raven Server isn't running. Please make sure RavenDB is running.\nExiting ...", CC.Crimson);
+                await Task.Delay(5000);
+                Environment.Exit(Environment.ExitCode);
+            }
+            try
+            {                
+                if (!Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).Any(x => x == Database.DatabaseName))
                 {
-                    LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
-                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord("Valerie")));
-                    LogService.Write(LogSource.DTB, "Created Database Valerie.", CC.ForestGreen);
+                    LogService.Write(LogSource.DTB, $"No Database named {Database.DatabaseName} found! Creating Database {Database.DatabaseName}...", CC.IndianRed);
+                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(Database.DatabaseName)));
+                    LogService.Write(LogSource.DTB, $"Created Database {Database.DatabaseName}.", CC.ForestGreen);
                 }
             }
             catch { }
