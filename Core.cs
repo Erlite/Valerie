@@ -19,12 +19,14 @@ namespace Valerie
 
         async Task InitializeAsync()
         {
+            var Database = await DatabaseHandler.LoadDBConfigAsync();
+
             var Services = new ServiceCollection()
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 20,
-                    AlwaysDownloadUsers = true,
                     LogLevel = LogSeverity.Error,
+                    AlwaysDownloadUsers = true,
 #if !OSCHECK
                     WebSocketProvider = WS4NetProvider.Instance
 #endif
@@ -38,8 +40,9 @@ namespace Valerie
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore
                 {
-                    Database = "Valerie",
-                    Urls = new[] { "http://127.0.0.1:8080" }
+                    Certificate = Database.Certificate,
+                    Database = Database.DatabaseName,
+                    Urls = new[] { Database.DatabaseUrl }
                 }.Initialize())
                 .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()

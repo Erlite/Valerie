@@ -19,7 +19,7 @@ namespace Valerie.Handlers
         [JsonIgnore]
         public X509Certificate2 Certificate { get => !string.IsNullOrWhiteSpace(CertificatePath) ? new X509Certificate2(CertificatePath) : null; }
 
-        public static async Task<DatabaseHandler> LoadConfigAsync()
+        public static async Task<DatabaseHandler> LoadDBConfigAsync()
         {
             var DBConfigPath = $"{Directory.GetCurrentDirectory()}/DatabaseConfig.json";
             if (File.Exists(DBConfigPath)) return JsonConvert.DeserializeObject<DatabaseHandler>(await File.ReadAllTextAsync(DBConfigPath));
