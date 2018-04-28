@@ -15,3 +15,6 @@ Please don't.
 **Why?** I've a different way of writing code. You are welcome to make a pull request with your changes. I'll merge it if I like it.
 ### `Personal Instance`
 To run your own instance of Valerie, click [here](https://github.com/Yucked/Valerie/wiki/Setup-Guide).
+### `Inspiration`
+<p align="center">
+<a href="https://www.youtube.com/user/xoxxxoooxo/playlists"><img src="https://78.media.tumblr.com/6eda175e1f45b91282da58f7a12d7a99/tumblr_oino60SeYU1u38vxko1_500.gif"/></a></p>
