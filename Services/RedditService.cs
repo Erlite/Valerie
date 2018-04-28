@@ -40,8 +40,6 @@ namespace Valerie.Services
                foreach (var Server in Store.OpenSession().Query<GuildModel>().Customize(x => x.WaitForNonStaleResults())
                 .Where(x => x.Reddit.IsEnabled == true && x.Reddit.Subreddits.Any() == true && x.Reddit.Webhook != null))
                    Start(Convert.ToUInt64(Server.Id));
-
-
            }, null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(30));
         }
 
