@@ -8,7 +8,7 @@ namespace Valerie.Handlers
     public class DatabaseHandler
     {
         [JsonProperty("DatabaseName")]
-        public string DatabaseName { get; set; } = "Velixa";
+        public string DatabaseName { get; set; } = "Valerie";
 
         [JsonProperty("RavenDB-URL")]
         public string DatabaseUrl { get; set; } = "http://127.0.0.1:8080";
