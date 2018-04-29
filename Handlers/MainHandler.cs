@@ -3,32 +3,30 @@ using Discord;
 using System.Linq;
 using Valerie.Enums;
 using Valerie.Services;
-using System.Net.Http;
 using System.Diagnostics;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
-using Raven.Client.ServerWide;
 using CC = System.Drawing.Color;
-using Raven.Client.ServerWide.Operations;
 
 namespace Valerie.Handlers
 {
     public class MainHandler
     {
-        ConfigHandler Config { get; }
-        HttpClient HttpClient { get; }
-        EventsHandler Events { get; }
+        DatabaseHandler DB { get; }
         IDocumentStore Store { get; }
+        ConfigHandler Config { get; }
+        EventsHandler Events { get; }
         DiscordSocketClient Client { get; }
 
-        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client, IDocumentStore store)
+        public MainHandler(ConfigHandler config, EventsHandler events,
+            DiscordSocketClient client, IDocumentStore store, DatabaseHandler database)
         {
             Store = store;
             Client = client;
             Config = config;
             Events = events;
-            HttpClient = httpClient;
+            DB = database;
         }
 
         public async Task InitializeAsync()
@@ -67,15 +65,9 @@ namespace Valerie.Handlers
                 Environment.Exit(Environment.ExitCode);
             }
             try
-            {                
-                if (!Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).Any(x => x == Database.DatabaseName))
-                {
-                    LogService.Write(LogSource.DTB, $"No Database named {Database.DatabaseName} found! Creating Database {Database.DatabaseName}...", CC.IndianRed);
-                    await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(Database.DatabaseName)));
-                    LogService.Write(LogSource.DTB, $"Created Database {Database.DatabaseName}.", CC.ForestGreen);
-                }
+            {
+                await DB.LoadAndRestoreAsync(Database, Store).ConfigureAwait(false);
             }
-            catch { }
             finally
             {
                 Config.ConfigCheck();
