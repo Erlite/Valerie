@@ -44,17 +44,18 @@ namespace Valerie
                     Database = Database.DatabaseName,
                     Urls = new[] { Database.DatabaseUrl }
                 }.Initialize())
-                .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()
+                .AddSingleton<HttpClient>()
                 .AddSingleton<GuildHelper>()
                 .AddSingleton<EventHelper>()
                 .AddSingleton<MainHandler>()
-                .AddSingleton<GuildHandler>()
-                .AddSingleton<ConfigHandler>()
                 .AddSingleton<RedditService>()
+                .AddSingleton<GuildHandler>()
                 .AddSingleton<MethodHelper>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
                 .AddSingleton<WebhookService>()
+                .AddSingleton<DatabaseHandler>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
