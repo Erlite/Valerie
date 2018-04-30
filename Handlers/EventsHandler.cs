@@ -7,12 +7,13 @@ using Valerie.Addons;
 using Valerie.Helpers;
 using Valerie.Services;
 using System.Reflection;
+using System.Threading;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
 using static Valerie.Addons.Embeds;
-using System.Threading;
+using System.Runtime.ExceptionServices;
 
 namespace Valerie.Handlers
 {
@@ -77,7 +78,7 @@ namespace Valerie.Handlers
             {
                 LogService.Write(LogSource.DSN, $"Checking connection state...", CC.LightYellow);
                 await EventHelper.CheckStateAsync();
-            });            
+            });
             return Task.CompletedTask;
         }
 
@@ -150,7 +151,7 @@ namespace Valerie.Handlers
                     if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result.ErrorReason);
                     break;
             }
-            _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context));
+            _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context, argPos));
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
@@ -243,5 +244,8 @@ namespace Valerie.Handlers
 
         internal void UnhandledException(object Sender, UnhandledExceptionEventArgs ExceptionArgument)
             => LogService.Write(LogSource.EXC, $"{ExceptionArgument.ExceptionObject}", CC.IndianRed);
+
+        internal void FirstChanceException(object sender, FirstChanceExceptionEventArgs ExceptionArgument)
+            => LogService.Write(LogSource.EXC, $"{ExceptionArgument.Exception.Message}\n{ExceptionArgument.Exception.StackTrace}", CC.IndianRed);
     }
 }

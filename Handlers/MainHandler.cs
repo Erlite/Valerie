@@ -50,6 +50,7 @@ namespace Valerie.Handlers
             Client.MessageReceived += Events.CommandHandlerAsync;
 
             AppDomain.CurrentDomain.UnhandledException += Events.UnhandledException;
+            AppDomain.CurrentDomain.FirstChanceException += Events.FirstChanceException;
 
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
