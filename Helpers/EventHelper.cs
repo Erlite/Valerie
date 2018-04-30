@@ -107,7 +107,8 @@ namespace Valerie.Helpers
         internal async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
-            if (!Message.Content.ToLower().StartsWith("valerie") || string.IsNullOrWhiteSpace(UserMessage)) return;
+            if (!Message.Content.ToLower().StartsWith("valerie") || string.IsNullOrWhiteSpace(UserMessage)
+                || Message.Channel.Id != Config.CleverbotWebhook.TextChannel) return;
             Response CleverResponse;
             if (!CleverbotTracker.ContainsKey(Config.CleverbotWebhook.TextChannel))
             {
