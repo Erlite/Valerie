@@ -13,25 +13,23 @@ namespace Valerie.Handlers
 {
     public class MainHandler
     {
-        DatabaseHandler DB { get; }
         IDocumentStore Store { get; }
         ConfigHandler Config { get; }
         EventsHandler Events { get; }
         DiscordSocketClient Client { get; }
 
         public MainHandler(ConfigHandler config, EventsHandler events,
-            DiscordSocketClient client, IDocumentStore store, DatabaseHandler database)
+            DiscordSocketClient client, IDocumentStore store)
         {
             Store = store;
             Client = client;
             Config = config;
             Events = events;
-            DB = database;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(DatabaseHandler Database)
         {
-            await DatabaseCheck();
+            await DatabaseCheck(Database).ConfigureAwait(false);
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
@@ -39,26 +37,22 @@ namespace Valerie.Handlers
             Client.Connected += Events.Connected;
             Client.UserLeft += Events.UserLeftAsync;
             Client.Disconnected += Events.Disconnected;
-            Client.GuildAvailable += Events.GuildAvailable;
             Client.UserJoined += Events.UserJoinedAsync;
             Client.JoinedGuild += Events.JoinedGuildAsync;
+            Client.GuildAvailable += Events.GuildAvailable;
             Client.LatencyUpdated += Events.LatencyUpdated;
             Client.ReactionAdded += Events.ReactionAddedAsync;
             Client.MessageReceived += Events.HandleMessageAsync;
             Client.MessageDeleted += Events.MessageDeletedAsync;
-            Client.ReactionRemoved += Events.ReactionRemovedAsync;
             Client.MessageReceived += Events.CommandHandlerAsync;
-
-            AppDomain.CurrentDomain.UnhandledException += Events.UnhandledException;
-            AppDomain.CurrentDomain.FirstChanceException += Events.FirstChanceException;
+            Client.ReactionRemoved += Events.ReactionRemovedAsync;
 
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
         }
 
-        async Task DatabaseCheck()
+        async Task DatabaseCheck(DatabaseHandler DB)
         {
-            var Database = await DatabaseHandler.LoadDBConfigAsync();
             if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
             {
                 LogService.Write(LogSource.DTB, "Raven Server isn't running. Please make sure RavenDB is running.\nExiting ...", CC.Crimson);
@@ -67,7 +61,7 @@ namespace Valerie.Handlers
             }
             try
             {
-                await DB.LoadAndRestoreAsync(Database, Store).ConfigureAwait(false);
+                await DB.DatabaseOptionsAsync(DB, Store).ConfigureAwait(false);
             }
             finally
             {
