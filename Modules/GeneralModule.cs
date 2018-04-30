@@ -194,7 +194,7 @@ namespace Valerie.Modules
 
         [Command("Warnings"), Summary("Shows current number of warnings for specified user.")]
         public Task WarningsAsync(IGuildUser User = null)
-            => ReplyAsync($"{Context.User} has {Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id).Warnings} warnings.");
+            => ReplyAsync($"{User ?? Context.User} has {Context.GuildHelper.GetProfile(Context.Guild.Id, (User ?? Context.User).Id).Warnings} warnings.");
 
         [Command("Selfroles"), Summary("Shows a list of all assignable roles for current server.")]
         public Task SelfRolesAsync()

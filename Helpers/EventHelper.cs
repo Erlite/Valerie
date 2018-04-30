@@ -98,9 +98,9 @@ namespace Valerie.Helpers
 
         internal async Task ModeratorAsync(SocketUserMessage Message, GuildModel Config)
         {
-            if (GuildHelper.ProfanityMatch(Message.Content))
+            if (GuildHelper.ProfanityMatch(Message.Content) && Config.Mod.AntiProfanity)
                 await WarnUserAsync(Message, Config, $"{Message.Author.Mention}, Refrain from using profanity. You've been warned.");
-            if (GuildHelper.InviteMatch(Message.Content))
+            if (GuildHelper.InviteMatch(Message.Content) && Config.Mod.AntiInvite)
                 await WarnUserAsync(Message, Config, $"{Message.Author.Mention}, No invite links allowed. You've been warned.");
         }
 

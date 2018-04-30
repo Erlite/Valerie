@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using Discord.Rest;
 using Valerie.Models;
-using Valerie.Handlers;
 using System.Net.Http;
 using Discord.Webhook;
+using Valerie.Helpers;
+using Valerie.Handlers;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Valerie.Helpers;
 
 namespace Valerie.Services
 {
@@ -22,12 +22,15 @@ namespace Valerie.Services
         {
             get
             {
-                if (File.Exists("Avatar.jpg")) return new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read);
+                if (File.Exists("Avatar.jpg"))
+                    using (var AvatarStream = new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read))
+                        return AvatarStream;
                 else
                 {
-                    return new FileStream(
+                    using (var DownloadStream = new FileStream(
                         StringHelper.DownloadUserImageAsync(HttpClient, SocketClient.CurrentUser).GetAwaiter().GetResult(),
-                        FileMode.Open, FileAccess.Read);
+                        FileMode.Open, FileAccess.Read))
+                        return DownloadStream;
                 }
             }
         }
