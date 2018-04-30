@@ -22,17 +22,19 @@ namespace Valerie.Handlers
         ConfigHandler Config { get; }
         public DatabaseHandler(IDocumentStore store, ConfigHandler config)
         {
-            Store = Store;
+            Store = store;
             Config = config;
         }
 
-        public static async Task<DatabaseModel> DatabaseConfigAsync()
+        public static DatabaseModel DBConfig
         {
-            var DBConfigPath = $"{Directory.GetCurrentDirectory()}/DatabaseConfig.json";
-            if (File.Exists(DBConfigPath)) return JsonConvert.DeserializeObject<DatabaseModel>(await File.ReadAllTextAsync(DBConfigPath));
-
-            await File.WriteAllTextAsync(DBConfigPath, JsonConvert.SerializeObject(new DatabaseModel(), Formatting.Indented));
-            return JsonConvert.DeserializeObject<DatabaseModel>(await File.ReadAllTextAsync(DBConfigPath));
+            get
+            {
+                var DBConfigPath = $"{Directory.GetCurrentDirectory()}/DBConfig.json";
+                if (File.Exists(DBConfigPath)) return JsonConvert.DeserializeObject<DatabaseModel>(File.ReadAllText(DBConfigPath));
+                File.WriteAllText(DBConfigPath, JsonConvert.SerializeObject(new DatabaseModel(), Formatting.Indented));
+                return JsonConvert.DeserializeObject<DatabaseModel>(File.ReadAllText(DBConfigPath));
+            }
         }
 
         public async Task DatabaseCheck()
@@ -50,12 +52,11 @@ namespace Valerie.Handlers
 
         async Task DatabaseSetupAsync()
         {
-            if (Store == null) throw new NullReferenceException("store is null");
-            if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).Any(x => x == DatabaseName)) return;
-            LogService.Write(LogSource.DTB, $"Database {DatabaseName} doesn't exist!", Color.IndianRed);
+            if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).Any(x => x == DBConfig.DatabaseName)) return;
+            LogService.Write(LogSource.DTB, $"Database {DBConfig.DatabaseName} doesn't exist!", Color.IndianRed);
 
-            await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(DatabaseName)));
-            LogService.Write(LogSource.DTB, $"Created Database {DatabaseName}.", Color.ForestGreen);
+            await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(DBConfig.DatabaseName)));
+            LogService.Write(LogSource.DTB, $"Created Database{DBConfig.DatabaseName}.", Color.ForestGreen);
 
             LogService.Write(LogSource.DTB, "Setting up backup operation...", Color.YellowGreen);
             await Store.Maintenance.SendAsync(new UpdatePeriodicBackupOperation(new PeriodicBackupConfiguration
@@ -64,7 +65,7 @@ namespace Valerie.Handlers
                 BackupType = BackupType.Backup,
                 FullBackupFrequency = "*/10 * * * *",
                 IncrementalBackupFrequency = "0 2 * * *",
-                LocalSettings = new LocalSettings { FolderPath = BackupLocation }
+                LocalSettings = new LocalSettings { FolderPath = DBConfig.BackupLocation }
             })).ConfigureAwait(false);
 
             LogService.Write(LogSource.DTB, "Finished backup operation!", Color.YellowGreen);
@@ -82,15 +83,15 @@ namespace Valerie.Handlers
             LogService.Write(LogSource.DTB, $"Beginning Backup Restore...", Color.GreenYellow);
             LogService.Write(LogSource.DTB, "Move Backup files to CurrentDIR/Backup. Press any key to continue...", Color.YellowGreen);
             Console.ReadKey();
-            if (!Directory.GetFiles(BackupLocation).Any())
+            if (!Directory.GetFiles(DBConfig.BackupLocation).Any())
             {
                 LogService.Write(LogSource.DTB, $"No files found to restore.", Color.OrangeRed);
                 return;
             }
             await (await Store.Maintenance.Server.SendAsync(new RestoreBackupOperation(new RestoreBackupConfiguration
             {
-                DatabaseName = DatabaseName,
-                BackupLocation = BackupLocation,
+                DatabaseName = DBConfig.DatabaseName,
+                BackupLocation = DBConfig.BackupLocation,
             }))).WaitForCompletionAsync();
             LogService.Write(LogSource.DTB, $"Finished Database Restore!", Color.ForestGreen);
         }
@@ -106,8 +107,9 @@ namespace Valerie.Handlers
             }
             string Arguments = null;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                Arguments = "curl -F 'importOptions={\"IncludeExpired\":true,\"RemoveAnalyzers\":false,\"OperateOnTypes\":\"DatabaseRecord,Documents,Conflicts,Indexes,RevisionDocuments,Identities,CompareExchange\"}'" +
-                $" -F 'file=@Dump.ravendbdump' {DatabaseUrl}/databases/{DatabaseName}/smuggler/import";
+                Arguments =
+                    "curl -F 'importOptions={\"IncludeExpired\":true,\"RemoveAnalyzers\":false,\"OperateOnTypes\":\"DatabaseRecord,Documents,Conflicts,Indexes,RevisionDocuments,Identities,CompareExchange\"}'" +
+                $" -F 'file=@Dump.ravendbdump' {DBConfig.DatabaseUrl}/databases/{DBConfig.DatabaseName}/smuggler/import";
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 Arguments = "";
 

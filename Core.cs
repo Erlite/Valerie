@@ -1,9 +1,9 @@
 ﻿using System;
 using Discord;
 using Valerie.Helpers;
-using Valerie.Handlers;
 using Valerie.Services;
 using System.Net.Http;
+using Valerie.Handlers;
 using Discord.Commands;
 using Discord.WebSocket;
 using Raven.Client.Documents;
@@ -19,7 +19,6 @@ namespace Valerie
 
         async Task InitializeAsync()
         {
-            var Database = await DatabaseHandler.DatabaseConfigAsync().ConfigureAwait(false);
             var Services = new ServiceCollection()
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
@@ -39,9 +38,9 @@ namespace Valerie
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore
                 {
-                    Certificate = Database.Certificate,
-                    Database = Database.DatabaseName,
-                    Urls = new[] { Database.DatabaseUrl }
+                    Certificate = DatabaseHandler.DBConfig.Certificate,
+                    Database = DatabaseHandler.DBConfig.DatabaseName,
+                    Urls = new[] { DatabaseHandler.DBConfig.DatabaseUrl }
                 }.Initialize())
                 .AddSingleton<LogService>()
                 .AddSingleton<HttpClient>()
