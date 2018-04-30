@@ -48,7 +48,7 @@ namespace Valerie.Services
             Append(
                 $"      Discord  :  {Discord.DiscordConfig.Version}\n" +
                 $"      RavenDB  :  {Raven.Client.Properties.RavenVersionAttribute.Instance.FullVersion}\n" +
-                $"      Cookie   :  \n" +
+                $"      Cookie   :  {Cookie.CookieClient.Version}\n" +
                 $"      Colorful :  1.2.6\n\n", Color.Bisque);
             FileLog($"\n\n=================================[ {DateTime.Now} ]=================================\n\n");
         }
