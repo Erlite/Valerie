@@ -19,8 +19,7 @@ namespace Valerie
 
         async Task InitializeAsync()
         {
-            var Database = await DatabaseHandler.LoadDBConfigAsync();
-
+            var Database = await DatabaseHandler.DatabaseConfigAsync().ConfigureAwait(false);
             var Services = new ServiceCollection()
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
@@ -59,7 +58,8 @@ namespace Valerie
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
-            Provider.GetRequiredService<LogService>().Initialize();
+            Provider.GetRequiredService<LogService>().PrintApplicationInformation();
+            await Provider.GetRequiredService<DatabaseHandler>().DatabaseCheck();
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
             Provider.GetRequiredService<RedditService>().Initialize();

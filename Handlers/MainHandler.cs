@@ -21,10 +21,8 @@ namespace Valerie.Handlers
             Events = events;
         }
 
-        public async Task InitializeAsync(DatabaseHandler Database)
+        public async Task InitializeAsync()
         {
-            await Database.DatabaseCheck(Store, Config).ConfigureAwait(false);
-
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
             Client.LeftGuild += Events.LeftGuild;

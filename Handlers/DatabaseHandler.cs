@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Valerie.Enums;
+using Valerie.Models;
 using Newtonsoft.Json;
 using Valerie.Services;
 using System.Diagnostics;
@@ -12,41 +13,29 @@ using Color = System.Drawing.Color;
 using System.Runtime.InteropServices;
 using Raven.Client.ServerWide.Operations;
 using Raven.Client.Documents.Operations.Backups;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Valerie.Handlers
 {
     public class DatabaseHandler
     {
-        [JsonProperty("DatabaseName")]
-        public string DatabaseName { get; set; } = "Valerie";
-
-        [JsonProperty("RavenDB-URL")]
-        public string DatabaseUrl { get; set; } = "http://127.0.0.1:8080";
-
-        [JsonProperty("X509CertificatePath")]
-        protected string CertificatePath { get; set; }
-
-        [JsonProperty("BackupLocation")]
-        protected string BackupLocation
+        IDocumentStore Store { get; }
+        ConfigHandler Config { get; }
+        public DatabaseHandler(IDocumentStore store, ConfigHandler config)
         {
-            get => Directory.Exists($"{Directory.GetCurrentDirectory()}/Backup") ? $"{Directory.GetCurrentDirectory()}/Backup"
-                : Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/Backup").FullName;
+            Store = Store;
+            Config = config;
         }
 
-        [JsonIgnore]
-        public X509Certificate2 Certificate { get => !string.IsNullOrWhiteSpace(CertificatePath) ? new X509Certificate2(CertificatePath) : null; }
-
-        public static async Task<DatabaseHandler> LoadDBConfigAsync()
+        public static async Task<DatabaseModel> DatabaseConfigAsync()
         {
             var DBConfigPath = $"{Directory.GetCurrentDirectory()}/DatabaseConfig.json";
-            if (File.Exists(DBConfigPath)) return JsonConvert.DeserializeObject<DatabaseHandler>(await File.ReadAllTextAsync(DBConfigPath));
+            if (File.Exists(DBConfigPath)) return JsonConvert.DeserializeObject<DatabaseModel>(await File.ReadAllTextAsync(DBConfigPath));
 
-            await File.WriteAllTextAsync(DBConfigPath, JsonConvert.SerializeObject(new DatabaseHandler(), Formatting.Indented));
-            return JsonConvert.DeserializeObject<DatabaseHandler>(await File.ReadAllTextAsync(DBConfigPath));
+            await File.WriteAllTextAsync(DBConfigPath, JsonConvert.SerializeObject(new DatabaseModel(), Formatting.Indented));
+            return JsonConvert.DeserializeObject<DatabaseModel>(await File.ReadAllTextAsync(DBConfigPath));
         }
 
-        public async Task DatabaseCheck(IDocumentStore Store, ConfigHandler Config)
+        public async Task DatabaseCheck()
         {
             if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
             {
@@ -55,12 +44,13 @@ namespace Valerie.Handlers
                 Environment.Exit(Environment.ExitCode);
             }
 
-            await DatabaseOptionsAsync(Store).ConfigureAwait(false);
+            await DatabaseSetupAsync().ConfigureAwait(false);
             Config.ConfigCheck();
         }
 
-        async Task DatabaseOptionsAsync(IDocumentStore Store)
+        async Task DatabaseSetupAsync()
         {
+            if (Store == null) throw new NullReferenceException("store is null");
             if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).Any(x => x == DatabaseName)) return;
             LogService.Write(LogSource.DTB, $"Database {DatabaseName} doesn't exist!", Color.IndianRed);
 
@@ -82,12 +72,12 @@ namespace Valerie.Handlers
 
             switch (Console.ReadKey().Key)
             {
-                case ConsoleKey.D1: await RestoreAsync(Store).ConfigureAwait(false); break;
-                case ConsoleKey.D2: Import(Store); break;
+                case ConsoleKey.D1: await RestoreAsync().ConfigureAwait(false); break;
+                case ConsoleKey.D2: Import(); break;
             }
         }
 
-        async Task RestoreAsync(IDocumentStore Store)
+        async Task RestoreAsync()
         {
             LogService.Write(LogSource.DTB, $"Beginning Backup Restore...", Color.GreenYellow);
             LogService.Write(LogSource.DTB, "Move Backup files to CurrentDIR/Backup. Press any key to continue...", Color.YellowGreen);
@@ -105,7 +95,7 @@ namespace Valerie.Handlers
             LogService.Write(LogSource.DTB, $"Finished Database Restore!", Color.ForestGreen);
         }
 
-        void Import(IDocumentStore Store)
+        void Import()
         {
             LogService.Write(LogSource.DTB, "Move Dump.ravendbdump file to root of current directory. Press any key to continue...", Color.YellowGreen);
             Console.ReadKey();
