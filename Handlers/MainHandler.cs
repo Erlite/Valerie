@@ -1,13 +1,7 @@
-﻿using System;
-using Discord;
-using System.Linq;
-using Valerie.Enums;
-using Valerie.Services;
-using System.Diagnostics;
+﻿using Discord;
 using Discord.WebSocket;
-using System.Threading.Tasks;
 using Raven.Client.Documents;
-using CC = System.Drawing.Color;
+using System.Threading.Tasks;
 
 namespace Valerie.Handlers
 {
@@ -29,7 +23,7 @@ namespace Valerie.Handlers
 
         public async Task InitializeAsync(DatabaseHandler Database)
         {
-            await DatabaseCheck(Database).ConfigureAwait(false);
+            await Database.DatabaseCheck(Database, Store, Config).ConfigureAwait(false);
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
@@ -49,24 +43,6 @@ namespace Valerie.Handlers
 
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
-        }
-
-        async Task DatabaseCheck(DatabaseHandler DB)
-        {
-            if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
-            {
-                LogService.Write(LogSource.DTB, "Raven Server isn't running. Please make sure RavenDB is running.\nExiting ...", CC.Crimson);
-                await Task.Delay(5000);
-                Environment.Exit(Environment.ExitCode);
-            }
-            try
-            {
-                await DB.DatabaseOptionsAsync(DB, Store).ConfigureAwait(false);
-            }
-            finally
-            {
-                Config.ConfigCheck();
-            }
         }
     }
 }
