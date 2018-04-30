@@ -91,7 +91,7 @@ namespace Valerie.Modules
             RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeUserAsync(SocketGuildUser User = null, int Amount = 10)
         {
-            User = User ?? Context.Client.CurrentUser as SocketGuildUser;
+            User = User ?? await Context.Guild.GetCurrentUserAsync() as SocketGuildUser;
             var GetMessages = await Context.Channel.GetMessagesAsync(Amount).FlattenAsync();
             await Context.GuildHelper.PurgeAync(GetMessages.Where(x => x.Author.Id == User.Id).Cast<IUserMessage>(), Context.Channel as ITextChannel, Amount);
         }
