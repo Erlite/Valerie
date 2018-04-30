@@ -84,13 +84,14 @@ namespace Valerie.Helpers
             if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
         }
 
-        internal void RecordCommand(CommandService CommandService, IContext Context)
+        internal void RecordCommand(CommandService CommandService, IContext Context, int ArgPos)
         {
-            var Search = CommandService.Search(Context, 0);
+            var Search = CommandService.Search(Context, ArgPos);
             if (!Search.IsSuccess) return;
             var Command = Search.Commands.FirstOrDefault().Command;
             var Profile = GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (!Profile.Commands.ContainsKey(Command.Name)) Profile.Commands.Add(Command.Name, 0);
+            if (!Profile.Commands.ContainsKey(Command.Name))
+                Profile.Commands.Add(Command.Name, 0);
             Profile.Commands[Command.Name]++;
             GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
         }
