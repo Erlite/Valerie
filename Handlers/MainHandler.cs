@@ -23,7 +23,7 @@ namespace Valerie.Handlers
 
         public async Task InitializeAsync(DatabaseHandler Database)
         {
-            await Database.DatabaseCheck(Database, Store, Config).ConfigureAwait(false);
+            await Database.DatabaseCheck(Store, Config).ConfigureAwait(false);
 
             Client.Log += Events.Log;
             Client.Ready += Events.Ready;
