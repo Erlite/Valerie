@@ -69,7 +69,10 @@ namespace Valerie.Helpers
 
         public Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
             => Amount <= 100 ? Channel.DeleteMessagesAsync(Messages) :
-               Task.Run(() => Messages.ToList().ForEach(async x => await x.DeleteAsync().ConfigureAwait(false)));
+               Task.Run(() =>
+               {
+                   for (int i = 0; i < Messages.ToArray().Length; i = i + 100) Channel.DeleteMessagesAsync(Messages.Skip(i).Take(100));
+               });
 
 
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)

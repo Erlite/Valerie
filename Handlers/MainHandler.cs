@@ -1,27 +1,32 @@
 ﻿using System;
 using Discord;
+using System.Linq;
 using Valerie.Enums;
 using Valerie.Services;
-using System.Net.Http;
+using System.Diagnostics;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
 using CC = System.Drawing.Color;
 
 namespace Valerie.Handlers
 {
     public class MainHandler
     {
+        DatabaseHandler DB { get; }
+        IDocumentStore Store { get; }
         ConfigHandler Config { get; }
-        HttpClient HttpClient { get; }
         EventsHandler Events { get; }
         DiscordSocketClient Client { get; }
 
-        public MainHandler(ConfigHandler config, HttpClient httpClient, EventsHandler events, DiscordSocketClient client)
+        public MainHandler(ConfigHandler config, EventsHandler events,
+            DiscordSocketClient client, IDocumentStore store, DatabaseHandler database)
         {
+            Store = store;
             Client = client;
             Config = config;
             Events = events;
-            HttpClient = httpClient;
+            DB = database;
         }
 
         public async Task InitializeAsync()
@@ -45,6 +50,7 @@ namespace Valerie.Handlers
             Client.MessageReceived += Events.CommandHandlerAsync;
 
             AppDomain.CurrentDomain.UnhandledException += Events.UnhandledException;
+            AppDomain.CurrentDomain.FirstChanceException += Events.FirstChanceException;
 
             await Client.LoginAsync(TokenType.Bot, Config.Config.Token).ConfigureAwait(false);
             await Client.StartAsync().ConfigureAwait(false);
@@ -52,17 +58,20 @@ namespace Valerie.Handlers
 
         async Task DatabaseCheck()
         {
-            try
+            var Database = await DatabaseHandler.LoadDBConfigAsync();
+            if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
             {
-                var RavenDb = await HttpClient.GetAsync("http://127.0.0.1:8080/studio/index.html").ConfigureAwait(false);
-                var Database = await HttpClient.GetAsync("http://127.0.0.1:8080/studio/index.html#databases/documents?&database=Valerie").ConfigureAwait(false);
-                if (RavenDb.IsSuccessStatusCode || Database.IsSuccessStatusCode) Config.ConfigCheck();
-            }
-            catch
-            {
-                LogService.Write(LogSource.DTB, "Either RavenDB isn't running or Database 'Valerie' has not been created.", CC.IndianRed);
+                LogService.Write(LogSource.DTB, "Raven Server isn't running. Please make sure RavenDB is running.\nExiting ...", CC.Crimson);
                 await Task.Delay(5000);
                 Environment.Exit(Environment.ExitCode);
+            }
+            try
+            {
+                await DB.LoadAndRestoreAsync(Database, Store).ConfigureAwait(false);
+            }
+            finally
+            {
+                Config.ConfigCheck();
             }
         }
     }

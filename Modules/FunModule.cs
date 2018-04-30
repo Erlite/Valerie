@@ -53,6 +53,14 @@ namespace Valerie.Modules
         public async Task CatAsync() =>
             await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://aws.random.cat/meow").ConfigureAwait(false))["file"]}");
 
+        [Command("Fox"), Summary("What does the FOX SAY!")]
+        public async Task FoxAsync()
+            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("https://randomfox.ca/floof/").ConfigureAwait(false))["image"]}");
+
+        [Command("Shibe"), Summary("Much wow, such grace, very floof.")]
+        public async Task ShibeAsync()
+            => await ReplyAsync($"{JToken.Parse(await Context.HttpClient.GetStringAsync("http://shibe.online/api/shibes?count=1").ConfigureAwait(false))[0]}");
+
         [Command("Rate"), Summary("Rates something for you out of 10.")]
         public async Task RateAsync([Remainder] string ThingToRate) => await ReplyAsync($":thinking: I would rate '{ThingToRate}' a solid {Context.Random.Next(11)}/10");
 

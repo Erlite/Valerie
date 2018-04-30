@@ -22,6 +22,7 @@ namespace Valerie.Helpers
         MethodHelper MethodHelper { get; }
         WebhookService WebhookService { get; }
         Dictionary<ulong, Response> CleverbotTracker { get; set; }
+        public static readonly TimeSpan GlobalTimeout = TimeSpan.FromSeconds(30);
 
         public EventHelper(Random random, GuildHelper GH, DiscordSocketClient client, ConfigHandler CH,
             MethodHelper MH, WebhookService WS)
@@ -33,6 +34,23 @@ namespace Valerie.Helpers
             MethodHelper = MH;
             WebhookService = WS;
             CleverbotTracker = new Dictionary<ulong, Response>();
+        }
+
+        internal async Task CheckStateAsync()
+        {
+            if (Client.ConnectionState == ConnectionState.Connected) return;
+
+            var Timeout = Task.Delay(GlobalTimeout);
+            var Connect = Client.StartAsync();
+            var LocalTask = await Task.WhenAny(Timeout, Connect);
+
+            if (LocalTask == Timeout || Connect.IsFaulted) Environment.Exit(1);
+            else if (Connect.IsCompletedSuccessfully)
+            {
+                LogService.Write(Enums.LogSource.DSD, "Client Reset Completed.", System.Drawing.Color.ForestGreen);
+                return;
+            }
+            else Environment.Exit(1);
         }
 
         internal Task XPHandlerAsync(SocketMessage Message, GuildModel Config)
@@ -66,13 +84,14 @@ namespace Valerie.Helpers
             if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
         }
 
-        internal void RecordCommand(CommandService CommandService, IContext Context)
+        internal void RecordCommand(CommandService CommandService, IContext Context, int ArgPos)
         {
-            var Search = CommandService.Search(Context, 0);
+            var Search = CommandService.Search(Context, ArgPos);
             if (!Search.IsSuccess) return;
             var Command = Search.Commands.FirstOrDefault().Command;
             var Profile = GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (!Profile.Commands.ContainsKey(Command.Name)) Profile.Commands.Add(Command.Name, 0);
+            if (!Profile.Commands.ContainsKey(Command.Name))
+                Profile.Commands.Add(Command.Name, 0);
             Profile.Commands[Command.Name]++;
             GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
         }

@@ -9,6 +9,7 @@ using Discord.Webhook;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Valerie.Helpers;
 
 namespace Valerie.Services
 {
@@ -17,7 +18,19 @@ namespace Valerie.Services
         HttpClient HttpClient { get; }
         GuildHandler GuildHandler { get; }
         DiscordSocketClient SocketClient { get; }
-        FileStream AvatarStream { get => new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read); }
+        FileStream AvatarStream
+        {
+            get
+            {
+                if (File.Exists("Avatar.jpg")) return new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read);
+                else
+                {
+                    return new FileStream(
+                        StringHelper.DownloadUserImageAsync(HttpClient, SocketClient.CurrentUser).GetAwaiter().GetResult(),
+                        FileMode.Open, FileAccess.Read);
+                }
+            }
+        }
         public WebhookService(HttpClient httpClient, GuildHandler guild, DiscordSocketClient client)
         {
             GuildHandler = guild;
@@ -40,18 +53,9 @@ namespace Valerie.Services
 
         public async Task SendMessageAsync(WebhookOptions Options)
         {
-            try
-            {
-                if (!(SocketClient.GetChannel(Options.Webhook.TextChannel) is SocketTextChannel Channel)) return;
-                var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
-                await WebhookFallbackAsync(Client, Channel, Options);
-            }
-            catch
-            {
-                LogService.Write(Enums.LogSource.DSD, $"Webhook  {Options.Webhook.WebhookId} Failed | " +
-                    $"{(SocketClient.GetChannel(Options.Webhook.TextChannel) as SocketGuildChannel).Guild.Name}",
-                    System.Drawing.Color.Crimson);
-            }
+            if (!(SocketClient.GetChannel(Options.Webhook.TextChannel) is SocketTextChannel Channel)) return;
+            var Client = WebhookClient(Options.Webhook.WebhookId, Options.Webhook.WebhookToken);
+            await WebhookFallbackAsync(Client, Channel, Options);
         }
 
         public async Task<WebhookWrapper> CreateWebhookAsync(SocketTextChannel Channel, string Name)

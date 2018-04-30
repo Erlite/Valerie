@@ -19,12 +19,14 @@ namespace Valerie
 
         async Task InitializeAsync()
         {
+            var Database = await DatabaseHandler.LoadDBConfigAsync();
+
             var Services = new ServiceCollection()
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 20,
-                    AlwaysDownloadUsers = true,
                     LogLevel = LogSeverity.Error,
+                    AlwaysDownloadUsers = true,
 #if !OSCHECK
                     WebSocketProvider = WS4NetProvider.Instance
 #endif
@@ -38,28 +40,28 @@ namespace Valerie
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore
                 {
-                    Database = "Valerie",
-                    Urls = new[] { "http://127.0.0.1:8080" }
+                    Certificate = Database.Certificate,
+                    Database = Database.DatabaseName,
+                    Urls = new[] { Database.DatabaseUrl }
                 }.Initialize())
-                .AddSingleton<HttpClient>()
                 .AddSingleton<LogService>()
+                .AddSingleton<HttpClient>()
                 .AddSingleton<GuildHelper>()
                 .AddSingleton<EventHelper>()
                 .AddSingleton<MainHandler>()
-                .AddSingleton<GuildHandler>()
-                .AddSingleton<ConfigHandler>()
                 .AddSingleton<RedditService>()
+                .AddSingleton<GuildHandler>()
                 .AddSingleton<MethodHelper>()
+                .AddSingleton<ConfigHandler>()
                 .AddSingleton<EventsHandler>()
-                .AddSingleton<UpdateService>()
                 .AddSingleton<WebhookService>()
+                .AddSingleton<DatabaseHandler>()
                 .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
             Provider.GetRequiredService<LogService>().Initialize();
             await Provider.GetRequiredService<MainHandler>().InitializeAsync();
             await Provider.GetRequiredService<EventsHandler>().InitializeAsync(Provider);
-            Provider.GetRequiredService<UpdateService>().InitializeTimer();
             Provider.GetRequiredService<RedditService>().Initialize();
 
             await Task.Delay(-1);

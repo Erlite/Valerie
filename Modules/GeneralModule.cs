@@ -77,7 +77,7 @@ namespace Valerie.Modules
                 $"Stars: {Servers.Sum(x => x.Starboard.StarboardMessages.Sum(y => y.Stars))}\n" +
                 $"Crystals: {Servers.Sum(x => x.Profiles.Sum(y => y.Value.Crystals))}", true);
             Embed.AddField("Severs", $"{Client.Guilds.Count}", true);
-            Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString()} MB", true);
+            Embed.AddField("Memory", $"Heap Size: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2)} MB", true);
             Embed.AddField("Programmer", $"[{(await Context.Client.GetApplicationInfoAsync()).Owner}](https://github.com/Yucked)", true);
             await ReplyAsync("", embed: Embed.Build());
         }

@@ -3,6 +3,8 @@ skip_tags: true
 image: Visual Studio 2017 Preview
 shallow_clone: true
 clone_folder: C:\Projects\Valerie
+skip_commits:
+  message: /Update/
 before_build:
 - cmd: dotnet restore
 build:
@@ -18,7 +20,7 @@ deploy:
 - provider: GitHub
   tag: Stable
   release: Stable
-  description: On going beta rewrite. Will be finished soon. Currently rewriting modules.
+  description: Stable Release! Little bug fixes here and there.
   auth_token:
     secure: nEHV/UOH6M27jySdtWUJM4D3kbi1B3JL14t5w9FbYTgNwMV4ZtZl5uAJ5VzlNmHk
   artifact: Stable-$(appveyor_build_version)-Core2.1, Stable-$(appveyor_build_version)-Core2.0

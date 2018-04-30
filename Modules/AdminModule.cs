@@ -398,5 +398,20 @@ namespace Valerie.Modules
                 .WithFooter($"Channel: {StringHelper.CheckChannel(Context.Guild as SocketGuild, Get.ChannelId)} | Message Id: {Get.MessageId}");
             return ReplyAsync(string.Empty, Embed.Build());
         }
+
+        [Command("MessageLog"), Summary("Retrives messages from deleted messages.")]
+        public Task MessageLogAsync(SocketGuildUser User = null, int Recent = 0)
+        {            
+            User = User ?? Context.User as SocketGuildUser;
+            if (!Context.Server.DeletedMessages.Any(x => x.AuthorId == User.Id)) return ReplyAsync($"Coudln't find any deleted messages from user {User.Username}.");
+            var Get = Recent == 0 ? Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).LastOrDefault()
+                : Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).ToList()[Recent];
+            var GetUser = (Context.Client as DiscordSocketClient).GetUser(Get.AuthorId);
+            var Embed = GetEmbed(Paint.Aqua)
+                .WithAuthor($"{User} - {Get.DateTime}", GetUser != null ? GetUser.GetAvatarUrl() : Context.Client.CurrentUser.GetAvatarUrl())
+                .WithDescription(Get.Content)
+                .WithFooter($"Channel: {StringHelper.CheckChannel(Context.Guild as SocketGuild, Get.ChannelId)} | Message Id: {Get.MessageId}");
+            return ReplyAsync(string.Empty, Embed.Build());
+        }
     }
 }
