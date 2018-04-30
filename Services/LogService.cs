@@ -3,22 +3,20 @@ using System.IO;
 using Valerie.Enums;
 using System.Drawing;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Console = Colorful.Console;
 
 namespace Valerie.Services
 {
     public class LogService
     {
-        public void Initialize()
-        {
-            var LogPath = Path.Combine(Directory.GetCurrentDirectory(), "log.txt");
-            if (!File.Exists(LogPath)) File.Create(LogPath);
-            PrintApplicationInformation();
-        }
+        readonly static object Lock = new object();
 
-        static async Task LogAsync(string Message)
-            => await File.AppendAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "log.txt"), Message + Environment.NewLine);
+        static void FileLog(string Message)
+        {
+            lock (Lock)
+                using (var Writer = File.AppendText($"{Directory.GetCurrentDirectory()}/log.txt"))
+                    Writer.WriteLine(Message);
+        }
 
         static void Append(string Text, Color Color)
         {
@@ -34,7 +32,7 @@ namespace Valerie.Services
             Append($"-> {Date} ", Color.DarkGray);
             Append($"[{Source}]", Color);
             Append($" {Text}", Color.WhiteSmoke);
-            _ = LogAsync($"[{DateTime.Now}] [{Source}] {Text}");
+            FileLog($"[{Date}] [{Source}] {Text}");
         }
 
         public void PrintApplicationInformation()
@@ -45,15 +43,14 @@ namespace Valerie.Services
             Append(
                 "      Author   :  Yucked\n" +
                 "      Version  :  18.4.X - Stable\n" +
-                "      Discord  :  Discord.me/Glitched\n" +
-                $"      Arch     : {Arch}\n" +
-                $"      PID      : {Process.GetCurrentProcess().Id}\n\n", Color.Bisque);
+                "      Discord  :  Discord.me/Glitched\n\n", Color.Bisque);
             Append("-> PACKAGES\n", Color.Crimson);
             Append(
                 $"      Discord  :  {Discord.DiscordConfig.Version}\n" +
                 $"      RavenDB  :  {Raven.Client.Properties.RavenVersionAttribute.Instance.FullVersion}\n" +
                 $"      Cookie   :  \n" +
                 $"      Colorful :  1.2.6\n\n", Color.Bisque);
+            FileLog($"\n\n=================================[ {DateTime.Now} ]=================================\n\n");
         }
     }
 }
