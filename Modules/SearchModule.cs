@@ -161,12 +161,12 @@ namespace Valerie.Modules
             string Response = null;
             if (!string.IsNullOrWhiteSpace(SearchTerms))
             {
-                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchGIFsAsync(SearchTerms, Rating: Rating.NSFW);
+                var GetGif = await Context.ConfigHandler.Cookie.Giphy.SearchGIFsAsync(SearchTerms, Rating: Rating.G);
                 Response = GetGif.GIFS.ToList()[Context.Random.Next(0, GetGif.Pagination.Count)].EmbedURL;
             }
             else
             {
-                var Gif = await Context.ConfigHandler.Cookie.Giphy.TrendingGIFsAsync(Rating: Rating.NSFW);
+                var Gif = await Context.ConfigHandler.Cookie.Giphy.TrendingGIFsAsync(Rating: Rating.G);
                 Response = Gif.GIFS.ToList()[Context.Random.Next(Gif.Pagination.Count)].EmbedURL;
             }
             await ReplyAsync(string.Empty, GetEmbed(Paint.Aqua).WithImageUrl(Response).Build());
