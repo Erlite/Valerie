@@ -13,7 +13,6 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using CC = System.Drawing.Color;
 using static Valerie.Addons.Embeds;
-using System.Runtime.ExceptionServices;
 
 namespace Valerie.Handlers
 {
@@ -148,8 +147,7 @@ namespace Valerie.Handlers
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
                 case CommandError.UnmetPrecondition:
-                    if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result.ErrorReason);
-                    break;
+                    if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result?.ErrorReason); break;
             }
             _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context, argPos));
         }
@@ -241,11 +239,5 @@ namespace Valerie.Handlers
             }
             GuildHandler.Save(Config);
         }
-
-        internal void UnhandledException(object Sender, UnhandledExceptionEventArgs ExceptionArgument)
-            => LogService.Write(LogSource.EXC, $"{ExceptionArgument.ExceptionObject}", CC.IndianRed);
-
-        internal void FirstChanceException(object sender, FirstChanceExceptionEventArgs ExceptionArgument)
-            => LogService.Write(LogSource.EXC, $"{ExceptionArgument.Exception.Message}\n{ExceptionArgument.Exception.StackTrace}", CC.IndianRed);
     }
 }
