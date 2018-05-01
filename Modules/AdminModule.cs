@@ -1,5 +1,5 @@
-﻿using Discord;
-using System;
+﻿using System;
+using Discord;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,8 +12,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Valerie.Addons.Preconditions;
 using static Valerie.Addons.Embeds;
+using Valerie.Addons.Preconditions;
 
 namespace Valerie.Modules
 {
@@ -124,17 +124,17 @@ namespace Valerie.Modules
             var IntCheck = int.TryParse(Value, out int Result);
             var ChannelCheck = Context.GuildHelper.GetChannelId(Context.Guild as SocketGuild, Value);
             var RoleCheck = Context.GuildHelper.GetRoleId(Context.Guild as SocketGuild, Value);
-            if ((ChannelCheck.Item1 || RoleCheck.Item1 || IntCheck) == false)
-                return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. If it's a role or channel, try mentioning it?");
             var GetChannel = (Context.Guild as SocketGuild).GetTextChannel(ChannelCheck.Item2) as SocketTextChannel;
             switch (SettingType)
             {
                 case SettingType.Prefix: Context.Server.Prefix = Value; break;
                 case SettingType.CleverbotChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.CleverbotWebhook =
                          Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions { Name = "Cleverbot" }).Result;
                     break;
                 case SettingType.JoinChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.JoinWebhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
@@ -142,24 +142,36 @@ namespace Valerie.Modules
                         }).Result;
                     break;
                 case SettingType.LeaveChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.LeaveWebhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
                             Name = Context.Client.CurrentUser.Username
                         }).Result;
                     break;
-                case SettingType.ModChannel: Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
+                case SettingType.ModChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.RedditChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.Reddit.Webhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
                             Name = "Reddit Feed"
                         }).Result;
                     break;
-                case SettingType.StarboardChannel: Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
-                case SettingType.JoinRole: Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
-                case SettingType.MuteRole: Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
-                case SettingType.MaxWarnings: Context.Server.Mod.MaxWarnings = Result; break;
+                case SettingType.StarboardChannel:
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
+                case SettingType.JoinRole:
+                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the role?");
+                    Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
+                case SettingType.MuteRole:
+                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the role?");
+                    Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
+                case SettingType.MaxWarnings:
+                    if (IntCheck == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. Value must be a number.");
+                    Context.Server.Mod.MaxWarnings = Result; break;
                 case SettingType.LevelUpMessage: Context.Server.ChatXP.LevelMessage = Value; break;
             }
             return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
@@ -401,7 +413,7 @@ namespace Valerie.Modules
 
         [Command("MessageLog"), Summary("Retrives messages from deleted messages.")]
         public Task MessageLogAsync(SocketGuildUser User = null, int Recent = 0)
-        {            
+        {
             User = User ?? Context.User as SocketGuildUser;
             if (!Context.Server.DeletedMessages.Any(x => x.AuthorId == User.Id)) return ReplyAsync($"Coudln't find any deleted messages from user {User.Username}.");
             var Get = Recent == 0 ? Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).LastOrDefault()
