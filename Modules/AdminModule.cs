@@ -108,10 +108,10 @@ namespace Valerie.Modules
             Context.Server.JoinWebhook = DefaultWebhook;
             Context.Server.LeaveWebhook = DefaultWebhook;
             Context.Server.ChatXP.LevelMessage = "👾 Congrats **{user}** on hitting level {level}! You received **{crystals}** crystals.";
-            Context.Server.JoinMessages.Add("{user} in da houuuuuuseeeee! Turn up!");
-            Context.Server.JoinMessages.Add("Whalecum to {guild}, {user}! Make yourself comfy wink wink.");
-            Context.Server.LeaveMessages.Add("{user} abandoned us ... Fake frens :((");
-            Context.Server.LeaveMessages.Add("Fuck {user} and fuck this guild and fuck all of you!");
+            Context.Server.JoinMessages.Add("**{user}** in da houuuuuuseeeee! Turn up!");
+            Context.Server.JoinMessages.Add("Whalecum to **{guild}**, **{user}**! Make yourself comfy wink wink.");
+            Context.Server.LeaveMessages.Add("**{user}** abandoned us ... Fake frens :((");
+            Context.Server.LeaveMessages.Add("Oh man, we lost **{user}**... Press F to pay respects.");
             Context.Server.ChatXP.IsEnabled = true;
             Context.Server.IsConfigured = true;
             await ReplyAsync($"Configuration for {Context.Guild} is finished.", Document: DocumentType.Server);
