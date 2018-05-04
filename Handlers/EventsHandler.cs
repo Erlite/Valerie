@@ -65,7 +65,7 @@ namespace Valerie.Handlers
         {
             CancellationToken.Cancel();
             CancellationToken = new CancellationTokenSource();
-            LogService.Write(LogSource.CNN, "Beep Boop, Boop Beep.", CC.BlueViolet);
+            LogService.Write(LogSource.CNN, "Connected to Discord.", CC.BlueViolet);
             return Task.CompletedTask;
         }
 
