@@ -27,7 +27,7 @@ namespace Valerie.Handlers
                 Session.Store(new GuildModel
                 {
                     Id = $"{Id}",
-                    Prefix = "!"
+                    Prefix = "$"
                 });
                 Session.SaveChanges();
             }
