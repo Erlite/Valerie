@@ -10,7 +10,6 @@ using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
-using System.Collections.Specialized;
 
 namespace Valerie.Modules
 {
@@ -77,7 +76,7 @@ namespace Valerie.Modules
                 var OldTime = Profile.DailyReward.Value;
                 var Passed = Context.MethodHelper.EasternTime - OldTime;
                 var WaitTime = OldTime - Passed;
-                if (Passed.Hours < 24 || Passed.Days < 1) return ReplyAsync($"Woops, you'll have to wait {WaitTime.Hour} hours, {WaitTime.Minute} minutes {Emotes.PepeSad}");
+                if (Passed.Hours < 24 || Passed.Days < 1) return ReplyAsync($"Woops, you'll have to wait {WaitTime.Hour} hours, {WaitTime.Minute} minutes {Emotes.Shout}");
                 Profile.DailyStreak++;
                 Profile.Crystals += Profile.DailyStreak * 100;
                 Profile.DailyReward = Context.MethodHelper.EasternTime;
@@ -88,7 +87,7 @@ namespace Valerie.Modules
                 Profile.Crystals += 100;
             }
             Context.GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
-            return ReplyAsync($"You've received your daily reward. {Emotes.DHeart}");
+            return ReplyAsync($"You've received your daily reward. {Emotes.ThumbUp}");
         }
 
         [Command("Slotmachine"), Summary("Want to earn quick crystals? That's how you earn some.")]
@@ -96,7 +95,7 @@ namespace Valerie.Modules
         {
             var Slots = new string[] { "☄", "🔥", "👾", "🔆", "👀", "👅", "🍑" };
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (Profile.Crystals < Bet) return ReplyAsync($"Awww shoot! You don't have enough crystals {Emotes.PepeSad}");
+            if (Profile.Crystals < Bet) return ReplyAsync($"Awww shoot! You don't have enough crystals {Emotes.Shout}");
             var Embed = GetEmbed(Paint.Lime);
             var GetSlot = new int[]
             {
@@ -115,12 +114,12 @@ namespace Valerie.Modules
             if (win == 0)
             {
                 Profile.Crystals -= Bet;
-                Embed.Description = $"*Aww..* it seems you lost **{Bet}** crystals {Emotes.PepeSad}\nYou currently have {Profile.Crystals} crystals.";
+                Embed.Description = $"*Aww..* it seems you lost **{Bet}** crystals {Emotes.ThumbDown}\nYou currently have {Profile.Crystals} crystals.";
             }
             else
             {
                 Profile.Crystals -= Bet;
-                Embed.Description = $"**CONGRATS!** You won **{Bet}** crystals {Emotes.DWink}\nYou currently have {Profile.Crystals} crystals.";
+                Embed.Description = $"**CONGRATS!** You won **{Bet}** crystals {Emotes.ThumbUp}\nYou currently have {Profile.Crystals} crystals.";
             }
             Context.GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
             return ReplyAsync(string.Empty, Embed.Build());
@@ -130,18 +129,18 @@ namespace Valerie.Modules
         public Task FlipAsync(char Side, int Bet = 100)
         {
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (Profile.Crystals < Bet) return ReplyAsync($"Awww shoot! You don't have enough crystals {Emotes.PepeSad}");
+            if (Profile.Crystals < Bet) return ReplyAsync($"Awww shoot! You don't have enough crystals {Emotes.Shout}");
             Side = Char.ToLower(Side);
             bool Heads = Context.Random.Next(0, 101) < 50 ? true : false;
             if ((Side == 'h' && Heads) || (Side == 't' && !Heads))
             {
                 Profile.Crystals += Bet;
-                return ReplyAsync($"{Emotes.DWink} You won {Bet} crystals! Currently have {Profile.Crystals} crystals.", Document: DocumentType.Server);
+                return ReplyAsync($"{Emotes.ThumbUp} You won {Bet} crystals! Currently have {Profile.Crystals} crystals.", Document: DocumentType.Server);
             }
             else if ((Side == 'h' && !Heads) || (Side == 't' && Heads))
             {
                 Profile.Crystals -= Bet;
-                return ReplyAsync($"{Emotes.PepeSad} You lost {Bet} crystals! Currently have {Profile.Crystals} crystals.", Document: DocumentType.Server);
+                return ReplyAsync($"{Emotes.ThumbDown} You lost {Bet} crystals! Currently have {Profile.Crystals} crystals.", Document: DocumentType.Server);
             }
             else return ReplyAsync($"Side can either be `h` or `t`.");
         }
@@ -153,7 +152,7 @@ namespace Valerie.Modules
             int MaxNum = Context.Random.Next(50, 101);
             int RandomNum = Context.Random.Next(MinNum, MaxNum);
             await ReplyAsync($"Guess a number between **{MinNum}** and **{MaxNum}**. You have **10** seconds. *GO!!!*");
-            var UserGuess = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(10));
+            var UserGuess = await WaitForReaponseAsync(Timeout: TimeSpan.FromSeconds(10));
             if (RandomNum != int.Parse(UserGuess.Content))
             {
                 await ReplyAsync($"Aww, it seems you guessed the wrong number. The lucky number was: **{RandomNum}**.");
@@ -162,7 +161,7 @@ namespace Valerie.Modules
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
             Profile.Crystals += (int)Math.Pow(RandomNum, 2);
             Context.GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
-            await ReplyAsync($"Ayyy, you guessed it right {Emotes.DWink}. Got {(int)Math.Pow(RandomNum, 2)} crystals.");
+            await ReplyAsync($"Ayyy, you guessed it right {Emotes.ThumbUp}. Got {(int)Math.Pow(RandomNum, 2)} crystals.");
         }
 
         [Command("Leaderboards"), Summary("Shows top 10 users with the highest XP for this server.")]
@@ -194,8 +193,8 @@ namespace Valerie.Modules
             var Starboard = Servers.Select(x => x.Starboard.StarboardMessages.Where(y => y.AuthorId == User.Id));
             var GuildProfile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
             var Commands = GuildProfile.Commands.OrderByDescending(x => x.Value);
-            string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.PepeSad}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
-            var Blacklisted = GuildProfile.IsBlacklisted ? Emotes.TickYes : Emotes.TickNo;
+            string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.Squint}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
+            var Blacklisted = GuildProfile.IsBlacklisted ? Emotes.ThumbUp : Emotes.ThumbDown;
             int TotalXp = Profiles.Sum(x => x.Sum(y => y.Value.ChatXP));
             int Level = IntHelper.NextLevelXP(IntHelper.GetLevel(TotalXp));
 

@@ -48,7 +48,7 @@ namespace Valerie.Modules
                     break;
                 case UpdateType.JoinMessage: Context.Config.JoinMessage = Value; break;
             }
-            await ReplyAsync($"{UpdateType} has been updated {Emotes.DWink}", Document: DocumentType.Config);
+            await ReplyAsync($"{UpdateType} has been updated {Emotes.ThumbUp}", Document: DocumentType.Config);
         }
 
         [Command("GetInvite"), Summary("Makes an invite for the  specified guild.")]

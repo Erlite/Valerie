@@ -107,7 +107,7 @@ namespace Valerie.Helpers
         {
             var check = Collection.Contains((T)Value);
             if (Collection.Contains((T)Value)) return (false, $"`{ObjectName}` already exists in {CollectionName}.");
-            if (Collection.Count == Collection.Capacity) return (false, $"Reached max number of entries {Emotes.DEyes}");
+            if (Collection.Count == Collection.Capacity) return (false, $"Reached max number of entries {Emotes.Shout}");
             return (true, $"`{ObjectName}` has been added to {CollectionName}");
         }
     }

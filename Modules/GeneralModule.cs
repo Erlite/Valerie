@@ -22,7 +22,7 @@ namespace Valerie.Modules
         [Command("Ping"), Summary("Replies back with a pong?")]
         public async Task PingAsync() => await ReplyAsync(string.Empty, GetEmbed(Paint.Lime)
             .WithTitle("Beep Boop, Boop Beep!")
-            .WithThumbnailUrl(Emotes.DHeart.Url)
+            .WithThumbnailUrl(Emotes.Shout.Url)
             .AddField("Gateway", $"{(Context.Client as DiscordSocketClient).Latency} ms", true)
             .AddField("Network", $"{(await new Ping().SendPingAsync(IPAddress.Loopback)).RoundtripTime} ms", true).Build());
 
@@ -30,7 +30,7 @@ namespace Valerie.Modules
         public async Task FeedbackAsync()
         {
             await ReplyAsync($"*Please provide your feedback in 2-3 sentences.*");
-            var Response = await ResponseWaitAsync(Timeout: TimeSpan.FromSeconds(60));
+            var Response = await WaitForReaponseAsync(Timeout: TimeSpan.FromSeconds(60));
             if (Response == null || Response.Content.Length < 20)
             {
                 await ReplyAndDeleteAsync($"Hmm, I can't submit a blank feedback. Try again maybe?");
@@ -46,7 +46,7 @@ namespace Valerie.Modules
                 .Build(),
                 Name = "User Feedback / Report"
             });
-            await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.DSupporter}");
+            await ReplyAsync($"Thank you for sumbitting your feedback. {Emotes.Squint}");
         }
 
         [Command("Stats"), Alias("About", "Info"), Summary("Displays information about Valerie and her stats.")]
@@ -145,9 +145,9 @@ namespace Valerie.Modules
                 .AddField("ID", Role.Id, true)
                 .AddField("Color", Role.Color, true)
                 .AddField("Role Position", Role.Position, true)
-                .AddField("Is Hoisted?", Role.IsHoisted ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Managed?", Role.IsManaged ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Mentionable?", Role.IsMentionable ? Emotes.TickYes : Emotes.TickNo, true)
+                .AddField("Is Hoisted?", Role.IsHoisted ? Emotes.ThumbUp : Emotes.ThumbDown, true)
+                .AddField("Is Managed?", Role.IsManaged ? Emotes.ThumbUp : Emotes.ThumbDown, true)
+                .AddField("Is Mentionable?", Role.IsMentionable ? Emotes.ThumbUp : Emotes.ThumbDown, true)
                 .AddField("Granted Permissions", Granted.Any() ? string.Join(", ", Granted) : "No permissions granted.")
                 .AddField("Denied Permissions", Denied.Any() ? string.Join(", ", Denied) : "No permissions denied.").Build());
         }
@@ -159,8 +159,8 @@ namespace Valerie.Modules
             return ReplyAsync(string.Empty, GetEmbed(Paint.Rose)
                 .WithAuthor($"{User.Username} Information | {User.Id}", User.GetAvatarUrl())
                 .WithThumbnailUrl(User.GetAvatarUrl()).
-                AddField("Muted?", User.IsMuted ? Emotes.TickYes : Emotes.TickNo, true)
-                .AddField("Is Bot?", User.IsBot ? Emotes.TickYes : Emotes.TickNo, true)
+                AddField("Muted?", User.IsMuted ? Emotes.ThumbUp : Emotes.ThumbDown, true)
+                .AddField("Is Bot?", User.IsBot ? Emotes.ThumbUp : Emotes.ThumbDown, true)
                 .AddField("Creation Date", User.CreatedAt, true)
                 .AddField("Join Date", User.JoinedAt, true)
                 .AddField("Status", User.Status, true)
@@ -198,15 +198,16 @@ namespace Valerie.Modules
 
         [Command("Selfroles"), Summary("Shows a list of all assignable roles for current server.")]
         public Task SelfRolesAsync()
-            => ReplyAsync(!Context.Server.AssignableRoles.Any() ? $"There are no self-assignable roles {Emotes.PepeSad}" :
-                $"**Current Self-Assignable Roles:** {string.Join(", ", Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, x)))}");
+            => ReplyAsync(!Context.Server.AssignableRoles.Any() ? $"There are no self-assignable roles {Emotes.ThumbDown}" :
+                $"**Current Self-Assignable Roles:**" +
+                $"{string.Join("\n", $"{Emotes.Next}{ Context.Server.AssignableRoles.Select(x => StringHelper.CheckRole(Context.Guild as SocketGuild, x))}")}");
 
         [Command("Iam"), Summary("Adds you to the specified role. Role must be a self-assignable role.")]
         public Task IAmAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.PepeSad}");
-            else if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
+            if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"`{Role.Name}` isn't an assignable role {Emotes.ThumbDown}");
+            else if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.Shout}");
             return User.AddRoleAsync(Role);
         }
 
@@ -214,7 +215,7 @@ namespace Valerie.Modules
         public Task IAmNotAsync(IRole Role)
         {
             var User = Context.User as SocketGuildUser;
-            if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.DWink}");
+            if (User.Roles.Contains(Role)) return ReplyAsync($"You already have `{Role.Name}` role {Emotes.Shout}");
             return User.AddRoleAsync(Role);
         }
 

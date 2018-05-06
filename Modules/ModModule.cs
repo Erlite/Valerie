@@ -19,18 +19,19 @@ namespace Valerie.Modules
         {
             await User.KickAsync(Reason).ConfigureAwait(false);
             await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, Reason).ConfigureAwait(false);
-            await ReplyAsync($"***{User} got kicked.*** {Emotes.DHammer}", Document: DocumentType.Server).ConfigureAwait(false);
+            await ReplyAsync($"***{User} got kicked.*** {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
         }
 
-        [Command("Kick"), Summary("Kicks multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
+        [Command("MassKick"), Summary("Kicks multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickAsync(params IGuildUser[] Users)
         {
+            if (!Users.Any()) return;
             foreach (var User in Users)
             {
                 await User.KickAsync("Multiple kicks.").ConfigureAwait(false);
                 await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, "Multiple kicks.").ConfigureAwait(false);
             }
-            await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got kicked. {Emotes.DHammer}", Document: DocumentType.Server).ConfigureAwait(false);
+            await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got kicked. {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
         }
 
         [Command("Ban"), Summary("Bans a user from the server."), RequireBotPermission(GuildPermission.BanMembers)]
@@ -38,25 +39,26 @@ namespace Valerie.Modules
         {
             await Context.Guild.AddBanAsync(User, 7, Reason).ConfigureAwait(false);
             await Context.GuildHelper.LogAsync(Context, User, CaseType.Ban, Reason).ConfigureAwait(false);
-            await ReplyAsync($"***{User} got banned.*** {Emotes.DHammer}", Document: DocumentType.Server).ConfigureAwait(false);
+            await ReplyAsync($"***{User} got banned.*** {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
         }
 
-        [Command("Ban"), Summary("Bans multiple users at once."), RequireBotPermission(GuildPermission.BanMembers)]
+        [Command("MassBan"), Summary("Bans multiple users at once."), RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(params IGuildUser[] Users)
         {
+            if (!Users.Any()) return;
             foreach (var User in Users)
             {
                 await Context.Guild.AddBanAsync(User, 7, "Mass Ban.");
                 await Context.GuildHelper.LogAsync(Context, User, CaseType.Ban, "Multiple bans.");
             }
-            await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got bent {Emotes.DHammer}", Document: DocumentType.Server);
+            await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got bent {Emotes.Hammer}", Document: DocumentType.Server);
         }
 
         [Command("Ban"), Summary("Bans a user from the server."), RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanAsync(ulong UserId, [Remainder] string Reason = null)
         {
             await Context.Guild.AddBanAsync(UserId, 7, Reason ?? "Secert Ban.");
-            await ReplyAsync($"***{UserId} got bent.*** :ok_hand:");
+            await ReplyAsync($"***{UserId} got bent.*** {Emotes.Hammer}");
         }
 
         [Command("Reason"), Summary("Specifies reason for a users case.")]
@@ -108,7 +110,7 @@ namespace Valerie.Modules
             {
                 Context.Server.Mod.MuteRole = Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted").Id;
                 await User.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted"));
-                await ReplyAsync($"{User} has been muted {Emotes.PepeSad}", Document: DocumentType.Server);
+                await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}", Document: DocumentType.Server);
                 return;
             }
             OverwritePermissions Permissions = new OverwritePermissions(addReactions: PermValue.Deny, sendMessages: PermValue.Deny, attachFiles: PermValue.Deny);
@@ -120,12 +122,12 @@ namespace Valerie.Modules
                         await Channel.AddPermissionOverwriteAsync(Role, Permissions).ConfigureAwait(false);
                 Context.Server.Mod.MuteRole = Role.Id;
                 await User.AddRoleAsync(Role);
-                await ReplyAsync($"{User} has been muted {Emotes.PepeSad}", Document: DocumentType.Server);
+                await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}", Document: DocumentType.Server);
                 return;
             }
 
             await User.AddRoleAsync(Context.Guild.GetRole(Context.Server.Mod.MuteRole));
-            await ReplyAsync($"{User} has been muted {Emotes.PepeSad}");
+            await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}");
         }
 
         [Command("Unmute"), Summary("Umutes a user."), RequireBotPermission(GuildPermission.ManageRoles)]
@@ -134,7 +136,7 @@ namespace Valerie.Modules
             var Role = Context.Guild.GetRole(Context.Server.Mod.MuteRole) ?? Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted");
             if (!User.Roles.Contains(Role)) return ReplyAsync($"{User} doesn't have the mute role.");
             User.RemoveRoleAsync(Role);
-            return ReplyAsync($"{User} has been unmuted {Emotes.DWink}");
+            return ReplyAsync($"{User} has been unmuted {Emotes.ThumbUp}");
         }
 
         [Command("Warn"), Summary("Warns a user with a specified reason."), RequireBotPermission(GuildPermission.KickMembers)]
@@ -150,7 +152,7 @@ namespace Valerie.Modules
                 await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, Reason);
             }
             Context.GuildHelper.SaveProfile(Context.Guild.Id, User.Id, Profile);
-            await ReplyAsync($"{User} has been warned.");
+            await ReplyAsync($"{User} has been warned {Emotes.Shout}");
         }
 
         [Command("ResetWarns"), Summary("Resets users warnings.")]
@@ -159,7 +161,7 @@ namespace Valerie.Modules
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
             Profile.Warnings = 0;
             Context.GuildHelper.SaveProfile(Context.Guild.Id, User.Id, Profile);
-            return ReplyAsync($"{User.Username}'s warnings has been reset {Emotes.DEyes}");
+            return ReplyAsync($"{User.Username}'s warnings has been reset {Emotes.Squint}");
         }
 
         [Command("Blacklist"), Summary("Blacklists a user preventing them from using any Valerie's features .")]
@@ -172,12 +174,12 @@ namespace Valerie.Modules
                     if (Profile.IsBlacklisted) return ReplyAsync($"{User} is already blacklisted.");
                     Profile.IsBlacklisted = true;
                     Context.GuildHelper.SaveProfile(Context.Guild.Id, User.Id, Profile);
-                    return ReplyAsync($"{User} has been blacklisted {Emotes.PepeSad}");
+                    return ReplyAsync($"{User} has been blacklisted {Emotes.ThumbDown}");
                 case 'r':
                     if (!Profile.IsBlacklisted) return ReplyAsync($"{User} isn't blacklisted.");
                     Profile.IsBlacklisted = false;
                     Context.GuildHelper.SaveProfile(Context.Guild.Id, User.Id, Profile);
-                    return ReplyAsync($"{User} has been whitelisted {Emotes.DHeart}");
+                    return ReplyAsync($"{User} has been whitelisted {Emotes.ThumbUp}");
             }
             return Task.CompletedTask;
         }

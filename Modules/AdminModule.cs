@@ -129,12 +129,12 @@ namespace Valerie.Modules
             {
                 case SettingType.Prefix: Context.Server.Prefix = Value; break;
                 case SettingType.CleverbotChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.CleverbotWebhook =
                          Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions { Name = "Cleverbot" }).Result;
                     break;
                 case SettingType.JoinChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.JoinWebhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
@@ -142,7 +142,7 @@ namespace Valerie.Modules
                         }).Result;
                     break;
                 case SettingType.LeaveChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.LeaveWebhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
@@ -150,10 +150,10 @@ namespace Valerie.Modules
                         }).Result;
                     break;
                 case SettingType.ModChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.Mod.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.RedditChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.Reddit.Webhook =
                         Context.WebhookService.UpdateWebhookAsync(GetChannel, Context.Server.CleverbotWebhook, new WebhookOptions
                         {
@@ -161,20 +161,20 @@ namespace Valerie.Modules
                         }).Result;
                     break;
                 case SettingType.StarboardChannel:
-                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the channel?");
+                    if (ChannelCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the channel?");
                     Context.Server.Starboard.TextChannel = ChannelCheck.Item2; break;
                 case SettingType.JoinRole:
-                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the role?");
+                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the role?");
                     Context.Server.Mod.JoinRole = RoleCheck.Item2; break;
                 case SettingType.MuteRole:
-                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. try mentioning the role?");
+                    if (RoleCheck.Item1 == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. try mentioning the role?");
                     Context.Server.Mod.MuteRole = RoleCheck.Item2; break;
                 case SettingType.MaxWarnings:
-                    if (IntCheck == false) return ReplyAsync($" {Emotes.TickNo} {SettingType} value was provided in incorrect format. Value must be a number.");
+                    if (IntCheck == false) return ReplyAsync($" {Emotes.Cross} {SettingType} value was provided in incorrect format. Value must be a number.");
                     Context.Server.Mod.MaxWarnings = Result; break;
                 case SettingType.LevelUpMessage: Context.Server.ChatXP.LevelMessage = Value; break;
             }
-            return ReplyAsync($"{SettingType} has been updated {Emotes.DWink}", Document: DocumentType.Server);
+            return ReplyAsync($"{SettingType} has been updated {Emotes.ThumbUp}", Document: DocumentType.Server);
         }
 
         [Command("Toggle"), Summary("Sets certain values for current server's config.")]
@@ -214,7 +214,7 @@ namespace Valerie.Modules
                     }
                     break;
             }
-            return ReplyAsync($"{ToggleType} has been {State} {Emotes.DWink}", Document: DocumentType.Server);
+            return ReplyAsync($"{ToggleType} has been {State} {Emotes.ThumbUp}", Document: DocumentType.Server);
         }
 
         [Command("Export"), Summary("Exports your server config as a json file.")]
@@ -253,7 +253,7 @@ namespace Valerie.Modules
                 if (Property.PropertyType == typeof(List<MessageWrapper>)) Property.SetValue(Context.Server, new List<MessageWrapper>());
                 if (Property.PropertyType == typeof(Dictionary<ulong, UserProfile>)) Property.SetValue(Context.Server, new Dictionary<ulong, UserProfile>());
             }
-            return ReplyAsync("Guild Config has been recreated.", Document: DocumentType.Server);
+            return ReplyAsync($"Guild Config has been recreated {Emotes.ThumbUp}", Document: DocumentType.Server);
         }
 
         [Command("SelfRoles"), Summary("Adds/Removes role to/from self assingable roles.")]
@@ -268,7 +268,7 @@ namespace Valerie.Modules
                     Context.Server.AssignableRoles.Add(Role.Id);
                     return ReplyAsync(Check.Item2, Document: DocumentType.Server);
                 case 'r':
-                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.PepeSad}");
+                    if (!Context.Server.AssignableRoles.Contains(Role.Id)) return ReplyAsync($"{Role.Name} isn't an assignable role {Emotes.Shout}");
                     Context.Server.AssignableRoles.Remove(Role.Id);
                     return ReplyAsync($"`{Role.Name}` is no longer an assignable role.", Document: DocumentType.Server);
             }
@@ -373,12 +373,12 @@ namespace Valerie.Modules
 
         [Command("JoinMessages"), Summary("Shows all the join messages for this server.")]
         public Task JoinMessagesAsync()
-            => ReplyAsync(!Context.Server.JoinMessages.Any() ? $"{Context.Server} doesn't have any user join messages {Emotes.PepeSad}" :
+            => ReplyAsync(!Context.Server.JoinMessages.Any() ? $"{Context.Server} doesn't have any user join messages {Emotes.Shout}" :
                 $"**Join Messages**\n{string.Join("\n", $"-> {Context.Server.JoinMessages}")}");
 
         [Command("LeaveMessages"), Summary("Shows all the join messages for this server.")]
         public Task LeaveMessagesAsync()
-            => ReplyAsync(!Context.Server.JoinMessages.Any() ? $"{Context.Server} doesn't have any user leave messages {Emotes.PepeSad} " :
+            => ReplyAsync(!Context.Server.JoinMessages.Any() ? $"{Context.Server} doesn't have any user leave messages {Emotes.Shout} " :
                 $"**Leave Messages**\n{string.Join("\n", $"-> {Context.Server.LeaveMessages}")}");
 
         [Command("Forbid"), Summary("Shows all the forbidden roles for this server.")]
@@ -393,8 +393,8 @@ namespace Valerie.Modules
 
         [Command("Subreddit"), Summary("Shows all the subreddits this server is subbed to.")]
         public Task SubredditAsync()
-            => ReplyAsync(!Context.Server.Reddit.Subreddits.Any() ? $"This server isn't subscribed to any subreddits {Emotes.PepeSad}" :
-                $"**Subbed To Following Subreddits:** {string.Join(", ", Context.Server.Reddit.Subreddits)}");
+            => ReplyAsync(!Context.Server.Reddit.Subreddits.Any() ? $"This server isn't subscribed to any subreddits {Emotes.Shout}" :
+                $"**Subbed To Following Subreddits:** {string.Join("\n", $"{Emotes.Next}{Context.Server.Reddit.Subreddits}")}");
 
         [Command("MessageLog"), Summary("Retrives messages from deleted messages.")]
         public Task MessageLogAsync(int Old = 0)
