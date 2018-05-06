@@ -6,8 +6,8 @@ using System.Net.Http;
 using Valerie.Handlers;
 using Discord.Commands;
 using Discord.WebSocket;
-using Raven.Client.Documents;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
 using Discord.Net.Providers.WS4Net;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,14 +26,11 @@ namespace Valerie
                     LogLevel = LogSeverity.Error,
                     AlwaysDownloadUsers = true,
 #if !OSCHECK
-                    WebSocketProvider = WS4NetProvider.Instance
+                    WebSocketProvider = WS4NetProvider.Instance                    
 #endif
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
-                    ThrowOnError = true,
-                    IgnoreExtraArgs = false,
-                    CaseSensitiveCommands = false,
                     DefaultRunMode = RunMode.Async
                 }))
                 .AddSingleton<IDocumentStore>(new DocumentStore

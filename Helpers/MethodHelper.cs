@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Valerie.Models;
-using Newtonsoft.Json;
 using System.Net.Http;
+using Newtonsoft.Json;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
