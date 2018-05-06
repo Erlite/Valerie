@@ -15,7 +15,7 @@ namespace Valerie.Modules
     [Name("Tag Commands"), Group("Tag"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class TagModule : Base
     {
-        [Command, Priority(1), Summary("Executes a tag with the given name.")]
+        [Command, Priority(0), Summary("Executes a tag with the given name.")]
         public Task TagAsync([Remainder] string Name)
         {
             if (!CheckTag(Name, true)) return Task.CompletedTask;
@@ -24,7 +24,7 @@ namespace Valerie.Modules
             return ReplyAsync(Tag.Content, Document: DocumentType.Server);
         }
 
-        [Command("Create"), Priority(1), Summary("Initiates Tag Creation wizard.")]
+        [Command("Create"), Priority(10), Summary("Initiates Tag Creation wizard.")]
         public async Task CreateAsync()
         {
             await ReplyAsync($"**Welcome to Tag Creation Wizard!**\n{Emotes.Next}What will be the name of your tag? (Type c to cancel)");
@@ -48,16 +48,17 @@ namespace Valerie.Modules
             await ReplyAsync($"Tag `{Name.Item2}` has been created!", Document: DocumentType.Server);
         }
 
-        [Command("Update"), Priority(1), Summary("Updates an existing tag.")]
+        [Command("Update"), Priority(10), Summary("Updates an existing tag.")]
         public async Task UpdateAsync(string TagName)
         {
             if (!CheckTag(TagName)) return;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
             if (Tag.Owner != Context.User.Id) { await ReplyAsync($"You are not the owner of tag `{TagName}`."); return; }
-            await ReplyAsync($"What would you like to modify?\n" +
-                $"1: Change  `{TagName}` Name\n2: Change `{TagName}` Content\n3: Enable/Disable Auto `{TagName}` Execution");
+            await ReplyAsync($"What would you like to modify (Use number to specifiy)?\n" +
+                $"{Emotes.Next} Change  `{TagName}` Name\n{Emotes.Next} Change `{TagName}` Content\n{Emotes.Next} Enable/Disable Auto `{TagName}` Execution");
             var Options = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
             if (!Options.Item1) { await ReplyAsync(Options.Item2); return; }
+            (string, DocumentType) Message;
             switch (Convert.ToInt32(Options.Item2))
             {
                 case 1:
@@ -65,23 +66,25 @@ namespace Valerie.Modules
                     var NewName = CheckResponse(await WaitForReaponseAsync(), "Tag Modification", true);
                     if (!NewName.Item1) { await ReplyAsync(NewName.Item2); return; }
                     Tag.Name = NewName.Item2;
+                    Message = ($"{TagName}  {Emotes.Next} {NewName}", DocumentType.Server);
                     break;
                 case 2:
                     await ReplyAsync($"What would you like new content to be?");
                     var NewContent = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
                     if (!NewContent.Item1) { await ReplyAsync(NewContent.Item2); return; }
                     Tag.Content = NewContent.Item2;
+                    Message = ($"{TagName}'s content has been updated {Emotes.ThumbUp}", DocumentType.Server);
                     break;
                 case 3:
                     await ReplyAsync($"Do you want {TagName} to be auto-responsive? (Y/N)");
                     var NewExe = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
                     if (!NewExe.Item1) { await ReplyAsync(NewExe.Item2); return; }
                     Tag.AutoRespond = NewExe.Item2.ToLower() == "y" ? true : false;
+                    Message = ($"{TagName} auto-responsiveness has been {(NewExe.Item2.ToLower() == "y" ? "enabled" : "disabled")}.", DocumentType.Server);
                     break;
-                default:
-                    break;
+                default: Message = ($"Invalid choice {Emotes.ThumbDown}.", DocumentType.None); break;
             }
-            await ReplyAsync($"Tag `{TagName}'` has been updated!", Document: DocumentType.Server);
+            await ReplyAsync(Message.Item1, Document: Message.Item2);
         }
 
         [Command("Remove"), Priority(1), Summary("Deletes a tag.")]
