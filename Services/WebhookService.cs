@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using Discord.Rest;
 using Valerie.Models;
-using System.Net.Http;
-using Discord.Webhook;
 using Valerie.Helpers;
+using System.Net.Http;
 using Valerie.Handlers;
+using Discord.Webhook;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Valerie.Services
                 else
                 {
                     using (var DownloadStream = new FileStream(
-                        StringHelper.DownloadUserImageAsync(HttpClient, SocketClient.CurrentUser).GetAwaiter().GetResult(),
+                        StringHelper.DownloadImageAsync(HttpClient, SocketClient.CurrentUser.GetAvatarUrl()).GetAwaiter().GetResult(),
                         FileMode.Open, FileAccess.Read))
                         return DownloadStream;
                 }
