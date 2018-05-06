@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Discord.Commands;
 
 namespace Valerie.Helpers
 {
@@ -113,12 +114,18 @@ namespace Valerie.Helpers
             return Result;
         }
 
-        public static async Task<string> DownloadUserImageAsync(HttpClient HttpClient, IUser User)
+        public static async Task<string> DownloadImageAsync(HttpClient HttpClient, string URL)
         {
-            var Get = await HttpClient.GetByteArrayAsync(User.GetAvatarUrl(ImageFormat.Png, 2048)).ConfigureAwait(false);
-            using (var UserImage = File.Create($"{CacheFolder}/{User.Id}.png"))
+            var Get = await HttpClient.GetByteArrayAsync(URL).ConfigureAwait(false);
+            string FileName = $"Valerie-{Guid.NewGuid().ToString("n").Substring(0, 8)}";
+            using (var UserImage = File.Create($"{CacheFolder}/{FileName}.png"))
                 await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
-            return $"{CacheFolder}/{User.Id}.png";
+            return $"{CacheFolder}/{FileName}.png";
         }
+
+        public static string ParametersInfo(IReadOnlyCollection<ParameterInfo> Parameters)
+            => Parameters.Any() ?
+            string.Join(" ", Parameters.Select(x => x.IsOptional ? $" `<(Optional){x.Name}>` " : $" `<{x.Name}>` ")) : null;
+
     }
 }
