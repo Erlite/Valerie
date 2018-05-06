@@ -3,12 +3,12 @@ using Discord;
 using System.Linq;
 using Valerie.Models;
 using Valerie.Addons;
-using Valerie.Handlers;
 using Valerie.Services;
+using Valerie.Handlers;
 using Discord.Commands;
 using Discord.WebSocket;
-using Cookie.Cleverbot.Models;
 using System.Threading.Tasks;
+using Cookie.Cleverbot.Models;
 using System.Collections.Generic;
 
 namespace Valerie.Helpers
@@ -18,8 +18,8 @@ namespace Valerie.Helpers
         Random Random { get; }
         GuildHelper GuildHelper { get; }
         DiscordSocketClient Client { get; }
-        ConfigHandler ConfigHandler { get; }
         MethodHelper MethodHelper { get; }
+        ConfigHandler ConfigHandler { get; }
         WebhookService WebhookService { get; }
         Dictionary<ulong, Response> CleverbotTracker { get; set; }
         public static readonly TimeSpan GlobalTimeout = TimeSpan.FromSeconds(30);
@@ -84,14 +84,11 @@ namespace Valerie.Helpers
             if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
         }
 
-        internal void RecordCommand(CommandService CommandService, IContext Context, int ArgPos)
+        internal void RecordCommand(CommandInfo Command, IContext Context)
         {
-            var Search = CommandService.Search(Context, ArgPos);
-            if (!Search.IsSuccess) return;
-            var Command = Search.Commands.FirstOrDefault().Command;
+            if (Command == null) return;
             var Profile = GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id);
-            if (!Profile.Commands.ContainsKey(Command.Name))
-                Profile.Commands.Add(Command.Name, 0);
+            if (!Profile.Commands.ContainsKey(Command.Name)) Profile.Commands.Add(Command.Name, 0);
             Profile.Commands[Command.Name]++;
             GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
         }
