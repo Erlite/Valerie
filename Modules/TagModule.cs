@@ -66,7 +66,7 @@ namespace Valerie.Modules
                     var NewName = CheckResponse(await WaitForReaponseAsync(), "Tag Modification", true);
                     if (!NewName.Item1) { await ReplyAsync(NewName.Item2); return; }
                     Tag.Name = NewName.Item2;
-                    Message = ($"{TagName}  {Emotes.Next} {NewName}", DocumentType.Server);
+                    Message = ($"{TagName}  {Emotes.Next} {NewName.Item2}", DocumentType.Server);
                     break;
                 case 2:
                     await ReplyAsync($"What would you like new content to be?");
