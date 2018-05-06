@@ -21,13 +21,13 @@ namespace Valerie.Handlers
         Random Random { get; }
         GuildHelper GuildHelper { get; }
         EventHelper EventHelper { get; }
-        GuildHandler GuildHandler { get; }
         DiscordSocketClient Client { get; }
         bool CommandExecuted { get; set; }
-        ConfigHandler ConfigHandler { get; }
+        GuildHandler GuildHandler { get; }
         IServiceProvider Provider { get; set; }
-        CommandService CommandService { get; }
+        ConfigHandler ConfigHandler { get; }
         WebhookService WebhookService { get; }
+        CommandService CommandService { get; }
         CancellationTokenSource CancellationToken { get; set; }
 
         public EventsHandler(GuildHandler guild, ConfigHandler config, DiscordSocketClient client, CommandService command,
@@ -98,7 +98,7 @@ namespace Valerie.Handlers
             {
                 Name = Client.CurrentUser.Username,
                 Webhook = Config.LeaveWebhook,
-                Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.DEyes}"
+                Message = !Config.LeaveMessages.Any() ? $"**{User.Username}** abandoned us! {Emotes.Squint}"
                 : StringHelper.Replace(Config.LeaveMessages[Random.Next(0, Config.LeaveMessages.Count)], User.Guild.Name, User.Username)
             });
         }
@@ -141,15 +141,22 @@ namespace Valerie.Handlers
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot) return;
             if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
-            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
+            var Result = await CommandService.ExecuteAsync(Context, argPos + 1, Provider, MultiMatchHandling.Best);
+            var Search = CommandService.Search(Context, argPos + 1);
+            var Command = Search.IsSuccess ? Search.Commands.FirstOrDefault().Command : null;
             CommandExecuted = Result.IsSuccess;
             switch (Result.Error)
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
                 case CommandError.UnmetPrecondition:
                     if (!Result.ErrorReason.Contains("SendMessages")) await Context.Channel.SendMessageAsync(Result?.ErrorReason); break;
+                case CommandError.BadArgCount:
+                    string Name = Command.Module.Group != null && Command.Name.Contains("Async")
+                        ? Command.Module.Group : $"{Command.Module.Group ?? null} {Command.Name}";
+                    await Context.Channel.SendMessageAsync($"**Usage:** {Context.Config.Prefix} {Name} {StringHelper.ParametersInfo(Command.Parameters)}");
+                    break;
             }
-            _ = Task.Run(() => EventHelper.RecordCommand(CommandService, Context, argPos));
+            _ = Task.Run(() => EventHelper.RecordCommand(Command, Context));
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
