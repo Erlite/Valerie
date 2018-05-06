@@ -6,6 +6,7 @@ using Valerie.Models;
 using Valerie.Addons;
 using Valerie.Helpers;
 using Discord.Commands;
+using Discord.WebSocket;
 using System.Threading.Tasks;
 using static Valerie.Addons.Embeds;
 
@@ -14,7 +15,7 @@ namespace Valerie.Modules
     [Name("Tag Commands"), Group("Tag"), RequireBotPermission(ChannelPermission.SendMessages)]
     public class TagModule : Base
     {
-        [Command, Priority(0), Summary("Executes a tag with the given name.")]
+        [Command, Priority(1), Summary("Executes a tag with the given name.")]
         public Task TagAsync([Remainder] string Name)
         {
             if (!CheckTag(Name, true)) return Task.CompletedTask;
@@ -26,35 +27,61 @@ namespace Valerie.Modules
         [Command("Create"), Priority(1), Summary("Initiates Tag Creation wizard.")]
         public async Task CreateAsync()
         {
-            await ReplyAsync($"**Welcome to Tag Creation Wizard!**\nWhat will be the name of your tag?");
-            var GetName = await ResponseWaitAsync();
-            if (GetName == null || CheckTag(GetName.Content, Exists: true)) return;
-            await ReplyAsync($"What is going to be the response for *{GetName.Content}*?");
-            var GetContent = await ResponseWaitAsync();
-            if (GetContent == null) return;
-            await ReplyAsync($"Do you want {GetName.Content} to be auto-responsive? (Y/N)");
-            var GetToggle = await ResponseWaitAsync();
-            var Check = GetToggle.Content.ToLower() == "y" ? true : false;
+            await ReplyAsync($"**Welcome to Tag Creation Wizard!**\n{Emotes.Next}What will be the name of your tag? (Type c to cancel)");
+            var Name = CheckResponse(await WaitForReaponseAsync(), "Tag creation", true);
+            if (Name.Item1 == false) { await ReplyAsync(Name.Item2); return; }
+            await ReplyAsync($"{Emotes.Next} What is going to be the response for *{Name.Item2}*?");
+            var Content = CheckResponse(await WaitForReaponseAsync(), "Tag Creation");
+            if (Content.Item1 == false) { await ReplyAsync(Content.Item2); return; }
+            await ReplyAsync($"{Emotes.Next} Do you want {Name.Item2} to be auto-responsive? (Y/N)");
+            var Toggle = CheckResponse(await WaitForReaponseAsync(), "Tag Creation");
+            var Check = Toggle.Item2.ToLower() == "y" ? true : false;
             Context.Server.Tags.Add(new TagWrapper
             {
                 Uses = 1,
+                Name = Name.Item2,
                 AutoRespond = Check,
                 Owner = Context.User.Id,
-                Name = GetName.Content,
-                Content = GetContent.Content,
+                Content = Content.Item2,
                 CreationDate = DateTime.Now
             });
-            await ReplyAsync($"Tag `{GetName.Content}` has been created!", Document: DocumentType.Server);
+            await ReplyAsync($"Tag `{Name.Item2}` has been created!", Document: DocumentType.Server);
         }
 
         [Command("Update"), Priority(1), Summary("Updates an existing tag.")]
-        public Task UpdateAsync(string Name, string Response)
+        public async Task UpdateAsync(string TagName)
         {
-            if (!CheckTag(Name)) return Task.CompletedTask;
-            var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
-            if (Tag.Owner != Context.User.Id) return ReplyAsync($"You are not the owner of tag `{Name}`.");
-            Context.Server.Tags.FirstOrDefault(x => x.Name == Name).Content = Response;
-            return ReplyAsync($"Tag `{Name}'s` content has been updated!", Document: DocumentType.Server);
+            if (!CheckTag(TagName)) return;
+            var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == TagName);
+            if (Tag.Owner != Context.User.Id) { await ReplyAsync($"You are not the owner of tag `{TagName}`."); return; }
+            await ReplyAsync($"What would you like to modify?\n" +
+                $"1: Change  `{TagName}` Name\n2: Change `{TagName}` Content\n3: Enable/Disable Auto `{TagName}` Execution");
+            var Options = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
+            if (!Options.Item1) { await ReplyAsync(Options.Item2); return; }
+            switch (Convert.ToInt32(Options.Item2))
+            {
+                case 1:
+                    await ReplyAsync($"What would you like the new name to be?");
+                    var NewName = CheckResponse(await WaitForReaponseAsync(), "Tag Modification", true);
+                    if (!NewName.Item1) { await ReplyAsync(NewName.Item2); return; }
+                    Tag.Name = NewName.Item2;
+                    break;
+                case 2:
+                    await ReplyAsync($"What would you like new content to be?");
+                    var NewContent = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
+                    if (!NewContent.Item1) { await ReplyAsync(NewContent.Item2); return; }
+                    Tag.Content = NewContent.Item2;
+                    break;
+                case 3:
+                    await ReplyAsync($"Do you want {TagName} to be auto-responsive? (Y/N)");
+                    var NewExe = CheckResponse(await WaitForReaponseAsync(), "Tag Modification");
+                    if (!NewExe.Item1) { await ReplyAsync(NewExe.Item2); return; }
+                    Tag.AutoRespond = NewExe.Item2.ToLower() == "y" ? true : false;
+                    break;
+                default:
+                    break;
+            }
+            await ReplyAsync($"Tag `{TagName}'` has been updated!", Document: DocumentType.Server);
         }
 
         [Command("Remove"), Priority(1), Summary("Deletes a tag.")]
@@ -62,9 +89,9 @@ namespace Valerie.Modules
         {
             if (!CheckTag(Name, true)) return Task.CompletedTask;
             var Tag = Context.Server.Tags.FirstOrDefault(x => x.Name == Name);
-            if (Tag.Owner != Context.User.Id) return ReplyAsync($"You are not the owner of tag `{Name}`.");
+            if (Tag.Owner != Context.User.Id) return ReplyAsync($"You are not the owner of tag `{Name}` {Emotes.Shout}");
             Context.Server.Tags.Remove(Tag);
-            return ReplyAsync($"Tag `{Name}` has been removed.", Document: DocumentType.Server);
+            return ReplyAsync($"Tag `{Name}` has been removed {Emotes.ThumbUp}", Document: DocumentType.Server);
         }
 
         [Command("User"), Priority(1), Summary("Shows all tags owned by you or a given user.")]
@@ -100,7 +127,8 @@ namespace Valerie.Modules
                 if (Suggest) _ = SuggestAsync(Name);
                 return false;
             }
-            if (Exists) _ = ReplyAsync($"Tag `{Name}` already exists.");
+            if (Exists) _
+                    = ReplyAsync($"Tag `{Name}` already exists.");
             return true;
         }
 
@@ -109,8 +137,18 @@ namespace Valerie.Modules
             string Message = $"Tag `{Name}` doesn't exist. ";
             var Tags = Context.Server.Tags.Where(x => x.Name.ToLower().Contains(Name.ToLower()));
             if (!Context.Server.Tags.Any() || !Tags.Any()) return ReplyAsync(Message);
-            Message = $"{Emotes.PepeSad} **Tag `{Name}` wasn't found. Try these perhaps?**\n {string.Join(", ", Tags.Select(x => x.Name))}";
+            Message = $"{Emotes.Shout} **Tag `{Name}` wasn't found. Try these perhaps?**\n {string.Join(", ", Tags.Select(x => x.Name))}";
             return ReplyAsync(Message);
+        }
+
+        (bool, string) CheckResponse(SocketMessage Message, string OperationName = null,
+            bool IsName = false)
+        {
+            var ReservedNames = new[] { "help", "about", "tag", "delete", "remove", "delete", "info", "modify", "update", "user" };
+            if (Message.Content.ToLower() == "c") return (false, $"{Emotes.Cross} {OperationName} has been cancelled.");
+            else if (Message.Content == null) return (false, $"{OperationName} timed out.");
+            if (IsName && ReservedNames.Any(x => Message.Content.ToLower().StartsWith(x))) return (false, $"Tag name is reserved. Try another name? {Emotes.Squint}");
+            return (true, Message.Content);
         }
     }
 }
