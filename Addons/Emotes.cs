@@ -6,7 +6,7 @@ namespace Valerie.Addons
     {
         public static Emote Bug { get => Emote.Parse("<:Bug:442486343398850560>"); }
         public static Emote Back { get => Emote.Parse("<:Left:442383594820861992>"); }
-        public static Emote Next { get => Emote.Parse("<:Right:442383594699358208> "); }
+        public static Emote Next { get => Emote.Parse("<:Right:442383594699358208>"); }
         public static Emote Cross { get => Emote.Parse("<:Cross:442384456083308554>"); }
         public static Emote Shout { get => Emote.Parse("<:Shout:442495861226733588>"); }
         public static Emote Squint { get => Emote.Parse("<:Squint:442486320481304586>"); }
