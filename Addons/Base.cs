@@ -5,6 +5,7 @@ using Valerie.Services;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Valerie.Addons.Interactive;
 
 namespace Valerie.Addons
 {
@@ -25,27 +26,28 @@ namespace Valerie.Addons
             return Msg;
         }
 
-        public Task<SocketMessage> ResponseWaitAsync(bool User = true, bool Channel = true, TimeSpan? Timeout = null)
+        public Task<SocketMessage> WaitForReaponseAsync(bool User = true, bool Channel = true, TimeSpan? Timeout = null)
         {
-            var Interactive = new Interactive<SocketMessage>();
-            if (User) Interactive.AddInteractive(new InteractiveUser());
-            if (Channel) Interactive.AddInteractive(new InteractiveChannel());
-            return ResponseWaitAync(Interactive, Timeout);
+            var Criteria = new JudgeCriteria<SocketMessage>();
+            if (User) Criteria.AddCriteria(new FromUser());
+            if (Channel) Criteria.AddCriteria(new FromChannel());
+            return WaitForReaponseAsync(Context, Criteria, Timeout);
         }
 
-        async Task<SocketMessage> ResponseWaitAync(VInteractive<SocketMessage> Interactive, TimeSpan? Timeout = null)
+        async Task<SocketMessage> WaitForReaponseAsync(IContext Context, ICriteria<SocketMessage> Interactive, TimeSpan? Timeout = null)
         {
             Timeout = Timeout ?? TimeSpan.FromSeconds(15);
             var Trigger = new TaskCompletionSource<SocketMessage>();
             async Task InteractiveHandlerAsync(SocketMessage Message)
             {
+                if (Message.Author.IsBot) return;
                 var Result = await Interactive.JudgeAsync(Context, Message).ConfigureAwait(false);
                 if (Result) Trigger.SetResult(Message);
             }
-            (Context.Client as DiscordSocketClient).MessageReceived += InteractiveHandlerAsync;
-            var PersonalTask = await Task.WhenAny(Trigger.Task, Task.Delay(Timeout.Value)).ConfigureAwait(false);
+                   (Context.Client as DiscordSocketClient).MessageReceived += InteractiveHandlerAsync;
+            var PersonalTask = await Task.WhenAny(Trigger.Task, Task.Delay(Timeout.Value));
             (Context.Client as DiscordSocketClient).MessageReceived -= InteractiveHandlerAsync;
-            if (PersonalTask == Trigger.Task) return await Trigger.Task.ConfigureAwait(false); else return null;
+            return PersonalTask == Trigger.Task ? await Trigger.Task.ConfigureAwait(false) : null;
         }
 
         void SaveDocuments(DocumentType Document)
