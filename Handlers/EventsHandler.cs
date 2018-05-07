@@ -88,7 +88,7 @@ namespace Valerie.Handlers
         internal async Task JoinedGuildAsync(SocketGuild Guild)
         {
             GuildHandler.AddGuild(Guild.Id, Guild.Name);
-            await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.JoinMessage ?? "Thank you for inviting me to your server. Your guild prefix is `!`. Type `!Cmds` for commands.");
+            await Guild.DefaultChannel.SendMessageAsync(ConfigHandler.Config.JoinMessage ?? "Thank you for inviting me to your server!");
         }
 
         internal async Task UserLeftAsync(SocketGuildUser User)
@@ -141,8 +141,8 @@ namespace Valerie.Handlers
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
                 Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot) return;
             if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
-            var Result = await CommandService.ExecuteAsync(Context, argPos + 1, Provider, MultiMatchHandling.Best);
-            var Search = CommandService.Search(Context, argPos + 1);
+            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
+            var Search = CommandService.Search(Context, argPos);
             var Command = Search.IsSuccess ? Search.Commands.FirstOrDefault().Command : null;
             CommandExecuted = Result.IsSuccess;
             switch (Result.Error)
