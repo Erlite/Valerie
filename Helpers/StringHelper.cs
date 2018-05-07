@@ -16,15 +16,6 @@ namespace Valerie.Helpers
 {
     public class StringHelper
     {
-        public static string CacheFolder
-        {
-            get
-            {
-                if (!Directory.Exists($"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}"))
-                    Directory.CreateDirectory($"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}");
-                return $"{Path.Combine(Directory.GetCurrentDirectory(), "Cache")}";
-            }
-        }
         public static string Normal = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,-./:;<=>?@[\\]^_`{|}~ ";
         public static string FullWidth = "０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯ" +
             "ＰＱＲＳＴＵＶＷＸＹＺ！＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿‘｛｜｝～ ";
@@ -118,9 +109,9 @@ namespace Valerie.Helpers
         {
             var Get = await HttpClient.GetByteArrayAsync(URL).ConfigureAwait(false);
             string FileName = $"Valerie-{Guid.NewGuid().ToString("n").Substring(0, 8)}";
-            using (var UserImage = File.Create($"{CacheFolder}/{FileName}.png"))
+            using (var UserImage = File.Create($"{FileName}.png"))
                 await UserImage.WriteAsync(Get, 0, Get.Length).ConfigureAwait(false);
-            return $"{CacheFolder}/{FileName}.png";
+            return $"{FileName}.png";
         }
 
         public static string ParametersInfo(IReadOnlyCollection<ParameterInfo> Parameters)
