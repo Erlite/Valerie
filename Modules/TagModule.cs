@@ -87,7 +87,7 @@ namespace Valerie.Modules
             await ReplyAsync(Message.Item1, Document: Message.Item2);
         }
 
-        [Command("Remove"), Priority(1), Summary("Deletes a tag.")]
+        [Command("Remove"), Priority(10), Summary("Deletes a tag.")]
         public Task RemoveAsync(string Name)
         {
             if (!CheckTag(Name, true)) return Task.CompletedTask;
@@ -97,7 +97,7 @@ namespace Valerie.Modules
             return ReplyAsync($"Tag `{Name}` has been removed {Emotes.ThumbUp}", Document: DocumentType.Server);
         }
 
-        [Command("User"), Priority(1), Summary("Shows all tags owned by you or a given user.")]
+        [Command("User"), Priority(10), Summary("Shows all tags owned by you or a given user.")]
         public Task UserAsync(IGuildUser User = null)
         {
             User = User ?? Context.User as IGuildUser;
@@ -106,7 +106,7 @@ namespace Valerie.Modules
             return ReplyAsync($"{User} owns {UserTag.Count()} tags.\n```{string.Join(", ", UserTag.Select(x => x.Name))}```");
         }
 
-        [Command("Info"), Priority(1), Summary("Displays information about a given tag.")]
+        [Command("Info"), Priority(10), Summary("Displays information about a given tag.")]
         public async Task InfoAsync(string Name)
         {
             if (!CheckTag(Name, true)) return;
@@ -121,6 +121,13 @@ namespace Valerie.Modules
                 .AddField("Content", Tag.Content, false)
                 .WithThumbnailUrl("https://png.icons8.com/office/80/000000/fingerprint.png")
                 .Build());
+        }
+
+        [Command("List"), Priority(10), Summary("Shows a list of all tags.")]
+        public Task TagsAsync()
+        {
+            if (!Context.Server.Tags.Any()) return ReplyAsync($"{Emotes.Shout} I couldn't find any tags for this server {Emotes.ThumbDown}");
+            return ReplyAsync($"{Emotes.Next} **TAGS LIST** {Emotes.Back}\n\n{string.Join(", ", Context.Server.Tags.Select(x => x.Name))}");
         }
 
         bool CheckTag(string Name, bool Suggest = false, bool Exists = false)
@@ -147,7 +154,7 @@ namespace Valerie.Modules
         (bool, string) CheckResponse(SocketMessage Message, string OperationName = null,
             bool IsName = false)
         {
-            var ReservedNames = new[] { "help", "about", "tag", "delete", "remove", "delete", "info", "modify", "update", "user" };
+            var ReservedNames = new[] { "help", "about", "tag", "delete", "remove", "delete", "info", "modify", "update", "user", "list" };
             if (Message.Content.ToLower() == "c") return (false, $"{Emotes.Cross} {OperationName} has been cancelled.");
             else if (Message.Content == null) return (false, $"{OperationName} timed out.");
             if (IsName && ReservedNames.Any(x => Message.Content.ToLower().StartsWith(x))) return (false, $"Tag name is reserved. Try another name? {Emotes.Squint}");
