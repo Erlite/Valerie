@@ -18,22 +18,16 @@ namespace Valerie.Services
         HttpClient HttpClient { get; }
         GuildHandler GuildHandler { get; }
         DiscordSocketClient SocketClient { get; }
-        FileStream AvatarStream
+        FileStream AvatarStream()
         {
-            get
-            {
-                if (File.Exists("Avatar.jpg"))
-                    using (var AvatarStream = new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read))
-                        return AvatarStream;
-                else
-                {
-                    using (var DownloadStream = new FileStream(
-                        StringHelper.DownloadImageAsync(HttpClient, SocketClient.CurrentUser.GetAvatarUrl()).GetAwaiter().GetResult(),
-                        FileMode.Open, FileAccess.Read))
-                        return DownloadStream;
-                }
-            }
+            if (File.Exists("Avatar.jpg"))
+                return new FileStream("Avatar.jpg", FileMode.Open, FileAccess.Read);
+            else
+                return new FileStream(
+                    StringHelper.DownloadImageAsync(HttpClient, SocketClient.CurrentUser.GetAvatarUrl()).GetAwaiter().GetResult(),
+                    FileMode.Open, FileAccess.Read);
         }
+
         public WebhookService(HttpClient httpClient, GuildHandler guild, DiscordSocketClient client)
         {
             GuildHandler = guild;
@@ -67,7 +61,7 @@ namespace Valerie.Services
             {
                 Name = Name
             });
-            var Webhook = Get ?? await Channel.CreateWebhookAsync(Name, AvatarStream);
+            var Webhook = Get ?? await Channel.CreateWebhookAsync(Name, AvatarStream());
             return new WebhookWrapper
             {
                 TextChannel = Channel.Id,
@@ -100,7 +94,7 @@ namespace Valerie.Services
                 await GetWebhookAsync(GetChannel, new WebhookOptions { Webhook = Old });
             if (Channel.Id == Old.TextChannel && Hook != null) return Old;
             else if (Hook != null) await Hook.DeleteAsync();
-            var New = await Channel.CreateWebhookAsync(Options.Name, AvatarStream);
+            var New = await Channel.CreateWebhookAsync(Options.Name, AvatarStream());
             return new WebhookWrapper
             {
                 TextChannel = Channel.Id,
