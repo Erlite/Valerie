@@ -21,6 +21,7 @@ namespace Valerie.Helpers
         MethodHelper MethodHelper { get; }
         ConfigHandler ConfigHandler { get; }
         WebhookService WebhookService { get; }
+        Dictionary<ulong, DateTime> XPUserList { get; set; }
         Dictionary<ulong, Response> CleverbotTracker { get; set; }
         public static readonly TimeSpan GlobalTimeout = TimeSpan.FromSeconds(30);
 
@@ -33,6 +34,7 @@ namespace Valerie.Helpers
             ConfigHandler = CH;
             MethodHelper = MH;
             WebhookService = WS;
+            XPUserList = new Dictionary<ulong, DateTime>();
             CleverbotTracker = new Dictionary<ulong, Response>();
         }
 
@@ -56,14 +58,17 @@ namespace Valerie.Helpers
         internal Task XPHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             var User = Message.Author as IGuildUser;
+            var GetTime = XPUserList.ContainsKey(User.Id) ? XPUserList[User.Id] : DateTime.UtcNow;
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (HasRole || !Config.ChatXP.IsEnabled) return Task.CompletedTask;
+            if (HasRole || !Config.ChatXP.IsEnabled || GetTime.AddSeconds(60) > DateTime.UtcNow) return Task.CompletedTask;
             var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);
             int Old = Profile.ChatXP;
             Profile.ChatXP += Random.Next(Message.Content.Length);
             var New = Profile.ChatXP;
             GuildHelper.SaveProfile(Convert.ToUInt64(Config.Id), User.Id, Profile);
+            if (XPUserList.ContainsKey(User.Id)) XPUserList.Remove(User.Id);
+            XPUserList.Add(User.Id, DateTime.UtcNow);
             return LevelUpHandlerAsync(Message, Config, Old, New);
         }
 
