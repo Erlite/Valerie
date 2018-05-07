@@ -8,7 +8,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Raven.Client.Documents;
-using Discord.Net.Providers.WS4Net;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Valerie
@@ -24,10 +23,7 @@ namespace Valerie
                 {
                     MessageCacheSize = 20,
                     LogLevel = LogSeverity.Error,
-                    AlwaysDownloadUsers = true,
-#if !OSCHECK
-                    WebSocketProvider = WS4NetProvider.Instance                    
-#endif
+                    AlwaysDownloadUsers = true
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
