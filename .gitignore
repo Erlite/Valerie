@@ -4,7 +4,9 @@
 # User-specific files
 *.suo
 *.user
-*.userosscache
+*.useross
+
+
 *.sln.docstates
 
 # User-specific files (MonoDevelop/Xamarin Studio)
@@ -294,7 +296,3 @@ config.codekit3
 *.vs/
 bin/
 obj/
-
-Resources/
-
-log\.txt
