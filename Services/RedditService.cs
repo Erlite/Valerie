@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using Valerie.Models;
-using Valerie.Handlers;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Valerie.Handlers;
 using System.Threading;
 using Discord.WebSocket;
-using Raven.Client.Documents;
 using System.Threading.Tasks;
+using Raven.Client.Documents;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
