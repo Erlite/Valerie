@@ -3,17 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RuntimeIdentifiers>win;win81-x64</RuntimeIdentifiers>
-    <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win81-x64'">OSCheck</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Colorful.Console" Version="1.2.6" />
     <PackageReference Include="Cookie" Version="3.0.2-Nightly" />
-    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00936" />
-    <PackageReference Include="Discord.Net.Providers.WS4Net" Version="2.0.0-beta2-00936" />
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00937" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.0" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.4-nightly-20180504-0503" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.4-nightly-20180507-0400" />
   </ItemGroup>
 
 </Project>
