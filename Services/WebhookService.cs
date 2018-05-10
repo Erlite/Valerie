@@ -78,8 +78,7 @@ namespace Valerie.Services
 
         public Task WebhookFallbackAsync(DiscordWebhookClient Client, ITextChannel Channel, WebhookOptions Options)
         {
-            if (Client == null || Channel == null) return Task.CompletedTask;
-            if (Client == null)
+            if (Client == null && Channel != null)
             {
                 LogService.Write(Enums.LogSource.DSD, $"Falling back to Channel: {Channel.Name}", System.Drawing.Color.Yellow);
                 return Channel.SendMessageAsync(Options.Message, embed: Options.Embed);
