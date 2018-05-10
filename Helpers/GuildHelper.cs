@@ -74,7 +74,6 @@ namespace Valerie.Helpers
                    for (int i = 0; i < Messages.ToArray().Length; i = i + 100) Channel.DeleteMessagesAsync(Messages.Skip(i).Take(100));
                });
 
-
         public (bool, ulong) GetChannelId(SocketGuild Guild, string Channel)
         {
             if (string.IsNullOrWhiteSpace(Channel)) return (true, 0);
@@ -109,6 +108,13 @@ namespace Valerie.Helpers
             if (Collection.Contains((T)Value)) return (false, $"`{ObjectName}` already exists in {CollectionName}.");
             if (Collection.Count == Collection.Capacity) return (false, $"Reached max number of entries {Emotes.Shout}");
             return (true, $"`{ObjectName}` has been added to {CollectionName}");
+        }
+
+        public bool HierarchyCheck(IGuild IGuild, IGuildUser User)
+        {
+            var Guild = IGuild as SocketGuild;
+            var HighestRole = Guild.CurrentUser.Roles.OrderByDescending(x => x.Position).FirstOrDefault().Position;
+            return (User as SocketGuildUser).Roles.Any(x => x.Position > HighestRole) ? true : false;
         }
     }
 }
