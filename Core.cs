@@ -22,7 +22,7 @@ namespace Valerie
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 20,
-                    LogLevel = LogSeverity.Error,
+                    LogLevel = LogSeverity.Warning,
                     AlwaysDownloadUsers = true
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfig
