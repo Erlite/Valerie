@@ -6,7 +6,7 @@ namespace Valerie.Models
 {
     public class DatabaseModel
     {
-        public string DatabaseName { get; set; } = "Velixa";
+        public string DatabaseName { get; set; } = "Valerie";
         public string DatabaseUrl { get; set; } = "http://127.0.0.1:8080";
         [JsonProperty("X509CertificatePath")]
         public string CertificatePath { get; set; }
