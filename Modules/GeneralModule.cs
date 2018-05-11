@@ -224,5 +224,12 @@ namespace Valerie.Modules
             $"Full Permission: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=8&scope=bot\n" +
             $"Minimal Permisison: https://discordapp.com/api/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&permissions=805694647&scope=bot" +
             $"Feel free to join my server: https://discord.gg/nzYTzxD");
+
+        [Command("Coffee"), Summary("Buy me a coffee!")]
+        public Task CoffeeAsync()
+            => ReplyAsync(string.Empty, GetEmbed(Paint.Yellow)
+                .WithAuthor("Buy Me A Coffee", "https://www.buymeacoffee.com/assets/img/guidelines/logo-mark-2.svg")
+                .WithDescription($"Hello! If you love Valerie feel free to buy me a coffee: https://www.buymeacoffee.com/Yucked")
+                .WithImageUrl("https://www.buymeacoffee.com/assets/img/guidelines/bmc-coffee.gif").Build());
     }
 }
