@@ -42,7 +42,7 @@ namespace Valerie.Modules
                 .AddField("Name", Name, true)
                 .AddField("Aliases", string.Join(", ", Command.Aliases), true)
                 .AddField("Arguments", Command.Parameters.Any() ? string.Join(", ", Command.Parameters.Select(x => $"`{x.Type.Name}` {x.Name}")) : "No arguments.")
-                .AddField("Usage", $"{Context.Config.Prefix} {Name} {string.Join(" ", Command.Parameters)}")
+                .AddField("Usage", $"{Context.Config.Prefix}{Name} {string.Join(" ", Command.Parameters)}")
                 .AddField("Summary", Command.Summary)
                 .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl());
             var GetChar = Command.Parameters.Where(x => x.Type == typeof(char));
