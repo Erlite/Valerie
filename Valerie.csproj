@@ -10,7 +10,7 @@
     <PackageReference Include="Cookie" Version="3.0.2-Nightly" />
     <PackageReference Include="Discord.Net" Version="2.0.0-beta2-00937" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.0" />
-    <PackageReference Include="RavenDB.Client" Version="4.0.4-nightly-20180507-0400" />
+    <PackageReference Include="RavenDB.Client" Version="4.0.4-nightly-20180511-0400" />
   </ItemGroup>
 
 </Project>
