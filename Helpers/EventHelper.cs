@@ -38,6 +38,16 @@ namespace Valerie.Helpers
             CleverbotTracker = new Dictionary<ulong, Response>();
         }
 
+        internal Task RunTasks(SocketMessage Message, GuildModel Config)
+        {
+            XPHandlerAsync(Message, Config);
+            ExecuteTagAsync(Message, Config);
+            AFKHandlerAsync(Message, Config);
+            CleverbotHandlerAsync(Message, Config);
+            ModeratorAsync(Message as SocketUserMessage, Config);
+            return Task.CompletedTask;
+        }
+
         internal async Task CheckStateAsync()
         {
             if (Client.ConnectionState == ConnectionState.Connected) return;
@@ -55,7 +65,7 @@ namespace Valerie.Helpers
             else Environment.Exit(1);
         }
 
-        internal Task XPHandlerAsync(SocketMessage Message, GuildModel Config)
+        Task XPHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             var User = Message.Author as IGuildUser;
             var GetTime = XPUserList.ContainsKey(User.Id) ? XPUserList[User.Id] : DateTime.UtcNow;
@@ -72,7 +82,7 @@ namespace Valerie.Helpers
             return LevelUpHandlerAsync(Message, Config, Old, New);
         }
 
-        internal Task ExecuteTagAsync(SocketMessage Message, GuildModel Config)
+        Task ExecuteTagAsync(SocketMessage Message, GuildModel Config)
         {
             if (!Config.Tags.Any(x => x.AutoRespond == true)) return Task.CompletedTask;
             var Tags = Config.Tags.Where(x => x.AutoRespond == true);
@@ -81,12 +91,13 @@ namespace Valerie.Helpers
             return Task.CompletedTask;
         }
 
-        internal async Task AFKHandlerAsync(SocketMessage Message, GuildModel Config)
+        Task AFKHandlerAsync(SocketMessage Message, GuildModel Config)
         {
-            if (!Message.MentionedUsers.Any(x => Config.AFK.ContainsKey(x.Id))) return;
+            if (!Message.MentionedUsers.Any(x => Config.AFK.ContainsKey(x.Id))) return Task.CompletedTask;
             string Reason = null;
             var User = Message.MentionedUsers.FirstOrDefault(u => Config.AFK.TryGetValue(u.Id, out Reason));
-            if (User != null) await Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
+            if (User != null) return Message.Channel.SendMessageAsync($"**{User.Username} has left an AFK Message:**  {Reason}");
+            return Task.CompletedTask;
         }
 
         internal void RecordCommand(CommandInfo Command, IContext Context)
@@ -98,15 +109,16 @@ namespace Valerie.Helpers
             GuildHelper.SaveProfile(Context.Guild.Id, Context.User.Id, Profile);
         }
 
-        internal async Task ModeratorAsync(SocketUserMessage Message, GuildModel Config)
+        Task ModeratorAsync(SocketUserMessage Message, GuildModel Config)
         {
             if (GuildHelper.ProfanityMatch(Message.Content) && Config.Mod.AntiProfanity)
-                await WarnUserAsync(Message, Config, $"{Message.Author.Mention}, Refrain from using profanity. You've been warned.");
+                return WarnUserAsync(Message, Config, $"{Message.Author.Mention}, Refrain from using profanity. You've been warned.");
             if (GuildHelper.InviteMatch(Message.Content) && Config.Mod.AntiInvite)
-                await WarnUserAsync(Message, Config, $"{Message.Author.Mention}, No invite links allowed. You've been warned.");
+                return WarnUserAsync(Message, Config, $"{Message.Author.Mention}, No invite links allowed. You've been warned.");
+            return Task.CompletedTask;
         }
 
-        internal async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
+        async Task CleverbotHandlerAsync(SocketMessage Message, GuildModel Config)
         {
             string UserMessage = Message.Content.ToLower().Replace("valerie", string.Empty);
             if (!Message.Content.ToLower().StartsWith("valerie") || string.IsNullOrWhiteSpace(UserMessage)
