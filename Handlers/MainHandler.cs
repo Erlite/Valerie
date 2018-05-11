@@ -34,7 +34,7 @@ namespace Valerie.Handlers
             Client.GuildAvailable += Events.GuildAvailable;
             Client.LatencyUpdated += Events.LatencyUpdated;
             Client.ReactionAdded += Events.ReactionAddedAsync;
-            Client.MessageReceived += Events.HandleMessageAsync;
+            //Client.MessageReceived += Events.HandleMessageAsync;
             Client.MessageDeleted += Events.MessageDeletedAsync;
             Client.MessageReceived += Events.CommandHandlerAsync;
             Client.ReactionRemoved += Events.ReactionRemovedAsync;

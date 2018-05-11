@@ -117,22 +117,6 @@ namespace Valerie.Handlers
             if (Role != null) await User.AddRoleAsync(Role).ConfigureAwait(false);
         }
 
-        internal Task HandleMessageAsync(SocketMessage Message)
-        {
-            var Guild = (Message.Channel as SocketGuildChannel).Guild;
-            var Config = GuildHandler.GetGuild(Guild.Id);
-            if (!(Message is SocketUserMessage UserMessage) || !(Message.Author is SocketGuildUser User)) return Task.CompletedTask;
-            if (UserMessage.Source != MessageSource.User || UserMessage.Author.IsBot || ConfigHandler.Config.Blacklist.Contains(User.Id) ||
-                GuildHelper.GetProfile(Guild.Id, UserMessage.Author.Id).IsBlacklisted) return Task.CompletedTask;
-
-            _ = EventHelper.XPHandlerAsync(UserMessage, Config);
-            _ = EventHelper.ModeratorAsync(UserMessage, Config);
-            _ = EventHelper.ExecuteTagAsync(UserMessage, Config);
-            _ = EventHelper.AFKHandlerAsync(UserMessage, Config);
-            _ = EventHelper.CleverbotHandlerAsync(UserMessage, Config);
-            return Task.CompletedTask;
-        }
-
         internal async Task CommandHandlerAsync(SocketMessage Message)
         {
             if (!(Message is SocketUserMessage Msg)) return;
@@ -153,10 +137,14 @@ namespace Valerie.Handlers
                 case CommandError.BadArgCount:
                     string Name = Command.Module.Group != null && Command.Name.Contains("Async")
                         ? Command.Module.Group : $"{Command.Module.Group ?? null} {Command.Name}";
-                    await Context.Channel.SendMessageAsync($"**Usage:** {Context.Config.Prefix} {Name} {StringHelper.ParametersInfo(Command.Parameters)}");
+                    await Context.Channel.SendMessageAsync($"**Usage:** {Context.Config.Prefix}{Name} {StringHelper.ParametersInfo(Command.Parameters)}");
                     break;
             }
-            _ = Task.Run(() => EventHelper.RecordCommand(Command, Context));
+            _ = Task.Run(() =>
+            {
+                EventHelper.RecordCommand(Command, Context);
+                EventHelper.RunTasks(Message, Context.Server);
+            });
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
