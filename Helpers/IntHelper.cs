@@ -12,8 +12,9 @@ namespace Valerie.Helpers
 
         public static int GetGuildRank(IContext Context, ulong UserId)
         {
-            var Get = Context.Server.Profiles.OrderByDescending(x => x.Value.ChatXP).FirstOrDefault(x => x.Key == UserId);
-            return Context.Server.Profiles.ToList().IndexOf(Get);
+            var Order = Context.Server.Profiles.OrderByDescending(x => x.Value.ChatXP);
+            var User = Order.FirstOrDefault(x => x.Key == UserId);
+            return Order.ToList().IndexOf(User) + 1;
         }
     }
 }
