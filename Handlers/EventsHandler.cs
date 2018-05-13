@@ -22,7 +22,6 @@ namespace Valerie.Handlers
         GuildHelper GuildHelper { get; }
         EventHelper EventHelper { get; }
         DiscordSocketClient Client { get; }
-        bool CommandExecuted { get; set; }
         GuildHandler GuildHandler { get; }
         IServiceProvider Provider { get; set; }
         ConfigHandler ConfigHandler { get; }
@@ -122,13 +121,14 @@ namespace Valerie.Handlers
             if (!(Message is SocketUserMessage Msg)) return;
             int argPos = 0;
             var Context = new IContext(Client, Msg, Provider);
+            if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted
+                || Msg.Author.IsBot) return;
+            _ = Task.Run(() => EventHelper.RunTasks(Message, Context.Server));
             if (!(Msg.HasStringPrefix(Context.Config.Prefix, ref argPos) || Msg.HasStringPrefix(Context.Server.Prefix, ref argPos) ||
-                Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User || Msg.Author.IsBot) return;
-            if (Context.Config.Blacklist.Contains(Msg.Author.Id) || GuildHelper.GetProfile(Context.Guild.Id, Context.User.Id).IsBlacklisted) return;
+                Msg.HasMentionPrefix(Client.CurrentUser, ref argPos)) || Msg.Source != MessageSource.User) return;
             var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
             var Search = CommandService.Search(Context, argPos);
             var Command = Search.IsSuccess ? Search.Commands.FirstOrDefault().Command : null;
-            CommandExecuted = Result.IsSuccess;
             switch (Result.Error)
             {
                 case CommandError.Exception: LogService.Write(LogSource.EXC, Result.ErrorReason, CC.Crimson); break;
@@ -140,18 +140,14 @@ namespace Valerie.Handlers
                     await Context.Channel.SendMessageAsync($"**Usage:** {Context.Config.Prefix}{Name} {StringHelper.ParametersInfo(Command.Parameters)}");
                     break;
             }
-            _ = Task.Run(() =>
-            {
-                EventHelper.RecordCommand(Command, Context);
-                EventHelper.RunTasks(Message, Context.Server);
-            });
+            _ = Task.Run(() => EventHelper.RecordCommand(Command, Context));
         }
 
         internal async Task MessageDeletedAsync(Cacheable<IMessage, ulong> Cache, ISocketMessageChannel Channel)
         {
             var Config = GuildHandler.GetGuild((Channel as SocketGuildChannel).Guild.Id);
             var Message = await Cache.GetOrDownloadAsync();
-            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages || CommandExecuted) return;
+            if (Message == null || Config == null || !Config.Mod.LogDeletedMessages || Message.Author.IsBot) return;
             Config.DeletedMessages.Add(new MessageWrapper
             {
                 ChannelId = Channel.Id,
