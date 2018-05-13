@@ -43,7 +43,7 @@ namespace Valerie.Helpers
             XPHandlerAsync(Message, Config);
             ExecuteTagAsync(Message, Config);
             AFKHandlerAsync(Message, Config);
-            CleverbotHandlerAsync(Message, Config);
+            CleverbotHandlerAsync(Message, Config).ConfigureAwait(false);
             ModeratorAsync(Message as SocketUserMessage, Config);
             return Task.CompletedTask;
         }
@@ -71,7 +71,7 @@ namespace Valerie.Helpers
             var GetTime = XPUserList.ContainsKey(User.Id) ? XPUserList[User.Id] : DateTime.UtcNow;
             var BlacklistedRoles = new List<ulong>(Config.ChatXP.ForbiddenRoles.Select(x => x));
             var HasRole = (User as IGuildUser).RoleIds.Intersect(BlacklistedRoles).Any();
-            if (HasRole || !Config.ChatXP.IsEnabled || GetTime.AddSeconds(60) > DateTime.UtcNow) return Task.CompletedTask;
+            if (HasRole || !Config.ChatXP.IsEnabled || !(GetTime.AddSeconds(60) > DateTime.UtcNow)) return Task.CompletedTask;
             var Profile = GuildHelper.GetProfile(User.GuildId, User.Id);
             int Old = Profile.ChatXP;
             Profile.ChatXP += Random.Next(Message.Content.Length);
@@ -155,11 +155,13 @@ namespace Valerie.Helpers
                 await Guild.GetTextChannel(Config.Mod.TextChannel).SendMessageAsync(
                     $"**Kick** | Case {Config.Mod.Cases.Count + 1}\n**User:** {Message.Author} ({Message.Author.Id})\n**Reason:** Reached Max Warnings.\n" +
                     $"**Responsible Moderator:** {Client.CurrentUser}");
+                await GuildHelper.LogAsync(Guild, Message.Author, Client.CurrentUser, CaseType.Kick, Warning);
             }
             else
             {
                 Profile.Warnings++;
                 GuildHelper.SaveProfile(Guild.Id, Message.Author.Id, Profile);
+                await GuildHelper.LogAsync(Guild, Message.Author, Client.CurrentUser, CaseType.Warning, Warning);
             }
             await Message.Channel.SendMessageAsync(Warning);
         }
