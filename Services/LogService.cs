@@ -2,7 +2,6 @@
 using System.IO;
 using Valerie.Enums;
 using System.Drawing;
-using System.Diagnostics;
 using Console = Colorful.Console;
 
 namespace Valerie.Services
@@ -37,19 +36,10 @@ namespace Valerie.Services
 
         public void PrintApplicationInformation()
         {
-            string Arch = Environment.Is64BitOperatingSystem ? "x64" : "x32";
             Console.WriteAscii("VALERIE", Color.Pink);
             Append("-> INFORMATION\n", Color.Crimson);
-            Append(
-                "      Author   :  Yucked\n" +
-                "      Version  :  18.4.X - Stable\n" +
-                "      Discord  :  Discord.me/Glitched\n\n", Color.Bisque);
-            Append("-> PACKAGES\n", Color.Crimson);
-            Append(
-                $"      Discord  :  {Discord.DiscordConfig.Version}\n" +
-                $"      RavenDB  :  {Raven.Client.Properties.RavenVersionAttribute.Instance.FullVersion}\n" +
-                $"      Cookie   :  {Cookie.CookieClient.Version}\n" +
-                $"      Colorful :  1.2.6\n\n", Color.Bisque);
+            Append("    Author: Yucked | Discord: Https://Discord.me/Glitched\n", Color.Bisque);
+            Append($"\n=======================[ {DateTime.UtcNow} ]=======================\n", Color.Crimson);
             FileLog($"\n\n=================================[ {DateTime.Now} ]=================================\n\n");
         }
     }
