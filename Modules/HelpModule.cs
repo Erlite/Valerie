@@ -31,7 +31,7 @@ namespace Valerie.Modules
         }
 
 
-        [Command("Info"), Alias("Help"), Summary("Shows more information about a command and it's usage.")]
+        [Command("Help"), Summary("Shows more information about a command and it's usage.")]
         public Task CommandInfoAsync([Remainder] string CommandName)
         {
             var Command = CommandService.Search(Context, CommandName).Commands?.FirstOrDefault().Command;
