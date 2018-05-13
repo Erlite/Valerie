@@ -20,7 +20,8 @@ namespace Valerie.Addons.Preconditions
         {
             var Context = context as IContext;
             var GuildUser = Context.User as SocketGuildUser;
-            var AdminPerms = Context.Guild.OwnerId == Context.User.Id || GuildUser.GuildPermissions.Administrator || GuildUser.GuildPermissions.ManageGuild;
+            var Owner = Context.Client.GetApplicationInfoAsync().GetAwaiter().GetResult();
+            var AdminPerms = Context.Guild.OwnerId == Context.User.Id || GuildUser.GuildPermissions.Administrator || GuildUser.GuildPermissions.ManageGuild || GuildUser.Id == Owner.Owner.Id;
             var ModPerms = new[] { GuildPermission.KickMembers, GuildPermission.BanMembers, GuildPermission.ManageChannels, GuildPermission.ManageMessages, GuildPermission.ManageRoles };
             if (AccessLevel >= AccessLevel.ADMINISTRATOR && AdminPerms) return Task.FromResult(PreconditionResult.FromSuccess());
             else if (AccessLevel >= AccessLevel.MODERATOR && ModPerms.Any(x => GuildUser.GuildPermissions.Has(x))) return Task.FromResult(PreconditionResult.FromSuccess());
