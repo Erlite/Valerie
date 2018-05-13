@@ -34,15 +34,12 @@ namespace Valerie.Services
         }
 
         public void Initialize()
-        {
-            AutoFeedTimer = new Timer(_ =>
-           {
-               foreach (var Server in Store.OpenSession().Query<GuildModel>().Customize(x => x.WaitForNonStaleResults())
-                .Where(x => x.Reddit.IsEnabled == true && x.Reddit.Subreddits.Any() == true && x.Reddit.Webhook != null))
-                   Start(Convert.ToUInt64(Server.Id));
-           }, null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(30));
-        }
-
+            => AutoFeedTimer = new Timer(_ =>
+             {
+                 foreach (var Server in Store.OpenSession().Query<GuildModel>().Customize(x => x.WaitForNonStaleResults())
+                  .Where(x => x.Reddit.IsEnabled == true && x.Reddit.Subreddits.Any() == true && x.Reddit.Webhook != null))
+                     Start(Convert.ToUInt64(Server.Id));
+             }, null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(30));
 
         public Task Start(ulong GuildId)
         {
