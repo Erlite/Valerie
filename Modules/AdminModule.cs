@@ -397,11 +397,11 @@ namespace Valerie.Modules
                 $"**Subbed To Following Subreddits:** {string.Join("\n", $"{Emotes.Next}{Context.Server.Reddit.Subreddits}")}");
 
         [Command("MessageLog"), Summary("Retrives messages from deleted messages.")]
-        public Task MessageLogAsync(int Old = 0)
+        public Task MessageLogAsync(int Recent = 0)
         {
-            if (!Context.Server.DeletedMessages.Any() || Context.Server.DeletedMessages[Old] == null)
+            if (!Context.Server.DeletedMessages.Any() || Context.Server.DeletedMessages.Count < Recent)
                 return ReplyAsync("Failed to retrive deleted messages.");
-            var Get = Old == 0 ? Context.Server.DeletedMessages.LastOrDefault() : Context.Server.DeletedMessages[Old];
+            var Get = Recent == 0 ? Context.Server.DeletedMessages.LastOrDefault() : Context.Server.DeletedMessages[Recent];
             var User = StringHelper.CheckUser(Context.Client, Get.AuthorId);
             var GetUser = (Context.Client as DiscordSocketClient).GetUser(Get.AuthorId);
             var Embed = GetEmbed(Paint.Aqua)
@@ -416,6 +416,7 @@ namespace Valerie.Modules
         {
             User = User ?? Context.User as SocketGuildUser;
             if (!Context.Server.DeletedMessages.Any(x => x.AuthorId == User.Id)) return ReplyAsync($"Coudln't find any deleted messages from user {User.Username}.");
+            if (Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).Count() < Recent) return ReplyAsync($"Failed to retrive message.");
             var Get = Recent == 0 ? Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).LastOrDefault()
                 : Context.Server.DeletedMessages.Where(x => x.AuthorId == User.Id).ToList()[Recent];
             var GetUser = (Context.Client as DiscordSocketClient).GetUser(Get.AuthorId);
