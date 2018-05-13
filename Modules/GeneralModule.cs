@@ -228,8 +228,8 @@ namespace Valerie.Modules
         [Command("Coffee"), Summary("Buy me a coffee!")]
         public Task CoffeeAsync()
             => ReplyAsync(string.Empty, GetEmbed(Paint.Yellow)
-                .WithAuthor("Buy Me A Coffee", "https://www.buymeacoffee.com/assets/img/guidelines/logo-mark-2.svg")
-                .WithDescription($"Hello! If you love Valerie feel free to buy me a coffee: https://www.buymeacoffee.com/Yucked")
+                .WithThumbnailUrl("https://i.imgur.com/6iwKGOr.png")
+                .WithDescription($"Hello! If you love Valerie feel free to buy me a coffee: https://buymeacoff.ee/Yucked")
                 .WithImageUrl("https://www.buymeacoffee.com/assets/img/guidelines/bmc-coffee.gif").Build());
     }
 }
