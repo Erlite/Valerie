@@ -51,6 +51,7 @@ namespace Valerie.Models
 
     public class CaseWrapper
     {
+        public string User { get; set; }
         public ulong ModId { get; set; }
         public ulong UserId { get; set; }
         public string Reason { get; set; }
@@ -63,6 +64,10 @@ namespace Valerie.Models
     {
         Ban,
         Kick,
+        Mute,
+        Warning,
+        MassKick,
+        MassBan,
         AutoMod
     }
 
