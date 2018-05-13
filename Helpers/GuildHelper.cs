@@ -58,13 +58,35 @@ namespace Valerie.Helpers
                     $"**Responsible Moderator:** {Context.User}");
             Context.Server.Mod.Cases.Add(new CaseWrapper
             {
-                Reason = Reason,
+                User = $"{User}",
                 UserId = User.Id,
+                Reason = Reason,
                 CaseType = CaseType,
                 MessageId = Message.Id,
                 ModId = Context.User.Id,
                 CaseNumber = Context.Server.Mod.Cases.Count + 1
             });
+        }
+
+        public async Task LogAsync(SocketGuild Guild, IUser User, IUser Mod, CaseType CaseType, string Reason)
+        {
+            var Server = GuildHandler.GetGuild(Guild.Id);
+            Reason = Reason ?? $"*Responsible moderator, please type `{Server.Prefix}Reason {Server.Mod.Cases.Count + 1} <Reason>`*";
+            var ModChannel = Guild.GetTextChannel(Server.Mod.TextChannel);
+            if (ModChannel == null) return;
+            var Message = await ModChannel.SendMessageAsync($"**{CaseType}** | Case {Server.Mod.Cases.Count + 1}\n**User:** {User} ({User.Id})\n**Reason:** {Reason}\n" +
+                    $"**Responsible Moderator:** {Mod}");
+            Server.Mod.Cases.Add(new CaseWrapper
+            {
+                User = $"{User}",
+                UserId = User.Id,
+                ModId = Mod.Id,
+                Reason = Reason,
+                CaseType = CaseType,
+                MessageId = Message.Id,
+                CaseNumber = Server.Mod.Cases.Count + 1
+            });
+            GuildHandler.Save(Server);
         }
 
         public Task PurgeAync(IEnumerable<IUserMessage> Messages, ITextChannel Channel, int Amount)
