@@ -196,19 +196,20 @@ namespace Valerie.Modules
             string FavCommand = !GuildProfile.Commands.Any() ? $"None {Emotes.Squint}" : $"{Commands.FirstOrDefault().Key} ({Commands.FirstOrDefault().Value} times)";
             var Blacklisted = GuildProfile.IsBlacklisted ? Emotes.ThumbUp : Emotes.ThumbDown;
             int TotalXp = Profiles.Sum(x => x.Sum(y => y.Value.ChatXP));
-            int Level = IntHelper.NextLevelXP(IntHelper.GetLevel(TotalXp));
 
             var Embed = GetEmbed(Paint.Magenta)
                 .WithAuthor($"👾 {User.Username} Profile", User.GetAvatarUrl())
                 .WithThumbnailUrl(User.GetAvatarUrl())
                 .AddField("Server Stats",
-                $"**Level:** {IntHelper.GetLevel(GuildProfile.ChatXP)}  ({GuildProfile.ChatXP} / {IntHelper.NextLevelXP(IntHelper.GetLevel(GuildProfile.ChatXP))})\n" +
+                $"**Level:** {IntHelper.GetLevel(GuildProfile.ChatXP)}\n" +
                 $"**Stars:** {Context.Server.Starboard.StarboardMessages.Where(x => x.AuthorId == User.Id).Sum(x => x.Stars)}\n" +
-                $"**Crystals:** {GuildProfile.Crystals}", true)
+                $"**Crystals:** {GuildProfile.Crystals}\n", true)
                 .AddField("Global Stats",
-                $"**XP:** {TotalXp} / {Level}\n" +
+                $"**XP:** {TotalXp}\n" +
                 $"**Stars:** {Starboard.Sum(x => x.Sum(y => y.Stars))}\n" +
-                $"**Crystals:** {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}", true)
+                $"**Crystals:** {Profiles.Sum(x => x.Sum(y => y.Value.Crystals))}\n", true)
+                .AddField("\u200B", "\u200B", true)
+                .AddField("\u200B", "\u200B", true)
                 .AddField("Blacklisted?", Blacklisted, true)
                 .AddField("Favorite Command", FavCommand, true);
             return ReplyAsync(string.Empty, Embed.Build());
