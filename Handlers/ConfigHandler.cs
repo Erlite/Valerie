@@ -12,7 +12,6 @@ namespace Valerie.Handlers
     {
         IDocumentStore Store { get; }
         public ConfigHandler(IDocumentStore store) => Store = store;
-
         public ConfigModel Config { get { using (var Session = Store.OpenSession()) return Session.Load<ConfigModel>("Config"); } }
         public CookieClient Cookie
         {
