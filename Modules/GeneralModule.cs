@@ -231,5 +231,11 @@ namespace Valerie.Modules
                 .WithThumbnailUrl("https://i.imgur.com/6iwKGOr.png")
                 .WithDescription($"Hello! If you love Valerie feel free to buy me a coffee: https://buymeacoff.ee/Yucked")
                 .WithImageUrl("https://www.buymeacoffee.com/assets/img/guidelines/bmc-coffee.gif").Build());
+
+        [Command("Info"), Summary("Shows information about certain topics.")]
+        public async Task InfoAsync()
+        {
+
+        }
     }
 }
