@@ -16,13 +16,13 @@ namespace Valerie.Modules
     public class ModModule : Base
     {
         [Command("Kick"), Summary("Kicks a user out of the server."), RequireBotPermission(GuildPermission.KickMembers)]
-        public async Task KickAsync(IGuildUser User, [Remainder]string Reason = null)
+        public Task KickAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             if (Context.GuildHelper.HierarchyCheck(Context.Guild, User))
-            { await ReplyAsync($"Can't kick someone whose highest role is higher than valerie's roles. ");  return;}
-            await User.KickAsync(Reason).ConfigureAwait(false);
-            await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, Reason).ConfigureAwait(false);
-            await ReplyAsync($"***{User} got kicked.*** {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
+                return ReplyAsync($"Can't kick someone whose highest role is higher than valerie's roles. ");
+            User.KickAsync(Reason);
+            Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, Reason).ConfigureAwait(false);
+            return ReplyAsync($"***{User} got kicked.*** {Emotes.Hammer}", Document: DocumentType.Server);
         }
 
         [Command("MassKick"), Summary("Kicks multiple users at once."), RequireBotPermission(GuildPermission.KickMembers)]
@@ -33,19 +33,19 @@ namespace Valerie.Modules
             {
                 if (Context.GuildHelper.HierarchyCheck(Context.Guild, User)) continue;
                 await User.KickAsync("Multiple kicks.").ConfigureAwait(false);
-                await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, "Multiple kicks.").ConfigureAwait(false);
+                await Context.GuildHelper.LogAsync(Context, User, CaseType.MassKick, "Multiple kicks.").ConfigureAwait(false);
             }
             await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got kicked. {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
         }
 
         [Command("Ban"), Summary("Bans a user from the server."), RequireBotPermission(GuildPermission.BanMembers)]
-        public async Task BanAsync(IGuildUser User, [Remainder]string Reason = null)
+        public Task BanAsync(IGuildUser User, [Remainder]string Reason = null)
         {
             if (Context.GuildHelper.HierarchyCheck(Context.Guild, User))
-            { await ReplyAsync($"Can't ban someone whose highest role is higher than valerie's roles. ");  return;}
-            await Context.Guild.AddBanAsync(User, 7, Reason).ConfigureAwait(false);
-            await Context.GuildHelper.LogAsync(Context, User, CaseType.Ban, Reason).ConfigureAwait(false);
-            await ReplyAsync($"***{User} got banned.*** {Emotes.Hammer}", Document: DocumentType.Server).ConfigureAwait(false);
+                return ReplyAsync($"Can't ban someone whose highest role is higher than valerie's roles. ");
+            Context.Guild.AddBanAsync(User, 7, Reason).ConfigureAwait(false);
+            Context.GuildHelper.LogAsync(Context, User, CaseType.Ban, Reason).ConfigureAwait(false);
+            return ReplyAsync($"***{User} got banned.*** {Emotes.Hammer}", Document: DocumentType.Server);
         }
 
         [Command("MassBan"), Summary("Bans multiple users at once."), RequireBotPermission(GuildPermission.BanMembers)]
@@ -56,7 +56,7 @@ namespace Valerie.Modules
             {
                 if (Context.GuildHelper.HierarchyCheck(Context.Guild, User)) continue;
                 await Context.Guild.AddBanAsync(User, 7, "Mass Ban.");
-                await Context.GuildHelper.LogAsync(Context, User, CaseType.Ban, "Multiple bans.");
+                await Context.GuildHelper.LogAsync(Context, User, CaseType.MassBan, "Multiple bans.");
             }
             await ReplyAsync($"{string.Join(", ", Users.Select(x => $"*{x.Username}*"))} got bent {Emotes.Hammer}", Document: DocumentType.Server);
         }
@@ -88,14 +88,15 @@ namespace Valerie.Modules
             await ReplyAsync($"Case #{CaseNum} has been updated.", Document: DocumentType.Server);
         }
 
-        [Command("Purge"), Priority(0), Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
+        [Command("Purge"), Priority(10),
+            Summary("Deletes all messages from a channel."), RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeAsync(int Amount = 10)
         {
             var GetMessages = await Context.Channel.GetMessagesAsync(Amount).FlattenAsync();
             await Context.GuildHelper.PurgeAync(GetMessages.Cast<IUserMessage>(), Context.Channel as ITextChannel, Amount).ConfigureAwait(false);
         }
 
-        [Command("Purge"), Priority(10),
+        [Command("Purge"), Priority(0),
             Summary("Purges specified user messages with specified limit. If no user is provided, default user will be bot and default limit will be 10."),
             RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task PurgeUserAsync(SocketGuildUser User = null, int Amount = 10)
@@ -114,11 +115,12 @@ namespace Valerie.Modules
                 return;
             }
             if (Context.GuildHelper.HierarchyCheck(Context.Guild, User))
-            { await ReplyAsync($"Can't mute someone whose highest role is higher than valerie's roles. "); return;}
+            { await ReplyAsync($"Can't mute someone whose highest role is higher than valerie's roles. "); return; }
             if (Context.Guild.Roles.Contains(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted")))
             {
                 Context.Server.Mod.MuteRole = Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted").Id;
                 await User.AddRoleAsync(Context.Guild.Roles.FirstOrDefault(x => x.Name == "Muted"));
+                await Context.GuildHelper.LogAsync(Context, User, CaseType.Mute, string.Empty);
                 await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}", Document: DocumentType.Server);
                 return;
             }
@@ -131,12 +133,14 @@ namespace Valerie.Modules
                         await Channel.AddPermissionOverwriteAsync(Role, Permissions).ConfigureAwait(false);
                 Context.Server.Mod.MuteRole = Role.Id;
                 await User.AddRoleAsync(Role);
+                await Context.GuildHelper.LogAsync(Context, User, CaseType.Mute, string.Empty);
                 await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}", Document: DocumentType.Server);
                 return;
             }
 
             await User.AddRoleAsync(Context.Guild.GetRole(Context.Server.Mod.MuteRole));
-            await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}");
+            await Context.GuildHelper.LogAsync(Context, User, CaseType.Mute, string.Empty);
+            await ReplyAsync($"{User} has been muted {Emotes.ThumbDown}", Document: DocumentType.Server);
         }
 
         [Command("Unmute"), Summary("Umutes a user."), RequireBotPermission(GuildPermission.ManageRoles)]
@@ -152,7 +156,7 @@ namespace Valerie.Modules
         public async Task WarnAysnc(IGuildUser User, [Remainder]string Reason)
         {
             string WarnMessage = $"**[Warned in {Context.Guild}]** {Reason}";
-            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync(WarnMessage);
+            await (await User.GetOrCreateDMChannelAsync()).SendMessageAsync($"**Warning in {Context.Guild.Name}**\n\n```{WarnMessage}```");
             var Profile = Context.GuildHelper.GetProfile(Context.Guild.Id, User.Id);
             Profile.Warnings++;
             if (Profile.Warnings >= 3)
@@ -161,7 +165,8 @@ namespace Valerie.Modules
                 await Context.GuildHelper.LogAsync(Context, User, CaseType.Kick, Reason);
             }
             Context.GuildHelper.SaveProfile(Context.Guild.Id, User.Id, Profile);
-            await ReplyAsync($"{User} has been warned {Emotes.Shout}");
+            await Context.GuildHelper.LogAsync(Context, User, CaseType.Warning, Reason);
+            await ReplyAsync($"{User} has been warned {Emotes.Shout}", Document: DocumentType.Server);
         }
 
         [Command("ResetWarns"), Summary("Resets users warnings.")]
@@ -197,7 +202,7 @@ namespace Valerie.Modules
         public async Task TimeoutAsync(SocketGuildUser User, int Minutes)
         {
             if (Context.GuildHelper.HierarchyCheck(Context.Guild, User))
-            { await ReplyAsync($"Can't mute someone whose highest role is higher than valerie's roles. "); return;}
+            { await ReplyAsync($"Can't mute someone whose highest role is higher than valerie's roles. "); return; }
             var Roles = User.Roles.Where(x => x.IsEveryone == false);
             await User.RemoveRolesAsync(Roles).ContinueWith(async _ => await MuteAsync(User));
             _ = Task.Delay(TimeSpan.FromMinutes(Minutes)).ContinueWith(async y =>
