@@ -9,7 +9,7 @@ namespace Valerie.Addons.Preconditions
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext Context, CommandInfo Info, IServiceProvider Provider)
         {
             var Channel = Context.Channel as Discord.ITextChannel;
-            if (Channel.IsNsfw || Channel.Name.Contains("nsfw")) return Task.FromResult(PreconditionResult.FromSuccess());
+            if (Channel.IsNsfw) return Task.FromResult(PreconditionResult.FromSuccess());
             return Task.FromResult(PreconditionResult.FromError($"**{Info.Name}** command can only be ran in NSFW channel, pervert."));
         }
     }
